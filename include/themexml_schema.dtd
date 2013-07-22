@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- root element -->
+<!ELEMENT sqlyogtheme (framewindow, mdiclient, mdichild, menu, menubar, toolbar, maintoolbar, hsplitter, vsplitter, conntab, querytab, restab, tabletab)>
+<!ATTLIST sqlyogtheme
+          name CDATA #IMPLIED>
+          <!-- main application window -->
+          <!ELEMENT framewindow (background)>
+          
+          <!-- menu bar for the application window -->
+          <!ELEMENT menubar (background, foreground, text, seltext, selected)>
+                    <!-- background property -->
+                    <!ELEMENT background EMPTY>
+                    <!ATTLIST background
+                              color1 CDATA #REQUIRED
+                              color2 CDATA #IMPLIED
+                              image CDATA #IMPLIED>
+
+                    <!-- highlight property -->
+                    <!ELEMENT foreground EMPTY>
+                    <!ATTLIST foreground
+                              color1 CDATA #REQUIRED
+                              color2 CDATA #IMPLIED
+                              color3 CDATA #IMPLIED>
+                              
+                    <!-- normal text color -->
+                    <!ELEMENT text EMPTY>
+                    <!ATTLIST text
+                              active CDATA #REQUIRED
+                              inactive CDATA #REQUIRED>
+                              
+                    <!-- selected text color -->
+                    <!ELEMENT seltext EMPTY>
+                    <!ATTLIST seltext
+                              active CDATA #REQUIRED
+                              inactive CDATA #REQUIRED>
+                              
+                    <!ELEMENT selected EMPTY>
+                    <!ATTLIST selected
+                              color1 CDATA #REQUIRED
+                              color2 CDATA #REQUIRED>
+          
+          <!-- popup menu -->
+          <!ELEMENT menu (background, foreground, text, seltext, selected)>
+
+          <!-- toolbar for the application window -->
+          <!ELEMENT maintoolbar (background, foreground, selected)>
+
+          <!-- connection tab -->
+          <!ELEMENT conntab (background, foreground, selectedtab, seperator, tabtext, seltabtext, plusbutton, dragarrow, closebutton, hyperlink)>
+          <!ATTLIST conntab
+                    tabbottomline CDATA #REQUIRED>
+                    <!-- selected tab -->
+                    <!ELEMENT selectedtab EMPTY>
+                    <!ATTLIST selectedtab
+                              color2 CDATA #REQUIRED
+                              color1 CDATA #IMPLIED>
+
+                    <!-- seperator lines in the tab -->
+                    <!ELEMENT seperator EMPTY>
+                    <!ATTLIST seperator
+                              highlight CDATA #REQUIRED
+                              active CDATA #IMPLIED
+                              inactive CDATA #IMPLIED>
+
+                    <!-- the color used to draw tab text -->
+                    <!ELEMENT tabtext EMPTY>
+                    <!ATTLIST tabtext
+                              color1 CDATA #REQUIRED>
+                              
+                    <!-- color used to draw selected tab text -->
+                    <!ELEMENT seltabtext EMPTY>
+                    <!ATTLIST seltabtext
+                              color1 CDATA #REQUIRED>
+                              
+                    <!-- the plus button next to the tabs -->
+                    <!ELEMENT plusbutton EMPTY>
+                    <!ATTLIST plusbutton
+                              color1 CDATA #REQUIRED>
+
+                    <!-- drag arrow -->
+                    <!ELEMENT dragarrow EMPTY>
+                    <!ATTLIST dragarrow
+                              color1 CDATA #REQUIRED>
+
+                    <!-- close button on tabs -->
+                    <!ELEMENT closebutton EMPTY>
+                    <!ATTLIST closebutton
+                              color1 CDATA #REQUIRED>
+                              
+                    <!-- hyperlink property -->
+                    <!ELEMENT hyperlink EMPTY>
+                    <!ATTLIST hyperlink
+                              color1 CDATA #REQUIRED>
+
+          <!-- the blank area with no active connection -->
+          <!ELEMENT mdiclient (background)>
+
+          <!-- connection window -->
+          <!ELEMENT mdichild (background, hyperlink)>
+
+          <!-- vertical splitter seperating object browser and Query level tabs -->
+          <!ELEMENT vsplitter (line, background)>
+                    <!-- line property -->
+                    <!ELEMENT line EMPTY>
+                    <!ATTLIST line
+                              color1 CDATA #REQUIRED>
+
+          <!-- Query tab, the tabs shown on top in a connection window -->
+          <!ELEMENT querytab (background, foreground, selectedtab, seperator, tabtext, seltabtext, plusbutton, dragarrow, closebutton, hyperlink)>
+          <!ATTLIST querytab
+                    tabbottomline CDATA #REQUIRED
+                    border CDATA #REQUIRED>
+
+          <!-- any toolbar other than the main application toolbar -->
+          <!ELEMENT toolbar (background, foreground, selected)>
+
+          <!-- horizontal splitter -->
+          <!ELEMENT hsplitter (line, background)>
+
+          <!-- bottom tabs under Query editor tab -->
+          <!ELEMENT restab (background, foreground, selectedtab, seperator, tabtext, seltabtext, plusbutton, dragarrow, closebutton, hyperlink)>
+          <!ATTLIST restab
+                    tabbottomline CDATA #REQUIRED
+                    border CDATA #REQUIRED>
+
+          <!-- table tab for create/alter tab -->
+          <!ELEMENT tabletab (background, foreground, selectedtab, seperator, tabtext, seltabtext, plusbutton, dragarrow, closebutton, hyperlink)>
+          <!ATTLIST tabletab
+                    tabbottomline CDATA #REQUIRED
+                    border CDATA #REQUIRED>
+

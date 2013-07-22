@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3361">列表功能和常规参数	Ctrl+Shift+Space</string>
+	<string name="3362">你们&amp;所有</string>
+	<string name="3363">N&amp;所有</string>
+	<string name="3364">&amp;还原</string>
+	<string name="3365">&amp;4高级</string>
+	<string name="3366">引擎</string>
+	<string name="3367">复制所有</string>
+	<string name="3368">列名</string>
+	<string name="3370">主键？</string>
+	<string name="3371">非空？</string>
+	<string name="3372">二进制？</string>
+	<string name="3373">Unsigned</string>
+	<string name="3374">自增？</string>
+	<string name="3375">Zerofill？</string>
+	<string name="3376">索引名</string>
+	<string name="3377">索引类型</string>
+	<string name="3378">约束名</string>
+	<string name="3379">引用列</string>
+	<string name="3380">引用数据库</string>
+	<string name="3381">引用表</string>
+	<string name="3382">引用列</string>
+	<string name="3383">更新</string>
+	<string name="3384">删除</string>
+	<string name="3385">未指定表名</string>
+	<string name="3386">列名和数据类型不能为空</string>
+	<string name="3387">未指定数据类型</string>
+	<string name="3388">默认空串(&apos;&apos;)不支持%s数据类型</string>
+	<string name="3389">%s数据类型的长度必须指定</string>
+	<string name="3390">表中没有列。至少定义一列</string>
+	<string name="3391">创建表成功</string>
+	<string name="3392">没有定义列</string>
+	<string name="3393">没有选择列</string>
+	<string name="3394">没有外键引用选中的列</string>
+	<string name="3395">没有选择引用的数据库</string>
+	<string name="3396">没有选择引用的表</string>
+	<string name="3397">没有为外键选择引用列</string>
+	<string name="3398">没有匹配引用和被引用的列的数目</string>
+	<string name="3399">数据类型</string>
+	<string name="3400">长度</string>
+	<string name="3401">选择必选列。使用向上/向下按钮重排</string>
+	<string name="3402">没有提交要执行的查询</string>
+	<string name="3403">表创建成功。
+你要创建更多表吗？</string>
+	<string name="3404">选定的列引用一个或多个索引。删除这些列也将修改相应的指标。
+你要继续吗？</string>
+	<string name="3405">选定的列引用一个或多个索引。删除这些列也将修改相应的指标。
+你要继续吗？</string>
+	<string name="3406">选定的列是由一个或多个索引和外键引用。删除这些列也将修改相应的索引和外键。
+你要继续吗？</string>
+	<string name="3407">所选的列引用一个或多个索引。删除这些列也将修改相应的指标。
+你要继续吗？</string>
+	<string name="3408">所选的列是由一个或多个外键引用。删除这些列也将修改相应的外键。
+
+你要继续吗？</string>
+	<string name="3409">所选的列是由一个或多个索引和外键引用。删除这些列也将修改相应的索引和外键。
+
+你要继续吗？</string>
+	<string name="3410">无法定义多个主键</string>
+	<string name="3411">你要删除索引吗？</string>
+	<string name="3412">你要删除选定的指数？</string>
+	<string name="3413">你要删除外键？</string>
+	<string name="3414">你要删除选中的外键？</string>
+	<string name="3415">在MySQL中没有直接的方式来改变外键。SQLyog会放弃现有的，并创建一个新的关键使用现有名称。
+如果外键（数据类型匹配，适当的索引等）的必要先决条件得不到满足，在创建过程将失败。其结果将是现有FK下降，没有新的创建。
+你能避免被指定为重点的新名称。
+你要继续吗？</string>
+	<string name="3416">你要删除此列？</string>
+	<string name="3417">你要删除选中的列？</string>
+	<string name="3418">更改表</string>
+	<string name="3419">使用数据库名</string>
+	<string name="3420">插入新行 (Alt+Ins)</string>
+	<string name="3421">删除选定行 (Alt+Del)</string>
+	<string name="3422">上移 （Alt+Up）</string>
+	<string name="3423">下移 （Alt+Down）</string>
+	<string name="3424">传送时间</string>
+	<string name="3425">无法切换到另一个标签页。请再创建一个连接 （Ctrl+N）</string>
+	<string name="3426">查询执行进展！</string>
+	<string name="3427">发生错误时退出</string>
+	<string name="3428">正则表达式</string>
+	<string name="3429">数据库排序规则</string>
+	<string name="3430">复制查询语句到剪贴板</string>
+	<string name="3431">复制查询语句到新标签页</string>
+	<string name="3432">复制查询语句到同一查询标签页</string>
+	<string name="3434">添加表到编辑栏</string>
+	<string name="3435">新建表</string>
+	<string name="3436">加载架构设计器（Ctrl+O）</string>
+	<string name="3437">刷新编辑栏（F5）</string>
+	<string name="3438">导出编辑栏为图片</string>
+	<string name="3439">打印</string>
+	<string name="3440">缩小</string>
+	<string name="3441">放大</string>
+	<string name="3443">新建视图</string>
+	<string name="3444">新建存储过程</string>
+	<string name="3445">新建触发器</string>
+	<string name="3446">新建函数</string>
+	<string name="3447">新建事件</string>
+	<string name="3448">初始化命令</string>
+	<string name="3449">(用分号&apos;；&apos;分割多个命令)</string>
+	<string name="3450">字体编辑器设置</string>
+	<string name="3451">对象浏览器</string>
+	<string name="3452">设置foreign_key_checks = 0</string>
+	
+	
+	<string name="3453">在新选项卡中打开表格</string>
+	<string name="3458">表格数据</string>
+<!--string name="3459" is in file2.xml -->
+	<string name="3460">在新选项卡中打开表格	Ctrl+F11</string>
+	<string name="3461">初始化命令</string>
+	
+	<string name="3463">表的数据	F11</string>
+	<string name="3464">背景 颜色</string>
+	<string name="3465">前台颜色</string>
+	<string name="3466">从对象浏览器选择表/视图</string>
+	<string name="3467">插入新列（Alt+Ins）</string>
+	<string name="3468">删除选中列（Alt+Del）</string>
+	<string name="3469">删除选中索引（Alt+Del）</string>
+	<string name="3470">插入新索引（Alt+Ins）</string>
+	<string name="3471">删除选中外键（Alt+Del）</string>
+	<string name="3472">插入新外键（Alt+Ins）</string>
+	<string name="3477">在表数据/结果选项卡中分页</string>
+	<string name="3478">默认行数</string>
+	<string name="3479">工具栏大小</string>
+	<string name="3480">主题</string>
+	<string name="3481">小</string>
+	<string name="3482">中</string>
+	<string name="3483">大</string>
+	<string name="3484">执行所有</string>
+	<string name="3486">（注意：用；分割多个查询）</string>
+	<string name="3487">创建表/视图</string>
+	<string name="3488">刷新	F9</string>
+	<string name="3489">生成%s查询失败</string>
+	<string name="3490">SQLyog无法识别数据库的选中表。
+
+你要使用激活的数据库上下文吗？</string>
+	<string name="3491">选中数据库。请选择数据库并重试</string>
+</resources>

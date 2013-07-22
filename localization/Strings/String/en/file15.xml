@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3550">Total differences found: %d</string>
+	<string name="3551">&lt; Previous Difference</string>
+	<string name="3552">Next Difference &gt;</string>
+	<string name="3553">Finding first difference%.*s</string>
+	<string name="3554">No differences found</string>
+	<string name="3555">Finding next difference%.*s</string>
+	<string name="3556">&amp;Visual Data Comparison Wizard...	Ctrl+Alt+Q</string>
+	<string name="3557">Welcome to Visual Data Comparison Wizard!</string>
+	<string name="3558">This wizard will guide you through the steps to compare data between two databases and merge the changes.
+
+A job file stores the configuration of this task. You can use the job file to run this task again in the future.</string>
+	<string name="3559">Pause</string>
+	<string name="3560">Select a table to compare...</string>
+	<string name="3561">Visual Data Comparison Wizard</string>
+	<string name="3563">&amp;Visually merge data</string>
+	<string name="3564">With visual merging you can compare the rows side by side in source and target tables selected and merge the changes</string>
+	<string name="3565">Hide similar rows</string>
+	<string name="3566">Preview SQL</string>
+	<string name="3567">Explain</string>
+	<string name="3568">(Select a table...)</string>
+	<string name="3569">Filter tables in </string>
+	<string name="3570">Filter views in </string>
+	<string name="3571">Filter procedures in </string>
+	<string name="3572">Filter functions in </string>
+	<string name="3573">Filter events in </string>
+	<string name="3574">Filter triggers in </string>
+	<string name="3575">(View all databases)</string>
+	<string name="3576">Apply</string>
+</resources>

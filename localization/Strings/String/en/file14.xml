@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3527">All</string>
+	<string name="3528">Queries with errors</string>
+	<string name="3529">Queries with warnings</string>
+	<string name="3530">Queries with errors/warnings</string>
+	<string name="3531">Queries with result set</string>
+	<string name="3532">Queries without result set</string>
+	<string name="3533">%d queries executed, %d success, %d errors, %d warnings</string>
+	<string name="3534">Can&apos;t find Database you are looking for?</string>
+	<string name="3535">To sync databases located at different host(s), connect to multiple host(s) using 'File -> New-Connection'. The database dropdown will list all databases for all connections.</string>
+	<string name="3536">&amp;Skip this version</string>
+	<string name="3537">S&amp;elect/Deselect All</string>
+	<string name="3538">Filter Databases</string>
+	<string name="3539">Filter (Ctrl+Shift+B)</string>
+	<string name="3540">Can not find selected table in Object Browser.
+
+Remove Filter applied (if any) in Object Browser and Refresh Object Browser.</string>
+<string name="3541">View all databases</string>
+<string name="3542">Functions in </string>
+<string name="3543">Procedures in </string>
+<string name="3544">Tables in </string>
+<string name="3545">Events in </string>
+<string name="3546"> %d queries executed, %d success, %d errors, %d warnings</string>
+<string name="3547">Filter </string>
+<string name="3548">Triggers in </string>
+<string name="3549">Views in </string>
+</resources>

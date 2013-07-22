@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3527">전체</string>
+	<string name="3528">오류가 있는 쿼리</string>
+	<string name="3529">경고가 있는 쿼리</string>
+	<string name="3530">오류/경고가 있는 쿼리</string>
+	<string name="3531">리절트 셋이 있는 쿼리</string>
+	<string name="3532">리절트 셋이 없는 쿼리</string>
+	<string name="3533">%d 쿼리 실행, %d 성공, %d 오류, %d 경고</string>
+	<string name="3534">검색하는 데이터베이스를 찾을 수 없습니까?</string>
+	<string name="3535">서로 다른 호스트에 있는 데이터베이스를 동기화하려면, \'File -> New-Connection\'을 통해 다중 호스트에 연결하십시오.</string>
+	<string name="3536">이 버전 건너뛰기(&amp;S)</string>
+	<string name="3537">전체 선택/선택 해제</string>
+	<string name="3538">필터 데이터베이스</string>
+	<string name="3539">필터 (Ctrl+Shift+B)</string>
+	<string name="3540">오브젝트 브라우저에서 선택한 테이블을 찾을 수 없습니다.
+
+적용된 필터를 제거하고(만약 있으면) 오브젝트 브라우저를 새로고침 하세요.</string>
+	<string name="3541">모든 데이터베이스 보기</string>
+	<string name="3542">다음의 함수</string>
+	<string name="3543">다음의 프러시저</string>
+	<string name="3544">다음의 테이블</string>
+	<string name="3545">다음의 이벤트</string>
+	<string name="3546"> %d 쿼리 실행됨,  %d 성공, %d 오류, %d 경고</string>
+	<string name="3547">필터 </string>
+	<string name="3548">다음의 트리거</string>
+	<string name="3549">다음의 전망</string>
+
+</resources>

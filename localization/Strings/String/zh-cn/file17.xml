@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3595">找不到 Microsoft Office 用 64 位元驅動程式。下載</string>
+	<string name="3596">尋找第一批次差異中%.*s</string>
+	<string name="3597">尋找次一批次差異中%.*s</string>
+	<string name="3598">尋找前一批次差異中%.*s</string>
+	<string name="3599">表格不存在</string>
+	<string name="3600">綱要配對錯誤！請使用綱要同步工具修正。</string>
+	<string name="3601">不支援無主鍵／唯一鍵之對照表。</string>
+	<string name="3602">這個表格仍有尚未儲存的變更，</string>
+	<string name="3603">目前已開啟一或多個%s，請先關閉它們，以便關閉SQLyog。</string>
+	<string name="3604">你要繼續嗎？</string>
+	<string name="3605">个配置文件</string>
+</resources>

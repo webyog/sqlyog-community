@@ -1,0 +1,281 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1000">文本</string>
+	<string name="1001">图片</string>
+	<string name="1002">无法写入空值！</string>
+	<string name="1003">无法创建文件！</string>
+	<string name="1004">无法打开文件 ！</string>
+	<string name="1005">无法打开文件。数据没有改变。</string>
+	<string name="1006">所有变更将丢失。您要退出吗？</string>
+	<string name="1007">无法捕获信息。请检查您的权限。</string>
+	<string name="1008">无法为这个触发器捕获表单</string>
+	<string name="1009">查找开发端口出错</string>
+	<string name="1010">致命错误：网络错误：连接超时</string>
+	<string name="1011">HTTP隧道（只有专业版/企业版/旗舰版提供此功能）</string>
+	<string name="1012">SSH 通道（只有专业版／企业版／旗舰版提供）</string>
+	<string name="1013">SSH 加密（只有专业版／企业版／旗舰版提供）</string>
+	<string name="1014">现在就购买 SQLyog 专业版／企业版／旗舰版，启用此功能和更多其他功能。</string>
+	<string name="1015">警告：本计算机程序由版权法保护。未经授权的复制或分销这个程序或它的任何部分，会导致严重的民事和刑事处罚，将根据法律在最大程度上被起诉。</string>
+	<string name="1016">关于 SQLyog</string>
+	<string name="1017">关于 SQLyog 社区</string>
+	<string name="1018">您正在尝试一个新连接。
+连接将被储存。</string>
+	<string name="1019">您已变更连接细节。
+您要储存变更吗？</string>
+	<string name="1020">新连接</string>
+	<string name="1021">重新命名连接</string>
+	<string name="1022">请输入一个有效名称</string>
+	<string name="1023">连接已存在，请输入一个唯一的名称</string>
+	<string name="1024">格式查询</string>
+	<string name="1025">已计划的备份向导 (Ctrl+Alt+S)</string>
+	<string name="1026">导入外部数据向导(Ctrl+Alt+O)</string>
+	<string name="1027">架构同步工具 (Ctrl+Q)</string>
+	<string name="1028">数据库同步向导 (Ctrl+Alt+W)</string>
+	<string name="1029">SQL 计划和报告工具 (Ctrl+Alt+N)</string>
+	<string name="1030">新查询创建器 (Ctrl+K)</string>
+	<string name="1031">新架构设计器 (Ctrl+Alt+D)</string>
+	<string name="1032">获取 SQLyog 专业版／企业版／旗舰版</string>
+	<string name="1033">本功能在 SQLyog 专业版／企业版／旗舰版中可用。</string>
+	<string name="1034">本软件使用 GNU 通用公共许可（GPL，可能是最知名的开源许可）发布。GPL 许可的正式条款可以在http://www.fsf.org/licence 找到。</string>
+	<string name="1035">升级为 SQLyog 专业版／企业版／旗舰版</string>
+	<string name="1036">您确实要删除连接细节吗？</string>
+	<string name="1037">连接成功
+MySQL 版本：%s</string>
+	<string name="1038">连接信息</string>
+	<string name="1039">无法初始化新窗口。</string>
+	<string name="1040">如果您使用 HTTP 通道连接则此功能不可用</string>
+	<string name="1041">&amp;恢复</string>
+	<string name="1042">HTTP 错误号码%d
+%s</string>
+	<string name="1043">错误号码%d
+%s</string>
+	<string name="1044">连接：%d</string>
+	<string name="1045">建立标签文件</string>
+	<string name="1046">重新建立标签文件</string>
+	<string name="1047">预备</string>
+	<string name="1048">变更表单&amp;类型为</string>
+	<string name="1049">没有最近的文件</string>
+	<string name="1050">文件无法打开。</string>
+	<string name="1051">请连接到 MySQL 服务器</string>
+	<string name="1052">输入新视图名称</string>
+	<string name="1053">请输入新的程序名称。</string>
+	<string name="1054">输入新功能名称</string>
+	<string name="1055">输入新事件名称</string>
+	<string name="1056">输入新触发器名称</string>
+	<string name="1057">输入行号码</string>
+	<string name="1058">&amp;转到</string>
+	<string name="1059">改变数据库</string>
+	<string name="1060">&amp;改变</string>
+	<string name="1061">请提供一个有效的数据库名称</string>
+	<string name="1062">数据库成功改变</string>
+	<string name="1063">请提供一个有效的视图名称</string>
+	<string name="1064">无法创建视图&apos;%s&apos;；已经错在一个同名的表单或视图</string>
+	<string name="1065">请提供有效的事件名称</string>
+	<string name="1066">无法创建事件&apos;%s&apos;；事件已存在</string>
+	<string name="1067">请提供一个有效的程序名称</string>
+	<string name="1068">无法创建程序&apos;%s&apos;；程序已存在</string>
+	<string name="1069">请提供一个有效的功能名称</string>
+	<string name="1070">无法创建功能&apos;%s&apos;；功能已存在</string>
+	<string name="1071">请提供一个有效的触发器名称</string>
+	<string name="1072">无法创建触发器&apos;%s&apos;；已存在</string>
+	<string name="1073">行号码超出正常范围！</string>
+	<string name="1074">无法打开参考的查询文件。
+请确保查询文件确实存在。</string>
+	<string name="1075">选择的书签项为空。无可添加项。</string>
+	<string name="1076">读取书签文件出错。</string>
+	<string name="1077">无法找到&apos;%s&apos;
+请确认参考文件存在。</string>
+	<string name="1078">无法打开书签文件。</string>
+	<string name="1079">文件为空</string>
+	<string name="1080">无法打开参考文件。</string>
+	<string name="1081">无法写入参考文件。</string>
+	<string name="1082">&amp;粘贴 SQI 声明</string>
+	<string name="1083">没发现%s或已损坏。
+请重新安装%s。</string>
+	<string name="1084">（过滤已输入的值）</string>
+	<string name="1085">一个或多个储存的程序或视图已复制。
+他们可能包含 SQL &lt;source>数据库名称并将需要手动调整。</string>
+	<string name="1086">请至少选择一个对象</string>
+	<string name="1087">连接到源服务器</string>
+	<string name="1088">连接到目标服务器</string>
+	<string name="1089">已成功复制</string>
+	<string name="1090">没有可复制的项</string>
+	<string name="1091">复制时发生错误</string>
+	<string name="1092">中止复制...</string>
+	<string name="1093">复制数据库摘要</string>
+	<string name="1094">为%s创建表单结构</string>
+	<string name="1095">为%s复制数据（%ld行已完成）</string>
+	<string name="1096">为%s复制数据</string>
+	<string name="1097">复制%s...</string>
+	<string name="1098">从服务器获取%s的列表...</string>
+	<string name="1099">(%lu行))</string>
+	<string name="1100">已复制</string>
+	<string name="1101">查看&apos;%s&apos;复制</string>
+	<string name="1102">功能&apos;%s&apos;已复制</string>
+	<string name="1103">程序&apos;%s&apos;已复制</string>
+	<string name="1104">触发器&apos;%s&apos;已复制</string>
+	<string name="1105">事件&apos;%s&apos;已复制</string>
+	<string name="1106">%d%s已复制</string>
+	<string name="1107">&amp;复制</string>
+	<string name="1108">&amp;停止</string>
+	<string name="1109">无法打开架构文件</string>
+	<string name="1110">这个文件对编辑器来说太大。请考虑使用“工具”-〉从 SQL 堆存处恢复... 来代替</string>
+	<string name="1111">询问</string>
+	<string name="1112">- %s@%s - 为%s使用 SSH 通道</string>
+	<string name="1113">- %s@%s - 在%s使用 HTTP 通道</string>
+	<string name="1114">成功连接服务器</string>
+	<string name="1115">无法关闭连接。查询正在进行。</string>
+	<string name="1116">对象浏览器已刷新...</string>
+	<string name="1117">此选项卡的内容已变更。
+
+您要保存更改吗？</string>
+	<string name="1118">%s文件的内容已变更。
+
+您要保存更改吗？</string>
+	<string name="1119">文件无法保存。关闭动作将被取消。</string>
+	<string name="1120">无法创建文件。</string>
+	<string name="1121">无法写入到文件中。</string>
+	<string name="1122">执行错误。</string>
+	<string name="1123">执行成功</string>
+	<string name="1124">请将查询窗口设为可见以使用此选项</string>
+	<string name="1125">选择一个要插入的模板</string>
+	<string name="1126">数据库：%s</string>
+	<string name="1127">架构设计器</string>
+	<string name="1128">查询创建器</string>
+	<string name="1129">%s，错误号码：%d</string>
+	<string name="1130">此运行将导致%d行被%s。您要继续吗？
+
+请注意：如果有多行被更新，您可以关闭这个警告：“工具”－〉“选项”－〉“其他”－〉“提示”</string>
+	<string name="1131">已更新</string>
+	<string name="1132">已删除</string>
+	<string name="1133">您确定要删除选定的行吗？</string>
+	<string name="1134">您确定要删除目前选定的行吗？</string>
+	<string name="1135">无法复制数据到剪贴板上</string>
+	<string name="1136">不支持插入和更新空间数据类型。</string>
+	<string name="1137">重设过滤器</string>
+	<string name="1138">为保护您的数据不受意外损害，SQLyog 将检查更新过的数据库内容。
+在此结果集中的数据不是源自当前选定的数据库。
+
+要进行更新，您必须选择此结果源自的数据库。然后，SQLyog 将显示从这个结果集中可更新的数据库表单。</string>
+	<string name="1139">这个结果集可能并非源自目前在对象浏览器中选定的数据库。
+如果数据库上下文错误，编辑这个结果可能会导致数据损坏。
+请确保您所选择的数据库是您要执行的操作的数据库。
+要继续吗？</string>
+	<string name="1140">限制行</string>
+	<string name="1141">第一行：</string>
+	<string name="1142">行数：</string>
+	<string name="1143">刷新</string>
+	<string name="1144">导出为... (Ctrl+Shift+E)</string>
+	<string name="1145">复制数据</string>
+	<string name="1146">复制选定行的数据到剪贴板</string>
+	<string name="1147">插入新行</string>
+	<string name="1148">保存更改</string>
+	<string name="1149">删除选定行</string>
+	<string name="1150">取消变更</string>
+	<string name="1151">您无法编辑这个结果。
+请从下拉窗口中选择一个有效的表单。</string>
+	<string name="1152">[BLOB(DblClk To View)](%u字节)</string>
+	<string name="1153">...[BLOB(DblClk To View)]</string>
+	<string name="1154">您要储存这些变更吗？</string>
+	<string name="1155">（只读）</string>
+	<string name="1156">选择要删除的行！</string>
+	<string name="1157">停止</string>
+	<string name="1158">表格</string>
+	<string name="1159">网格</string>
+	<string name="1160">数据已修改但没有存储</string>
+	<string name="1161">请停止搜索更新/删除数据集</string>
+	<string name="1162">数据库：%s 表单：%s</string>
+	<string name="1163">错误代码：%d
+%s
+(%lu ms taken)</string>
+	<string name="1164">(%lu row(s) affected)
+(%lu ms taken)</string>
+	<string name="1165">(%lu row(s) returned)
+(%d ms taken)</string>
+	<string name="1166">没有执行查询。请在 SQL 窗口中输入查询或将光标放在一个查询上。</string>
+	<string name="1167">执行查询...</string>
+	<string name="1168">错误号码：%d</string>
+	<string name="1169">已被用户中止</string>
+	<string name="1170">结构已成功导出</string>
+	<string name="1171">%d 行已导出</string>
+	<string name="1172">打开导出文件出错。请检查您的架构文件细节。</string>
+	<string name="1173">写入文件时出错。</string>
+	<string name="1174">未选择数据库。请从下拉项中选择数据库。</string>
+	<string name="1175">另存为</string>
+	<string name="1176">&amp;停止</string>
+	<string name="1177">已成功导出</string>
+	<string name="1178">无法创建堆存文件。
+请确保堆存文件：
+1. 不是只读文件
+2. 没有被其他程序打开
+3. 文件路径存在</string>
+	<string name="1179">错误号码：%d
+%s</string>
+	<string name="1180">成功导出</string>
+	<string name="1181">&amp;导出</string>
+	<string name="1182">仅表单中有数据。您只能为堆存数据选择表单</string>
+	<string name="1183">仅表单中有数据。您只能为堆存数据选择表单</string>
+	<string name="1184">至少选择一个对象</string>
+	<string name="1185">没有可导出的项</string>
+	<string name="1186">导出表单：%s</string>
+	<string name="1187">导出视图：%s</string>
+	<string name="1188">导出程序：%s</string>
+	<string name="1189">导出功能：%s</string>
+	<string name="1190">导出事件：%s</string>
+	<string name="1191">导出触发器：%s</string>
+	<string name="1192">导出表单：%s
+导出行：%d</string>
+	<string name="1193">这在 SQL 语句中用最简单的形式保存了数据。
+附加表信息（索引，字符集，评论等）不会被保存。
+
+如果您想进行数据备份，则请使用“备份表单为 SQL 堆存”</string>
+	<string name="1194">请指定文件夹</string>
+	<string name="1195">至少选择一个表单</string>
+	<string name="1196">选择您要备份数据库的文件夹</string>
+	<string name="1197">备份数据库...</string>
+	<string name="1198">备份表单信息</string>
+	<string name="1199">获取行：</string>
+	<string name="1200">请指定一个文件名称</string>
+	<string name="1201">请至少选择一栏</string>
+	<string name="1202">可选的饱含在：</string>
+	<string name="1203">包含在：</string>
+	<string name="1204">导出为</string>
+	<string name="1205">无法创建文件</string>
+	<string name="1206">数据已成功导出</string>
+	<string name="1207">导出出错</string>
+	<string name="1208">无法写入到文件中！</string>
+	<string name="1209">AddMenu 出错</string>
+	<string name="1210">书签</string>
+	<string name="1211">书签出错</string>
+	<string name="1212">您输入的快捷方式名称在书签菜单中已经存在。
+要覆盖它吗？</string>
+	<string name="1213">添加书签</string>
+	<string name="1214">无法写入到书签文件</string>
+	<string name="1215">无法创建书签文件夹</string>
+	<string name="1216">请为此查询输入一个参考名称</string>
+	<string name="1217">请提供一个 SQL 文件名称</string>
+	<string name="1218">查询编辑器为空！
+请在编辑器中输入一些查询。</string>
+	<string name="1219">请指定文件夹名称</string>
+	<string name="1220">创建书签文件夹出错</string>
+	<string name="1221">重命名出错</string>
+	<string name="1222">您无法将&apos;%s&apos;移动到其本身中。</string>
+	<string name="1223">您确定要删除 &apos;%s&apos; 吗？</string>
+	<string name="1224">删除书签项目出错。</string>
+	<string name="1225">无法打开查询参考文件。
+请确保查询文件存在。</string>
+	<string name="1226">打开文件</string>
+	<string name="1227">完成对文件的搜索。无法找到&quot;%s&quot;</string>
+	<string name="1228">替换了%d例</string>
+	<string name="1229">替换</string>
+	<string name="1230">替换全部</string>
+	<string name="1231">查找</string>
+	<string name="1232">在这里输入过滤文本...</string>
+	<string name="1233">&amp;刷新</string>
+	<string name="1234">请停止此搜索以捕获母表中的行</string>
+	<string name="1235">&amp;列</string>
+	<string name="1236">&amp;表单</string>
+	<string name="1237">&amp;数据库</string>
+	<string name="1238">已重新连接 SQLyog</string>
+	<string name="1239">重新连接 SQLyog 失败</string>
+</resources>

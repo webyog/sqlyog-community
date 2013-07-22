@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3550">발견된 변경사항 합계: %d</string>
+	<string name="3551">&lt; 이전 변경사항</string>
+	<string name="3552">다음 변경사항 &gt;</string>
+	<string name="3553">최초 변경사항을 찾는 중%.*s</string>
+	<string name="3554">발견된 변경사항이 없음</string>
+	<string name="3555">다음 변경사항을 찾는 중%.*s</string>
+	<string name="3556">&amp;비주얼 데이터 비교 마법사...	Ctrl+Alt+Q</string>
+	<string name="3557">비주얼 데이터 비교 마법사에 오신 것을 환영합니다!</string>
+	<string name="3558">이 마법사는 두 개의 데이터베이스 사이의 데이터를 비교하여 변경사항을 병합하는 과정으로 여러분을 안내할 것입니다.
+
+작업 파일에 이 작업의 설정이 보관됩니다. 작업 파일을 사용하여, 나중에 다시 이 작업을 실행할 수 있습니다.</string>
+	<string name="3559">정지</string>
+	<string name="3560">비교를 위해 테이블을 선택하세요...</string>
+	<string name="3561">비주얼 데이터 비교 마법사</string>
+	<string name="3563">&amp;비주얼하게 데이터를 통합</string>
+	<string name="3564">비주얼 통합을 이용하여, 선택된 소스와 대상 테이블에 대해 각 행을 비교하여, 변경사항을 병합할 수 있습니다.</string>
+	<string name="3565">비슷한 열 숨기기</string>
+	<string name="3566">SQL 미리 보기</string>
+	<string name="3567">설명하다</string>
+	<string name="3568">(테이블을 선택하세요...)</string>
+	<string name="3569">다음으로 테이블 필터링 </string>
+	<string name="3570">다음으로 뷰 필터링 </string>
+	<string name="3571">다음으로 프로시저 필터링 </string>
+	<string name="3572">다음으로 함수 필터링 </string>
+	<string name="3573">다음으로 이벤트 필터링 </string>
+	<string name="3574">다음으로 트리거 필터링 </string>
+	<string name="3575">(전체 데이터베이스 보기)</string>
+	<string name="3576">적용</string>
+</resources>

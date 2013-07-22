@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1480">読み取り専用の結果</string>
+	<string name="1481">リストをリフレッシュする場合はここをクリックしてください</string>
+	<string name="1482">計算を停止する</string>
+	<string name="1483">最適なデータ型を非表示にする　</string>
+	<string name="1484">冗長インデックスを探す</string>
+	<string name="1485">冗長インデックスの情報を非表示にする</string>
+	<string name="1486">パワーツールオプション (プロフェッショナル/エンタープライズ/アルティメットのみ)</string>
+	<string name="1487">SQLフォーマッターオプション（エンタープライズ/アルティメットのみ）</string>
+	<string name="1488">クエリプロファイラーはSQLyogのアルティメットバージョンで使用可能です。&lt;br>クリック&amp;nbsp;&lt;br>&lt;a　href=&quot;http://www.webyog.com/en/buy.php?ref=community.queryprofiler &quot; target=&quot;_blank&quot;>here&lt;/a> SQLyogアルティメットを購入するには	 &lt;br>&amp;nbsp;&lt;br>　クエリプロファイラー機能:&lt;UL>	 &lt;LI>問題のあるSQLの特定	 &lt;LI>SQLの微調整	 &lt;LI>正しいインデックスの作成	 &lt;LI>クエリの分析し、最適化を補助	 &lt;LI>クエリ実行の各段階で費やされた正確な時間の報告 &lt;LI>良いSQLを書くための手助け	 &lt;LI>インデックスが効果的に使用されているかどうかを識別	 &lt;LI>アプリケーションの全体的な応答時間を向上させる&lt;/UL></string>
+	<string name="1489">列名が重複しています</string>
+	<string name="1490">Varcharデータ型の長さを指定する必要があります</string>
+	<string name="1491">Varbinaryデータ型の長さを指定する必要があります</string>
+	<string name="1492">テーブルに列がありません。少なくとも1つの列を定義してください</string>
+	<string name="1493">ALTER TABLEではすべての列を削除できません。変わりにDROP TABLEを使用してください</string>
+	<string name="1494">列名が指定されていません</string>
+	<string name="1495">列名(%s) のデータ型が指定されていません</string>
+	<string name="1496">/* エラー */</string>
+	<string name="1497">フィールド名が重複しています</string>
+	<string name="1498">このテーブル内にフィールドが存在しません。少なくとも1つのフィールドを定義してください</string>
+	<string name="1499">フィールド名が指定されていません</string>
+	<string name="1500">警告を表示</string>
+	<string name="1501">アップデート情報が見つかりません</string>
+	<string name="1502">SQLyogのアップデートが利用可能です。
+最新のバージョンをこちらからダウンロードし、インストールしてください。</string>
+	<string name="1503">SQLyogプロフェッショナルのアップデートが利用可能です。
+最新のバージョンをこちらからダウンロードし、インストールして下さい。</string>
+	<string name="1504">SQLyogエンタープライズのアップデートが利用可能です。
+最新のバージョンをこちらからダウンロードし、インストールして下さい。</string>
+	<string name="1505">SQLyogアルティメットのアップデートが利用可能です。
+最新バージョンをこちらからダウンロードし、インストールして下さい。</string>
+	<string name="1506">SQLyogの最新バージョンをご利用中です</string>
+	<string name="1507">SQLyogプロフェッショナルの最新バージョンをご利用中です</string>
+	<string name="1508">SQLyogエンタープライズの最新バージョンをご利用中です</string>
+	<string name="1509">SQLyogアルティメットの最新バージョンをご利用中です</string>
+	<string name="1510">アップデートを確認...</string>
+	<string name="1511">(挿入するにはTABを押してください)</string>
+	<string name="1512">タグファイルの再構築が完了しました</string>
+	<string name="1513">タグファイルの構築が完了しました</string>
+	<string name="1514">タグファイルの再構築中</string>
+	<string name="1515">タグファイルの構築中</string>
+	<string name="1516">プライベートキーのパスを入力して下さい</string>
+	<string name="1517">%sテストメッセージ</string>
+	<string name="1518">このEメールのメッセージは、お使いのSMTPアカウントの設定をテスト中に%sのアカウントマネージャによって自動的に送信されました。</string>
+	<string name="1519">テストメールの送信中にエラーが発生しました。
+%s</string>
+	<string name="1520">テストメールが正常に送信されました</string>
+	<string name="1521">HTTPトンネルが選択されました。有効なURLを指定してください。</string>
+	<string name="1522">データベース名を入力して下さい</string>
+	<string name="1523">データベースを選択してください</string>
+	<string name="1524">ジョブファイル名を指定してください</string>
+	<string name="1525">ジョブファイルを作成できませんでした。</string>
+	<string name="1526">氏名を入力して下さい</string>
+	<string name="1527">TOをメールアドレスに入力して下さい</string>
+	<string name="1528">メールアドレスにFROMを入力して下さい</string>
+	<string name="1529">SMTPサーバーアドレスを入力して下さい</string>
+	<string name="1530">ご使用のSMTPサーバのポート番号を入力してください</string>
+	<string name="1531">ご使用のアカウント名を入力してください　</string>
+	<string name="1532">パスワードを入力してください</string>
+	<string name="1533">%s
+ファイルが見つかりません・破損しています。 %sを再インストールして下さい。</string>
+	<string name="1534">評価中にサポートを得よう!</string>
+	<string name="1535">フォーマットが正常に完了しました</string>
+	<string name="1536">フォーマットの完了にエラーが起こりました</string>
+	<string name="1537">登録先: %s</string>
+	<string name="1538">登録先:</string>
+	<string name="1539">SQLyog %sのコピーは%sに登録されています</string>
+	<string name="1540">これはSQLyogの登録バージョンです。</string>
+	<string name="1541">ホストアドレスを入力して下さい</string>
+	<string name="1542">ポート番号を入力して下さい</string>
+	<string name="1543">PHPトンネラーURLを入力して下さい</string>
+	<string name="1544">HTTPタイムアウト値を入力して下さい</string>
+	<string name="1545">MySQLへの接続に失敗しました</string>
+	<string name="1546">MySQLへの接続を入力</string>
+	<string name="1547">MySQLへの接続を 終了</string>
+	<string name="1548">SSL用に構成されていないサーバーにSSL経由で接続しようとしています。
+SQLyogは通常モードで接続を続けます。</string>
+	<string name="1549">&amp;パスワード</string>
+	<string name="1550">&amp;パスワードを保存する</string>
+	<string name="1551">&amp;パスフレーズ</string>
+	<string name="1552">&amp;パスフレーズを保存する</string>
+	<string name="1553">タグの再構築を&amp;停止する</string>
+	<string name="1554">タグの構築を停止する &amp;</string>
+	<string name="1555">タグを再構築する &amp;</string>
+	<string name="1556">タグを構築する &amp;</string>
+	<string name="1557"> オートコンプリート：[Tab] - >次のタグ。 [Ctrl+Space]->すべてのタグを表示。 [Ctrl+Enter]-> タグに一致するタグ。</string>
+	<string name="1558">Plinkを開始できません</string>
+	<string name="1559">SSHサーバーのユーザー名を記入してください</string>
+	<string name="1560">SSHサーバーのパスワードを記入してください</string>
+	<string name="1561">SSHサーバーのホストアドレスを記入してください</string>
+	<string name="1562">SSHサーバーのポート番号を記入してください</string>
+	<string name="1563">SQLyog.dllの読み込み中にエラーが発生しました</string>
+	<string name="1564">検索はいかなるデータとも一致しませんでした</string>
+	<string name="1565">選択されたレベルでは検索がサポートされていません</string>
+	<string name="1566">すべてのデータベース%sを検索する</string>
+	<string name="1567">すべてのテーブル%sのデータベース`%s`を検索する</string>
+	<string name="1568">すべての列%sのテーブル`%s`を検索する</string>
+	<string name="1569">列`%s`.`%s`.`%s`を検索する</string>
+	<string name="1570">変更するにはクリックしてください</string>
+	<string name="1571">検索</string>
+	<string name="1572">前回インデックス設定されたページを取得できませんでした。最初を試すか、フレッシュ検索を行ってください</string>
+	<string name="1573">最初のページを取得できませんでした。フレッシュ検索を実行してください</string>
+	<string name="1574">データ検索</string>
+	<string name="1575">検索の停止中...</string>
+	<string name="1576">検索の初期化中....</string>
+	<string name="1577">最初</string>
+	<string name="1578">前回</string>
+	<string name="1579">次</string>
+	<string name="1580">データセットを追加するのに必要な情報の取得に失敗しました</string>
+	<string name="1581">エラー　</string>
+	<string name="1582">入力された正規表現にエラーがあります</string>
+	<string name="1583">検索済みの参照先： `%s`.`%s`.`%s`</string>
+	<string name="1584">%d表内で検索済み</string>
+	<string name="1585">選択されたデータ型に列はありません</string>
+	<string name="1586">選択したレベルに表は存在しません</string>
+	<string name="1587">%dテーブルの後にクライアント側のエラーによって検索が停止しました</string>
+	<string name="1588">%dテーブルの後検索が停止しました</string>
+	<string name="1589">`%s`.`%s`.`%s`を検索中</string>
+	<string name="1590">`%s`.`%s`を検索中</string>
+	<string name="1591">このサーバーにデータベースはありません</string>
+	<string name="1592">データベース</string>
+	<string name="1593">%s %sを検索</string>
+	<string name="1594">%sと1つのデータベース%sを検索</string>
+	<string name="1595">%s、ともう1つのデータベース%sを検索する</string>
+	<string name="1596">%s、%d、もう一つのデータベース%sを検索する</string>
+	<string name="1597">%s、%d、ほかのデータベース%sを検索する</string>
+	<string name="1598">このデータベースにテーブルはありません</string>
+	<string name="1599">テーブル</string>
+	<string name="1600">%s %s内のデータベース`%s`を検索する</string>
+	<string name="1601">%s内のデータベース`%s`および1つのテーブル%sを検索する</string>
+	<string name="1602">%sのデータベース`%s`を検索する</string>
+	<string name="1603">%sのデータベース`%s`およびもう1つのテーブル%sを検索する</string>
+	<string name="1604">%sのデータベース`%s`および%d、他のテーブルを検索する</string>
+	<string name="1605">%sのデータベース`%s`および%d、他のテーブルを検索する</string>
+	<string name="1606">%sのデータベース`%s`および%d、他のテーブルを検索する</string>
+	<string name="1607">%sのデータベース`%s`および%d、他のテーブル%sを検索する</string>
+	<string name="1608">このテーブルには列がありません</string>
+	<string name="1609">列</string>
+	<string name="1610">すべての列のテーブル`%s`を検索する</string>
+	<string name="1611">%sのテーブル`%s`を検索する</string>
+	<string name="1612">%sのテーブル`%s`および他1つの列を検索する</string>
+	<string name="1613">%sのテーブル`%s`および他1つの列を検索する</string>
+	<string name="1614">%sのテーブル`%s`および他2列を検索する</string>
+	<string name="1615">%sのテーブル`%s`および%d他の列を検索する</string>
+	<string name="1616">%sのテーブル`%sおよび%d他の列を検索する</string>
+	<string name="1617">(すべてのデータ型)</string>
+	<string name="1618">(数値</string>
+	<string name="1619">、短い文字列</string>
+	<string name="1620">(短い文字列</string>
+	<string name="1621">、日付/ 時間</string>
+	<string name="1622">(日付/ 時間</string>
+	<string name="1623">、バイナリ</string>
+	<string name="1624">(バイナリ</string>
+	<string name="1625">、と`%s`</string>
+	<string name="1626">無効なジョブファイル。</string>
+	<string name="1627">ジョブファイルを開けませんでした</string>
+	<string name="1628">ソースサーバーの詳細が提供されていません。</string>
+	<string name="1629">バッチスクリプトとしてデータをエクスポートするウィザード</string>
+	<string name="1630">すべてのデータベースのための単一ファイル</string>
+	<string name="1631">1件のデータベースに1つのファイルで対応</string>
+	<string name="1632">[注意: このオプションを使用すると、複数のSQLファイルにまたがって複数のテーブルのバックアップデータを作成することができます。データベースごとにSQLyogがdb_{databasename}.sqlという名のファイルを作成します。]</string>
+	<string name="1633">すべてのオブジェクトのための単一ファイル</string>
+	<string name="1634">各オブジェクトのための個別のファイル</string>
+	<string name="1635">[注意: このオプションを使用すると、複数のSQLファイルにまたがって複数のテーブルのバックアップデータを作成することができます。それぞれのテーブルに対してSQLyogがtbl_{tablename}.sqlと言う名のファイルを作成します。]</string>
+	<string name="1636">[すべて - mysqlシステムデータベースを含む]</string>
+	<string name="1637">[すべて - mysqlシステムデータベースを含まない]</string>
+	<string name="1638">SQLyogのスケジュールされたバックアップウィザードへようこそ!</string>
+	<string name="1639">このウィザードは、SQLダンプとしてのデータエクスポートをスケジュールする手順をガイドします。このウィザードは、単一のSQLファイルまたは複数のファイルにデータをエクスポートするのに使用することができます。
+
+ジョブファイルはこのタスクの設定を保存します。今後このタスクを再実行するのにジョブファイルを使用することができます。</string>
+	<string name="1640">*列</string>
+	<string name="1641">列</string>
+	<string name="1642">スケジューラーを初期化できませんでした!</string>
+	<string name="1643">ジョブが既に存在しています。既存のジョブを置き換えますか?</string>
+	<string name="1644">エラー発生! ジョブの作成に失敗しました</string>
+	<string name="1645">スケジュール名を指定して下さい</string>
+	<string name="1646">ジョブファイルが正常に保存されました</string>
+	<string name="1647">MMF作成中にエラーが発生しました</string>
+	<string name="1648">MapViewOfFileでエラーが発生しました</string>
+	<string name="1649">SSHエラー:</string>
+	<string name="1650">これはSQLyogのトライアルバージョンです。
+同時に選択できるオブジェクトは2つまでです。
+フォルダを開き、継続する2つのオブジェクトを選択して下さい</string>
+	<string name="1651">これはSQLyogのトライアルバージョンです。
+一度に選択できるのは2テーブルまでです。</string>
+	<string name="1652">これはSQLyogのトライアルバージョンです。
+一度にエクスポートできるデータベースは1つのみです。</string>
+	<string name="1653">SQLyog外部データ取り込みウィザード</string>
+	<string name="1654">SQLyogの外部データ取り込みウィザードへようこそ!</string>
+	<string name="1655">このウィザードは、外部データのインポートの手順をガイドし、インポートプロセスのスケジュール決めを補助します。
+
+ジョブファイルはこのタスクの設定を保存します。今後このタスクを再度実行するのにこのジョブファイルを使用することができます。</string>
+	<string name="1656">テーブルの有効なSQL WHERE句を指定することができます。WHERE句を満たす行のみがインポートされます。(注意:句にWHEREを含めないで下さい）</string>
+	<string name="1657">外部キーなどのメタデータをアクセスデータベースから正常にインポートするには、アクセスシステムテーブルに許可与える必要があります。
+
+(ユーザーレベルセキュリティー機能は、.accdb、.accde、.accdc、.accdrなどの新しいファイル形式に対応していないので、データベースは.mdb形式で保存して下さい。)</string>
+	<string name="1658">基礎となるデータベースは、インポートにテキストファイルドライバを使用しているようです。ドライバの制限は以下の通りです。
+
+1) テーブルは最大255フィールドに制限されています。
+2) フィールド名は64文字に、フィールドの幅は32766文字に制限されています。
+3) レコードは65,000バイトに制限されています。</string>
+	<string name="1659">列なしでテーブルをインポートすることはできません</string>
+	<string name="1660">ジョブファイル名を記入してください</string>
+	<string name="1661">ジョブファイルにエラーが発生しました</string>
+	<string name="1662">SQLの環境設定中にエラーが発生しました</string>
+	<string name="1663">ODBCドライバが3.0に準拠していません。 ODBC 3.0準拠のドライバをインストールしてください。</string>
+	<string name="1664">HDBC接続を初期化できませんでした</string>
+	<string name="1665">フォルダ名を入力して下さい</string>
+	<string name="1666">ファイル名を入力して下さい</string>
+	<string name="1667">ODBCソースについての詳細を入力して下さい</string>
+	<string name="1668">プロバイダの初期化中にエラーが発生しました</string>
+	<string name="1669">ODBC環境の初期化中にエラーが発生しました</string>
+	<string name="1670">クエリにエラーが発生しました</string>
+	<string name="1671">クエリは結果を返しませんでした!</string>
+	<string name="1672">SQLステートメントが無効です!</string>
+	<string name="1673">ODBCソースは選択されたテーブルに行を返還しませんでした!</string>
+	<string name="1674">ジョブ名を指定してください</string>
+	<string name="1675">テンポラリジョブファイルを作成できませんでした。</string>
+	<string name="1676">インポートプロセスを終了してもよろしいですか?</string>
+	<string name="1677">SQLステートメントは有効です!</string>
+	<string name="1678">SQLステートメントは有効です!</string>
+	<string name="1679">この機能はお使いのOSではサポートされていません!</string>
+	<string name="1680">- 現在まで実行されていません　</string>
+	<string name="1681">- 一番最新の実行先: %u/%u/%u:%u:u</string>
+	<string name="1682">ジョブを削除します。よろしいですか?</string>
+	<string name="1683">ジョブの削除に成功しました</string>
+	<string name="1684">ジョブが正常に初期化されました</string>
+	<string name="1685">SMTPサーバーに接続できません!</string>
+	<string name="1686">送信に失敗しました!</string>
+	<string name="1687">WinSockを初期化できません</string>
+	<string name="1688">WinSockにバージョン1.1のインスタンスを作成できません</string>
+	<string name="1689">ホストを解読することができません</string>
+	<string name="1690">ソケットを作成できません</string>
+	<string name="1691">与えられたサーバーとポートに接続することができません</string>
+	<string name="1692">サーバーに接続できません</string>
+	<string name="1693">タイムアウトエラー</string>
+	<string name="1694">サーバーにデータを送信できません</string>
+	<string name="1695">無効な受信者</string>
+	<string name="1696">PLAINの認証はSJAでサポートされていません</string>
+	<string name="1697">CRAM-MD5の認証はSJAでサポートされていません</string>
+	<string name="1698">SMTP認証に失敗しました</string>
+	<string name="1699">認証の与えられていないユーザー名またはパスワード</string>
+	<string name="1700">SMTPのアカウント名およびパスワードが一致しません。</string>
+	<string name="1701">SQLスケジューラーとレポートツール</string>
+	<string name="1702">SQLスケジューラーとレポートツールへようこそ</string>
+	<string name="1703">このウィザードはクエリの実行をスケジュールする手順をガイドします。結果セットは複数の受信者にEメールで送信することができます。また、この機能を使ってANALYZE、REPAIRなどのメンテナンスクエリを実行することもできます。
+
+ジョブファイルはこのタスクの設定を保存します。今後、このタスクを再度実行するのにこのジョブファイルを使用することができます。</string>
+	<string name="1704">入力したクエリは正常です</string>
+	<string name="1705">通知プロセスを終了してもよろしいですか?</string>
+	<string name="1706">ジョブファイルでエラーが発生しました:  行%sの%d</string>
+	<string name="1707">ソースサーバーの情報が不完全です</string>
+	<string name="1708">少なくとも1つのクエリを指定する必要があります</string>
+	<string name="1709">SMTPホストアドレスを指定して下さい</string>
+	<string name="1710">「～からのEメール」名を指定してください</string>
+	<string name="1711">Eメールアドレス「に」提供する必要があります</string>
+	<string name="1712">警告:メールの件名が与えられていません</string>
+	<string name="1713">認証用の「ログイン名」を指定してください</string>
+	<string name="1714">認証用の「パスワード」を指定してください</string>
+	<string name="1715">HTTPトンネリングURLを指定してください</string>
+	<string name="1716">SSHサーバーホストを指定してください</string>
+	<string name="1717">少なくとも1つのクエリを入力して下さい</string>
+	<string name="1718">ファイルにクエリがありません</string>
+	<string name="1719">パイプのプロセスを作成できませんでした。</string>
+</resources>

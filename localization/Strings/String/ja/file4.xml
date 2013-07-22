@@ -1,0 +1,272 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1720">件名を指定してください</string>
+	<string name="1721">無効なログファイル名です</string>
+	<string name="1722">このファイルには実行すべきクエリが含まれていません</string>
+	<string name="1723">クエリ・プロファイラを有効にしてください (Ultimateのみ)</string>
+	<string name="1724">タグファイルの保存先フォルダを選択してください</string>
+	<string name="1725">EXPLAINの結果</string>
+	<string name="1726">EXPLAIN EXTENDED情報</string>
+	<string name="1727">SHOW PROFILEの結果 (実行時間の長さ順)</string>
+	<string name="1728">アップタイム</string>
+	<string name="1729">Uptime_since_flush_status</string>
+	<string name="1730">&lt;UL>&lt;LI>[Preferences]でこのオプションを有効にしたため、SELECTステートメントを実行すると、クエリのプロファイルに関する情報がここに表示されます。&lt;LI>クエリ・プロファイラでサポートしているのはSELECTステートメントだけです&lt;/UL></string>
+	<string name="1731">注意: &lt;a href=&quot;pref_others &quot; target=&quot;_blank&quot;> 結果のオートページを有効にする tab&lt;/a>が選択されているため、プロファイル結果は、SQLyogが追加したLIMIT節を含むクエリの結果となります</string>
+	<string name="1732">クエリ･プロファイラのオプションが1つも選択されていません。[Tools]から[Preferences]を開き、オプションを1つ以上、選択してください。</string>
+	<string name="1733">HTTPトンネルでクエリ･プロファイラはサポートされていません</string>
+	<string name="1734">* クエリ実行後に残る実際の値 (クエリで変化しません)</string>
+	<string name="1735"># グローバル値 (接続した全クライアントの実行により影響をうけます)</string>
+	<string name="1736">このバージョンのMySQLでは、セッション値がサポートされていません。以下の状態変数はいずれもグローバルです (接続したすべてのクライアントの実行により影響を受けます)</string>
+	<string name="1737">クエリ実行中に再接続しました。
+詳細情報はありません</string>
+	<string name="1738">プロファイル情報が見つかりません。クエリを再実行してみてください</string>
+	<string name="1739">このバージョンのMySQLはEXPLAIN EXTENDED情報をサポートしていません</string>
+	<string name="1740">このバージョンのMySQLサーバではSHOW PROFILEはサポートされていません</string>
+	<string name="1741">クエリ実行で生じたSTATUS VARIABLESの変更</string>
+	<string name="1742">この分析にはMySQL 5.0以降が必要です</string>
+	<string name="1743">このテーブルに定義されたインデックスはありません</string>
+	<string name="1744">データベース内にテーブルがありません</string>
+	<string name="1745">メモリ不足です。継続実行できませんでした</string>
+	<string name="1746">SQLyog %s - MySQL GUIにご登録いただき、ありがとうございます。</string>
+	<string name="1747">SQLyog %s - MySQL GUIにご登録いただき、ありがとうございます。
+SQLyogをリスタートして、すべての設定を有効にしてください。</string>
+	<string name="1748">試用期限が切れています。</string>
+	<string name="1749">このバージョンのSQLyogには、必要なものがすべて含まれています</string>
+	<string name="1750">ライセンス・キーを取得するには、SQLyogの購入が必要です。購入先：</string>
+	<string name="1751">ライセンス・キーをご入力ください</string>
+	<string name="1752">テーブルには何も登録されていません。データなしでこのテーブルのデータタイプを最適化することはできません。</string>
+	<string name="1753">メモリ不足のため、この操作は完了できません</string>
+	<string name="1754">テーブル</string>
+	<string name="1755">%sを1つ以上選択してください。</string>
+	<string name="1756">データタイプを1つ以上選択してください。</string>
+	<string name="1757">列</string>
+	<string name="1758">すべての列</string>
+	<string name="1759">SQLyogデータベース同期化Wizard</string>
+	<string name="1760">SQLyogデータベース同期化Wizardへようこそ!</string>
+	<string name="1761">このWizardは、2つのデータベース間でデータを同期させる方法を1つ1つ解説し、同期プロセスのスケジュール管理について説明するために用意されています。
+
+ジョブファイルはこのタスクの設定を保存するファイルです。このジョブファイルを使用すれば、将来、同じタスクをもう一度実行することができます。</string>
+	<string name="1762">エラーNo. 2003
+’ローカルホスト’のMySQLサーバに接続できません</string>
+	<string name="1763">[ALL]テーブルはすでに選択済みです</string>
+	<string name="1764">`%s`のFULLフィールドを表示します</string>
+	<string name="1765">テーブル[%s]の列を1つ以上選択してください</string>
+	<string name="1766">テーブル[%s]に正しくないWHERE節が含まれています
+
+%s</string>
+	<string name="1767">一時ジョブファイルを作成できませんでした。</string>
+	<string name="1768">ファイル・マッピングの作成に含まれたエラー</string>
+	<string name="1769">SOURCEのサーバ情報が不完全です</string>
+	<string name="1770">TARGETのサーバ情報に不足があります</string>
+	<string name="1771">テーブルを1つ以上指定してください。</string>
+	<string name="1772">テーブル名が指定されていません</string>
+	<string name="1773">&apos;%s&apos;テーブルの1つ以上の列を指定してください</string>
+	<string name="1774">HTTPトンネルのURLを入力してください。</string>
+	<string name="1775">SSHホスト情報を入力してください。</string>
+	<string name="1776">同期プロセスを終了します。よろしいですか?</string>
+	<string name="1777">ソース・データベースを選択してください</string>
+	<string name="1778">ターゲット・データベースを選択してください</string>
+	<string name="1779">このバージョンのSQLyogのData Syncが使えるのはバージョン4.1.1以降のMySQLサーバだけです。ご指定のサーバに1つ以上、それ以前のバージョンが含まれています。解決法はWebyogでお調べください</string>
+	<string name="1780">このバージョンのSQLyogのData Syncが使えるのはバージョン4.1.1以降のMySQLサーバだけです。ご指定のサーバに1つ以上、それ以前のバージョンが含まれています。解決法についてはWebyogにご連絡ください。</string>
+	<string name="1781">警告!!! ファイル・マッピング・オブジェクト(%d)を開けませんでした。</string>
+	<string name="1782">最後の3つのチェックボックスは、2つまでしかチェックを入れられません。
+3つともチェックされていると、何も同期化されません。</string>
+	<string name="1783">これでターゲットのスキーマが変更されます。続行しますか?</string>
+	<string name="1784">テーブルを比較する</string>
+	<string name="1785">ビューを比較しています</string>
+	<string name="1786">ストアドプロシージャを比較中です</string>
+	<string name="1787">イベントを比較中です</string>
+	<string name="1788">機能を比較中です</string>
+	<string name="1789">トリガーの比較中です</string>
+	<string name="1790">キー・ファイルが読み込めません。</string>
+	<string name="1791">保存内容がありません!</string>
+	<string name="1792">失敗を比較する</string>
+	<string name="1793">成功を比較する</string>
+	<string name="1794">/* ドロップされた外国キーの再作成が完了しました*/</string>
+	<string name="1795">/* 必要な変更が確実に実行可能となるよう外国キーをターゲットでドロップしてください。*/</string>
+	<string name="1796">オブジェクト・ブラウザからテーブルをドラッグするか、右クリックの後、[Add Tables]を選択してください</string>
+	<string name="1797">オブジェクト・ブラウザのテーブル/ビューをドラッグするか、右クリックから[Add Tables/Views]を選択してください</string>
+	<string name="1798">列を選択するには、列名をダブルクリックするか、列をグリッド内にドラッグ&amp;ドロップしてください</string>
+	<string name="1799">現在、クエリ・ビルダーは1つのデータベースのテーブルまたはビューしかサポートしていません</string>
+	<string name="1800">アスタリスク(*)にたいしてCriteriaを指定することはできません</string>
+	<string name="1801">エイリアス/テーブル名が重複しています</string>
+	<string name="1802">クエリ・ビルダー・ファイルを開けませんでした。</string>
+	<string name="1803">データベースが見つかりませんでした</string>
+	<string name="1804">%s個のファイルの内容が変更されました。
+
+このクエリ設計を保存しますか?</string>
+	<string name="1805">このタブの内容が変更されました。
+
+このクエリ設計を保存しますか?</string>
+	<string name="1806">クエリ・ビルダーを終了しますか?</string>
+	<string name="1807">無効なクエリ・ビルダー・ファイルです。</string>
+	<string name="1808">オブジェクト・ブラウザからテーブルをドラッグするか、右クリックから[Add Tables]を選択するか、または、キャンバス・ツールバーを使用してください</string>
+	<string name="1809">1つのスキーマ設計タブで使用できるのは、1つのデータベースから取得したテーブルだけです。</string>
+	<string name="1810">選択したテーブルは、すでにキャンバス上にあります</string>
+	<string name="1811">この外国キーを削除します。よろしいですか?</string>
+	<string name="1812">スキーマ設計ファイルを開けませんでした。</string>
+	<string name="1813">テーブルは選択されていません</string>
+	<string name="1814">テーブルが合いません。キャンバスをリフレッシュしてください</string>
+	<string name="1815">印刷対象がありません!</string>
+	<string name="1816">比率は10％から600%の間で設定してください</string>
+	<string name="1817">&amp;をリフレッシュ	F5</string>
+	<string name="1818">&amp;をリフレッシュ	F9</string>
+	<string name="1819">メモリ不足でビットマップを作成できません。
+実行中のプログラムをいくつか終了してから、もう一度お試しください。</string>
+	<string name="1820">印刷中にエラーが発生しました</string>
+	<string name="1821">ビットマップを作成できませんでした</string>
+	<string name="1822">ビットマップを作成できませんでした。メモリ不足です!</string>
+	<string name="1823">無効なスキーマファイルです。</string>
+	<string name="1824">無効なスキーマ設計です。</string>
+	<string name="1825">データベース名がありません。</string>
+	<string name="1826">無効なスキーマファイルです</string>
+	<string name="1827">CREATEテーブルのステートメントにエラーがあります</string>
+	<string name="1828">データベースが未選択です!</string>
+	<string name="1829">削除する列を選択する</string>
+	<string name="1830">テーブル (%s) は外国キーをサポートしていません。
+テーブルエンジンはInnoDB、PBXT、SolidDBのいずれかにしてください。</string>
+	<string name="1831">%sのファイルの内容が変更されました。
+
+このスキーマ設計を保存しますか?</string>
+	<string name="1832">このタブの内容は変更されました。
+
+スキーマ設計を保存しますか?</string>
+	<string name="1833">デフォルト・プリンターが見つかりません</string>
+	<string name="1834">デフォルト･プリンターの選択中にエラーが発生しました</string>
+	<string name="1835">プロキシ・サーバ・アドレスを付与してください</string>
+	<string name="1836">プロキシ・サーバのポート番号を入力してください</string>
+	<string name="1837">トンネル中にエラーが発生しました。HTTP応答が無効な可能性があります。PHP設定でトンネルなどが無効化されている必要があります。もしご希望なら、HTTP応答をsupport@webyog.comにお送りください。[Advanced]ボタンで設定変更をすると問題が解決される場合もあります。</string>
+	<string name="1838">HTTPサーバへの接続中にエラーが発生しました。</string>
+	<string name="1839">SQLyogのトンネルファイルのバージョンの食い違い、またはPHPエラーが発生しています。
+SQLyogのインストール・フォルダから最新のSQLyogTunnel.phpをアップロードしてください。</string>
+	<string name="1840">ユーザがクエリを停止しました。</string>
+	<string name="1841">トンネルページの応答を取得中にエラーが発生しました。</string>
+	<string name="1842">必要なPHPバージョンは&lt; 4.3.0です。HTTPトンネルを使用するには、v4.3.0またはそれ以降のバージョンにアップグレードする必要があります。</string>
+	<string name="1843">HTTPエラー。認証が必要です!</string>
+	<string name="1844">HTTPエラー。トンネルするURLに接続できませんでした。</string>
+	<string name="1845">登録されていないHTTPサーバ・エラー</string>
+	<string name="1846">構文が誤っているため、この要求をサーバで処理することができませんでした</string>
+	<string name="1847">この資源を要求するにはユーザ認証が必要です。</string>
+	<string name="1848">HTTPプロトコルに実装されていません。</string>
+	<string name="1849">サーバは要求をぶじ解析しおわりましたが、実行することができません。</string>
+	<string name="1850">サーバが検索した結果、要求されたURIに合うものはありませんでした。</string>
+	<string name="1851">このHTTP動詞は許容されていません。</string>
+	<string name="1852">クライアントで許容される応答がありませんでそた。</string>
+	<string name="1853">プロキシ認証が必要です。</string>
+	<string name="1854">要求待ちでサーバがタイムアウトしました。</string>
+	<string name="1855">現在の資源状態と競合するため、この要求は完了することができません。</string>
+	<string name="1856">要求された資源はもうサーバ内にありません。フォワード先アドレスも不明です。</string>
+	<string name="1857">内容の長さが定義されていなければ、サーバに要求が受け入れられません。</string>
+	<string name="1858">要求ヘッダフィールドに与えられた事前条件の1つ以上が正しくないと評価されました。</string>
+	<string name="1859">要求実体がlargであるため、このサーバでは要求を処理できません。</string>
+	<string name="1860">要求URIがサーバの対応できる長さを超えているため、サーバは要求を処理できません</string>
+	<string name="1861">要求実体の形式がサポートされていないため、サーバは要求を処理できません。</string>
+	<string name="1862">要求の再試行はしかるべきアクションをとった後でおこなってください。</string>
+	<string name="1863">不測の状況が発生したため、サーバは要求を完遂できませんでした。</string>
+	<string name="1864">この要求の完遂に必要な機能がこのサーバではサポートされていません。</string>
+	<string name="1865">サーバが、ゲートウェイまたはプロキシとして活動中に、上流サーバから無効な応答を受け取りました。</string>
+	<string name="1866">このサービスは一時的に過負荷状態に陥っています。</string>
+	<string name="1867">要求メッセージで使用されたバージョンのHTTPプロトコルは、このサーバでサポートされていません。</string>
+	<string name="1868">ご使用のMySQLサーバに対し、HTTPトンネルを使用した接続方法が選択されました。ご使用のMySQLホストのアドレスに、トンネルURLからアクセス可能なホスト名が、必ず含まれるようにしてください。
+
+HTTPトンネルの詳しいセットアップ方法については、[Help]ボタンをクリックしてください。</string>
+	<string name="1869">ご使用のMySQLサーバへはSSHトンネルにより接続するよう選択されました。ご使用のMySQLホストのアドレスに、SSHホストからアクセス可能なホスト名がかならず含まれるようにしてください。
+
+SSHポートのフォワード方法の詳しい設定方法を参照するには、[Help]ボタンをクリックしてください。</string>
+	<string name="1870">MySQLサーバへの接続は、SSL暗号化接続が選択されています。
+サーバがSSL暗号化接続を許容すること、ユーザにより、SSL接続を使用すると設定してあることをご確認ください。
+
+SSL暗号化接続の詳細な設定方法を参照するには、[Help]　ボタンをクリックしてください。</string>
+	<string name="1871">SSH接続できませんでした。
+SSHサーバが実行中であること、SSHトンネルに引き渡す値として正しい値が入力されていることをご確認ください。</string>
+	<string name="1872">スキーマを作成する</string>
+	<string name="1873">スキーマ作成に使用するテーブルを選択してください</string>
+	<string name="1874">&amp;作成...</string>
+	<string name="1875">&amp;すべてを選択</string>
+	<string name="1876">&amp;すべてを選択解除</string>
+	<string name="1877">キャンセル&amp;</string>
+	<string name="1878">データベースをリストアする</string>
+	<string name="1879">データベースをリストアする</string>
+	<string name="1880">ディレクトリを選択する</string>
+	<string name="1881">リストアするテーブルを選択する</string>
+	<string name="1882">S&amp;すべてを選択</string>
+	<string name="1883">注意: このオプションはMySQL RESTORE TABLEオプションを使用します。</string>
+	<string name="1884">です</string>
+	<string name="1885">取り消し</string>
+	<string name="1886">スキーマ同期ツール</string>
+	<string name="1887">オブジェクトの表示を消して無視する</string>
+	<string name="1888">&amp;同一</string>
+	<string name="1889">&amp;ターゲットで変更する</string>
+	<string name="1890">&amp;ターゲットで作成する</string>
+	<string name="1891">&amp;ターゲットでドロップする</string>
+	<string name="1892">&amp;比較する</string>
+	<string name="1893">&amp;トグル式の選択</string>
+	<string name="1894">&amp;すべて選択解除</string>
+	<string name="1895">&amp;すべてを実行...</string>
+	<string name="1896">&amp;名前をつけて保存...</string>
+	<string name="1897">&amp;クローズ</string>
+	<string name="1898">ソースを選択してください{接続 - データベース}</string>
+	<string name="1899">ターゲット{接続 - データベース}を選択してください。ターゲットに変更は適用されません</string>
+	<string name="1900">注意： 複数ホストに配置されたデータベースを同期させるには、[File]から新規接続を開き、複数のホストに接続します。データベースをドロップダウンすると、すべての接続のすべてのデータベースがリスト表示されます。</string>
+	<string name="1901">オブジェクトを選択する</string>
+	<string name="1902">ターゲットで変更されるオブジェクト</string>
+	<string name="1903">ターゲットで作成されるオブジェクト</string>
+	<string name="1904">比較する</string>
+	<string name="1905">ターゲットでドロップするオブジェクト</string>
+	<string name="1906">同一オブジェクト</string>
+	<string name="1907">状態</string>
+	<string name="1908">テーブルのみ</string>
+	<string name="1909">全オブジェクト</string>
+	<string name="1910">列の並べ替え</string>
+	<string name="1911">並べ替えたい場合は、[Up/Down]ボタンで列の順番を変更し、[並べ替える]ボタンを押してください</string>
+	<string name="1912">列順を変更する</string>
+	<string name="1913">&amp;上へ</string>
+	<string name="1914">&amp;下へ</string>
+	<string name="1915">並べ替える...</string>
+	<string name="1916">SQLyogデータベース同期化Wizardへようこそ!</string>
+	<string name="1917">このWizardには、2つのデータベース間でデータを同期させるためのステップが1つ1つ説明されています。
+
+また、このWizardには、データベースの同期化スケジュールの設定方法も説明されています。</string>
+	<string name="1918">&amp;新規ジョブを開始する</string>
+	<string name="1919">&amp;保存されたジョブを編集する</string>
+	<string name="1920">ソース</string>
+	<string name="1921">接続のコピー元は</string>
+	<string name="1922">ホストアドレス</string>
+	<string name="1923">HTTPトンネルを使用してください</string>
+	<string name="1924">URL</string>
+	<string name="1925">(秒)</string>
+	<string name="1926">アドバンスド...</string>
+	<string name="1927">&amp;ソケットを使用する</string>
+	<string name="1928">F&amp;ファイルバス</string>
+	<string name="1929">ユーザ名</string>
+	<string name="1930">パスワード</string>
+	<string name="1931">ポート</string>
+	<string name="1932">&amp;圧縮されたプロトコルを使用</string>
+	<string name="1933">セッションのアイドリング・タイムアウト</string>
+	<string name="1934">&amp;デフォルト</string>
+	<string name="1935">&amp;SSHトンネルを使用する</string>
+	<string name="1936">SSH&amp;ホスト</string>
+	<string name="1937">SSH &amp;ポート</string>
+	<string name="1938">パブリック・キー</string>
+	<string name="1939">&amp;プライベート・キー</string>
+	<string name="1940">SS&amp;L暗号接続を使用する</string>
+	<string name="1941">C&amp;A版証明書</string>
+	<string name="1942">&amp;サイファ</string>
+	<string name="1943">&amp;認証を使用する</string>
+	<string name="1944">&amp;クライアント・キー</string>
+	<string name="1945">&amp;クライアント証明書</string>
+	<string name="1946">ターゲット</string>
+	<string name="1947">&amp;圧縮されたプロトコルを使用する</string>
+	<string name="1948">&amp;デフォルト</string>
+	<string name="1949">いつこのタスクを実行しますか?</string>
+	<string name="1950">&amp;今すぐ実行する</string>
+	<string name="1951">&amp;オプションを保存中です</string>
+	<string name="1952">&amp;ジョブファイルを保存する</string>
+	<string name="1953">Windowsのスケジューラでスケジュール保存&amp;を保存する&amp;</string>
+	<string name="1954">&amp;ログファイル</string>
+	<string name="1955">ログファイルには、このタスクの実行中に発生したすべてのエラーが記録されています。</string>
+	<string name="1956">列のマッピングおよび変換</string>
+	<string name="1957">ソース：</string>
+	<string name="1958">外出先：</string>
+	<string name="1959">&amp;SQLを編集する...</string>
+</resources>

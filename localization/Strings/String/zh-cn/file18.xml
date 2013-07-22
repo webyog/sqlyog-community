@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3606">（使用“；”来分隔多个数据库。留下空白以显示全部）</string>
+	<string name="3607">正在 ping 服务器……</string>
+	<string name="3608">所用时间</string>
+	<string name="3609">已 ping 过的服务器</string>
+	<string name="3610">启用 Clear&amp;text 插件</string>
+	<string name="3611">超时</string>
+	<string name="3612">使 间隔 保持活跃</string>
+</resources>

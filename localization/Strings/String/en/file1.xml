@@ -1,0 +1,295 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1000">Text</string>
+	<string name="1001">Image</string>
+	<string name="1002">Cannot write NULL value!</string>
+	<string name="1003">Could not create file !</string>
+	<string name="1004">Could not open file !</string>
+	<string name="1005">Could not open file. The data is not changed</string>
+	<string name="1006">You will lose all changes. Do you want to quit?</string>
+	<string name="1007">Unable to retrieve information. Please check your permission.</string>
+	<string name="1008">Unable to retrive the table for this trigger</string>
+	<string name="1009">Error in finding the open port</string>
+	<string name="1010">FATAL ERROR: Network error: Connection timed out</string>
+	<string name="1011">HTTP Tunneling (Professional/Enterprise/Ultimate only)</string>
+	<string name="1012">SSH Tunneling (Professional/Enterprise/Ultimate only)</string>
+	<string name="1013">SSL Encryption (Professional/Enterprise/Ultimate only)</string>
+	<string name="1014">Get SQLyog PROFESSIONAL/ENTERPRISE/ULTIMATE today to enable this and dozens of other great features.</string>
+	<string name="1015">Warning : This computer program is protected by copyright laws. Unauthorized reproduction or distribution of this program, or any portion of it, may result in severe civil and criminal penalties, and will be prosecuted to the maximum extent possible under the law.</string>
+	<string name="1016">About SQLyog</string>
+	<string name="1017">About SQLyog Community</string>
+	<string name="1018">You are trying to connect to a new connection.
+Connection will be saved.</string>
+	<string name="1019">You have changed your connection details.
+Do you want to save changes?</string>
+	<string name="1020">New Connection</string>
+	<string name="1021"> Rename Connection</string>
+	<string name="1022">Please enter a valid name</string>
+	<string name="1023">Connection already exists, Please enter a unique name</string>
+	<string name="1024">Format Query</string>
+	<string name="1025">Scheduled Backup Wizard (Ctrl+Alt+S)</string>
+	<string name="1026">Import External Data Wizard(Ctrl+Alt+O)</string>
+	<string name="1027">Schema Synchronization Tool (Ctrl+Q)</string>
+	<string name="1028">Database Synchronization Wizard (Ctrl+Alt+W)</string>
+	<string name="1029">SQL Scheduler and Reporting Tool (Ctrl+Alt+N)</string>
+	<string name="1030">New Query Builder (Ctrl+K)</string>
+	<string name="1031">New Schema Designer (Ctrl+Alt+D)</string>
+	<string name="1032">Get SQLyog PROFESSIONAL/ENTERPRISE/ULTIMATE</string>
+	<string name="1033">This feature is available in PROFESSIONAL/ENTERPRISE/ULTIMATE version of SQLyog.</string>
+	<string name="1034">This software is released under the GNU General Public Licence(GPL), which is probably the best known Open Source licence. The formal terms of GPL licence can be found at http://www.fsf.org/licence/.</string>
+	<string name="1035">Upgrade to SQLyog Professional/Enterprise/Ultimate</string>
+	<string name="1036">Do you really want to delete the connection detail?</string>
+	<string name="1037">Connection successful!
+MySQL version: %s</string>
+	<string name="1038">Connection Info</string>
+	<string name="1039">Could not initialize a new window.</string>
+	<string name="1040">This feature is not available if you are connecting using HTTP Tunneling</string>
+	<string name="1041">&amp;Restore</string>
+	<string name="1042">HTTP Error No. %d
+%s</string>
+	<string name="1043">Error No. %d
+%s</string>
+	<string name="1044"> Connections: %d</string>
+	<string name="1045">Build tag file</string>
+	<string name="1046">Rebuild tag file</string>
+	<string name="1047"> Ready</string>
+	<string name="1048">Change Table T&amp;ype To</string>
+	<string name="1049">No Recent Files</string>
+	<string name="1050">Could not open file.</string>
+	<string name="1051"> Please Connect To A MySQL Server</string>
+	<string name="1052">Enter new view name</string>
+	<string name="1053">Enter new procedure name</string>
+	<string name="1054">Enter new function name</string>
+	<string name="1055">Enter new event name</string>
+	<string name="1056">Enter new trigger name</string>
+	<string name="1057">Enter line number</string>
+	<string name="1058">&amp;Go To</string>
+	<string name="1059">Alter Database</string>
+	<string name="1060">&amp;Alter</string>
+	<string name="1061">Please provide a valid database name</string>
+	<string name="1062">Database altered successfully</string>
+	<string name="1063">Please provide a valid view name</string>
+	<string name="1064">Can&apos;t create view &apos;%s&apos;; a table or view with that name already exists</string>
+	<string name="1065">Please provide a valid event name</string>
+	<string name="1066">Can&apos;t create event &apos;%s&apos;; Event exists</string>
+	<string name="1067">Please provide a valid procedure name</string>
+	<string name="1068">Can&apos;t create procedure &apos;%s&apos;; Procedure exists</string>
+	<string name="1069">Please provide a valid function name</string>
+	<string name="1070">Can&apos;t create function &apos;%s&apos;; Function exists</string>
+	<string name="1071">Please provide a valid trigger name</string>
+	<string name="1072">Can&apos;t create trigger &apos;%s&apos;; already exists</string>
+	<string name="1073">Line number out of range!</string>
+	<string name="1074">Could not open the referenced query file.
+Make sure that the query file exists.</string>
+	<string name="1075">The selected Favorite item is empty. Nothing to add.</string>
+	<string name="1076">Error reading favorite file.</string>
+	<string name="1077">Could not find &apos;%s&apos;
+Please verify the referenced file exists.</string>
+	<string name="1078">Could not Open Favorite File.</string>
+	<string name="1079">File is Empty</string>
+	<string name="1080">Could not open the referenced file.</string>
+	<string name="1081">Could not Write into referenced file.</string>
+	<string name="1082">&amp;Paste SQl Statement</string>
+	<string name="1083">%s not found or corrupted.
+Please reinstall %s.</string>
+	<string name="1084">(Filter on values already entered)</string>
+	<string name="1085">One or more stored programs or views were copied.			
+They may contain SQL-referencing the &lt;source> database name and will need to be adjusted manually.</string>
+	<string name="1086">Please select atleast one object</string>
+	<string name="1087">Connecting to source server  </string>
+	<string name="1088">Connecting to target server  </string>
+	<string name="1089">Copied successfully </string>
+	<string name="1090">There was nothing to be copied</string>
+	<string name="1091">Error occured while copying </string>
+	<string name="1092">Aborting copy...</string>
+	<string name="1093"> Copy Database Summary</string>
+	<string name="1094">Create table structure for %s</string>
+	<string name="1095">Copying data for %s (%ld rows completed)</string>
+	<string name="1096">Copying data for %s</string>
+	<string name="1097">Copying %s ...</string>
+	<string name="1098">Fetching list of %s from server...</string>
+	<string name="1099"> (%lu rows))</string>
+	<string name="1100"> copied
+</string>
+	<string name="1101">View &apos;%s&apos; copied
+</string>
+	<string name="1102">Function &apos;%s&apos; copied
+</string>
+	<string name="1103">Procedure &apos;%s&apos; copied
+</string>
+	<string name="1104">Trigger &apos;%s&apos; copied
+</string>
+	<string name="1105">Event &apos;%s&apos; copied
+</string>
+	<string name="1106">%d %s copied
+
+</string>
+	<string name="1107">&amp;Copy</string>
+	<string name="1108">&amp;Stop</string>
+	<string name="1109">Could not open Schema file.</string>
+	<string name="1110">This file is too big for the editor. Consider to use Tools->Restore From SQL Dump... instead</string>
+	<string name="1111">Query</string>
+	<string name="1112">- %s@%s - Using SSH tunnel to %s</string>
+	<string name="1113">- %s@%s - Using HTTP tunneler at %s</string>
+	<string name="1114"> Connection to server successful...</string>
+	<string name="1115">Could not close connection. Query(s)are being executed.</string>
+	<string name="1116"> Objectbrowser refreshed...</string>
+	<string name="1117">The content of this tab has changed.
+
+Do you want to save the changes?</string>
+	<string name="1118">The content of the %s file has changed.
+
+Do you want to save the changes?</string>
+	<string name="1119">File could not be saved. Close action was cancelled.</string>
+	<string name="1120">Could not create file.</string>
+	<string name="1121">Could not write into file.</string>
+	<string name="1122">Error in operation.</string>
+	<string name="1123">Operation successful</string>
+	<string name="1124">Please make the Query window visible to use this option</string>
+	<string name="1125">Select a template to insert</string>
+	<string name="1126">Database: %s</string>
+	<string name="1127">Schema Designer</string>
+	<string name="1128">Query Builder</string>
+	<string name="1129">%s, Error No : %d</string>
+	<string name="1130">This operation will result in %d rows being %s. Do you want to continue?
+
+Note: You can turn off this warning by unchecking Tools -> Preferences -> Others -> Prompt if multiple rows are getting updated</string>
+	<string name="1131">updated</string>
+	<string name="1132">deleted</string>
+	<string name="1133">Do you really want to delete the selected row(s)?</string>
+	<string name="1134">Do you really want to delete the currently selected row?</string>
+	<string name="1135">Could not copy data to clipboard</string>
+	<string name="1136">INSERT and UPDATE of Spatial data types are not supported.</string>
+	<string name="1137">Reset Filter</string>
+	<string name="1138">In order to protect your data against accidential damage, SQLyog will check for the database-context where the UPDATE is done.
+The data in this Result Set does not originate from the database that is currently selected.
+
+To perform UPDATES you must first select a database from where this result originates. After that, SQLyog will display tables from the database that can be updated from this result set.</string>
+	<string name="1139">This result set may not originate from the database currently selected in the object browser.
+Editing this result may introduce data corruption if the database context is wrong.
+Ensure that you have selected the database where you want to perform the operation(s).
+Do you want to continue?</string>
+	<string name="1140">Limit rows</string>
+	<string name="1141">First row</string>
+	<string name="1142"># of rows</string>
+	<string name="1143">Refresh</string>
+	<string name="1144">Export As... (Ctrl+Shift+E)</string>
+	<string name="1145">Copy Data</string>
+	<string name="1146">Copy selected row(s) data to clipboard</string>
+	<string name="1147"> Insert new row</string>
+	<string name="1148"> Save changes</string>
+	<string name="1149"> Delete selected row(s)</string>
+	<string name="1150"> Cancel changes</string>
+	<string name="1151">You cannot edit this result.
+Please select a valid table from the dropdown window.</string>
+	<string name="1152">[BLOB(DblClk To View)](%u bytes)</string>
+	<string name="1153">...[BLOB(DblClk To View)]</string>
+	<string name="1154">Do you want to save the changes?</string>
+	<string name="1155">(Read Only)</string>
+	<string name="1156">Select row(s) to delete!</string>
+	<string name="1157">Stop</string>
+	<string name="1158">Form</string>
+	<string name="1159">Grid</string>
+	<string name="1160">Data modified but not saved</string>
+	<string name="1161">Please stop the search to update/delete Data Set</string>
+	<string name="1162"> Database: %s Table: %s</string>
+	<string name="1163">Error Code: %d
+%s
+(%lu ms taken)
+
+</string>
+	<string name="1164">(%lu row(s) affected)
+(%lu ms taken)
+
+</string>
+	<string name="1165">(%lu row(s) returned)
+(%d ms taken)
+
+</string>
+	<string name="1166">No query(s) were executed. Please enter a query in the SQL window or place the cursor inside a query.</string>
+	<string name="1167">Executing Query(s)...</string>
+	<string name="1168">Error no : %d</string>
+	<string name="1169">Aborted by user</string>
+	<string name="1170">Structure Exported Successfully</string>
+	<string name="1171">  %d Rows Exported</string>
+	<string name="1172">Error opening ExportFile. Please check details of your schema file.</string>
+	<string name="1173">Error writing in file.</string>
+	<string name="1174">No database selected. Please select a database from the dropdown.</string>
+	<string name="1175">Save As</string>
+	<string name="1176">S&amp;top</string>
+	<string name="1177">Exported successfully</string>
+	<string name="1178">Could not create dump file.
+Make sure the dump file - 
+1. Is not read-only
+2. Is not opened by another process
+3. Is file path existing</string>
+	<string name="1179">Error No.: %d
+%s</string>
+	<string name="1180">Export unsuccessful</string>
+	<string name="1181">&amp;Export</string>
+	<string name="1182">Only table(s) have data. You need to select only table(s) for dumping - Data Only</string>
+	<string name="1183">Only table(s) have data. You need to select atleast one table for dumping - Data Only</string>
+	<string name="1184">Select at least one object</string>
+	<string name="1185">There is nothing to export</string>
+	<string name="1186">Exporting table: %s</string>
+	<string name="1187">Exporting view: %s</string>
+	<string name="1188">Exporting procedure: %s</string>
+	<string name="1189">Exporting function: %s</string>
+	<string name="1190">Exporting event: %s</string>
+	<string name="1191">Exporting trigger: %s</string>
+	<string name="1192">Exporting table: %s 
+Rows exported: %d</string>
+	<string name="1193">This saves the data in most simple form of SQL statement.
+Additional table information (indexes, charset, comments etc.) is not saved.
+
+If you want to take a backup of your data please use &apos;Backup table as SQL Dump&apos; instead </string>
+	<string name="1194">Please specify a folder</string>
+	<string name="1195">Select at least one table</string>
+	<string name="1196">Select a folder where you want to backup the database</string>
+	<string name="1197">Backing up database...</string>
+	<string name="1198"> Backup Table Information</string>
+	<string name="1199">Fetching Row(s) :</string>
+	<string name="1200">Please specify a file name</string>
+	<string name="1201">Please select at least one column</string>
+	<string name="1202">Optionally enclosed by :</string>
+	<string name="1203">Enclosed by :</string>
+	<string name="1204">Export As</string>
+	<string name="1205">Could not create file</string>
+	<string name="1206">Data exported successfully</string>
+	<string name="1207">Error while exporting</string>
+	<string name="1208">Could not write into file !</string>
+	<string name="1209">Error in AddMenu</string>
+	<string name="1210">Favorites</string>
+	<string name="1211">Error in favorites</string>
+	<string name="1212">The name you have entered for the shortcut already exists in Favorites menu.
+Would you like to overwrite it?</string>
+	<string name="1213">Add Favorite</string>
+	<string name="1214">Cannot write into Favorite File</string>
+	<string name="1215">Cannot create Favorite Folder</string>
+	<string name="1216">Please enter a reference name for the query</string>
+	<string name="1217">Please provide a SQL file name</string>
+	<string name="1218">Query Editor is empty!
+Please enter some query(s) in the editor.</string>
+	<string name="1219">Please specify the folder name</string>
+	<string name="1220">Error while creating favorites folder</string>
+	<string name="1221">Error renaming </string>
+	<string name="1222">You cannot move &apos;%s&apos; to itself.</string>
+	<string name="1223">Are you sure want to delete &apos;%s&apos;?</string>
+	<string name="1224">Error deleting the favorite item.</string>
+	<string name="1225">Could not open the referenced query file.
+Make sure that the query file exists.</string>
+	<string name="1226">Open File</string>
+	<string name="1227">Finished searching the document. Cannot find &quot;%s&quot;</string>
+	<string name="1228">Replaced %d instance(s).</string>
+	<string name="1229">Replace</string>
+	<string name="1230">Replace All</string>
+	<string name="1231">Find</string>
+	<string name="1232">Enter filter text here...</string>
+	<string name="1233">Refre&amp;sh</string>
+	<string name="1234">Please stop the search to retreive parent table rows</string>
+	<string name="1235">&amp;Columns</string>
+	<string name="1236">T&amp;able</string>
+	<string name="1237">&amp;Database</string>
+	<string name="1238">  SQLyog reconnected</string>
+	<string name="1239">  SQLyog reconnect failed</string>
+</resources>

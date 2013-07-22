@@ -1,0 +1,288 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1240">SQL 포매터</string>
+	<string name="1241">최근 스키마 디자인 파일</string>
+	<string name="1242">%s은 이미 존재합니다.
+대체하시겠습니까?</string>
+	<string name="1243">다른 이름으로 저장...</string>
+	<string name="1244">오브젝트 브라우저 새로 고침	F5</string>
+	<string name="1245">쿼리 실행	F9</string>
+	<string name="1246">최근 쿼리 실행	F9</string>
+	<string name="1247">선택된 쿼리 실행 컨트롤	Ctrl+F9</string>
+	<string name="1248">모든 쿼리 실행 쉬프트	Ctrl+F9</string>
+	<string name="1249">오브젝트 브라우저 새로 고침	F9</string>
+	<string name="1250">최근 쿼리 실행	F5</string>
+	<string name="1251">쿼리 실행	F5</string>
+	<string name="1252">선택된 쿼리 실행 컨트롤	Ctrl+F5</string>
+	<string name="1253">모든 쿼리 실행 쉬프트	Ctrl+F5</string>
+	<string name="1254">사용된 경로 오류</string>
+	<string name="1255">다른 색상...</string>
+	<string name="1256">최상의 데이터 유형 계산</string>
+	<string name="1257">현재 데이터 베이스의 문맥은 `%s`입니다. 파일 내에서 하나 이상의 사용문이 다른 데이터 베이스 문맥을 지정하지 않는 한, 해당 파일 내의 SQL문은 실행됩니다. 계속하시겠습니까?</string>
+	<string name="1258">실행</string>
+	<string name="1259">크기 0의 덤프 파일을 불러올 수 없습니다.</string>
+	<string name="1260">실행된 쿼리: %u</string>
+	<string name="1261">불러오기 실패</string>
+	<string name="1262">가져 오기 실패. 배치 파일 열기 오류</string>
+	<string name="1263">불러오기 성공</string>
+	<string name="1264">열기</string>
+	<string name="1265">실행된 쿼리: %lld</string>
+	<string name="1266">쿼리를 실행하는 과정에서 오류가 발생했습니다.
+해당 쿼리와 오류 메시지는 다음 위치에 기록되었습니다:
+%s.
+오류 파일을 열려면 &quot;오류 파일 열기...&quot;를 클릭하십시오.</string>
+	<string name="1267">SQLyog.err 파일 정보를 얻을 수 없습니다!</string>
+	<string name="1268">최소 하나의 필드를 선택해 주십시오</string>
+	<string name="1269">데이터 베이스가 백업된 폴더를 선택해 주십시오</string>
+	<string name="1270">테이블 정보 복구</string>
+	<string name="1271">해당 폴더에서 .MYD 파일을 찾을 수 없습니다!</string>
+	<string name="1272">쿼리:
+%s
+
+다음 위치에서 오류 발생:%s
+오류 코드: %d - %s</string>
+	<string name="1273">쿼리:
+%s
+
+다음 위치에서 오류 발생:%s
+라인 번호.:%d
+오류 코드: %d - %s</string>
+	<string name="1274">연결할 수 없습니다</string>
+	<string name="1275">&apos;사용&apos; 문을 발행할 수 없습니다</string>
+	<string name="1276">터널 버전을 얻을 수 없습니다</string>
+	<string name="1277">결과 세트를 얻을 수 없습니다</string>
+	<string name="1278">그리드 컨트롤이 생성되지 않았습니다</string>
+	<string name="1279">정말로 해당 인덱스를 드롭하시겠습니까?</string>
+	<string name="1280">%s.%s의 새 인덱스 생성</string>
+	<string name="1281">%s.%s의 존재하는 인덱스 편집</string>
+	<string name="1282">색인을 넣으시려면 최소 하나의 세로 행을 선택해 주십시오</string>
+	<string name="1283">리소스 파일을 열 수 없습니다</string>
+	<string name="1284">언어 변경 사항을 적용하시려면 SQLyog를 다시 시작해 주십시오</string>
+	<string name="1285">데이터 베이스 %s 드롭</string>
+	<string name="1286">이 옵션은 HTTP 터널링 모드에서 사용할 수 없습니다.
+
+CSV 파일을 곧 바로 원격 서버에 업로드하시려면, SQLyog의 마이그레이션 툴킷을 사용하십시오.
+사용할 수 있는 ODBC 드라이버는 마이크로소프트 텍스트 드라이버 (*.txt, *cvc) 운영체제와 함께 제공되는 ODBC 드라이버입니다.</string>
+	<string name="1287">이 옵션은 HTTP 터널링 모드에서 사용할 수 없습니다.</string>
+	<string name="1288">오브젝트 브라우저 새로 고침</string>
+	<string name="1289">오브젝트 브라우저를 새로 고침할 수 없습니다</string>
+	<string name="1290">오브젝트 브라우저 새로 고침됨</string>
+	<string name="1291">선택된 데이터 베이스 없음</string>
+	<string name="1292">새로운 데이터 검색	Ctrl+Shift+D</string>
+	<string name="1293">데이터 검색	Ctrl+Shift+D</string>
+	<string name="3459">새로운 데이터 검색	Ctrl+Shift+D</string>
+	<string name="1294">정말로 데이터 베이스 (%s)를 드롭하시겠습니까?
+
+경고: 모든 데이터를 잃게 됩니다!</string>
+	<string name="1295">%s 드롭 오류</string>
+	<string name="1296">%s 드롭 성공</string>
+	<string name="1297">정말로 테이블 (%s)를 드롭하시겠습니까?
+
+경고: 모든 데이터를 잃게됩니다!</string>
+	<string name="1298">모든 세로 행을 삭제할 수 없습니다</string>
+	<string name="1299">정말로 세로 행 (%s)를 드롭하시겠습니까?
+
+경고: 해당 세로 행의 모든 데이터를 잃게됩니다!</string>
+	<string name="1300">정말로 인덱스 (%s)를 드롭하시겠습니까?</string>
+	<string name="1301">인덱스가 성공적으로 삭제되었습니다</string>
+	<string name="1302">정말로 데이터 (%s)를 삭제하시겠습니까?
+
+경고: 모든 데이터를 잃게됩니다!</string>
+	<string name="1303">인덱스가 성공적으로 생성되었습니다</string>
+	<string name="1304">정말로 데이터 베이스 (%s)의 모든 테이블에 해당되는 데이터를 삭제하시겠습니까?
+
+경고: 모든 데이터를 잃게됩니다!</string>
+	<string name="1305">정말로 %s (%s)를 드롭하시겠습니까?</string>
+	<string name="1306">정말로 트리거 (%s)를 드롭하시겠습니까?</string>
+	<string name="1307">뷰 정의를 찾을 수 없습니다.
+
+아마도 해당 뷰는
+&quot;뷰 생성...SQL 보안 정의자...&quot;와 같이 생성되었으며
+귀하는 정의자가 아닙니다</string>
+	<string name="1308">이용 가능한 정보가 없습니다!</string>
+	<string name="1309">고급 속성 - &apos;%s&apos;의 &apos;%s&apos;</string>
+	<string name="1310">서버 상태</string>
+	<string name="1311">서버 변수</string>
+	<string name="1312">서버 프로세스 목록</string>
+	<string name="1313">프로세스를 종료할 수 없습니다.
+현재 연결 스레드 id입니다</string>
+	<string name="1314">스키마 생성 성공</string>
+	<string name="1315">스키마 생성 중 오류 발생</string>
+	<string name="1316">다음에 해당되는 스키마 생성 - &apos;%s&apos;</string>
+	<string name="1317">스키마 생성 중...</string>
+	<string name="1318">스키마를 성공적으로 생성했습니다...</string>
+	<string name="1319">스키마 생성 중 오류 발생...</string>
+	<string name="1320">%s의 필드 정보 가져 오기</string>
+	<string name="1321">%s의 필드 정보 쓰기</string>
+	<string name="1322">%s의 인덱스 정보 가져 오기</string>
+	<string name="1323">%s의 인덱스 정보 쓰기</string>
+	<string name="1324">%s의 FK 정보 쓰기</string>
+	<string name="1325">%s의 FK 정보 가져 오기</string>
+	<string name="1326">테이블 이름을 지정해 주십시오</string>
+	<string name="1327">최소 하나의 필드를 선택해 주십시오</string>
+	<string name="1328">해당 테이블의 외래 키 관계를 추가하기 위한 테이블을 변경할 수 없습니다.
+구조와 데이터는 성공적으로 복사되었습니다.</string>
+	<string name="1329">해당 테이블의 외래 키 관계를 복사하는 중 오류가 발생했습니다.
+구조와 데이터는 성공적으로 복사되었습니다.</string>
+	<string name="1330">테이블 복사 성공</string>
+	<string name="1331">테이블 진단 정보</string>
+	<string name="1332">세로 행 재정렬 확인</string>
+	<string name="1333">드롭 관계 확인</string>
+	<string name="1334">세로 행을 성공적으로 재정렬했습니다</string>
+	<string name="1335">세로 행 재정렬 실패</string>
+	<string name="1336">세로 행 재정렬 실패.
+임시 테이블에서 데이터를 복구할 수 있습니다</string>
+	<string name="1337">세로 행 재정렬 중 오류 발생</string>
+	<string name="1338">사용자에 의해 실행이 취소되었습니다</string>
+	<string name="1339">세로 행 재정렬 중...</string>
+	<string name="1340">목록에서 프로세스를 선택해 주십시오</string>
+	<string name="1341">프로세스 목록을 종료할 수 없습니다...</string>
+	<string name="1342">Enum 값 목록</string>
+	<string name="1343">설정 값 목록</string>
+	<string name="1344">복제 값</string>
+	<string name="1345">환경설정</string>
+	<string name="1346">알림: 경고 목록을 확인하시려면, 도구 -> 환경설정 -> 일반 -> 메시지 탭의 경고 보기를 활성화하십시오</string>
+	<string name="1347">실행 시간</string>
+	<string name="1348">총 시간</string>
+	<string name="1349">쿼리: %s</string>
+	<string name="1350">오류 코드: %d
+%s</string>
+	<string name="1351">%lu 가로 열 복귀</string>
+	<string name="1352">%lu 열에 적용됨</string>
+	<string name="1353">, %lu 경고</string>
+	<string name="1354">정말로 데이터 베이스에서 이 외래 키를 삭제하시겠습니까?</string>
+	<string name="1355">선택된 테이블은 외래 키를 지원하지 않습니다.
+테이블 엔진은 InnoDB, PBXT, 또는 SolidDB만 해당됩니다.</string>
+	<string name="1356">관계 편집</string>
+	<string name="1357">관계 생성을 위한 테이블을 찾을 수 없습니다</string>
+	<string name="1358">참조 테이블을 선택해 주십시오</string>
+	<string name="1359">참조에 해당되는 세로 행을 선택해 주십시오</string>
+	<string name="1360">같은 수의 소스와 참조 열을 선택해 주십시오</string>
+	<string name="1361">올바른 외래 키 이름을 입력해 주십시오</string>
+	<string name="1362">실행: %s</string>
+	<string name="1363">총: %s</string>
+	<string name="1364">%lu 가로 열</string>
+	<string name="1365">쿼리 배치가 성공적으로 완료되었습니다</string>
+	<string name="1366">오류가 발생했지만 쿼리 배치가 완료되었습니다</string>
+	<string name="1367">주석</string>
+	<string name="1368">자동 증가</string>
+	<string name="1369">평균 가로 행 길이</string>
+	<string name="1370">최대 가로 열</string>
+	<string name="1371">최소 가로 열</string>
+	<string name="1372">가로 열 포맷</string>
+	<string name="1373">지연 키 쓰기</string>
+	<string name="1374">체크섬</string>
+	<string name="1375">해당 테이블의 데이터를 읽을 수 없습니다!</string>
+	<string name="1376">해당 탭의 내용이 변경되었습니다.
+
+변경 사항을 저장하시겠습니까?</string>
+	<string name="1377">%s 파일의 내용이 변경되었습니다.
+
+변경 사항을 저장하시겠습니까?</string>
+	<string name="1378">정말로 해당 세로 행을 드롭하시겠습니까?</string>
+	<string name="1379">선택된 세로 행이 인덱스/외래 키에 의해 참조되었습니다.
+드롭하시면 인덱스/외래 키 또한 변경됩니다..
+계속하시겠습니까?</string>
+	<string name="1380">선택된 세로 행을 드롭하시겠습니까?</string>
+	<string name="1381">하나 이상의 선택된 세로 행이 인덱스/외래 키에 의해 참조되었습니다.
+드롭하시면 인덱스/외래 키 또한 변경됩니다..
+계속하시겠습니까?</string>
+	<string name="1382">언어 옵션 숨기기</string>
+	<string name="1383">해당 데이터 형식 (%s)에서는 기본 공 문자열 (&apos;&apos;)이 지원되지 않습니다</string>
+	<string name="1384">선택된 외래 키를 드롭하시겠습니까?</string>
+	<string name="1385">정말로 해당 외래 키를 드롭하시겠습니까?</string>
+	<string name="1386">기본 키는 여러 개로 정할 수 없습니다</string>
+	<string name="1387">선택된 인덱스를 드롭하시겠습니까?</string>
+	<string name="1388">정말로 해당 필드를 드롭하시겠습니까?</string>
+	<string name="1389">테이블에 최소 하나의 가로 열을 추가해 주십시오</string>
+	<string name="1390">변경된 사항이 없습니다.</string>
+	<string name="1391">해당 데이터 형식에서는 기본 공 문자열이 지원되지 않습니다</string>
+	<string name="1392">데이터 형태에 필드 이름 (%s)이 정해지지 않음</string>
+	<string name="1393">새 테이블 생성</string>
+	<string name="1394">새 테이블 이름을 입력하십시오</string>
+	<string name="1395">테이블 이름을 입력해 주십시오</string>
+	<string name="1396">테이블이 성공적으로 생성되었습니다. 다른 테이블을 추가하시겠습니까?</string>
+	<string name="1397">&apos;%s&apos;의 새 테이블</string>
+	<string name="1398">테이블 이름</string>
+	<string name="1399">데이터 베이스</string>
+	<string name="1400">테이블 유형</string>
+	<string name="1401">캐릭터 세트</string>
+	<string name="1402">콜레이션</string>
+	<string name="1403">저장</string>
+	<string name="1404">복귀</string>
+	<string name="1405">변경 사항을 잃게됩니다. 정말로 나가시겠습니까?</string>
+	<string name="1406">1 세로 열</string>
+	<string name="1407">2 인덱스</string>
+	<string name="1408">3 외래 키</string>
+	<string name="1409">5 SQL 미리 보기</string>
+	<string name="1410">4 고급 속성</string>
+	<string name="1411">결과</string>
+	<string name="1412">메시지</string>
+	<string name="1413">테이블 데이터</string>
+	<string name="1414">데이터 세트</string>
+	<string name="1415">오브젝트</string>
+	<string name="1416">히스토리</string>
+	<string name="1417">%u 결과</string>
+	<string name="1418">%u 결과</string>
+	<string name="1419">%u 메시지</string>
+	<string name="1420">%u 메시지</string>
+	<string name="1421">%u 정보</string>
+	<string name="1422">%u 정보</string>
+	<string name="1423">%u 히스토리</string>
+	<string name="1424">%u 히스토리</string>
+	<string name="1425">%u 테이블 데이터</string>
+	<string name="1426">%u 테이블 데이터</string>
+	<string name="1427">&amp;%u 프로파일러</string>
+	<string name="1428">%u 프로파일러</string>
+	<string name="1429">새 테이블</string>
+	<string name="1430">이 테이블의 중복된 인덱스를 찾으십시오. &lt;a href=&quot;redundantindexes_help &quot; target=&quot;_blank&quot;> 더 읽어 보기&lt;/a></string>
+	<string name="1431">데이터 베이스 내에 있는 각 테이블의 중복된 데이터를 찾으십시오. &lt;a href=&quot;redundantindexes_help &quot; target=&quot;_blank&quot;> 더 읽어 보기&lt;/a></string>
+	<string name="1432">/*테이블: %s*/</string>
+	<string name="1433">/*보기: %s*/</string>
+	<string name="1434">/*세로 행 정보*/</string>
+	<string name="1435">/*인덱스 정보*/</string>
+	<string name="1436">/*DDL 정보*/</string>
+	<string name="1437">테이블이 성공적으로 변경되었습니다</string>
+	<string name="1438">테이블 이름이 정해지지 않았습니다.</string>
+	<string name="1439">인덱스가 올바르게 정해지지 않았습니다.</string>
+	<string name="1440">외래 키가 올바르게 정해지지 않았습니다.</string>
+	<string name="1441">테이블이 성공적으로 생성되었습니다.</string>
+	<string name="1442">&quot;%s&quot;를 찾을 수 없습니다</string>
+	<string name="1443">SQLyog가 사용자 관리자 다이얼로그에 필요한 정보를 가져오지 못했습니다. 사용자에게 &apos;mysql&apos; 데이터 베이스 내에 있는 권한 테이블의 선택 권한이 없는 것 같습니다. 이 정보 없이는 SQLyog 사용자 관리자를 계속할 수 없습니다.</string>
+	<string name="1444">전체 권한</string>
+	<string name="1445">오브젝트 레벨 권한</string>
+	<string name="1446">새 사용자</string>
+	<string name="1447">사용자 이름 변경</string>
+	<string name="1448">사용자 편집</string>
+	<string name="1449">사용자 이름, 비밀번호, 이 사용자에 대한 제한 사항 편집</string>
+	<string name="1450">새 사용자 생성</string>
+	<string name="1451">이 사용자의 전체 권한 부여/취소</string>
+	<string name="1452">이 사용자에 해당되는 선택된 오브젝트에 권한 부여/취소</string>
+	<string name="1453">변경 사항 저장</string>
+	<string name="1454">변경 사항 취소</string>
+	<string name="1455">비밀번호가 일치하지 않습니다</string>
+	<string name="1456">사용자명이 지정되지 않았습니다. 익명의 사용자를 생성하시겠습니까?</string>
+	<string name="1457">취소</string>
+	<string name="1458">생성</string>
+	<string name="1459">사용자 세트가 비어 있어 사용자 관리자를 계속할 수 없습니다. 종료합니다</string>
+	<string name="1460">사용자명이 지정되지 않았습니다. 익명의 사용자로 이름을 변경하시겠습니까?</string>
+	<string name="1461">정말로 해당 사용자를 삭제하시겠습니까?</string>
+	<string name="1462">SciLexer.dll 불러오기 오류 발생</string>
+	<string name="1463">riched20.dll 불러오기 오류 발생</string>
+	<string name="1464">GetModuleFileName 실패!</string>
+	<string name="1465">SQLyog가 종료됩니다</string>
+	<string name="1466">경고</string>
+	<string name="1467">MySQL 경고</string>
+	<string name="1468">오류 메시지</string>
+	<string name="1469">MySQL 오류</string>
+	<string name="1470">실행된 SQL문: %s</string>
+	<string name="1471">오류 번호 : %s</string>
+	<string name="1472">오류 메시지: %s</string>
+	<string name="1473">(존재하는 연결을 선택해 주십시오...)</string>
+	<string name="1474">문서 검색 마침</string>
+	<string name="1475">문서의 처음 부분에 도달했습니다. 검색을 마지막부터 계속하시겠습니까?</string>
+	<string name="1476">문서의 마지막 부분에 도달했습니다. 검색을 처음부터 계속하시겠습니까?</string>
+	<string name="1477">문서 검색을 마쳤습니다. 검색 항목을 찾을 수 없습니다</string>
+	<string name="1478">메모리가 충분하지 않습니다. 응용 프로그램이 종료되었습니다!</string>
+	<string name="1479">(데이터 베이스 선택...)</string>
+</resources>

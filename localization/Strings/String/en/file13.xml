@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3492">Copy With Normalized &amp;Whitespace	Alt+C</string>
+	<string name="3493">Keep-Alive Inter&amp;val</string>
+	<string name="3494">Table Data/Info/History Tab positioning</string>
+	<string name="3495">Tab&amp;le Data under Query tabs</string>
+	<string name="3496">&amp;Info under Query tabs</string>
+	<string name="3497">&amp;History under Query tabs</string>
+	<string name="3498">Comments</string>
+	<string name="3499">Strings</string>
+	<string name="3500">Keywords</string>
+	<string name="3501">Number</string>
+	<string name="3502">Operator</string>
+	<string name="3503">Hidden Command</string>
+	<string name="3504">Line Number Margin</string>
+	<string name="3505">Folding Margin</string>
+	<string name="3506">Text Selection</string>
+	<string name="3507">Braces Match</string>
+	<string name="3508">Braces UnMatch</string>
+	<string name="3509">Canvas</string>
+	<string name="3510">Line</string>
+	<string name="3511">Messages/Table Data/Info</string>
+	<string name="3512">Click on result to view/edit data</string>
+	<string name="3513">&amp;Export Connection Details...</string>
+	<string name="3514">&amp;Import Connection Details...</string>
+	<string name="3515">Export/I&amp;mport Connection Details</string>
+	<string name="3516">Data exported successfully. Would you like to open file?</string>
+	<string name="3517">Please specify filename for Archive</string>
+	<string name="3518">Connection type</string>
+	<string name="3519">     Connection Name</string>
+	<string name="3521">&amp;Open File...</string>
+	<string name="3522">Host</string>
+	<string name="3523">&amp;Select/Deselect All</string>
+	<string name="3524">&amp;Import</string>
+	<string name="3525">Export Connection Details</string>
+	<string name="3526">Import Connection Details</string>
+
+</resources>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3492">使用规范的&amp;空格复制	Alt+C</string>
+	<string name="3493">保持活动的间隔</string>
+	<string name="3494">表格数据/信息/历史键定位</string>
+	<string name="3495">查询键下方的表&amp;格数据</string>
+	<string name="3496">&amp;查询键下方的信息</string>
+	<string name="3497">&amp;查询键下方的历史</string>
+	<string name="3498">评论</string>
+	<string name="3499">字符串</string>
+	<string name="3500">关键词</string>
+	<string name="3501">数字</string>
+	<string name="3502">操作员</string>
+	<string name="3503">隐藏命令</string>
+	<string name="3504">行号边距</string>
+	<string name="3505">折页线外空白</string>
+	<string name="3506">文本选择</string>
+	<string name="3507">括号匹配</string>
+	<string name="3508">括号不匹配</string>
+	<string name="3509">元素</string>
+	<string name="3510">行</string>
+	<string name="3511">消息/表格数据/信息</string>
+	<string name="3512">点击结果浏览/编辑数据</string>
+	<string name="3513">导出连接详情…</string>
+	<string name="3514">导入连接详情…</string>
+	<string name="3515">导入/导出连接详情…</string>
+	<string name="3516">数据导出成功。您想打开文件吗？</string>
+	<string name="3517">请指定归档的文件名</string>
+	<string name="3518">连接类型</string>
+	<string name="3519">连接名称</string>
+	<string name="3521">&amp;打开文件……</string>
+	<string name="3522">主机</string>
+	<string name="3523">&amp;全选/取消全选</string>
+	<string name="3524">&amp;导入</string>
+	<string name="3525">导出连接详情</string>
+	<string name="3526">导入连接详情</string>
+</resources>

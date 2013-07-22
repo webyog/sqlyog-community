@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3577">편집 내용 적용 (Ctrl+S)</string>
+	<string name="3578">上一处差别 (Ctrl+P)</string>
+	<string name="3579">下一处差别 (Ctrl+N)</string>
+	<string name="3580">选择一个表格 (Ctrl+T)</string>
+	<string name="3581">隐藏类似的行 (Ctrl+H)</string>
+	<string name="3582">源 (Ctrl+L)</string>
+	<string name="3583">目标 (Ctrl+R)</string>
+	<string name="3584">타겟으로 통합 (Ctrl+Right)</string>
+	<string name="3585">소스로 통합 (Ctrl+Left)</string>
+	<string name="3586">预览 SQL (Ctrl+Q)</string>
+	<string name="3587">편집 취소 (Ctrl+Z)</string>
+	<string name="3588">선택한 변경 내용 되돌림 (Ctrl+Shift+Z)</string>
+	<string name="3589">停止 (Ctrl+Enter)</string>
+	<string name="3590">停止 (Ctrl+S)</string>
+	<string name="3591">쿼리 실행%.*s</string>
+	<string name="3592">比较 (Ctrl+Enter)</string>
+	<string name="3593">暂停 (Ctrl+P)</string>
+	<string name="3594">暂停 (Ctrl+N)</string>
+</resources>

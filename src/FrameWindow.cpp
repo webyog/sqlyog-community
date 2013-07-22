@@ -1,0 +1,8660 @@
+/* Copyright (C) 2013 Webyog Inc
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA
+
+*/
+
+#include <ocidl.h>
+#include <unknwn.h>
+#include <olectl.h>
+#include <scintilla.h>
+#include <shlobj.h>
+
+#ifndef COMMUNITY
+#include "tinyxml.h"
+#endif
+
+#include "ExportMultiFormat.h"
+#include "FrameWindow.h"
+#include "FrameWindowHelper.h"
+#include "MySQLVersionHelper.h"
+#include "Global.h"
+#include "MDIWindow.h"
+#include "ExportMultiFormat.h"
+#include "PreferenceBase.h"
+#include "PreferenceCommunity.h"
+#include "HelpHeader.h"
+#include "OtherDialogs.h"
+#include "ImportFromSQL.h"
+#include "ImportBatch.h"
+#include "EditorFont.h"
+#include "CommonHelper.h"
+#include "SQLTokenizer.h"
+#include "GUIHelper.h"
+#include "TabEditorSplitter.h"
+#include  "wyIni.h"
+#include "UpgradeCheck.h"
+#include "QueryAnalyzerBase.h"
+#include "ConnectionTab.h"
+#include "UserManager.h"
+#include "ButtonDropDown.h"
+#include "TableTabInterface.h"
+#include "TableTabInterfaceTabMgmt.h"
+#include "TabFields.h"
+#include "TabAdvancedProperties.h"
+#include "TabForeignKeys.h"
+#include "TabIndexes.h"
+#include "DataView.h"
+#include "CCustomComboBox.h"
+
+#ifndef COMMUNITY
+#include "TabSchemaDesigner.h"
+#include "TabQueryBuilder.h"
+#include "HttpError.h"
+#include "FormView.h"
+#include "DatabaseSearch.h"
+#include "VisualDataDiff.h"
+#endif
+
+#ifdef COMMUNITY
+#include "CommunityRibbon.h"
+#endif
+
+extern	PGLOBALS		pGlobals;
+
+#define			MDISTARTID			60000
+#define			FIND_STR_LEN		256
+#define			DELIMITEROPEN		"DELIMITER $$\r\n\r\n"
+#define			DELIMITERCLOSE		"$$\r\n\r\nDELIMITER ;"
+#define			MAX_RECENT_FILES	9
+#define			RECENT_FILE_COUNT	10
+#define			RECENT_SQLFILE_SUBMENU			16
+#define         RECENT_QUERYBUILDER_SUBMENU     17
+#define			RECENT_SCHEMADESIGNS_SUBMENU	18
+#define         WND_MNU_ITEMS       3
+#define         MNU_QUERYBUILDER    8
+#define         MNU_SCHEMADESIGNER				9
+#define         MNU_REBUILDTAGS     12
+#define			ZERO				0
+
+#define			FIRSTTOOLICONCOUNT	6
+
+#define			TABBED_INTERFACE_HEIGHT	25
+#define         TABBED_INTERFACE_TOP_PADDING    10
+
+/* some of the features are not available when you connect using tunneling feature */
+/* we show the user a decent message and exit */
+
+#define	NO_BACKUP_TUNNEL	_("This feature is not available if you are connecting using HTTP Tunneling")
+#define	NO_RESTORE_TUNNEL	_("This feature is not available if you are connecting using HTTP Tunneling")
+#define	NO_IMPORTCSV_TUNNEL	_("This feature is not available if you are connecting using HTTP Tunneling")
+#define CONNECT_MYSQL_MSG   _(L" Please Connect To A MySQL Server")
+
+void 
+log(const char * buff)
+{
+#ifdef _DEBUG
+	FILE	*fp = fopen ( "E:\\SQLini_log.log", "a" );
+	fprintf(fp, "%s\n" , buff);
+	fclose ( fp );
+#endif
+}
+FrameWindow::FrameWindow(HINSTANCE hinstance)
+{	
+    wyWChar     directory[MAX_PATH];
+    wyWChar*    lpfileport = NULL;
+    wyString    dirstr, section;
+    wyInt32     count;
+
+    m_popupmenucount = 0;
+    m_statusbarmgmt = NULL;
+    m_editorcolumnline = -1;
+
+    if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
+    {
+        dirstr.SetAs(directory);
+
+        wyIni::IniGetString(GENERALPREFA, "EdgeColumn", "0", &section, dirstr.GetString());
+        m_editorcolumnline = section.GetAsInt32();
+
+        wyIni::IniGetString("UserInterface", "Language", "en", &section, dirstr.GetString());
+        count = GetModuleFileName(NULL, directory, MAX_PATH - 1);
+	    directory[count - pGlobals->m_modulenamelength] = '\0';
+        dirstr.SetAs(directory);
+        dirstr.Add(LANGUAGE_DBFILE);
+
+        //Initialize L10nText library
+        InitL10n(section.GetString(), dirstr.GetString(), wyFalse); 
+    }
+    
+    m_hwndtooltip       = NULL;
+	m_hinstance			= hinstance;
+	m_findmsg			= 0;
+	m_finddlg			= NULL;
+    m_htabinterface     = NULL;
+	m_icons				= NULL;
+	m_hicon				= NULL;
+	m_numicons			= 0;
+	m_upgrdchk			= NULL;
+	m_hsecondiml		= NULL;
+	m_hwndtool			= NULL;
+	m_hwndsecondtool	= NULL;
+	m_hwndtoolcombo		= NULL;
+	memset(&m_tunnelauth, 0, sizeof(TUNNELAUTH));
+	memset(&m_rchsplitter, 0, sizeof(RECT));
+	memset(&m_rcvsplitter, 0, sizeof(RECT));
+
+	m_iserrdlg = wyFalse;
+    m_isredindexhelp = wyFalse;
+
+	//UpgradeCheck object
+	m_upgrdchk = new UpgradeCheck();
+
+	m_toolbariconsize = GetToolBarIconSize();
+    m_iscloseallmdi = wyFalse;
+    m_framewndsaveselection = -1;
+
+	//Connection tab object
+	m_conntab = new ConnectionTab();
+
+	m_hwndconntab = NULL;//handle for connection tab
+	m_closetab = wyFalse;//flag to check if connection is closed
+
+    m_findtext.Clear();
+    ZeroMemory(&m_frstruct, sizeof(FINDREPLACE));
+    m_frstruct.lStructSize = sizeof(FINDREPLACE);
+    m_findproc = NULL;
+    m_languagecount = GetL10nLanguageCount();
+
+#ifdef COMMUNITY
+	m_commribbon    =  NULL;
+#endif
+}
+
+
+FrameWindow::~FrameWindow()
+{	
+    ShowQueryExecToolTip(wyFalse);
+
+	if(m_upgrdchk)
+		delete m_upgrdchk;
+
+	if(m_hmainiml)
+		VERIFY(ImageList_Destroy(m_hmainiml)); 
+        
+	VERIFY(ImageList_Destroy(m_hsecondiml));
+	VERIFY(ImageList_Destroy(m_hcomboiml));
+	VERIFY(delete m_pcfavoritemenu);
+	VERIFY(delete m_pcaddfavorite);
+	VERIFY(delete m_pcorganizefavorite);
+
+#ifdef COMMUNITY
+	if(m_commribbon)
+		VERIFY(delete m_commribbon);
+#endif
+
+    VERIFY(delete m_connection);
+
+	if(m_conntab)
+	{
+		delete m_conntab;
+	}
+
+    delete m_statusbarmgmt;
+    CloseL10n();
+}
+
+wyBool
+FrameWindow::Create()
+{		
+	wyString path; 
+
+	//CreateInitFile();
+
+    m_connection = CreateConnection();
+
+    if(!m_connection)
+        return wyFalse;
+
+    m_hinstance = pGlobals->m_entinst?pGlobals->m_entinst:pGlobals->m_hinstance;
+    
+    if(RegisterWindow(m_hinstance))
+    {
+		if(!(CreateMainWindow(m_hinstance)))
+			return wyFalse;
+	}
+
+    LoadMainIcon();
+
+    RegisterButtonDropDown(GetModuleHandle(NULL));
+	RegisterQueryWindow(m_hinstance);
+	RegisterVSplitter(m_hinstance);
+	RegisterHSplitter(m_hinstance);
+	RegisterInsertUpdateWindow(m_hinstance);  
+	RegisterSDCanvasWindow(m_hinstance);
+	RegisterQBCanvasWindow(m_hinstance);
+    RegisterTabInterfaceWindow(m_hinstance);
+    RegisterDataWindow(m_hinstance);
+    RegisterPlainWindow(m_hinstance);
+	RegisterPQAResultwindow(m_hinstance);
+	RegisterHTMLInfoTabwindow(m_hinstance);
+	RegisterHTMLFormViewWindow(m_hinstance);
+	RegisterHTMLDbSearchWindow(m_hinstance);
+    RegisterCustomComboBox(GetModuleHandle(NULL));
+
+    #ifndef COMMUNITY
+        RegisterCustomComboBox(pGlobals->m_entinst);
+        VisualDataDiff::RegisterWindows(m_hinstance);
+    #endif
+    
+	
+    InitFavorites(m_hwndmain);
+	
+	SetConnectionNumber();
+
+	//Sets the community ribbon
+	HandleCommunityRibbon();
+	
+	//Upgrade check
+	CheckForUpgrade();
+	
+    Resize();
+		
+	m_icons = m_connection->CreateIconList(m_hwndmain, &m_numicons);
+	
+	///Initialise the recent file menu items.
+	InitLatestFiles();
+
+	// Enable/ Disable menu and buttons
+	OnActiveConn();
+
+	//Gets the .ini path
+	GetSQLyogIniPath(&path);
+	if(!path.GetLength())
+		return wyFalse;
+
+	InitSplitterPos(path.GetString());
+
+#ifndef COMMUNITY
+	InitPQAOptions(path.GetString());
+//	InitAutoCompleteCaseSelection(path.GetString());
+
+#endif
+		
+	return wyTrue;
+}
+// Function registers the main window.
+wyBool  
+FrameWindow::RegisterWindow(HINSTANCE hInstance)
+{
+	WNDCLASS	wndclass;
+    HBRUSH      hbr;
+
+	memset(&wndclass, 0, sizeof(WNDCLASS));
+	
+	// Register the main window.
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW ;
+	wndclass.lpfnWndProc   = FrameWindow::WndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = 0;
+	wndclass.hInstance     = hInstance ;
+	wndclass.hIcon         = LoadIcon(pGlobals->m_hinstance, MAKEINTRESOURCE(IDI_MAIN));
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground = wyTheme::GetBrush(BRUSH_FRAMEWINDOW, &hbr) ? hbr : (HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  =(LPCWSTR)IDR_MAINMENU ;
+	wndclass.lpszClassName = MAIN_WINDOW_CLASS_NAME_STR;	
+	
+	VERIFY(RegisterClass(&wndclass));
+
+	return wyTrue;
+}
+
+// Functions registers the Connection window that is the QueryWindow.
+wyBool 
+FrameWindow::RegisterQueryWindow(HINSTANCE hInstance)
+{
+	ATOM		ret;
+	WNDCLASS	wndclass;
+    HBRUSH      hbr;
+	
+	// Register the main window.
+	wndclass.style         = 0;//CS_HREDRAW | CS_VREDRAW ;
+	wndclass.lpfnWndProc   = MDIWindow::WndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hInstance ;
+	VERIFY(wndclass.hIcon  = ImageList_ExtractIcon(0, m_hmainiml, 0));  
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground = wyTheme::GetBrush(BRUSH_MDICHILD, &hbr) ? hbr : (HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = (LPCWSTR)NULL ;
+	wndclass.lpszClassName = QUERY_WINDOW_CLASS_NAME_STR;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	m_hicon = wndclass.hIcon;
+	return wyTrue;
+}
+
+// Functions registers the vertical splitter window used in the query window as divider.
+
+wyBool
+FrameWindow::RegisterVSplitter(HINSTANCE hInstance)
+{
+	ATOM		ret;
+	WNDCLASS	wndclass;
+    HBRUSH hbr;
+	
+	// Register the main window.
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW;
+	wndclass.lpfnWndProc   = FrameWindowSplitter::WndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hInstance ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_SIZEWE);
+    wndclass.hbrBackground = wyTheme::GetBrush(BRUSH_VSPLITTER, &hbr) ? hbr : (HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = NULL;
+	wndclass.lpszClassName = VSPLITTER_WINDOW_CLASS_NAME_STR ;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	return wyTrue;
+}
+
+// Functions registers the horizontal splitter window.
+wyBool
+FrameWindow::RegisterHSplitter(HINSTANCE hInstance)
+{
+	ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW;
+	wndclass.lpfnWndProc   = TabEditorSplitter::WndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hInstance ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_SIZENS);
+	wndclass.hbrBackground =(HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = NULL ;
+	wndclass.lpszClassName = HSPLITTER_WINDOW_CLASS_NAME_STR;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	return wyTrue;
+}
+
+// Function registers the InsertUpdate window that contains all the child windows
+wyBool
+FrameWindow::RegisterInsertUpdateWindow(HINSTANCE hInstance)
+{
+	ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+    wndclass.lpfnWndProc   = DefWindowProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hInstance ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground = (HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = NULL;
+	wndclass.lpszClassName = INSERT_UPDATE_WINDOW_CLASS_NAME_STR;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	return wyTrue;
+}
+
+// Function registers the InsertUpdate window that contains all the child windows
+wyBool
+FrameWindow::RegisterDataWindow(HINSTANCE hInstance)
+{
+	ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = CS_DBLCLKS;
+	wndclass.lpfnWndProc   = DataView::FrameWndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hInstance ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground = (HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = NULL;
+	wndclass.lpszClassName = DATA_WINDOW;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	return wyTrue;
+}
+
+// Function registers the SD - Canvas window with white back ground
+wyBool
+FrameWindow::RegisterSDCanvasWindow(HINSTANCE hInstance)
+{
+#ifndef COMMUNITY
+
+	ATOM		ret;
+	WNDCLASS	wndclass;
+	
+    // Register the main window.
+	wndclass.style         = CS_DBLCLKS;//CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wndclass.lpfnWndProc   = TabSchemaDesigner::CanvasWndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hInstance ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground =(HBRUSH)(COLOR_WINDOW + 1);
+	wndclass.lpszMenuName  = NULL ;
+	wndclass.lpszClassName = SD_CANVAS_WINDOW;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+#endif
+
+	return wyTrue;
+}
+
+// Function registers the QB - Canvas window with white back ground
+wyBool
+FrameWindow::RegisterQBCanvasWindow(HINSTANCE hInstance)
+{
+#ifndef COMMUNITY
+
+	ATOM		ret;
+	WNDCLASS	wndqbclass;
+	
+	// Register the main window.
+	wndqbclass.style         = CS_DBLCLKS;//CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wndqbclass.lpfnWndProc   = TabQueryBuilder::CanvasWndProc;
+	wndqbclass.cbClsExtra    = 0;
+	wndqbclass.cbWndExtra    = sizeof(HANDLE);
+	wndqbclass.hInstance     = hInstance ;
+	wndqbclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndqbclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndqbclass.hbrBackground =(HBRUSH)(COLOR_WINDOW + 1);
+	wndqbclass.lpszMenuName  = NULL;
+	wndqbclass.lpszClassName = QB_CANVAS_WINDOW;	
+	
+	VERIFY(ret = RegisterClass(&wndqbclass));
+#endif
+
+	return wyTrue;
+}
+
+
+// Functions registers the Tab Interface window for Table Operations.
+wyBool 
+FrameWindow::RegisterTabInterfaceWindow(HINSTANCE hInstance)
+{
+    ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = 0;//CS_HREDRAW | CS_VREDRAW ;
+	wndclass.lpfnWndProc   = TableTabInterface::TableTabInterfaceWndProc;//MDIWindow::WndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hInstance ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+    wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    
+	wndclass.lpszMenuName  = (LPCWSTR)NULL ;
+	wndclass.lpszClassName = TABLE_TABINTERFACE_WINDOW;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	//m_hicon = wndclass.hIcon;
+	return wyTrue;
+
+}
+
+/*
+wyBool
+FrameWindow::RegisterTabIntBottomFrameWindow(HINSTANCE hinstance)
+{
+    ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = 0;//CS_HREDRAW | CS_VREDRAW ;
+	wndclass.lpfnWndProc   = TableTabInterface::TabIntBottomFrameWndProc;//TableTabInterfaceWndProc;//MDIWindow::WndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hinstance ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+    //wndclass.hbrBackground = (HBRUSH)(COLOR_3DLIGHT);
+    wndclass.hbrBackground = (HBRUSH)GetStockObject(COLOR_3DSHADOW);
+	wndclass.lpszMenuName  = (LPCWSTR)NULL ;
+	wndclass.lpszClassName = TTI_BOTTOMFRAME_WNDCLS;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	//m_hicon = wndclass.hIcon;
+
+    return wyTrue;
+}
+*/
+wyBool
+FrameWindow::RegisterPlainWindow(HINSTANCE hInstance)
+{
+    ATOM		ret;
+	WNDCLASS	wndclass;
+
+    // Register the Plain window.
+    wndclass.style         = 0;//CS_HREDRAW | CS_VREDRAW ;
+    wndclass.lpfnWndProc   = TableTabInterfaceTabMgmt::SubTabsCommonWndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hInstance ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+    wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
+	wndclass.lpszMenuName  = (LPCWSTR)NULL ;
+	wndclass.lpszClassName = TTI_SUBTABS_COMMONWNDCLS;
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	//m_hicon = wndclass.hIcon;
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::RegisterPQAResultwindow(HINSTANCE hinstanceent)
+{
+	ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wndclass.lpfnWndProc   = QueryAnalyzerBase::PQAHtmlWndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hinstanceent ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground =(HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = NULL ;
+	wndclass.lpszClassName = PQA_RESULT_WINDOW;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::RegisterHTMLInfoTabwindow(HINSTANCE hinstanceent)
+{
+	ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wndclass.lpfnWndProc   = ObjectInfo::HtmlWndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hinstanceent ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground =(HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = NULL ;
+	wndclass.lpszClassName = INFO_HTML_WINDOW;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::RegisterHTMLDbSearchWindow(HINSTANCE hinstanceent)
+{
+#ifndef COMMUNITY	
+	ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wndclass.lpfnWndProc   = TabDbSearch::HtmlWndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hinstanceent ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground =(HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = NULL ;
+	wndclass.lpszClassName = DBSEARCH_HTML_WINDOW;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+#endif
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::RegisterHTMLFormViewWindow(HINSTANCE hinstanceent)
+{
+#ifndef COMMUNITY	
+	ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wndclass.lpfnWndProc   = FormView::HtmlWndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hinstanceent ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground =(HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = NULL ;
+	wndclass.lpszClassName = FORMVIEW_HTML_WINDOW;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+#endif
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::RegisterHTTPErrorWindow(HINSTANCE hinstanceent)
+{
+#ifndef COMMUNITY
+
+	ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wndclass.lpfnWndProc   = CHttpError::HTTPErrorHtmlWndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hinstanceent ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground =(HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = NULL ;
+	wndclass.lpszClassName = HTTP_ERROR_WINDOW;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+#endif
+
+	return wyTrue;
+}
+
+
+void
+FrameWindow::SetYogMenuOwnerDraw()
+{
+	HMENU       hmenu;
+    wyInt32     i = 0, ignorecount = 0;
+    
+	
+    if(IsWindowMaximised() && wyTheme::IsSysmenuEnabled(GetActiveWin()->m_hwnd))
+    {
+        i = 1;
+        ignorecount = 3;
+    }
+
+    hmenu = GetMenu(m_hwndmain);
+    
+    if(wyTheme::GetBrush(BRUSH_MENUBAR, NULL))
+    {
+        wyTheme::SetMenuItemOwnerDraw(hmenu, i, ignorecount, BRUSH_MENUBAR, wyFalse);
+    }
+    else
+    {
+        wyTheme::SetMenuItemOwnerDraw(hmenu, i, ignorecount, BRUSH_BTNFACE, wyFalse);
+    }
+}
+
+// Function creates the main window i.e the main application window.
+wyBool
+FrameWindow::CreateMainWindow(HINSTANCE hinstance)
+{
+	wyUInt32    exstyle	= NULL;
+	wyUInt32    style   =  WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN;
+	HWND	    hwnd;
+	wyBool		val;
+	wyWChar		*appname = NULL;
+
+	appname = pGlobals->m_appname.GetAsWideChar();
+	    
+	// Create the main window.
+	VERIFY(hwnd	= CreateWindowEx(exstyle, MAIN_WINDOW_CLASS_NAME_STR, appname,
+								  style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+								  NULL, NULL, hinstance, this));
+
+	// keep track of the last window.
+	m_lastfocus = hwnd;
+
+	// Show and update the window.
+	
+    LocalizeMenu(GetMenu(hwnd));
+    SetYogMenuOwnerDraw();
+	//ShowWindow(hwnd, SW_NORMAL);
+	//VERIFY(ret = UpdateWindow(hwnd));
+
+    MoveToInitPos(hwnd);
+
+     val = m_connection->CheckRegistration(m_hwndmain, this);
+
+	 ///Handle UUID for upgrade check
+	 m_connection->HandleApplicationUUID();
+	 
+	 if(val == wyTrue)
+	 {
+		 CreateToolBarWindow();
+
+#ifdef ENTERPRISE
+	 	 SetMainWindowTitle();		 	 
+#endif
+	 }
+	 return val;
+}
+
+VOID
+FrameWindow::SetMainWindowTitle()
+{
+	wyString tempstr;
+	
+	if(pGlobals->m_entlicense.GetLength() == 0)
+		return;
+	
+	SetWindowText(m_hwndmain, pGlobals->m_appname.GetAsWideChar());
+}
+
+wyBool
+FrameWindow::MoveToInitPos(HWND hwnd)
+{
+	RECT	    rc;
+	wyInt32     lstyle = 0;
+    wyWChar     *lpfileport=0;
+	wyWChar     directory[MAX_PATH + 1] = {0};
+	wyString	dirstr;
+	wyInt32	    screenwidth, width, screenheight, height;
+	wyInt32		virtx, virty;
+	wyInt32		diffht, diffwd;
+	wyInt32		xprim, yprim;
+
+    if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyFalse)
+    {
+        ShowWindow(hwnd, SW_NORMAL);
+        return wyFalse;
+    }
+	
+	dirstr.SetAs(directory);
+
+    lstyle = wyIni::IniGetInt(SECTION_NAME, "Maximize", 0, dirstr.GetString());
+
+    if(lstyle == 1)
+    {
+        ShowWindow(hwnd, SW_MAXIMIZE);
+        return wyTrue;
+    }
+
+    rc.left = wyIni::IniGetInt(SECTION_NAME, "Left", 0, dirstr.GetString());
+	rc.top	= wyIni::IniGetInt(SECTION_NAME, "Top", 0, dirstr.GetString());
+	rc.right = wyIni::IniGetInt(SECTION_NAME, "Right", 600, dirstr.GetString());
+	rc.bottom = wyIni::IniGetInt(SECTION_NAME, "Bottom", 600, dirstr.GetString());
+	
+	/*If change from extended monitor to single , 
+	its required if closed the SQLyog last time from 2nd monitor.
+	So we moved to Most Left
+	*/
+	screenwidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+	screenheight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+	
+	virtx = GetSystemMetrics(SM_XVIRTUALSCREEN);
+	virty = GetSystemMetrics(SM_YVIRTUALSCREEN);
+		
+	xprim = GetSystemMetrics(SM_CXSCREEN);
+	yprim = GetSystemMetrics(SM_CYSCREEN);
+	
+	width = rc.right - rc.left;
+	height = rc.bottom - rc.top;
+
+	diffht = screenheight + virty;
+    diffwd = screenwidth + virtx; 
+				
+	//check whether the 2nd monitor is on corner or not before closing application
+	if(screenheight >= yprim && virtx >=0 && rc.left <= (virtx))
+	{
+		if(rc.top <= 0)
+		{
+			rc.left = 0;
+			rc.right = rc.left + width;
+
+			rc.top = 0;
+			rc.bottom = rc.top + height;
+		} 
+
+		else if(rc.top >= yprim) 
+		{
+			rc.left = 0;
+			rc.right = rc.left + width;
+			
+			rc.top = yprim - height;
+			rc.bottom = rc.top + height;
+		}
+	}
+
+	else if(screenheight >= yprim && virtx <= 0 && rc.left >= (xprim))
+	{
+		if(rc.top <= 0)
+		{
+			rc.left = xprim - width;
+			rc.right = rc.left + width;
+
+			rc.top = 0;
+			rc.bottom = rc.top + height;
+		}
+
+		else if(rc.top >= yprim)
+		{
+			rc.left = xprim - width;
+			rc.right = rc.left + width;
+
+			rc.top = yprim - height;
+			rc.bottom = rc.top + height;
+		}
+	}
+	
+
+	if(rc.left >= screenwidth) //if right side 
+	{
+		rc.left =  screenwidth - width;
+		rc.right = rc.left + width;
+	}
+
+	// If SQLyog was in 2nd monitor and moved 2nd monitor from right to left & open sqlyog 
+	else if(rc.left >= diffwd) 
+	{
+		rc.left =  diffwd - width;
+		rc.right = rc.left + width;
+	}
+
+	if(rc.right <= virtx) // lf left side
+	{
+		rc.left = 0;
+		rc.right = width;
+	}
+	
+	if(rc.top >= screenheight) //if down 
+	{
+		rc.top = screenheight - height;
+		rc.bottom = rc.top + height;		
+	}
+	
+	// If SQLyog was in 2nd monitor and moved 2nd monitor from bottom to top & open sqlyog 
+	else if(rc.top >= diffht)
+	{
+		rc.top = diffht - height;
+		rc.bottom = rc.top + height;
+	}
+
+	if(rc.bottom <= virty) // if top
+	{
+		rc.top = 0;
+		rc.bottom = height;
+	}
+	
+	MoveWindow(hwnd, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, FALSE);        
+    ShowWindow(hwnd, SW_NORMAL);
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::WriteInitPos(HWND hwnd)
+{
+	RECT        rc;
+    wyWChar      *lpfileport=0;
+    wyString    value, dirstr;
+    wyInt32     lstyle = 0, tmpleft = 0, tmptop = 0;;
+	wyWChar      directory[MAX_PATH + 1] = {0};
+
+    if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyFalse)
+        return wyFalse;
+
+	VERIFY(GetWindowRect(hwnd, &rc));
+	
+	// bug if the window is in minimized position then wrong values are entered and you cannot 
+	// change the sizing...so we need to see that only correct values are entered
+    lstyle = GetWindowLongPtr(hwnd, GWL_STYLE);
+
+	if(lstyle & WS_MINIMIZE)
+    {
+        rc.left     = 0;
+        rc.top      = 0;
+        rc.bottom   = 600;
+        rc.right    = 600;
+    }
+	
+	dirstr.SetAs(directory);
+
+	/*if(rc.left < 0)
+	{
+		tmpleft = -rc.left;
+		//rc.left = 0;
+	}
+
+	if(rc.top < 0)
+	{
+		tmptop = -rc.top;
+		//rc.top = 0;
+	}*/
+
+	// write the values.
+	value.Sprintf("%d", rc.left);
+	wyIni::IniWriteString(SECTION_NAME, "Left", value.GetString(), dirstr.GetString());
+
+	value.Sprintf("%d", rc.top);
+	wyIni::IniWriteString(SECTION_NAME, "Top", value.GetString(), dirstr.GetString());
+	
+	value.Sprintf("%d", rc.right + tmpleft);
+	wyIni::IniWriteString(SECTION_NAME, "Right", value.GetString(), dirstr.GetString());
+	
+	value.Sprintf("%d", rc.bottom + tmptop);
+	wyIni::IniWriteString(SECTION_NAME, "Bottom", value.GetString(), dirstr.GetString());
+
+    
+    if(lstyle & WS_MAXIMIZE)
+		value.Sprintf("1");
+	else
+		value.Sprintf("0");
+
+	wyIni::IniWriteString(SECTION_NAME, "Maximize", value.GetString(), dirstr.GetString());
+
+	return wyTrue;
+
+}
+
+// The window procedure for MainWindow. 
+// It creates all its child window in WM_CREATE message.
+LRESULT	CALLBACK
+FrameWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+{
+	FrameWindow*	    pcmainwin = (FrameWindow *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	wyInt32             ret;
+	MDIWindow*          wnd;
+	wyInt32		        tabimageid;
+	LPNMHDR			    lpnmhdr =(LPNMHDR)lparam;
+    LPDRAWITEMSTRUCT    lpds;
+
+	switch(message)
+	{
+	case WM_NCCREATE:
+		pcmainwin	= (FrameWindow *)(((CREATESTRUCT*)lparam)->lpCreateParams);
+		pcmainwin->SetHwnd(hwnd);
+		SetWindowLongPtr(hwnd, GWLP_USERDATA,(LONG_PTR)pcmainwin);
+		break;
+
+	case WM_CREATE:
+		pcmainwin->OnCreate();
+		return 0;
+
+	case UM_COMBOCHANGE:
+		pcmainwin->OnToolComboSelChange();
+		break;
+	
+    case UM_SETFOCUSAFTERFINDMSG:
+        SetActiveWindow((HWND)wparam);
+        break;
+	
+	case UM_SETFOCUS:
+		SetFocus((HWND)wparam);
+        
+    case WM_SETACTIVEWINDOW:
+		SetFocus((HWND)wparam);
+        SetActiveWindow((HWND)wparam);
+        break;
+
+    case UM_UPDATEMAINTOOLBAR:
+		{								
+			pcmainwin->EnableToolButtonsAndCombo(pcmainwin->m_hwndtool, pcmainwin->m_hwndsecondtool, pcmainwin->m_hwndtoolcombo, wparam ? wyTrue : wyFalse, wyTrue);					
+		}
+		break;
+
+    case MAX_WINDOW:
+        SetWindowLongPtr(hwnd, GWL_STYLE, GetWindowLongPtr(hwnd, GWL_STYLE) | WS_MAXIMIZE);
+        InvalidateRect(hwnd, NULL, TRUE);
+        UpdateWindow(hwnd);
+        break;
+
+	case WM_COMMAND:
+		pcmainwin->OnWmCommand(wparam);
+		break;
+
+	case WM_MENUCOMMAND:
+        pcmainwin->OnWmMenuCommand(hwnd, wparam, lparam);
+		break;
+
+	case WM_MEASUREITEM:
+        return wyTheme::MeasureMenuItem((LPMEASUREITEMSTRUCT)lparam, GetMenu(hwnd), pcmainwin->m_popupmenucount ? wyTrue : wyFalse);
+
+	case WM_DRAWITEM:
+        if(((LPDRAWITEMSTRUCT)lparam)->CtlType == ODT_MENU && wparam == 0)
+        {
+            return wyTheme::DrawMenuItem((LPDRAWITEMSTRUCT)lparam, GetMenu(hwnd));
+        }
+        else
+        {
+            lpds = (LPDRAWITEMSTRUCT)lparam;
+            wyTheme::DrawStatusBarPart((LPDRAWITEMSTRUCT)lparam, pcmainwin->m_statusbarmgmt ? pcmainwin->m_statusbarmgmt->GetPartText(lpds->itemID) : L"");
+            return 1;
+        }
+        break;
+
+	case WM_ACTIVATE:
+        pcmainwin->OnActivate(wparam);
+		break;
+
+	case WM_MENUSELECT:
+		return pcmainwin->OnWmMenuSelect((HMENU)lparam, LOWORD(wparam));		
+
+	case WM_HELP:
+		{
+			VERIFY(wnd = GetActiveWin());
+
+			if(!wnd)
+				ShowHelp("Getting%20started%20SQLyog%20GUI%20for%20MySQL.htm");
+			else
+			{
+				tabimageid = wnd->m_pctabmodule->GetActiveTabImage();
+
+				//If user presses Help in dialog of SchemaDesigner
+				if(tabimageid == IDI_SCHEMADESIGNER_16)
+					ShowHelp("SchemaDesigner%20Introduction%20SQLyog%20MySQL%20GUI.html");
+			
+				//If user presses Help in dialog of QueryBuilder
+				else if(tabimageid == IDI_QUERYBUILDER_16)
+					ShowHelp("Query%20Builder%20for%20SQLyog%20MySQL%20Management%20Tool.htm");
+				else
+				{
+					//Spatial data type err dialog is present,if user preeses the Help in that dialog
+					if(pcmainwin->m_iserrdlg == wyTrue)
+						ShowHelp("Data%20Manipulations%20in%20SQLyog%20MySQL%20GUI.html");
+                    else if(pcmainwin->m_isredindexhelp == wyTrue)
+                        ShowHelp("Redundant%20Indexes%20for%20SQLyog%20MySQL%20Client.htm");
+					else
+						ShowHelp("Getting%20started%20SQLyog%20GUI%20for%20MySQL.htm");
+				}	
+			}
+			return wyTrue;
+		}
+
+	// Sends all the existing MDI child window to ask whther to close or not.
+	// This is required if a user has enetered some text and selected cancel when asked to save.
+	case WM_CLOSE:
+
+        //set the flag to identify frame window closing
+        pcmainwin->m_iscloseallmdi = wyTrue;
+        
+        if(pcmainwin->OnWmClose(hwnd) == wyFalse)
+        {
+            //reset the frame window variable used in custom save dialog
+            pcmainwin->m_iscloseallmdi = wyFalse;
+            pcmainwin->m_framewndsaveselection = -1;
+            return 0;
+        }
+		break;
+
+	case WM_CLOSEALLWINDOW:
+		EnumChildWindows((HWND)pGlobals->m_hwndclient, FrameWindow::CloseEnumProc,(LPARAM)lparam);
+		break;
+	
+	case WM_DESTROY:
+		pcmainwin->DestroyResources();
+		break;
+
+	case WM_NCDESTROY:
+		delete[] pcmainwin->m_icons;
+		return 0;
+
+	case WM_INITMENUPOPUP:
+        if(HIWORD(lparam) == TRUE)
+        {
+            break;
+        }
+
+        wnd = GetActiveWin();
+
+        if(LOWORD(lparam) != 0 || IsWindowMaximised() == wyFalse || wyTheme::IsSysmenuEnabled(wnd ? wnd->m_hwnd : NULL) == wyFalse)
+        {
+            wyTheme::SetMenuItemOwnerDraw((HMENU)wparam);
+        }
+
+        pcmainwin->m_popupmenucount++;
+
+		if(pcmainwin->OnWmInitPopup(wparam, lparam) == wyFalse)
+        {
+			return 0;
+        }
+
+		break;
+
+	case WM_UNINITMENUPOPUP:
+        pcmainwin->m_popupmenucount--;
+		pcmainwin->HandleOnMenuDestroy((HMENU)wparam);
+		break;
+
+	case WM_NOTIFY:
+        if((ret = wyTheme::DrawToolBar(lparam, wyTrue)) != -1)
+        {
+            return ret;
+        }
+
+		if(pcmainwin->ONWmMainWinNotify(hwnd, lparam, wparam) == 0)
+		{
+            return 0;
+		}
+        else if(lpnmhdr->code == CTCN_SELCHANGING)
+        {
+            FrameWindow::ShowQueryExecToolTip(wyFalse);
+            return 1;
+        }
+        else if(lpnmhdr->code == CTCN_TABCLOSING && lpnmhdr->idFrom == IDC_CONNECTIONTAB)
+		{
+			if(pcmainwin->m_closetab == wyTrue)
+            {
+                pcmainwin->m_closetab = wyFalse; 
+                return 1;
+            }
+            
+            return 0;
+		}
+
+		break;
+
+	case WM_SIZE:
+        return pcmainwin->OnWmSize(wparam);	
+        
+	case UM_DESTROY_CONNTAB:
+		if(pcmainwin->m_hwndconntab)
+		{
+			DestroyWindow(pcmainwin->m_hwndconntab);
+			pcmainwin->m_hwndconntab = NULL;
+		}
+		return 1;
+
+    case WM_NCPAINT:
+    case WM_NCACTIVATE:
+        {
+            wyInt32 ret;
+            HDC hdc = GetWindowDC(hwnd);
+            RECT rcwnd, rcclient, rect;
+            GetWindowRect(hwnd, &rcwnd);
+            GetClientRect(hwnd, &rcclient);
+            MapWindowRect(hwnd, NULL, &rcclient);
+            
+            ret = DefFrameProc(hwnd, pGlobals->m_hwndclient, message, wparam, lparam);
+            HBRUSH hbr = GetSysColorBrush(COLOR_BTNFACE);
+            wyTheme::GetBrush(BRUSH_FRAMEWINDOW, &hbr);
+
+            rect.left = rect.top = (rcclient.left - rcwnd.left);
+            rect.top = (rcclient.top - rcwnd.top) - 1;
+            rect.bottom = rect.top + 1;
+            rect.right = rcclient.right - rcwnd.left;
+
+            if(rect.right - rect.left && rect.bottom - rect.top)
+            {
+                FillRect(hdc, &rect, hbr);
+            }
+            ReleaseDC(hwnd, hdc);
+            return ret;
+        }
+        break;
+	}
+
+  	return DefFrameProc(hwnd, pGlobals->m_hwndclient, message, wparam, lparam);
+}
+
+void 
+FrameWindow::DestroyResources()
+{
+	HMENU			menu, submenu, subsubmenu;
+	wyInt32			count, menucount, itemcount = 0, submenucount, subsubmenucount;
+    wyInt32         subsubcount = 0;
+	MENUITEMINFO	mif;
+	wyWChar          *newbuf = NULL;
+
+	menu = GetMenu(m_hwndmain);
+	menucount = GetMenuItemCount(menu);
+
+	for(count = 0; count < 0/*menucount*/; count++)
+    {
+		VERIFY(submenu = GetSubMenu(menu, count));
+		/*	starting from v5.1 we support favorites menu and since we keep some other data
+			as long data we dont owner draw it, thus we check for the index number of the menu here
+			and dont call the sub procedure to owner draw it */
+		
+		submenucount = GetMenuItemCount(submenu);
+
+		for(itemcount = 0; itemcount < submenucount; itemcount++)
+		{
+            subsubmenu = GetSubMenu(submenu, itemcount);
+
+            if(subsubmenu)
+            {
+                subsubmenucount = GetMenuItemCount(subsubmenu);
+
+		        for(subsubcount = 0; subsubcount < subsubmenucount; subsubcount++)
+		        {
+			        memset(&mif, 0, sizeof(mif));
+
+                    // first we know whther its a separator.
+			        mif.cbSize = sizeof(mif);
+			        mif.fMask  = MIIM_TYPE | MIIM_DATA | MIIM_ID;
+			        mif.fType  = MFT_SEPARATOR;
+        			
+			        VERIFY(GetMenuItemInfo(subsubmenu, subsubcount, TRUE, &mif));
+
+			        newbuf = (wyWChar*)mif.dwItemData;
+
+			        if(mif.fType & MFT_SEPARATOR )
+				        continue;
+        			
+			        if(newbuf)
+				        free(newbuf);
+
+                    newbuf = NULL;
+		        }
+            }
+
+			memset(&mif, 0, sizeof(mif));
+
+			// first we know whther its a separator.
+			mif.cbSize = sizeof(mif);
+			mif.fMask  = MIIM_TYPE | MIIM_DATA | MIIM_ID;
+			mif.fType  = MFT_SEPARATOR;
+			
+			VERIFY(GetMenuItemInfo(submenu, itemcount, TRUE, &mif));
+
+			newbuf = (wyWChar*)mif.dwItemData;
+
+			if(mif.fType & MFT_SEPARATOR )
+				continue;
+			
+			if(newbuf)
+				free(newbuf);
+
+            newbuf = NULL;
+		}
+	}
+
+	if(m_hicon)
+		DestroyIcon(m_hicon);
+
+	PostQuitMessage(0);  
+
+	return;
+}
+
+
+void 
+FrameWindow::RecursiveMenuEnable(HMENU hsubmenu, wyBool iswindowmenu, wyInt32 state)
+{
+  wyInt32 isubmenuitemindex;
+  wyInt32 isubmenuitemcount;
+  wyInt32 isubmenuitemid;
+
+  // Reset the menu counter, for running through all available items
+  isubmenuitemindex=0;
+
+  // Retrieve the count of the subitems
+  isubmenuitemcount = GetMenuItemCount(hsubmenu);
+
+  if(iswindowmenu)
+    isubmenuitemcount = 0;//WND_MNU_ITEMS; // number of items in menu window except the connection menuitems.
+
+  for(isubmenuitemindex = 0; isubmenuitemindex < isubmenuitemcount; isubmenuitemindex++)
+  {
+    isubmenuitemid = GetMenuItemID(hsubmenu,isubmenuitemindex);
+
+    if(isubmenuitemid != -1)
+      EnableMenuItem(hsubmenu,isubmenuitemid, state | MF_BYCOMMAND);
+    else
+      RecursiveMenuEnable(GetSubMenu(hsubmenu, isubmenuitemindex), wyFalse, state);
+   }
+
+  return;
+}
+
+// Functions to set various handle value of the members and to get the handles when needed.
+void
+FrameWindow::SetHwnd(HWND hwndmain)
+{
+	m_hwndmain = hwndmain;
+
+	return;
+}
+
+void
+FrameWindow::SetMDIHwnd(HWND hwndmdiclient)
+{
+	m_hwndmdiclient = hwndmdiclient;
+
+	return;
+}
+
+void 
+FrameWindow::SetStatusHwnd(HWND hwndstatus)
+{
+	m_hwndstatus = hwndstatus;
+
+	return;
+}
+
+void
+FrameWindow::SetToolHwnd(HWND hwndtool)
+{
+	m_hwndtool = hwndtool;
+
+	return;
+}
+
+void 
+FrameWindow::SetToolCombo(HWND hwndtoolcombo)
+{
+	m_hwndtoolcombo = hwndtoolcombo;
+
+	return;
+}
+
+HWND
+FrameWindow::GetHwnd()
+{
+	return m_hwndmain;
+}
+
+HINSTANCE
+FrameWindow::GetHinstance()
+{
+	return m_hinstance;
+}
+
+HWND
+FrameWindow::GetStatusHwnd()
+{
+	return m_hwndstatus;
+}
+
+HWND
+FrameWindow::GetToolHwnd()
+{
+	return m_hwndtool;
+}
+
+HWND
+FrameWindow::GetToolCombo()
+{
+	return m_hwndtoolcombo;
+}
+
+HWND
+FrameWindow::GetMDIWindow()
+{
+	return m_hwndmdiclient;
+}
+
+// Function creates the main window.
+wyBool
+FrameWindow::CreateToolBarWindow()
+{
+	HWND	 hwndtool;
+	wyUInt32 exstyle = NULL;
+	wyUInt32 style   = TBSTYLE_CUSTOMERASE | WS_CHILD | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_FLAT | TBSTYLE_TOOLTIPS | TBSTYLE_TRANSPARENT | CCS_NODIVIDER;
+	
+	//Make sure destroy all toolbar resources during the chage of icon size
+	DestroyToolBarResources();
+		
+	// Create the toolbar.
+	VERIFY(hwndtool	= CreateWindowEx(exstyle, TOOLBARCLASSNAME, NULL, style, 0,0,0,0, GetHwnd(),
+								  (HMENU)IDC_TOOLBAR,(HINSTANCE)GetHinstance(), NULL));
+	VERIFY(m_hwndsecondtool = CreateWindowEx(exstyle, TOOLBARCLASSNAME, NULL, style, 0,0,0,0, GetHwnd(),
+								  (HMENU)IDC_TOOLBAR2,(HINSTANCE)GetHinstance(), NULL));
+
+    //wndproc = (WNDPROC)SetWindowLongPtr(hwndtool, GWLP_WNDPROC, (LONG)FrameWindow::ToolbarWndProc);
+    //SetWindowLongPtr(hwndtool, GWLP_USERDATA, (LONG)wndproc);
+
+    //wndproc = (WNDPROC)SetWindowLongPtr(m_hwndsecondtool, GWLP_WNDPROC, (LONG)FrameWindow::ToolbarWndProc);
+    //SetWindowLongPtr(m_hwndsecondtool, GWLP_USERDATA, (LONG)wndproc);
+
+	// Set the class toolbar handle to newly created window.
+	SetToolHwnd(hwndtool);
+
+	// Create tool buttons.
+	VERIFY(CreateToolButtons(hwndtool));
+	VERIFY(m_connection->CreateOtherToolButtons(m_hwndsecondtool, m_hsecondiml));
+
+	// Create the combo box which will hold the databases of the connections.
+	VERIFY(m_hwndtoolcombo = CreateToolCombo(hwndtool));
+
+	SetToolCombo(m_hwndtoolcombo);
+
+	SetToolComboFont();
+	m_connection->SetToolComboImageList(this);
+	AddTextInCombo(NODBSELECTED);
+
+	return wyTrue;
+}
+
+LRESULT	CALLBACK
+FrameWindow::ToolbarWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+{
+    WNDPROC wndproc = (WNDPROC)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+    HDC hdc;
+    RECT rcwnd, rcclient, rect;
+    HBRUSH hbr;
+    wyBool ret = wyFalse;
+
+    if(message == WM_NCPAINT)
+    {
+        if((ret = wyTheme::GetBrush(BRUSH_MAINTOOLBAR, &hbr)) == wyFalse)
+        {
+            hbr = CreateSolidBrush(GetSysColor(COLOR_BTNFACE));
+        }
+
+        hdc = GetWindowDC(hwnd);
+        GetWindowRect(hwnd, &rcwnd);
+        GetClientRect(hwnd, &rcclient);
+        MapWindowRect(hwnd, NULL, &rcclient);
+        
+        rect.left = rect.top = 0;
+        rect.bottom = rcclient.top - rcwnd.top;
+        rect.right = rcwnd.right - rcwnd.left;
+
+        if(rect.right - rect.left && rect.bottom - rect.top)
+        {
+            FillRect(hdc, &rect, hbr);
+        }
+
+        rect.top = rcclient.bottom - rcwnd.top;
+        rect.bottom = rect.top + (rcwnd.bottom - rcclient.bottom);
+        
+        if(rect.right - rect.left && rect.bottom - rect.top)
+        {
+            FillRect(hdc, &rect, hbr);
+        }
+
+        rect.top = 0;
+        rect.right = rcclient.left - rcwnd.left;
+        
+        if(rect.right - rect.left && rect.bottom - rect.top)
+        {
+            FillRect(hdc, &rect, hbr);
+        }
+
+        rect.left = rcclient.right - rcwnd.left;
+        rect.right = rect.left + (rcwnd.right - rcclient.right);
+        
+        if(rect.right - rect.left && rect.bottom - rect.top)
+        {
+            FillRect(hdc, &rect, hbr);
+        }
+
+        if(ret == wyFalse)
+        {
+            DeleteBrush(hbr);
+        }
+
+        ReleaseDC(hwnd, hdc);
+        return 0;
+    }
+
+    return CallWindowProc(wndproc, hwnd, message, wparam, lparam);
+}
+
+// Function initializes array of buttons and adds them to the toolbar whose handle is sent as
+// parameter.
+wyBool
+FrameWindow::CreateToolButtons(HWND hwndtool)
+{
+	wyInt32     size, iconid;
+	HICON		hicon;
+	
+	/*
+		We are adding m_icons from the 2 element in the toolbar as we dont show
+		stop icon everytime. When the user has pressed the exeuction icon we replace
+		it with stop icon so we always put that icon in the first list of the image list */
+
+	wyInt32 command[] =
+		{	
+			IDM_FILE_NEWCONNECTION, ID_NEW_EDITOR , IDM_EXECUTE, ACCEL_EXECUTEALL, 
+			ACCEL_QUERYUPDATE, IDM_REFRESHOBJECT
+		};
+	wyUInt32 states[][2] = 
+	{ 
+		{TBSTATE_ENABLED, TBSTYLE_BUTTON}, {TBSTATE_ENABLED, TBSTYLE_BUTTON} ,
+        {TBSTATE_ENABLED, TBSTYLE_BUTTON}, {TBSTATE_ENABLED, TBSTYLE_BUTTON}, 
+        {TBSTATE_ENABLED, TBSTYLE_BUTTON}, {TBSTATE_ENABLED, TBSTYLE_BUTTON}, 
+   	};
+	wyInt32 imgres[] =  
+		{	IDI_CONNECT, IDI_QUERY, IDI_EXECUTE, IDI_EXECUTEALL, IDI_EXECUTEFORUPD, 
+			IDI_REFRESH
+		};
+		
+	VERIFY(m_hsecondiml	= ImageList_Create(m_toolbariconsize, m_toolbariconsize, ILC_COLOR32 | ILC_MASK, 1, 0));
+	SendMessage(hwndtool, TB_SETIMAGELIST, 0,(LPARAM)m_hsecondiml);
+	SendMessage(hwndtool, TB_SETEXTENDEDSTYLE, 0,(LPARAM)TBSTYLE_EX_DRAWDDARROWS);
+
+	size = sizeof(command)/ sizeof(command[0]);
+	
+	hicon = (HICON)LoadImage(m_hinstance, MAKEINTRESOURCE(IDI_STOP), IMAGE_ICON, m_toolbariconsize, m_toolbariconsize, LR_DEFAULTCOLOR);
+	VERIFY((iconid = ImageList_AddIcon(m_hsecondiml, hicon))!= -1);
+	VERIFY(DestroyIcon(hicon));
+
+	// set some required values
+	SendMessage(hwndtool, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
+
+    AddToolBarButtons(m_hinstance, hwndtool, m_hsecondiml, command, size, states, imgres);
+
+    SendMessage(hwndtool, TB_AUTOSIZE, 0, 0);
+	ShowWindow(hwndtool, TRUE);
+
+	return wyTrue;
+}
+
+
+// Create the combo box which will be there in the toolbar window.
+HWND
+FrameWindow::CreateToolCombo(HWND hwndtool)
+{
+	HWND        hwndcombo;
+	wyUInt32    style = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_DISABLENOSCROLL ;
+		
+	VERIFY(hwndcombo = CreateWindowEx(0, WC_COMBOBOXEX, TEXT(""), style, 516, 0, 150, 425,
+												m_hwndtool,(HMENU)IDC_TOOLCOMBO,(HINSTANCE)GetHinstance(), NULL));
+	return hwndcombo;
+}
+
+// Function to set the font of the combo box in the toolbar to ARIAL
+wyBool
+FrameWindow::SetToolComboFont()
+{
+	SendMessage(m_hwndtoolcombo, WM_SETFONT,(WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
+	return wyTrue;
+}
+
+// Function to create MDI client window.
+wyBool
+FrameWindow::CreateMDIWindow()
+{
+	wyUInt32                style = WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | WS_CLIPCHILDREN;
+	CLIENTCREATESTRUCT      cs;
+
+	// Initialize the cs structure.
+	cs.hWindowMenu  = GetSubMenu((HMENU)GetMenu(GetHwnd()), MDISUBMENU );
+	cs.idFirstChild = MDISTARTID;
+
+	VERIFY(pGlobals->m_hwndclient	= CreateWindow(	TEXT("MDICLIENT"), NULL,
+			style,  0, 0, 0, 0, m_hwndmain,(HMENU)1,(HINSTANCE)GetHinstance(),
+			(PSTR)&cs));
+
+	SetMDIHwnd(pGlobals->m_hwndclient);
+
+	//subclass the window procedure to handle Ctrl+Tab shortcut
+	pGlobals->m_wmnextproc = (WNDPROC)SetWindowLongPtr(pGlobals->m_hwndclient, GWLP_WNDPROC, (LONG_PTR)FrameWindow::FrameWndProc);
+
+	return wyTrue;
+}
+
+//handle Ctrl+tab shortcut for WM_MDINEXT message 
+LRESULT	CALLBACK 
+FrameWindow::FrameWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+{
+	wyInt32  tabid, count;
+	wyInt32 tabcount = 0;
+    HBRUSH                  hbr;
+    RECT    rect;
+
+	/*if message is WM_MDINEXT, then on Ctrl+Tab select the tab at next right position.
+	if it is the last tab then first tab will be selected*/
+
+	if(message == WM_MDINEXT)
+	{
+		//if it is default message
+		if(pGlobals->m_iscustomwmnext  == wyFalse)
+		{
+			count = CustomTab_GetItemCount(pGlobals->m_pcmainwin->m_hwndconntab);
+			tabid = CustomTab_GetCurSel(pGlobals->m_pcmainwin->m_hwndconntab);
+			
+			if(count > 1)
+			{
+				//left to right on Ctrl+tab
+				if(lparam == 0)
+				{
+					tabcount = (tabid + 1) % count;
+				}
+				//right to left on Ctrl+shift+tab
+				else if(lparam == 1)
+				{
+					tabcount = (tabid - 1 >= 0)? (tabid - 1) : (count - 1);
+				}
+				CustomTab_SetCurSel(pGlobals->m_pcmainwin->m_hwndconntab, tabcount, 1);
+				CustomTab_EnsureVisible(pGlobals->m_pcmainwin->m_hwndconntab, tabcount);	
+			}
+			return 1;
+		}
+	}
+    else if(message == WM_ERASEBKGND && wyTheme::GetBrush(BRUSH_MDICLIENT, &hbr))
+    {
+        GetClientRect(hwnd, &rect);
+        FillRect((HDC)wparam, &rect, hbr);
+        return 1;
+    }
+
+	//call default frame window procedure
+	return CallWindowProc(pGlobals->m_wmnextproc, hwnd, message, wparam, lparam);	
+}
+
+// Function to create the status bar of the main window.
+wyBool
+FrameWindow::CreateStatusBarWindow()
+{
+	RECT     rc;
+	HWND     hwndstatus;
+	wyUInt32 exstyles = NULL;
+	wyUInt32 styles = WS_CHILD | WS_BORDER | WS_VISIBLE;
+
+	VERIFY(GetClientRect(GetHwnd(), &rc));
+
+	VERIFY(hwndstatus = CreateWindowEx(exstyles, STATUSCLASSNAME, L"", styles, 0,0,0,0, GetHwnd(),
+				(HMENU)IDC_FRAMESTATUS,(HINSTANCE)GetHinstance(), NULL));
+
+    m_connection->ManageStatusBar(hwndstatus);
+
+	VERIFY(UpdateWindow(hwndstatus));
+
+    SetStatusHwnd(hwndstatus);
+    
+	m_connection->SetStatusParts(hwndstatus);
+    m_statusbarmgmt = new StatusBarMgmt(hwndstatus);
+	return wyTrue;
+}
+
+
+// Functions to resize various windows.
+wyBool
+FrameWindow::Resize(WPARAM wparam)
+{
+	ResizeToolBar();
+	m_connection->ResizeStatusWindow(GetHwnd(), GetStatusHwnd());
+	
+	ResizeMDIWindow();
+
+	//To paint properely while maximizing frame window
+	if(GetHwnd() && wparam == SIZE_MAXIMIZED)
+		InvalidateRect(NULL, NULL, TRUE);			
+
+	return wyTrue;
+}
+
+void
+FrameWindow::ResizeToolBar()
+{
+	wyInt32	vpos, hpos, height, width, comboht = TOOLBAR_HEIGHT, tabheight = 0;
+	wyInt32 firsttoolextrawidth = 0, combovpos = 0, firsttoolbarheight = 0;
+	RECT	rc, rctool, rcttemp;
+
+	VERIFY(GetClientRect((HWND)GetHwnd(), &rc));
+
+	if(m_toolbariconsize == ICON_SIZE_32)
+	{
+		firsttoolextrawidth = m_toolbariconsize + m_toolbariconsize / 2;
+		combovpos = 8;		
+	}
+
+	else if(m_toolbariconsize == ICON_SIZE_24)
+	{
+		firsttoolextrawidth = (m_toolbariconsize * 2) - 2;
+		combovpos = 4;		
+	}
+
+	else
+	{
+		firsttoolextrawidth = (m_toolbariconsize * 3) - 2;
+		combovpos = 0;		
+	}
+
+	firsttoolbarheight = m_toolbariconsize +  8;
+
+	// Set the values for toolbar.
+	vpos	= 0; 
+	hpos	= 0; 
+	height = firsttoolbarheight;
+	
+	width = TOOLBAR_WIDTH;
+	
+	width = (FIRSTTOOLICONCOUNT * m_toolbariconsize) + TOOLBAR_COMBO_WIDTH + firsttoolextrawidth;
+
+	// Move both the toolbars.
+	VERIFY(MoveWindow(m_hwndtool, hpos, vpos, width, height, TRUE));
+
+	//Tab interface
+    if(m_hwndconntab)
+    {
+        tabheight = CustomTab_GetTabHeight(m_hwndconntab);
+        VERIFY(MoveWindow(m_hwndconntab, hpos, m_toolbariconsize + TABBED_INTERFACE_TOP_PADDING, rc.right, tabheight, TRUE));
+    }
+
+	VERIFY(GetClientRect(m_hwndtool, &rcttemp)); 
+	
+	hpos = rcttemp.right + 10;	
+	comboht = m_toolbariconsize;    
+
+	// Set the values for the combobox.
+	hpos	= width - TOOLBAR_COMBO_WIDTH;	
+	width = TOOLBAR_COMBO_WIDTH;
+
+	VERIFY(MoveWindow((HWND)GetToolCombo(), hpos, combovpos, width, comboht , TRUE));
+
+	VERIFY(GetWindowRect(GetToolHwnd(), &rctool)); 
+	VERIFY(MapWindowPoints(NULL, GetHwnd(),(LPPOINT)&rctool, 2));
+
+	VERIFY(MoveWindow((HWND)m_hwndsecondtool, hpos + TOOLBAR_COMBO_WIDTH, vpos, 
+                                (rc.right-rc.left) - (hpos + 150), height, TRUE));
+
+	ShowWindow(GetToolCombo(), TRUE);
+	ShowWindow(m_hwndsecondtool, TRUE);
+
+	return;
+}
+
+void
+FrameWindow::ResizeMDIWindow()
+{
+	wyInt32 ret, hpos, vpos, width, height;
+	RECT	rcframe, rctool, rcstatus;
+
+	VERIFY(GetClientRect(GetHwnd(), &rcframe));
+	VERIFY(GetWindowRect(GetToolHwnd(), &rctool));
+	VERIFY(GetWindowRect(GetStatusHwnd(), &rcstatus));
+
+	hpos	= 0;
+    vpos	= m_toolbariconsize + TABBED_INTERFACE_TOP_PADDING + (m_hwndconntab ? CustomTab_GetTabHeight(m_hwndconntab) : TABBED_INTERFACE_HEIGHT);
+	height	= (rcframe.bottom - (rcstatus.bottom - rcstatus.top))- vpos;
+	width	= rcframe.right - rcframe.left;
+
+	VERIFY(ret = MoveWindow(GetMDIWindow(), 0, vpos, width, height, FALSE));
+
+	return;
+}
+
+wyInt32
+FrameWindow::ShowMySQLErrorCancel(HWND hdlg, Tunnel * tunnel, PMYSQL mysql)
+{
+	wyUInt32    mysqlerrno;
+	wyString    err;
+
+	mysqlerrno = tunnel->mysql_errno(*mysql);
+
+	/* it may happen that due to http error the errornumber is 0 so we return */
+	if(0 == mysqlerrno)
+		return IDYES;
+
+	if(tunnel->IsTunnel()&& mysqlerrno > 12000)
+		err.Sprintf(_("HTTP Error No. %d\n%s"), mysqlerrno, tunnel->mysql_error(*mysql));
+	else
+		err.Sprintf(_("Error No. %d\n%s"), mysqlerrno, tunnel->mysql_error(*mysql));
+
+	return MessageBox(hdlg, err.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONERROR | MB_OKCANCEL | MB_DEFBUTTON2);
+}
+
+
+// Callback procedure to close every Query Window.
+wyInt32 CALLBACK
+FrameWindow::CloseEnumProc(HWND hwnd, LPARAM lParam)
+{
+	wyInt32	*ret = (wyInt32*)lParam;
+
+	if(GetWindow(hwnd, GW_OWNER))        
+		return wyTrue ;
+ 
+	SendMessage(GetParent(hwnd), WM_MDIRESTORE, (WPARAM)pGlobals->m_hwndclient, 0);
+ 
+	if(!(SendMessage(hwnd, WM_QUERYENDSESSION, 0, 0)))
+	{
+		*(ret)= 0;
+		return wyFalse;
+	}
+ 
+	SendMessage(GetParent(hwnd), WM_MDIDESTROY, (WPARAM)hwnd, 0);
+
+	return wyTrue ;
+}
+
+// Function to add text in the combobox of the toolbar. This function is called whenever
+// the current database is changed so that the current database is shown in the combobox. When
+// called for the first time or if NULL is sent as parameter then it writes no database selected.
+wyBool
+FrameWindow::AddTextInCombo(const wyWChar * text)
+{
+	wyUInt32        ret;
+	const wyWChar*   def = NODBSELECTED;
+	COMBOBOXEXITEM	cbi;
+	wyString		seldb, title;
+
+	MDIWindow *wnd = GetActiveWin();
+
+	SendMessage(m_hwndtoolcombo, CB_RESETCONTENT, 0, 0);
+
+	cbi.mask = CBEIF_TEXT | CBEIF_IMAGE | CBEIF_SELECTEDIMAGE;
+	cbi.pszText     = (wyWChar*)(wcslen(text)!= 0 ? text : def);
+	cbi.cchTextMax  = 50;
+	cbi.iImage	    = 0;
+	cbi.iSelectedImage = 0;
+	cbi.iItem       = -1;
+
+	SendMessage(m_hwndtoolcombo, CBEM_INSERTITEM, 0L,(LPARAM)&cbi);
+	VERIFY(ret = SendMessage(m_hwndtoolcombo, CB_SETCURSEL,(WPARAM)0, 0)!= CB_ERR);
+
+	//Handle the title with DB name
+	if(!wnd || !text || !wcslen(text))
+		return wyFalse;
+	
+	seldb.SetAs(text);
+	title.Sprintf("%s/%s %s", wnd->m_title.GetString(), seldb.GetString(), wnd->m_tunneltitle.GetString());
+
+	SetWindowText(wnd->m_hwnd, title.GetAsWideChar());
+	
+	return wyTrue;
+}
+
+// Displays text which is passed as paramter in the first part of the status bar in the main
+// window.
+wyInt32
+FrameWindow::AddTextInStatusBar(const wyWChar *text)
+{
+    wyString temp(text);
+
+    temp.LTrim();
+    temp.Insert(0, " ");
+
+    m_statusbarmgmt->ShowInformation(temp.GetAsWideChar(), 0);
+    return 0;
+}
+
+// Function sets the connection number in the other part of the status bar of the main window
+// It takes the current number of connection which is stored globally.
+wyBool
+FrameWindow::SetConnectionNumber()
+{
+	wyString    con;
+
+	con.Sprintf(_(" Connections: %d"), pGlobals->m_conncount);
+    m_statusbarmgmt->ShowInformation(con.GetAsWideChar(), 5);
+
+	return wyTrue;
+}
+
+// function handle all the onwmcommand values in the main window.
+// somewhere classname is checked so that different command is not executed for different MDI
+// window otherwise it will give an GPF error.
+wyInt32
+FrameWindow::OnWmCommand(WPARAM wParam)
+{
+	HWND			hwndactive = (HWND)SendMessage(pGlobals->m_hwndclient, WM_MDIGETACTIVE, 0, NULL);
+	wyBool			ret = wyFalse;
+	MDIWindow *		pcquerywnd = NULL;
+	EditorBase		*peditorbase = NULL;
+	TabMgmt			*ptabmgmt	  = NULL;
+    TabEditor       *ptabeditor = NULL;
+    TabTypes        *ptabtype   = NULL;
+	TabHistory		*ptabhistory = NULL;
+	TabObject		*ptabobject = NULL;
+    TabTableData    *ptabledata = NULL;
+	HWND            hwnd;
+	ConnectionTab	*conntab  = NULL;
+	wyInt32			tabicon = 0;
+    MySQLDataEx*    mydata = NULL;
+
+#ifndef COMMUNITY
+	TabDbSearch		*ptabdbsearch = NULL;
+#endif
+
+	if(hwndactive)
+	{
+		pcquerywnd	 = (MDIWindow*)GetWindowLongPtr(hwndactive, GWLP_USERDATA);
+
+		tabicon = pcquerywnd->m_pctabmodule->GetActiveTabImage();
+
+		if(tabicon != IDI_DATASEARCH)
+		{
+            ptabeditor   = pcquerywnd->GetActiveTabEditor();
+			ptabtype     = pcquerywnd->GetTabModule()->GetActiveTabType();
+		    if(ptabeditor)
+		    {
+		        peditorbase = pcquerywnd->GetActiveTabEditor()->m_peditorbase;
+		        ptabmgmt	 = pcquerywnd->GetActiveTabEditor()->m_pctabmgmt;
+	        }
+			ptabhistory = pcquerywnd->GetActiveHistoryTab();
+			ptabobject = pcquerywnd->GetActiveInfoTab();
+
+            if(tabicon == IDI_TABLE)
+            {
+                ptabledata = (TabTableData*)ptabtype;
+            }
+		}
+#ifndef COMMUNITY
+		else
+		{
+			ptabdbsearch = (TabDbSearch*) pcquerywnd->m_pctabmodule->GetActiveTabType();
+		}
+#endif
+
+		//connection tab object
+		conntab = pGlobals->m_pcmainwin->m_conntab;
+	}
+
+	/* now we check that if a query is being executed for the selected window then we dont do anything */
+	if(pcquerywnd && (pcquerywnd->m_executing == wyTrue || pcquerywnd->m_pingexecuting == wyTrue))
+    {
+		wyInt32 id =  LOWORD(wParam);
+
+		if(id != IDM_FILE_EXIT &&
+			 id != IDM_FILE_NEWCONNECTION && 
+			 id != IDM_FILE_NEWSAMECONN &&
+			 id != ACCEL_NEWCONN &&     // if we r executing a query ctrl+m and ctrl+n is not working . issue - http://code.google.com/p/sqlyog/issues/detail?id=270
+			 id != ACCEL_NEWSAMECONN &&
+			 id != IDM_EXECUTE &&
+			 id != ACCEL_EXECUTEALL &&
+             id != IDM_WINDOW_CASCADE &&
+             id != IDM_WINDOWS_ICONARRANGE &&
+             id != IDM_WINDOW_TILE &&
+			 id != ACCEL_FIRSTCONN &&
+			 id != ACCEL_SECONDCONN &&
+			 id != ACCEL_THIRDCONN &&
+			 id != ACCEL_FOURTHCONN &&
+			 id != ACCEL_FIFTHCONN &&
+			 id != ACCEL_SIXTHCONN &&
+			 id != ACCEL_SEVENTHCONN &&
+			 id != ACCEL_EIGTHCONN &&
+			 id != ACCEL_NINTHCONN)
+			 return 1;
+	}
+
+    if(m_connection->OnWmCommand(hwndactive, pcquerywnd, wParam) == wyTrue)
+        return 1;
+
+	switch(LOWORD(wParam))
+	{
+    case ID_EXPORT_EXPORTTABLEDATA: 
+        pcquerywnd->EnableExportDialog();
+        break;
+    case ACCEL_OBFILTER:
+        SetFocus(pcquerywnd->m_pcqueryobject->m_hwndFilter);
+        SendMessage(pcquerywnd->m_pcqueryobject->m_hwndFilter, EM_SETSEL, 0, -1);
+        break;
+    case ACCEL_ALTERTABLE:
+        pcquerywnd->m_pcqueryobject->ProcessF6();
+        break;
+	case ACCEL_NEWCONN:
+	case IDM_FILE_NEWCONNECTION:
+		CreateConnDialog();
+		break;
+
+	case ACCEL_NEWSAMECONN:
+	case IDM_FILE_NEWSAMECONN:
+        if(pcquerywnd && OnNewSameConnection(hwndactive, pcquerywnd) == wyFalse)
+            return 0;
+		break;
+
+	case ACCEL_DISCONN:
+	case ACCEL_CLOSECONNECTION:
+	case IDM_FILE_CLOSECONNECTION:
+		if(hwndactive)
+			SendMessage((HWND)SendMessage(pGlobals->m_hwndclient, WM_MDIGETACTIVE, 0, NULL), WM_CLOSE, 0, 0);
+		break;
+
+	case IDM_TMAKER_CLOSE:
+		SendMessage((HWND)SendMessage(pGlobals->m_hwndclient, WM_MDIGETACTIVE, 0, NULL), WM_CLOSE, 0, 0);
+		break;
+		
+	case IDM_FILE_CLOASEALL:
+		{
+			wyInt32 ret = 0;
+			SendMessage(m_hwndmain, WM_CLOSEALLWINDOW, 0,(LPARAM)&ret);
+		}
+		break;
+
+	case IDM_FILE_OPENSQL:
+        if(hwndactive )
+			pcquerywnd->HandleFileOpen(SQLYOGFILEINDEX);			        
+		break;
+
+	//To open file in new tab
+	case ACCEL_OPENNEW:
+	case IDM_FILE_OPENSQLNEW:
+		if(hwndactive)
+		{
+//For Commubnity & PRO, there's no SD & QB
+#ifndef COMMUNITY
+			if(pGlobals->m_entlicense.CompareI("Professional"))
+			{
+				pcquerywnd->HandleFileOpen(SQLYOGFILEINDEX);
+			}
+			else
+			{
+				pcquerywnd->HandleFileOpen(SQLINDEX);
+			}
+#else
+			pcquerywnd->HandleFileOpen(SQLINDEX);
+#endif
+		}
+		break;
+	
+	case ACCEL_SAVE:
+	case IDM_FILE_SAVESQL:
+        if(hwndactive)
+			pcquerywnd->HandleFileSave();      
+		break;
+
+	case IDM_FILE_SAVEAS:
+		if(hwndactive )
+			pcquerywnd->HandleSaveAsFile();
+		break;
+
+	case ID_LF_1+1:   // Sqlyog Recent files
+	case ID_LF_1+2:
+	case ID_LF_1+3:
+	case ID_LF_1+4:
+	case ID_LF_1+5:
+	case ID_LF_1+6:
+	case ID_LF_1+7:
+	case ID_LF_1+8:
+	case ID_LF_1+9:
+	case ID_LF_1+10:
+
+			if(hwndactive )
+			pGlobals->m_pcmainwin->InsertFromLatestFile(LOWORD(wParam), pcquerywnd);
+		break;
+
+	case IDM_FILE_EXIT:
+        
+        PostMessage(m_hwndmain, WM_CLOSE, 0, 0);
+        return 1;
+        break;
+
+	case IDM_OBCOLOR:
+		SendMessage(pcquerywnd->m_pcqueryobject->m_hwnd, WM_COMMAND, wParam, NULL);
+		break;
+		
+	case IDC_TOOLCOMBO:
+        HandleToolCombo(wParam);
+		break;
+
+	case IDM_EXECUTE:
+	case ACCEL_QUERYUPDATE:
+	case ACCEL_QUERYUPDATE_KEY:
+	case ACCEL_EXECUTE_MENU:
+        if(!ptabeditor)
+            break;
+        HandleExecuteCurrentQuery(hwndactive, pcquerywnd, peditorbase, wParam);
+		break;
+	case ACCEL_EXECUTE:
+		if(pcquerywnd)
+			HandleOnRefreshExecuteQuery(hwndactive, pcquerywnd, wParam);
+		break;
+
+	case ACCEL_EXECUTESEL_CTRL_F9:
+		if(!(pGlobals->m_isrefreshkeychange == wyFalse && ptabeditor))    
+				break;
+		HandleExecuteAllQuery(hwndactive, pcquerywnd, peditorbase);
+		break;
+
+	case ACCEL_EXECUTESEL_CTRL_F5:
+		if(pGlobals->m_isrefreshkeychange == wyFalse)
+            break;        
+	case ACCEL_EXECUTEALL:
+        if(!ptabeditor)
+            break;
+        HandleExecuteAllQuery(hwndactive, pcquerywnd, peditorbase);
+		break;
+    case ID_EXPLAIN_EXPLAIN:
+        if(!ptabeditor)
+            break;
+        HandleExecuteExplain(hwndactive, pcquerywnd, peditorbase);
+        break;
+    case ID_EXPLAIN_EXTENDED:
+        if(!ptabeditor)
+            break;
+        HandleExecuteExplain(hwndactive, pcquerywnd, peditorbase, wyTrue);
+        break;
+
+	//case ACCEL_EXECUTESEL_CTRL_F9:
+	//	if(!(pGlobals->m_isrefreshkeychange == wyFalse&& ptabeditor))    
+	//			break;
+	//	if(IsQuerySelected(peditorbase)) // if Query is selected in query tab 
+	//		HandleExecuteSelQuery(hwndactive, pcquerywnd, peditorbase);
+	//	break;
+
+	//case ACCEL_EXECUTESEL_CTRL_F5:
+	//	if((pGlobals->m_isrefreshkeychange == wyFalse) ||(ptabeditor) &&(!IsQuerySelected(peditorbase)))
+	//		break;
+	//case ACCEL_EXECUTESEL:
+ //       if(!ptabeditor)
+ //           break;
+ //       HandleExecuteSelQuery(hwndactive, pcquerywnd, peditorbase);
+	//	break;
+
+	case ACCEL_NEWEDITOR:
+	case ID_NEW_EDITOR:
+        if(hwndactive)
+            CreateNewQueryEditor(pcquerywnd);
+		break;
+	
+	case ID_EDIT_SWITCHTABSTORIGHT:
+	case ACCEL_NAVIGATETABDOWN:
+		if(hwndactive )
+			HandleTabNavigation(pcquerywnd, wyTrue);
+		break;
+
+	case ID_EDIT_SWITCHTABSTOLEFT:
+	case ACCEL_NAVIGATETABUP:
+		if(hwndactive )
+			HandleTabNavigation(pcquerywnd, wyFalse);
+		break;
+
+	case ID_FILE_CLOSETAB:
+	case ACCEL_CLOSETAB:
+		if(hwndactive )
+			DeleteQueryTabItem(pcquerywnd);
+			break;
+	case IDM_DB_REFRESHOBJECT:
+	case IDM_REFRESHOBJECT:
+	    if(hwndactive)
+            HandleOnRefresh(pcquerywnd);
+		break;
+	case ACCEL_REFRESH:
+        if(hwndactive)
+			HandleOnRefreshExecuteQuery(hwndactive, pcquerywnd, wParam, wyTrue);
+		break;
+
+	case IDM_EDIT_UNDO:
+		if(hwndactive)
+			SendMessage(peditorbase->m_hwnd, SCI_UNDO, 0, 0); 		
+		break;
+
+	case IDM_EDIT_REDO:
+		if(hwndactive)
+			SendMessage(peditorbase->m_hwnd, SCI_REDO, 0, 0);  
+		break;
+
+
+	case IDM_EDIT_CUT:
+		if(hwndactive)
+		{
+			hwnd = GetFocus();
+			CopyStyledTextToClipBoard(hwnd);
+		    SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)""); 
+		}
+		break;		
+
+	case IDM_EDIT_COPY:
+		if(hwndactive)
+			CopyStyledTextToClipBoard(GetFocus());
+		break;		
+
+    case IDM_COPYNORMALIZED:
+        if(hwndactive && peditorbase)
+            CopyWithoutWhiteSpaces(peditorbase->m_hwnd);
+        break;
+
+	case ACCEL_PASTE:
+	case IDM_EDIT_PASTE:
+        if(hwndactive)
+			peditorbase->PasteData();
+		break;	
+		
+	/*case IDM_EDIT_CLEAR:
+		if(hwndactive)
+			SendMessage(peditorbase->m_hwnd, SCI_SETTEXT, 0, (LPARAM)"");
+		break;*/
+
+	case IDM_EDIT_SELECTALL:
+		if(hwndactive)
+			SendMessage(peditorbase->m_hwnd, EM_SETSEL, (WPARAM)0, (LPARAM)-1); 
+		break;
+
+    case IDM_EDIT_FINDNEXT:
+    case ACCEL_FINDNEXT:
+        if(!ptabeditor && !ptabhistory && !ptabobject && tabicon != IDI_TABLE)
+        {
+#ifndef COMMUNITY
+            if(!ptabdbsearch)
+                break;
+#else
+            break;
+#endif
+        }
+		if(hwndactive)
+            OnAccelFindNext(pcquerywnd);
+        break;
+
+	case IDM_EDIT_FIND:
+	case ACCEL_FIND:
+		if(!ptabeditor && !ptabhistory && !ptabobject && tabicon != IDI_TABLE)
+        {
+#ifndef COMMUNITY
+            if(!ptabdbsearch)
+                break;
+#else
+            break;
+#endif
+        }
+
+		if(hwndactive)
+			FindTextOrReplace(pcquerywnd, wyFalse);
+		break;		
+
+	case IDM_EDIT_REPLACE:
+	case ACCEL_REPLACE:
+        if(!ptabeditor)
+            break;
+		if(hwndactive )
+			FindTextOrReplace(pcquerywnd, wyTrue);
+		break;		
+
+	case IDM_EDIT_GOTO:
+	case ACCEL_GOTO:
+        if(!ptabeditor)
+            break;
+		if(hwndactive)
+            GoToLine(hwndactive, pcquerywnd);
+		break;		
+
+	case ACCEL_TMENU:
+	case IDM_FILE_CONNECT:
+	case ID_EDIT_INSERTTEMPLATES:
+		if(hwndactive)
+			pcquerywnd->ShowTemplateDlg();
+		break;
+
+	case ID_EDIT_INSERTFILE:
+		pcquerywnd->HandleFileOpen(SQLINDEX, wyTrue);
+		break;
+
+	case ACCEL_GRIDFORM:
+        if(hwndactive)
+		{
+#ifndef COMMUNITY
+        
+            if(tabicon == IDI_DATASEARCH)
+            {
+                ptabdbsearch->m_pdataview->AccelaratorSwitchForm();
+            }
+            else
+		
+#endif
+		    if(ptabledata)
+            {
+                ptabledata->m_tableview->AccelaratorSwitchForm();
+            }
+            else if(ptabmgmt && ptabmgmt->m_presultview)
+            {
+                ptabmgmt->m_presultview->AccelaratorSwitchForm();
+            }
+		}			
+		break;
+
+    case ACCEL_RESULT:
+	case IDM_EDIT_RESULT_TEXT:
+        if(!ptabeditor && !ptabledata && tabicon != IDI_DATASEARCH)
+            break;
+        if(hwndactive)
+		{
+#ifndef COMMUNITY
+		    if(tabicon == IDI_DATASEARCH)
+            {
+                ptabdbsearch->m_pdataview->ShowTextView();
+            }
+            else
+#endif
+        
+            if(ptabledata)
+            {
+                ptabledata->m_tableview->ShowTextView();
+            }
+            else if(ptabmgmt && ptabmgmt->GetDataView())
+            {
+                ptabmgmt->GetDataView()->ShowTextView();
+            }
+        }
+		break;		
+
+    case ACCEL_CHANGEVIEW:
+        if(hwndactive)
+		{
+      
+#ifndef COMMUNITY
+		    if(tabicon == IDI_DATASEARCH)
+            {
+                ptabdbsearch->m_pdataview->SwitchView();
+            }
+            else
+#endif
+            if(ptabledata)
+            {
+                ptabledata->m_tableview->SwitchView();
+            }
+            else if(ptabmgmt && ptabmgmt->GetDataView())
+            {
+                ptabmgmt->GetDataView()->SwitchView();
+            }
+		}
+        break;
+
+	case ACCEL_OBJECT:
+	case IDC_EDIT_SHOWOBJECT:
+		if(hwndactive)
+		{
+			pGlobals->m_pcmainwin->CheckOrUncheckObjBrowserVis(pcquerywnd);
+			pcquerywnd->ShowOrHideObjBrowser();
+		}
+		break;		
+
+	case ACCEL_RESULTWINDOW:
+	case IDC_EDIT_SHOWRESULT:
+        if(!ptabeditor)
+            break;
+		if(hwndactive)
+		{
+			ret = pGlobals->m_pcmainwin->CheckOrUncheckResultWindowVis(pcquerywnd);
+			if(ret)
+				pcquerywnd->ShowOrHideResultWindow();
+		}
+		break;		
+
+	case ACCEL_EDITWINDOW:
+	case IDC_EDIT_SHOWEDIT:
+        if(!ptabeditor)
+            break;
+		if(hwndactive)
+		{
+			ret = pGlobals->m_pcmainwin->CheckOrUncheckEditWindowVis(pcquerywnd);
+			if(ret == wyTrue)
+				pcquerywnd->ShowOrHideEditWindow();
+		}
+		break;
+		
+	case IDM_EDIT_ADVANCED_UPPER:
+	case ACCEL_UPPERCASE:
+        if(!ptabeditor)
+            break;
+		if(hwndactive )
+			peditorbase->MakeSelUppercase();
+		break;
+
+	case IDM_EDIT_ADVANCED_LOWER:
+	case ACCEL_LOWERCASE:
+        if(!ptabeditor)
+            break;
+		if(hwndactive )
+			peditorbase->MakeSelLowercase();
+		break;
+
+	case IDM_EDIT_ADVANCED_COMMENT:
+	case ACCEL_COMMENT:
+        if(!ptabeditor)
+            break;
+		if(hwndactive)
+			peditorbase->CommentSel();
+		break;
+
+	case IDM_EDIT_ADVANCED_REMOVE:
+	case ACCEL_REMOVE_COMMENT:
+        if(!ptabeditor)
+            break;
+		if(hwndactive)
+			peditorbase->CommentSel(wyTrue);
+		break;
+
+	case ACCEL_EXPORT:
+	case IDM_IMEX_EXPORTDATA:
+        if(!ptabeditor &&  
+#ifndef COMMUNITY
+            !ptabdbsearch &&
+#endif
+            !ptabledata)
+        {
+            break;
+        }
+
+		if(hwndactive)
+        {
+            if(ptabledata && (mydata = ptabledata->m_tableview->GetData()) && mydata->m_datares)
+            {
+                ptabledata->m_tableview->ExportData();
+            }
+            else if(ptabeditor && (mydata = ptabeditor->m_pctabmgmt->GetResultData()) && mydata->m_datares)
+            {
+                ptabeditor->m_pctabmgmt->GetDataView()->ExportData();
+            }
+#ifndef COMMUNITY
+            else if(ptabdbsearch && (mydata = ptabdbsearch->m_pdataview->GetData()) && mydata->m_datares)
+            {
+                ptabdbsearch->m_pdataview->ExportData();
+            }
+#endif
+        }
+
+		break;
+        
+	case IDC_PREF:
+        ManagePreferences();
+		break;
+
+	case ACCEL_IMPORTBATCH:
+	case ID_IMEX_TEXTFILE:
+	case ID_IMEX_TEXTFILE2:
+        if(hwndactive)
+            OnImportFromSQL(pcquerywnd);
+		break;
+
+	case ACCEL_EXPORTBATCH:
+	case ID_IMPORTEXPORT_DBEXPORTTABLES:
+	case ID_IMPORTEXPORT_DBEXPORTTABLES2:
+	case ID_IMPORTEXPORT_TABLESEXPORTTABLES:
+	case ID_IMPORTEXPORT_EXPORTTABLES:
+		if(hwndactive) 
+            pGlobals->m_pcmainwin->m_connection->OnExport(pcquerywnd, wParam);
+		break;
+
+	case ACCEL_EXPORTCSV:
+	case ID_EXPORT_AS:
+		if(hwndactive)
+			pcquerywnd->EnableExportDialog();
+		break;
+
+	case ACCEL_IMPORTCSV:
+	case ID_IMPORT_FROMCSV:
+		if(hwndactive)
+			pcquerywnd->m_pcqueryobject->ImportFromCSV(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+	case ACCEL_CREATEDB:
+	case IDM_CREATEDATABASE:
+		if(hwndactive)
+			OnCreateDatabase(hwndactive, pcquerywnd);	
+		break;
+	
+	
+	case ACCEL_FLUSH:
+	case ID_TOOLS_FLUSH:
+		if(hwndactive)
+			pcquerywnd->ShowFlushDlg();
+		break;
+
+	case ACCEL_TABLEDIAG:
+	case IDM_TOOLS_TABLEDIAG:
+		if(hwndactive)
+            OnTableDiag(pcquerywnd);
+		break;
+
+	case ACCEL_ADDUSER:
+	case IDM_TOOL_ADDUSER:
+    case ID_TOOLS_USERMANAGER:
+		if(hwndactive)
+            OnManageUser();
+		break;
+
+	case ACCEL_MANUSER:
+	case ID_TOOLS_MANPERM:
+		/*if(hwndactive)
+            OnUserPermission(pcquerywnd);*/
+		break;
+
+	case ID_SHOW_VARIABLES:
+		if(hwndactive)
+            OnShowValues(pcquerywnd, VARIABLES);
+		break;
+
+	case ID_SHOW_PROCESSLIST:
+		if(hwndactive)
+			OnShowValues(pcquerywnd, PROCESSLIST);
+		break;
+
+	case ID_SHOW_STATUS:
+		if(hwndactive)
+		    OnShowValues(pcquerywnd, STATUS);
+		break;
+
+	case ID_OBJECT_DROPDATABASE:
+		if(hwndactive )
+			pcquerywnd->m_pcqueryobject->DropDatabase(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+	case ID_OBJECT_EMPTYDATABASE:
+		if(hwndactive)
+			pcquerywnd->m_pcqueryobject->EmptyDatabase(pcquerywnd->m_hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+	case ID_OBJECT_TRUNCATEDATABASE:
+		if(hwndactive)
+			pcquerywnd->m_pcqueryobject->TruncateDatabase(pcquerywnd->m_hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+	case ID_OBJECT_DROPTABLE:
+		if(hwndactive)
+			pcquerywnd->m_pcqueryobject->DropTable(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+	case ACCEL_REORDER:
+	case ID_OBJECT_REORDER:
+		if(hwndactive )
+            pcquerywnd->m_pctabmodule->CreateTableTabInterface(pcquerywnd, wyTrue, TABCOLUMNS);
+			//pcquerywnd->m_pcqueryobject->ReorderColumns();
+		break;
+
+	case ID_OBJECT_DROPFIELD:
+		if(hwndactive )
+			pcquerywnd->m_pcqueryobject->DropField(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+	
+	case ID_DB_CREATESTOREDPROCEDURE:
+	case ID_OBJECT_CREATESTOREDPROCEDURE:
+		if(hwndactive )
+            OnCreateProcedure(hwndactive, pcquerywnd);
+		break;
+
+	case ID_DB_CREATEFUNCTION:
+	case ID_OBJECT_CREATEFUNCTION:
+		if(hwndactive )
+            OnCreateFunction(hwndactive, pcquerywnd);
+		break;
+	
+	case ID_DB_CREATEVIEW:
+	case ID_OBJECT_CREATEVIEW:
+		if(hwndactive )
+            OnCreateView(hwndactive, pcquerywnd);
+		break;
+
+	case ID_DB_CREATEEVENT:
+	case ID_OBJECT_CREATEEVENT:
+		if(hwndactive )
+            OnCreateEvent(hwndactive, pcquerywnd);
+		break;
+
+    case ID_OBJECT_EXPORTVIEW:
+        pcquerywnd->ExportViews();
+        break;
+
+	case ID_DB_CREATETRIGGER:			
+	case ID_OBJECT_CREATETRIGGER:
+		if(hwndactive )
+            OnCreateTrigger(hwndactive, pcquerywnd);
+		break;
+
+	case ID_OBJECT_ALTERVIEW:
+		if(hwndactive )
+            OnAlterView(pcquerywnd);
+		break;
+
+	case ID_OBJECT_ALTERSTOREDPROCEDURE:
+		if(hwndactive )
+            OnAlterProcedure(pcquerywnd);
+		break;
+
+	case ID_OBJECT_ALTERFUNCTION:
+		if(hwndactive )
+            OnAlterFunction(pcquerywnd);
+		break;
+
+	case ID_OBJECT_ALTEREVENT:
+		if(hwndactive )
+			OnAlterEvent(pcquerywnd);
+		break;
+
+	case ID_OBJECT_ALTERTRIGGER:
+		if(hwndactive )
+            OnAlterTrigger(pcquerywnd);
+		break;
+
+	case ID_OBJECT_DROPVIEW:
+		if(hwndactive )
+			pcquerywnd->m_pcqueryobject->DropDatabaseObject(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, "view");
+		break;
+	case ID_OBJECT_DROPEVENT:
+		if(hwndactive )
+			pcquerywnd->m_pcqueryobject->DropDatabaseObject(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, "event");
+		break;
+	case ID_OBJECT_DROPSTOREDPROCEDURE:
+		if(hwndactive )
+			pcquerywnd->m_pcqueryobject->DropDatabaseObject(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, "procedure");
+		break;
+
+	case ID_OBJECT_DROPTRIGGER:
+		if(hwndactive )
+			pcquerywnd->m_pcqueryobject->DropTrigger(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+	case ID_OBJECT_DROPFUNCTION:
+		if(hwndactive )
+			pcquerywnd->m_pcqueryobject->DropDatabaseObject(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, "function");
+		break;
+
+	case ID_COLUMNS_DROPINDEX:
+		if(hwndactive)
+			pcquerywnd->m_pcqueryobject->DropIndex(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+    case ID_COLUMNS_MANAGECOLUMNS:
+        if(hwndactive)
+			pcquerywnd->m_pctabmodule->CreateTableTabInterface(pcquerywnd, wyTrue, 0);
+        break;
+
+	case ACEL_EMPTYTABLE:
+	case ID_OBJECT_CLEARTABLE:
+		if(hwndactive )
+			pcquerywnd->m_pcqueryobject->EmptyTable(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+	case ACCEL_COPYTABLE:
+	case ID_OBJECT_COPYTABLE:
+		if(hwndactive)
+			pcquerywnd->m_pcqueryobject->CopyTable(pcquerywnd);
+		break;
+
+	case ID_OBJECT_VIEWDATA:
+	case ACCEL_INSERTUPDATE:
+	case ID_OBJECT_INSERTUPDATE:
+		if(hwndactive)
+        {
+            SetFocus(NULL);
+			CreateNewTableDataTab(pcquerywnd);
+        }
+
+		break;
+
+    case ID_TABLE_OPENINNEWTAB:
+    case ACCEL_OPENTABLESTICKY:
+        if(hwndactive)
+        {
+            if(pcquerywnd->m_pcqueryobject->GetSelectionImage() == NTABLE)
+            {
+                SetFocus(NULL);
+			    CreateNewTableDataTab(pcquerywnd, wyTrue);
+            }
+        }
+
+        break;
+
+	case ID_OBJECT_INSERTSTMT:
+	case ACCEL_INSERT:
+		if(hwndactive && peditorbase)
+		{
+			pcquerywnd->m_pcqueryobject->CreateInsertStmt();
+			EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);    
+		}
+		break;
+
+	case ID_OBJECT_DELETESTMT:
+	case ACCEL_DELETE:
+		if(hwndactive && peditorbase)
+		{
+			pcquerywnd->m_pcqueryobject->CreateDeleteStmt();
+			EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);    
+		}
+		break;
+
+	case ID_OBJECT_UPDATESTMT:
+	case ACCEL_UPDATE:
+		if(hwndactive && peditorbase)
+		{
+			pcquerywnd->m_pcqueryobject->CreateUpdateStmt();
+			EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);    
+		}
+		break;
+
+	case ID_OBJECT_SELECTSTMT:
+	case ACCEL_SELECT:
+		if(hwndactive && peditorbase)
+		{
+			pcquerywnd->m_pcqueryobject->CreateSelectStmt();
+			EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);   
+		}
+		break;
+
+	case ID_DB_TABLE_MAKER:
+	case ID_TABLE_MAKER:
+		if(hwndactive )
+		{
+            pcquerywnd->m_pctabmodule->CreateTableTabInterface(pcquerywnd);  //m_pcqueryobject->
+            
+            /*
+			pcquerywnd->m_pcqueryobject->GetItemInfo();
+			pcquerywnd->m_pcqueryobject->CreateTableMaker();
+            */
+		}
+		break;
+
+	case ID_OPEN_COPYTABLE:
+		if(hwndactive )
+		    pcquerywnd->m_pcqueryobject->CopyTableToDiffertHostDB();
+		break;
+
+	case ID_OPEN_COPYDATABASE:
+		if(hwndactive )
+		    pcquerywnd->m_pcqueryobject->CopyDB();
+		break;
+	case ID_OBJECT_RENAMEEVENT:
+	case ID_OBJECTS_RENAMEVIEW:
+	case ID_OBJECTS_RENAMETRIGGER:
+	case ID_OBJECT_RENAMETABLE:
+		if(hwndactive)
+			pcquerywnd->m_pcqueryobject->RenameObject();
+		break;
+
+    case ID_INDEXES_CREATEINDEX:
+        if(hwndactive)
+            pcquerywnd->m_pctabmodule->CreateTableTabInterface(pcquerywnd, wyTrue, TABINDEXES);  
+		break;
+
+    case ID_INDEXES_EDITINDEX:
+        if(hwndactive)
+			pcquerywnd->m_pctabmodule->CreateTableTabInterface(pcquerywnd, wyTrue, TABINDEXES); 
+		break;
+
+    case ID_INDEXES_DROPINDEX:
+        if(hwndactive)
+			pcquerywnd->m_pcqueryobject->DropIndex(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+	case ACCEL_MANINDEX:
+	case ID_OBJECT_MAINMANINDEX:
+	case ID_OBJECT_MANINDEX:
+		if(hwndactive)
+            pcquerywnd->m_pctabmodule->CreateTableTabInterface(pcquerywnd, wyTrue, TABINDEXES);
+		break;
+		
+	case IDM_TABLE_RELATION:
+	case ACCEL_MANREL:
+		if(hwndactive)
+            pcquerywnd->m_pctabmodule->CreateTableTabInterface(pcquerywnd, wyTrue, TABFK);
+		break;
+		
+	case IDM_ALTERDATABASE:
+		if(hwndactive)	
+			OnAlterDatabase(hwndactive, pcquerywnd);
+		break;
+	
+	case ID_OBJECT_TABLEEDITOR:
+		if(hwndactive)
+            pcquerywnd->m_pctabmodule->CreateTableTabInterface(pcquerywnd, wyTrue);
+		break;
+	
+	case ID_OBJECT_ADVANCED:
+		if(hwndactive)
+			pcquerywnd->m_pcqueryobject->AdvProperties(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+	case ACCEL_SCHEMA:
+	case ID_OBJECT_CREATESCHEMA:
+		if(hwndactive)
+			pcquerywnd->m_pcqueryobject->CreateSchema();
+		break;
+
+	case IDM_WINDOW_TILE:
+		SendMessage(pGlobals->m_hwndclient, WM_MDITILE, 0, 0);
+		return 0 ;
+
+	case IDM_WINDOW_CASCADE:
+        SendMessage(pGlobals->m_hwndclient, WM_MDICASCADE, 0, 0);
+		return 0 ;
+
+	case IDM_WINDOWS_ICONARRANGE:
+		SendMessage(pGlobals->m_hwndclient, WM_MDIICONARRANGE, 0, 0);
+		return 0;
+
+	case IDM_HELP_HELP:
+		ShowHelp("What%20is%20SQLyog%20SQLyog%20MySQL%20GUI.htm");
+		break;
+
+	case ACCEL_KEYSHORT:
+	case IDM_HELP_SHORT:
+		return(DialogBox(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_KEYSHORT), pGlobals->m_pcmainwin->m_hwndmain, KeyShortCutsDlgProc));
+
+	case IDM_HELP_ABOUT:
+        return OnAbout();
+
+	case IDM_HELP_CHKUPGRD:
+		CheckForUpgrade(wyTrue);
+		break;
+
+    case ID_TOOLS_CHANGELANGUAGE:
+    case ACCEL_CHANGELANGUAGE:
+        SetLanguage(pGlobals->m_pcmainwin->m_hwndmain, wyFalse);
+        break;
+
+	case ID_HISTORY:
+    case ACCEL_HISTORYTAB:
+        if(hwndactive)
+        {
+		    pcquerywnd->m_pctabmodule->CreateHistoryTab(pcquerywnd, wyTrue);
+        }
+		break;
+
+    case ACCEL_INFOTAB:
+	case ID_INFOTAB:
+		if(hwndactive)
+        {
+			pcquerywnd->m_pctabmodule->CreateInfoTab(pcquerywnd, wyTrue);
+        }
+		break;
+
+	case ACCEL_FIRSTTAB:
+        if(!ptabeditor && !ptabtype)
+            break;
+		if(hwndactive)
+		{
+			if(ptabmgmt)
+            {
+			    ptabmgmt->HideResultWindow();
+			    ptabmgmt->SelectTab(0);
+            }
+            else
+            {
+                if(pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_CREATETABLE || pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_ALTERTABLE)
+                {
+                    TableTabInterfaceTabMgmt *tabintmgmt;
+                    tabintmgmt = ((TableTabInterface*)pcquerywnd->GetTabModule()->GetActiveTabType())->m_ptabintmgmt;
+                    tabintmgmt->SelectTab(0);
+                }
+            }
+		}
+		break;
+
+	case ACCEL_SECONDTAB:
+        if(!ptabeditor && !ptabtype)
+            break;
+		if(hwndactive )
+		{
+            if(ptabmgmt)
+            {
+			    ptabmgmt->HideResultWindow();
+			    ptabmgmt->SelectTab(1);
+		    }
+            else
+            {
+                if(pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_CREATETABLE  || pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_ALTERTABLE)
+                {
+                    TableTabInterfaceTabMgmt *tabintmgmt;
+                    tabintmgmt = ((TableTabInterface*)pcquerywnd->GetTabModule()->GetActiveTabType())->m_ptabintmgmt;
+                    tabintmgmt->SelectTab(1);
+                }
+            }
+		}
+		break;
+
+	case ACCEL_THIRDTAB:
+        if(!ptabeditor && !ptabtype)
+            break;
+		if(hwndactive )
+		{
+			if(ptabmgmt)
+            {
+			    ptabmgmt->HideResultWindow();
+			    ptabmgmt->SelectTab(2);
+		    }
+            else
+            {
+                if(pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_CREATETABLE || pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_ALTERTABLE)
+                {
+                    TableTabInterfaceTabMgmt *tabintmgmt;
+                    tabintmgmt = ((TableTabInterface*)pcquerywnd->GetTabModule()->GetActiveTabType())->m_ptabintmgmt;// m_ptabinterfacetabmgmt;
+                    tabintmgmt->SelectTab(2);
+                }
+            }
+		}
+		break;
+
+	case ACCEL_FOURTHTAB:
+        if(!ptabeditor && !ptabtype)
+            break;
+		if(hwndactive )
+		{
+			if(ptabmgmt)
+            {
+			    ptabmgmt->HideResultWindow();
+			    ptabmgmt->SelectTab(3);
+		    }
+            else
+            {
+                if(pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_CREATETABLE || pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_ALTERTABLE)
+                {
+                    TableTabInterfaceTabMgmt *tabintmgmt;
+                    tabintmgmt = ((TableTabInterface*)pcquerywnd->GetTabModule()->GetActiveTabType())->m_ptabintmgmt;// m_ptabinterfacetabmgmt;
+                    tabintmgmt->SelectTab(3);
+                }
+            }
+		}
+		break;
+
+	case ACCEL_FIFTHTAB:
+        if(!ptabeditor && !ptabtype)
+            break;
+		if(hwndactive)
+		{
+			if(ptabmgmt)
+            {
+			    ptabmgmt->HideResultWindow();
+			    ptabmgmt->SelectTab(4);
+		    }
+            else
+            {
+                if(pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_CREATETABLE || pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_ALTERTABLE)
+                {
+                    TableTabInterfaceTabMgmt *tabintmgmt;
+                    tabintmgmt = ((TableTabInterface*)pcquerywnd->GetTabModule()->GetActiveTabType())->m_ptabintmgmt;// m_ptabinterfacetabmgmt;
+                    tabintmgmt->SelectTab(4);
+                }
+            }
+		}
+		break;
+
+	case ACCEL_SIXTHTAB:
+        if(!ptabeditor)
+            break;
+		if(hwndactive)
+		{
+			ptabmgmt->HideResultWindow();
+			ptabmgmt->SelectTab(5);
+		}
+		break;
+
+	case ACCEL_SEVENTHTAB:
+        if(!ptabeditor)
+            break;
+		if(hwndactive )
+		{
+			ptabmgmt->HideResultWindow();
+			ptabmgmt->SelectTab(6);
+
+		}
+		break;
+
+	case ACCEL_EIGHTHTAB:
+        if(!ptabeditor)
+            break;
+		if(hwndactive )
+		{
+			ptabmgmt->HideResultWindow();
+			ptabmgmt->SelectTab(7);
+			
+		}
+		break;
+
+	case ACCEL_NINTHTAB:
+        if(!ptabeditor && !ptabtype)
+            break;
+		if(hwndactive )
+		{
+            if(ptabmgmt)
+            {
+			    ptabmgmt->HideResultWindow();
+			    ptabmgmt->SelectTab(CustomTab_GetItemCount(ptabmgmt->m_hwnd) - 1);
+            }
+            else
+            {
+                if(pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_CREATETABLE || pcquerywnd->GetTabModule()->GetActiveTabImage() == IDI_ALTERTABLE)
+                {
+                    TableTabInterfaceTabMgmt *tabintmgmt;
+                    tabintmgmt = ((TableTabInterface*)pcquerywnd->GetTabModule()->GetActiveTabType())->m_ptabintmgmt;// m_ptabinterfacetabmgmt;
+                    tabintmgmt->SelectTab(4);
+                }
+            }
+		}
+		break;
+
+	case ACCEL_FOCUSEDITOR:
+        if(hwndactive)
+		{	
+			if(ptabeditor)
+			{
+				/*if(pcquerywnd->GetActiveTabEditor())
+					CustomGrid_ApplyChanges(pcquerywnd->GetActiveTabEditor()->m_pctabmgmt->m_insert->m_hwndgrid, wyTrue);*/		// for closing the Grid Listbox
+				SetFocus(peditorbase->m_hwnd);
+			}
+#ifndef COMMUNITY
+			else if(ptabdbsearch)
+			{
+				ptabdbsearch->SetFocusSearchBox();
+			}
+#endif
+		}    
+		break;
+
+	case ACCEL_FOCUSRESULT:
+        if(!ptabeditor)
+            break;
+		/*if(hwndactive )
+			ptabmgmt->SetFocusToResultPane();   */
+
+		break;
+
+	case ACCEL_FOCUSOBJECT:
+		if(hwndactive)
+			SetFocus(pcquerywnd->m_pcqueryobject->m_hwnd);
+		break;
+        case ID_EXPORT_EXPORTCONNECTIONDETAILS:
+            OnExportConnectionDetails();
+            break;
+        case ID_EXPORT_IMPORTCONNECTIONDETAILS:
+            OnImportConnectionDetails();
+            break;
+	case IDM_DATATOCLIPBOARD:
+		break;
+
+	case IDM_SELDATATOCLIPBOARD:
+		break;
+
+	case ACCEL_ADDFAVORITE:
+	case ID_ADDTOFAVORITES:
+        if(!ptabeditor)
+            break;
+		if(hwndactive)
+			m_pcaddfavorite->Display(hwndactive);
+		break;
+		
+	case ID_REFRESHFAVORITES:
+		if(hwndactive)
+			m_pcfavoritemenu->Display(pGlobals->m_pcmainwin->m_hwndmain);
+		break;
+
+	case ID_ORGANIZEFAVORITES:
+		if(hwndactive)
+			m_pcorganizefavorite->Display(hwndactive);
+		break;
+
+    // select 1 to 8 and then last connections, on Ctrl+1,2....9
+	case ACCEL_FIRSTCONN:
+	case ACCEL_SECONDCONN:
+	case ACCEL_THIRDCONN:
+	case ACCEL_FOURTHCONN:
+	case ACCEL_FIFTHCONN:
+	case ACCEL_SIXTHCONN:
+	case ACCEL_SEVENTHCONN:
+	case ACCEL_EIGTHCONN:
+	case ACCEL_NINTHCONN:
+		if(hwndactive)
+		{
+			conntab->SelectActiveConnection(LOWORD(wParam));
+		}
+		break;
+		
+    
+    /*case ACCEL_NOFORMATCOPY:
+        ptabeditor->HandleNoFormatCopy();
+        break;*/
+
+	}	
+	return 1;
+}
+
+
+void
+FrameWindow::OnExportConnectionDetails()
+{
+    wyInt32 ret;
+    ExportImportConnection *e=new ExportImportConnection(false);
+    ret = e->ActivateConnectionManagerDialog(pGlobals->m_pcmainwin->m_hwndmain);
+    delete(e);
+    
+}
+
+void FrameWindow::OnImportConnectionDetails()
+{
+    wyInt32 ret;
+    ExportImportConnection *e=new ExportImportConnection(true);
+    ret=e->ActivateConnectionManagerDialog(pGlobals->m_pcmainwin->m_hwndmain);
+    delete(e);
+}
+
+// Function to change the status bar information on mousehover change
+wyInt32
+FrameWindow::OnWmMenuSelect(HMENU hmenuhandle, wyInt32 menuid)
+{
+	wyInt32			ret = 0;
+	wyWChar			buff[SIZE_512]={0};
+	ConnectionBase *conbase = pGlobals->m_pcmainwin->m_connection;
+	wyWChar			name[SIZE_64];
+	MDIWindow		*wnd = GetActiveWin();
+
+	//Build/Rebuild tag menu text is changing dynamically
+	if(menuid == ID_REBUILDTAGS && conbase)
+	{		
+		if(conbase->m_isbuiltactagfile == wyFalse)
+		{
+			AddTextInStatusBar(_(L"Build tag file"));
+			if(wnd)
+			{
+				wnd->m_statusbartext.SetAs(_(L"Build tag file"));
+			}
+		}
+		else
+		{
+			AddTextInStatusBar(_(L"Rebuild tag file"));
+			if(wnd)
+			{
+				wnd->m_statusbartext.SetAs(_(L"Rebuild tag file"));
+			}
+		}
+	}
+
+	//For all other menus except Powertools->Build/Rebuild tag
+	else
+	{
+		if(menuid >= FAVORITEMENUID_START && menuid <= FAVORITEMENUID_END)
+			ret = LoadString(pGlobals->m_hinstance, FAVORITE_MENU_ID, buff, SIZE_512-1);
+		else
+			ret = LoadString(pGlobals->m_hinstance, menuid, buff, SIZE_512-1);
+
+		if(ret == 0)
+		{
+			wcscpy(buff, _(L" Ready"));
+		}
+
+		AddTextInStatusBar(buff);
+		if(wnd)
+		{
+			wnd->m_statusbartext.SetAs(buff);
+		}
+	}
+
+	//Handles the Table's Engine menu
+	if(hmenuhandle)
+	{
+		GetMenuString(hmenuhandle, menuid, name, SIZE_64, MF_BYPOSITION);
+				
+		//Check for Engine sub-menu here
+		if(!wcsicmp(name, _(L"Change Table T&ype To")))
+		{
+			conbase->HandleTableEngineMenu(hmenuhandle, menuid);
+		}
+		if(!wcsicmp(name, _(L"&Columns"))) 
+		{
+			if(GetMenuItemID(GetSubMenu(hmenuhandle,menuid), 1) == ID_DATASEARCH)
+			{
+				FreeMenuOwnerDrawItem(GetSubMenu(hmenuhandle,menuid), 1);
+				RemoveMenu(GetSubMenu(hmenuhandle,menuid),ID_DATASEARCH, MF_BYCOMMAND);
+				DrawMenuBar(m_hwndmain);
+			}
+		}
+		if(!wcsicmp(name, _(L"T&able")) || !wcsicmp(name, _(L"&Database"))) 
+		{
+			if(GetMenuItemID(GetSubMenu(hmenuhandle,menuid), 2) == ID_DATASEARCH)
+			{
+				FreeMenuOwnerDrawItem(GetSubMenu(hmenuhandle,menuid), 2);
+				RemoveMenu(GetSubMenu(hmenuhandle,menuid),ID_DATASEARCH, MF_BYCOMMAND);
+				DrawMenuBar(m_hwndmain);
+			}
+			if(GetMenuItemID(GetSubMenu(hmenuhandle,menuid), 3) == ID_DB_DATASEARCH)
+			{
+				FreeMenuOwnerDrawItem(GetSubMenu(hmenuhandle,menuid), 3);
+				RemoveMenu(GetSubMenu(hmenuhandle,menuid),ID_DB_DATASEARCH, MF_BYCOMMAND);
+				DrawMenuBar(m_hwndmain);
+			}
+			
+		}
+	}
+		
+	return 0;
+}
+
+// Gets the current selected item in the combobox in the toolbar.
+wyInt32
+FrameWindow::GetCurrentSel()
+{
+	wyInt32		index;
+
+	VERIFY((index	= SendMessage(m_hwndtoolcombo, CB_GETCURSEL, 0, 0))!= CB_ERR);
+
+	return index;
+}
+
+// The function is called whenever ths combo box is drop downed.
+// Before showing any info it gets all the database in the mysql connection of the current active window
+// and adds them to combo box. If any error occurs while getting info about the databases then
+// it shows the error and add only No Database Selected and return
+wyBool
+FrameWindow::OnToolComboDropDown()
+{
+	FillComboWithDBNames(m_hwndtoolcombo);	
+	
+	return wyTrue;
+}
+
+// This function is called whenever there is a change in selection in the combobox in the toolbar.
+// When a new database is selected then we change the current database in the MYSQL connection.
+
+wyBool
+FrameWindow::OnToolComboSelChange()
+{
+	wyInt32         index;
+	wyWChar          db[SIZE_512] = {0};
+    wyString        query;
+	MDIWindow *		pcquerywnd;
+	COMBOBOXEXITEM	cbi;
+    MYSQL_RES       *res;
+
+	VERIFY(pcquerywnd = GetActiveWin());
+	// Now change the cursor to wait mode.
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+	// Get the original database so if the user dosnt select a database or an error occurs
+	// then change it to the current database. i mean show it in combodropdown.
+	VERIFY((index = SendMessage(m_hwndtoolcombo, CB_GETCURSEL, 0, 0)) != CB_ERR);	
+
+	cbi.mask        = CBEIF_TEXT ;
+	cbi.pszText     = db;
+	cbi.cchTextMax  = sizeof(db);
+	cbi.iItem       = index;
+	
+	VERIFY(SendMessage(m_hwndtoolcombo, CBEM_GETITEM, 0,(LPARAM)&cbi));
+	
+	wyString dbname(db);
+
+	query.Sprintf("use `%s`", dbname.GetString());
+
+    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
+	{
+		ShowMySQLError(m_hwndmain, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
+		return wyFalse;
+	}
+
+	pcquerywnd->m_tunnel->mysql_free_result(res);
+	pcquerywnd->m_tunnel->SetDB(dbname.GetString());
+
+	pcquerywnd->m_database.Sprintf("%s", dbname.GetString());
+	pGlobals->m_lastdatabase.SetAs(db);
+
+	SendMessage(m_hwndtoolcombo, CB_SETCURSEL,(WPARAM)index, 0);
+	SetFocus(m_hwndtoolcombo);
+	AddTextInCombo(db);
+
+	//selecting new database in to the object browser
+	pcquerywnd->m_pcqueryobject->OnComboChanged(db);
+
+	return wyTrue;
+}
+
+// get current database from the combobox
+wyBool
+FrameWindow::GetCurrentSelDB(wyWChar *db, wyInt32 size)
+{
+	wyInt32         index;
+	COMBOBOXEXITEM  cbi;
+
+	VERIFY((index = SendMessage(m_hwndtoolcombo, CB_GETCURSEL, 0, 0)) != CB_ERR);	
+
+	cbi.mask        = CBEIF_TEXT ;
+	cbi.pszText     = db;
+	cbi.cchTextMax  = size;
+	cbi.iItem       = index;
+	
+	VERIFY(SendMessage(m_hwndtoolcombo, CBEM_GETITEM, 0,(LPARAM)&cbi));
+
+	if(wcsicmp(db, NODBSELECTED) == 0)
+		db[0] = 0;
+
+	return wyTrue;
+}
+
+// This function is called whenever there is any error selecting a database in the combobox.
+// It adds the old database which is stored in the QueryWnd class and adds it to the combobox
+// so that the user dosnt get confused that the database has changed.
+wyBool
+FrameWindow::SetOldDB()
+{
+	MDIWindow *	pcquerywnd;		
+
+	VERIFY(pcquerywnd = GetActiveWin());
+
+    if(pcquerywnd)
+		AddTextInCombo(pcquerywnd->m_database.GetAsWideChar());
+		
+	return wyTrue;
+}
+
+// This function is called whenever the system sends notification requiring toottip text for the
+// toolbar.
+wyBool
+FrameWindow::OnToolTipInfo(LPNMTTDISPINFO lpnmtdi)
+{
+	wyWChar      string[SIZE_512]={0};
+	MDIWindow	*wnd;
+
+	wnd = GetActiveWin();
+
+    m_connection->OnToolTipInfo(lpnmtdi, string);
+
+    if(!wcslen(string))
+    {
+	    switch(lpnmtdi->hdr.idFrom)
+	    {
+
+	    case IDM_FILE_NEWCONNECTION:
+		    wcscpy(string, L"Create A New Connection (Ctrl+M)");
+		    break;
+
+	    case ID_NEW_EDITOR:
+		    wcscpy(string, L"New Query Editor (Ctrl+T)");
+		    break;
+
+	    case ID_OBJECT_VIEWDATA:
+		    wcscpy(string, L"View Table Data");
+		    break;
+
+	    case IDM_FILE_OPENSQL:
+		    VERIFY(LoadString(pGlobals->m_hinstance, IDM_FILE_OPENSQL, string, SIZE_512-1));
+		    break;
+
+	    //To open file in new tab
+	    case IDM_FILE_OPENSQLNEW:
+		    VERIFY(LoadString(pGlobals->m_hinstance, IDM_FILE_OPENSQLNEW, string, SIZE_512-1));
+		    break;
+
+	    case IDM_FILE_SAVESQL:
+		    VERIFY(LoadString(pGlobals->m_hinstance, IDM_FILE_SAVESQL, string, SIZE_512-1));
+		    break;
+
+	    case IDM_EDIT_CUT:
+		    VERIFY(LoadString(pGlobals->m_hinstance, IDM_EDIT_CUT, string, SIZE_512-1));
+		    break;
+
+	    case IDM_EDIT_COPY:
+		    VERIFY(LoadString(pGlobals->m_hinstance, IDM_EDIT_COPY, string, SIZE_512-1));
+		    break;
+
+        case IDM_COPYNORMALIZED:
+		    VERIFY(LoadString(pGlobals->m_hinstance, IDM_COPYNORMALIZED, string, SIZE_512-1));
+		    break;
+
+	    case IDM_EDIT_PASTE:
+		    VERIFY(LoadString(pGlobals->m_hinstance, IDM_EDIT_PASTE, string, SIZE_512-1));
+		    break;
+
+	    case IDM_EXECUTE:
+		    if(wnd && wnd->m_executing)
+			    wcscpy(string, L"Stop Execution");
+			else if(wnd /*&& wnd->m_pingexecuting*/)
+			{
+				break;
+			}
+		    else
+		    {
+			    if(pGlobals->m_isrefreshkeychange == wyFalse)
+				    wcscpy(string, L"Execute Query (F9)");
+			    else
+				    wcscpy(string, L"Execute Query (F5)");
+		    }
+		    break;
+
+	    case ACCEL_EXECUTEALL:
+	    case ID_STOPQUERY:
+		    if(wnd && wnd->m_executing)
+			    wcscpy(string, L"Stop Execution");
+		    else
+		    {
+			    if(pGlobals->m_isrefreshkeychange == wyFalse)
+				    wcscpy(string, L"Execute All Queries (Ctrl+F9)");
+			    else
+				    wcscpy(string, L"Execute All Queries (Ctrl+F5)");
+		    }
+		    break;		
+
+	    case ACCEL_QUERYUPDATE:
+	    case ACCEL_EXECUTESEL:
+		    wcscpy(string, L"Execute And Edit Resultset (F8)");
+		    break;
+
+	    case IDM_REFRESHOBJECT:
+		    if(pGlobals->m_isrefreshkeychange == wyFalse)
+			    wcscpy(string, L"Refresh Object Browser (F5)");
+		    else
+			    wcscpy(string, L"Refresh Object Browser (F9)");
+		    break;
+
+	    case IDM_TMAKER_SAVE:
+		    VERIFY(LoadString(pGlobals->m_hinstance, IDM_TMAKER_SAVE, string, SIZE_512-1));
+		    break;
+
+	    case ID_IMPORTEXPORT_DBEXPORTTABLES:
+		    wcscpy(string, L"Backup Database As SQL Dump (Ctrl+Alt+E)");
+		    break;
+
+	    case IDM_TOOL_ADDUSER:
+		    wcscpy(string, L"User Manager (Ctrl+U)");
+		    break;
+		
+	    case ID_IMEX_TEXTFILE:
+		    wcscpy(string, L"Execute SQL Script (Ctrl+Shift+Q)");
+		    break;
+
+	    case ID_OPEN_COPYDATABASE:
+		    wcscpy(string, L"Copy Database To Different Host/Database");
+		    break;
+		
+	    case ID_EXPORT_AS:
+		    wcscpy(string, L"Export Table Data (Ctrl+Alt+C)");
+		    break;
+
+		
+	    case ID_OBJECT_MAINMANINDEX:
+		    wcscpy(string, L"Manage Indexes (F7)");
+		    break;
+		
+	    case ACCEL_MANREL:
+		    wcscpy(string, L"Relationships/Foreign Keys (F10)");		
+		    break;	
+
+        case ID_QB_QUERYTOCLIPBOARD:
+            wcscpy(string, L"Copy Query To Clipboard");
+            break;
+
+        case ID_QB_QUERYTONEWEDITOR:
+            wcscpy(string, L"Copy Query To New Query Tab");
+            break;
+
+	    case ID_QB_QUERYTOSAMEEDITOR:
+		    wcscpy(string, L"Copy Query To Same Query Tab");
+            break;
+
+	    //To add Direct Create View Option in Query Builder.
+	    case ID_OBJECT_CREATEVIEW:
+		    wcscpy(string, L"Create View Using Current Query");
+		    break;
+    
+	    case ID_SD_ALTERTABLE:
+		    wcscpy(string, L"Alter Table");
+		    break;
+
+	    case ID_SD_MANAGE_INDEX:
+		    wcscpy(string, L"Manage Indexes");
+		    break;
+
+	    case ID_SD_MANAGE_RELATIONSHIP:
+		    wcscpy(string, L"Relationships/Foreign Keys");
+		    break;
+
+	    case ID_SD_TABLEVIEW:
+		    wcscpy(string, L"Table View");
+		    break;
+
+	    case ID_SCHEMA_NEWTABLE:
+		    wcscpy(string, L"Create Table");
+		    break;
+
+	    case ID_SCHEMA_REFRESHCANVAS:
+		    if(pGlobals->m_isrefreshkeychange == wyFalse)
+			    wcscpy(string, L"Refresh Canvas (F5)");
+		    else
+			    wcscpy(string, L"Refresh Canvas (F9)");
+		    break;
+	
+	    case ID_SCHEMA_ADDTABLES:
+		    wcscpy(string, L"Add Table(s) To Canvas");
+		    break;
+
+	    case ID_SCHEMA_LOADCANVAS:
+		    wcscpy(string, L"Load Schema Design (Ctrl+O)");
+		    break;
+
+	    case ID_SCHEMA_SAVEASBMP:
+		    wcscpy(string, L"Export Canvas As Image");
+		    break;
+
+	    case ID_SD_PRINTCANVAS:
+		    wcscpy(string, L"Print");
+		    break;
+
+	    case ID_SDZOOMIN:
+		    wcscpy(string, L"Zoom In");
+		    break;
+
+	    case ID_SDZOOMOUT:
+		    wcscpy(string, L"Zoom Out");
+		    break;
+	    }
+
+        wcscpy(lpnmtdi->lpszText, _(string));
+    }
+    else
+    {
+        wcscpy(lpnmtdi->lpszText, string);
+    }
+
+	return wyTrue;
+}
+
+// Function is called whenever a new database is selected in query by using USE statement.
+// This function calls the select database()query in mySQL and gets the currrent database 
+// and adds it to the combobox.
+wyBool
+FrameWindow::ChangeDBInCombo(Tunnel * tunnel, PMYSQL mysql, wyWChar * db)
+{
+	wyString        query;
+	MYSQL_RES*      myres;
+	MYSQL_ROW       myrow;
+	MDIWindow*      pcquerywnd;
+	wyString		dbname(db);
+	wyString		myrowstr;
+
+	VERIFY(pcquerywnd = GetActiveWin());
+	
+	query.Sprintf("select database()");
+
+	myres = ExecuteAndGetResult(pcquerywnd, tunnel, mysql, query);
+	if(!myres)
+	{
+		ShowMySQLError(m_hwndmain, tunnel, mysql, query.GetString());
+		return wyFalse;
+	}
+
+	myrow	=	tunnel->mysql_fetch_row(myres);
+	
+	if(myrow[0])
+    {
+		myrowstr.SetAs(myrow[0], IsMySQL41(tunnel, mysql));
+		AddTextInCombo(myrowstr.GetAsWideChar());
+		pcquerywnd->m_pcqueryobject->OnComboChanged(myrowstr.GetAsWideChar());
+		pcquerywnd->m_database.Sprintf("%s", myrowstr.GetString());
+		// Also copy it in the the temporary buffer so that we can select it when a new mySQLyog window is selected.
+		pGlobals->m_lastdatabase.SetAs(myrow[0], IsMySQL41(tunnel, mysql));
+	} 
+    else 
+		AddTextInCombo(NODBSELECTED);
+
+	if(db)
+    {
+		AddTextInCombo(db);
+		pcquerywnd->m_pcqueryobject->OnComboChanged(db);
+		pcquerywnd->m_database.Sprintf("%s", dbname.GetString());
+		pGlobals->m_lastdatabase.SetAs(db);
+		tunnel->SetDB(dbname.GetString());
+	}
+
+	tunnel->mysql_free_result(myres);
+	return wyTrue;
+}
+
+// The function initializes the main menu with all the latest files which are there in the init file.
+wyBool
+FrameWindow::InitLatestFiles()
+{
+	ReInitLatestFiles(wyTrue);
+
+	return wyTrue;
+}
+
+void
+FrameWindow::GetSQLyogIniPath(wyString *path)
+{
+	wyWChar     directory[MAX_PATH + 1], *lpfileport = 0;
+	wyUInt32    ret;
+	
+	// Get the complete path.
+	ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+	if(ret == 0)
+		return;
+
+	path->SetAs(directory);
+}
+
+// This function initializes the splitter position taken from the ini file.
+wyBool
+FrameWindow::InitSplitterPos(const wyChar *dirstr)
+{
+	//wyWChar     directory[MAX_PATH + 1], *lpfileport = 0;
+	//wyUInt32    ret;
+	//wyString	dirstr;
+
+	//// Get the complete path.
+	//ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+	//if(ret == 0)
+	//	return wyFalse;
+	//dirstr.SetAs(directory);
+
+    // first get the horz splitter position
+	
+	m_rchsplitter.left = wyIni::IniGetInt(HSPLITTER_SECTION_NAME, "Left", 0, dirstr);
+	m_rchsplitter.right = wyIni::IniGetInt(HSPLITTER_SECTION_NAME, "Right", 0, dirstr);
+	m_rchsplitter.top = wyIni::IniGetInt(HSPLITTER_SECTION_NAME, "Top", 0, dirstr);
+	m_rchsplitter.bottom = wyIni::IniGetInt(HSPLITTER_SECTION_NAME, "Bottom", 0, dirstr);
+	m_toppercent = wyIni::IniGetInt(HSPLITTER_SECTION_NAME, "ULeftOrTopPercent", 0, dirstr);
+	
+	// then get the vert splitter position
+	m_rcvsplitter.left = wyIni::IniGetInt(VSPLITTER_SECTION_NAME, "Left", 0, dirstr);
+	m_rcvsplitter.right = wyIni::IniGetInt(VSPLITTER_SECTION_NAME,  "Right", 0, dirstr);
+	m_rcvsplitter.top = wyIni::IniGetInt(VSPLITTER_SECTION_NAME, "Top", 0, dirstr);
+	m_rcvsplitter.bottom = wyIni::IniGetInt(VSPLITTER_SECTION_NAME, "Bottom", 0, dirstr);
+	m_leftpercent = wyIni::IniGetInt(VSPLITTER_SECTION_NAME, "ULeftOrTopPercent", 0, dirstr);
+	
+	return wyTrue;
+}
+
+void
+FrameWindow::InitPQAOptions(const wyChar *dirstr)
+{
+	wyUInt32 truncdata;
+
+	if(m_connection->m_enttype == ENT_PRO || m_connection->m_enttype == ENT_NORMAL)
+		return;
+	
+	//Eabled/Disabled PQA
+	truncdata	= wyIni::IniGetInt(GENERALPREFA, "QueryAnalyzer", 1, dirstr);
+	pGlobals->m_ispqaenabled = truncdata ? wyTrue : wyFalse;
+
+	//Eabled/Disabled PQA-show profiler
+	truncdata	= wyIni::IniGetInt(GENERALPREFA, "PQAProfile", 1, dirstr);
+	pGlobals->m_ispqashowprofile = (truncdata && pGlobals->m_ispqaenabled == wyTrue) ? wyTrue : wyFalse;
+}
+
+//VOID
+//FrameWindow::InitAutoCompleteCaseSelection(const wyChar *dirstr)
+//{
+//	wyInt32		truncdata = 0;
+//		
+//	pGlobals->m_isautocompleteupper = wyTrue;
+//
+//	truncdata = wyIni::IniGetInt(GENERALPREFA, "AutoComplete", 1, dirstr);
+//	
+//	if(!truncdata)
+//	{
+//		pGlobals->m_isautocompleteupper = wyFalse;
+//		return;
+//	}
+//	
+//	//Eabled/Disabled PQA-show profiler
+//	truncdata	= wyIni::IniGetInt(GENERALPREFA, "AutoCompleteUpperCase", 1, dirstr);
+//	pGlobals->m_isautocompleteupper = (truncdata) ? wyTrue : wyFalse;
+//
+//}
+
+// The function reinitializes the main menu and adds the updated latest file in the main menu.
+// This asme fun is getting called when frame window is creating too , this could identify by the flag "iscreate = wyTrue"
+wyBool
+FrameWindow::ReInitLatestFiles(wyBool iscreate)
+{
+	wyInt32     lstyle, menupos = RECENT_SQLFILE_SUBMENU;
+    wyString    compkeyvalue;
+	HMENU		hmenu, hsubmenu, hmenurecent;
+    HWND		hwndactive =(HWND)SendMessage(pGlobals->m_hwndclient, WM_MDIGETACTIVE, 0, NULL);
+	wyString	keyvaluestr, dirstr;
+	wyBool		retq = wyTrue, retsd = wyTrue, retqb = wyTrue;
+
+	if(!hwndactive && iscreate == wyFalse)
+		return wyFalse;
+
+	hmenu = GetMenu(m_hwndmain);
+
+	// we first check whether the first menu is in the first position or not.
+	lstyle = GetWindowLongPtr(hwndactive, GWL_STYLE);
+
+	if((lstyle & WS_MAXIMIZE) && wyTheme::IsSysmenuEnabled(hwndactive) && iscreate == wyFalse)
+		hsubmenu = GetSubMenu(hmenu, 1);
+	else
+		hsubmenu = GetSubMenu(hmenu, 0);
+
+	VERIFY(hmenurecent = GetSubMenu(hsubmenu, menupos));
+	if(!hmenurecent)
+		return wyFalse;
+
+	retq = InsertRecentMenuItems(hmenurecent);
+
+	/// Recent Schema design only for Enterprise
+#ifndef COMMUNITY
+	VERIFY(hmenurecent = GetSubMenu(hsubmenu, RECENT_SCHEMADESIGNS_SUBMENU));
+	if(!hmenurecent)
+		return wyFalse;
+
+    retsd = InsertRecentMenuItems(hmenurecent, IDI_SCHEMADESIGNER_16);
+
+    VERIFY(hmenurecent = GetSubMenu(hsubmenu, RECENT_QUERYBUILDER_SUBMENU));
+	if(!hmenurecent)
+		return wyFalse;
+
+    retqb = InsertRecentMenuItems(hmenurecent, IDI_QUERYBUILDER_16);
+#endif 
+
+    if(retsd == wyFalse || retq == wyFalse || retqb == wyFalse)
+		return wyFalse;
+
+	return wyTrue;
+}
+
+wyBool					
+FrameWindow::InsertRecentMenuItems(HMENU hsubmenu, wyInt32 tabimageid)
+{
+	wyInt32     count, idcount, menuid = 0;
+    wyUInt32    ret;
+	//wyChar		keyvalue[SIZE_512] = {0};
+	wyWChar     directory[MAX_PATH +1] = {0}, *lpfileport = 0;
+    wyString	compkeyvalue;
+	wyString	keyvaluestr, dirstr, keyname, keynamecpy;
+	
+   	keyname.SetAs("File");
+	menuid = ID_LF_1;
+    
+	// now we delete all the menu items and then add all the values again.
+	//duplicating issue of more than 10 files
+	for(count = 0; count <= MAX_RECENT_FILES; count++)
+		DeleteMenu(hsubmenu, 0, MF_BYPOSITION);
+
+	// first install a default id key.
+	VERIFY(InsertMenu(hsubmenu, 0, MF_BYPOSITION | MF_STRING, menuid, _(L"No Recent Files")));
+
+	// now we get all the keys from ini file.
+	ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+	if(ret ==0)
+		return wyFalse;
+
+	dirstr.SetAs(directory);
+	
+	keynamecpy.SetAs(keyname);
+
+	for(count = 1, idcount = 1; count <= RECENT_FILE_COUNT; count++)
+	{
+		keyname.AddSprintf("%d", count);		
+
+		 ret = wyIni::IniGetString(SECTION_NAME, keyname.GetString(), "0", &keyvaluestr, dirstr.GetString());
+		 if(ret == 0 || keyvaluestr.GetCharAt(0) == '0')
+			 continue;
+
+		compkeyvalue.Sprintf("&%d %s", idcount, keyvaluestr.GetString());
+
+		VERIFY(InsertMenu(hsubmenu, menuid, MF_BYCOMMAND | MF_STRING, menuid + count, compkeyvalue.GetAsWideChar()));
+
+		 idcount++;
+
+		keyname.SetAs(keynamecpy);
+	}
+
+	if(idcount > 1)
+		DeleteMenu(hsubmenu, menuid, MF_BYCOMMAND);
+
+	return wyTrue;
+}
+
+// Function writes the file which is passed as a parameter to the function and adds them to the
+// sqlyog.ini file. but first it checks whether the name exists or not. then only it adds.
+wyBool
+FrameWindow::WriteLatestFile(wyWChar *filename)
+{
+	wyInt32		count, idcount = 0;
+	wyWChar     keyvalue[MAX_RECENT_FILES * 2][SIZE_512] = {0}, directory[MAX_PATH+1] = {0}, *lpfilereport = NULL;
+	
+    wyString    keyname, keyvalstr, dirstr;
+	wyUInt32    ret;
+
+	MDIWindow	*wnd;
+	wyInt32		tabimageid;
+
+	VERIFY(wnd = GetActiveWin());
+
+	tabimageid = wnd->m_pctabmodule->GetActiveTabImage();
+
+	// clear all the buffer.
+	memset(keyvalue, 0,(SIZE_512 * MAX_RECENT_FILES));
+
+	 if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfilereport) == wyFalse)
+        return wyFalse;
+
+    if(directory)
+        dirstr.SetAs(directory);
+
+	
+	dirstr.SetAs(directory);
+
+	// Now get all the values.
+	for(count = 1; count <= RECENT_FILE_COUNT; count++)
+	{
+		keyname.Sprintf("File%d", count);
+				
+		ret = wyIni::IniGetString(SECTION_NAME, keyname.GetString(), "0", &keyvalstr, dirstr.GetString());		
+		
+		//wcscpy(keyvalue[count-1], keyvalstr.GetAsWideChar());
+		wcsncpy(keyvalue[count-1], keyvalstr.GetAsWideChar(), SIZE_512 - 1);
+		keyvalue[count-1][SIZE_512 - 1] = '\0';
+
+		if(ret == 0)
+			return wyFalse;
+
+		// we compare it here only if there exist. if it does then we simply return.
+		// as the file already exists in the recent files so we dont have to do anything
+		if((wcsicmp(keyvalue[count-1], filename)) == 0)
+			return wyFalse;
+	}
+
+	// If it has reached here then it does not exist and we have all the values.
+	// so we move one down all the keys.
+	for(count = MAX_RECENT_FILES - 2; count >= 0; count--)
+		wcscpy(keyvalue[count+1], keyvalue[count]);
+
+	// at last add the new file at the top.
+	//wcscpy(keyvalue[0], filename);
+	wcsncpy(keyvalue[0], filename, SIZE_512 - 1);
+	keyvalue[0][SIZE_512 - 1] = '\0';
+
+	// Now write in the file also.
+	for(count = 1, idcount = 1; count <= MAX_RECENT_FILES; count++)
+	{
+		keyname.Sprintf("File%d", idcount);
+		
+		if(!keyvalue[count-1][0])
+			continue;
+		keyvalstr.SetAs(keyvalue[count - 1]);
+		ret = wyIni::IniWriteString(SECTION_NAME, keyname.GetString(), keyvalstr.GetString(), dirstr.GetString());
+
+		idcount++;
+	}
+	return wyTrue;
+}
+
+// Function writes the splitter poition to the file so that when we start the application again we 
+// can start in the same position.
+
+wyBool
+FrameWindow::WriteSplitterPos(wyWChar *section)
+{
+	//wyUInt32    count;
+    wyWChar     directory[MAX_PATH+1], *lpfileport = 0;
+    wyString    keyvalue, sectionstr;
+	wyInt32	    ret;
+	wyString	dirstr;
+	
+	// Get the complete path.
+
+    if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyFalse)
+        return wyFalse;
+	
+	dirstr.SetAs(directory);
+	
+	// now add all the values in the file.
+	// we check what splitter we have to write.
+	if((wcscmp(section, TEXT(HSPLITTER_SECTION_NAME)))== 0)
+	{
+		sectionstr.SetAs(section);
+		keyvalue.Sprintf("%d", m_rchsplitter.left);
+		ret = wyIni::IniWriteString(sectionstr.GetString(), "Left", keyvalue.GetString(), dirstr.GetString());
+		if(ret)
+			return wyFalse;
+
+		keyvalue.Sprintf("%d", m_rchsplitter.right);
+		ret = wyIni::IniWriteString(sectionstr.GetString(), "Right", keyvalue.GetString(), dirstr.GetString());
+		if(ret)
+			return wyFalse;
+
+		keyvalue.Sprintf("%d", m_rchsplitter.top);
+		ret = wyIni::IniWriteString(sectionstr.GetString(), "Top", keyvalue.GetString(), dirstr.GetString());
+		if(ret)
+			return wyFalse;
+
+		keyvalue.Sprintf("%d", m_rchsplitter.bottom);
+		ret = wyIni::IniWriteString(sectionstr.GetString(), "Bottom", keyvalue.GetString(), dirstr.GetString());
+		if(ret)
+			return wyFalse;
+
+		keyvalue.Sprintf("%d", m_toppercent);
+		ret = wyIni::IniWriteString(sectionstr.GetString(), "ULeftOrTopPercent", keyvalue.GetString(), dirstr.GetString());
+		if(ret)
+			return wyFalse;
+	}
+	else
+	{
+		sectionstr.SetAs(section);
+		keyvalue.Sprintf("%d", m_rchsplitter.left);
+		ret = wyIni::IniWriteString(sectionstr.GetString(), "Left", keyvalue.GetString(), dirstr.GetString());
+		if(ret)
+			return wyFalse;
+
+		keyvalue.Sprintf("%d", m_rchsplitter.right);
+		ret = wyIni::IniWriteString(sectionstr.GetString(), "Right", keyvalue.GetString(), dirstr.GetString());
+		if(ret)
+			return wyFalse;
+
+		keyvalue.Sprintf("%d", m_rchsplitter.top);
+		ret = wyIni::IniWriteString(sectionstr.GetString(), "Top", keyvalue.GetString(), dirstr.GetString());
+		if(ret)
+			return wyFalse;
+
+		keyvalue.Sprintf("%d", m_rchsplitter.bottom);
+		ret = wyIni::IniWriteString(sectionstr.GetString(), "Bottom", keyvalue.GetString(), dirstr.GetString());
+		if(ret)
+			return wyFalse;
+
+		keyvalue.Sprintf("%d", m_leftpercent);
+		ret = wyIni::IniWriteString(sectionstr.GetString(), "ULeftOrTopPercent", keyvalue.GetString(), dirstr.GetString());
+		if(ret)
+			return wyFalse;
+
+	}
+	return wyTrue;
+}
+
+// This function sets the splitter position to the values sent in the RECT pointer.
+// This is required so that when the user closes the application we can keep the position of
+// the splitters and when the user starts the aplpication again we can give him the same position.
+wyBool
+FrameWindow::SetSplitterPos(RECT *rect, wyUInt32 leftortoppercent)
+	{
+		memcpy(&m_rcvsplitter, rect, sizeof(RECT));
+		m_leftpercent = leftortoppercent;
+
+	return wyTrue;
+}
+
+// Function writes the file which is selected from latest files in the Main Menu.
+// Opens it and puts the text into the edit box.
+wyBool
+FrameWindow::InsertFromLatestFile(wyInt32 id, MDIWindow * pcquerywnd)
+{
+	wyInt32		ret, lstyle;
+	wyWChar     filename[MAX_PATH+1]={0};
+    HMENU	    hmenu, hsubmenu;	
+    wyBool      retval = wyFalse;
+	wyString    recfilename;
+
+	VERIFY(hmenu  = GetMenu(m_hwndmain));
+	// First get the maximized state of the window,
+	lstyle = GetWindowLongPtr(pcquerywnd->m_hwnd, GWL_STYLE);
+	
+	if((lstyle & WS_MAXIMIZE) && wyTheme::IsSysmenuEnabled(pcquerywnd->m_hwnd))
+		VERIFY(hsubmenu = GetSubMenu(hmenu, 1));
+	else
+		VERIFY(hsubmenu = GetSubMenu(hmenu, 0));
+	
+	// Now get the menu string.
+	VERIFY(ret = GetMenuString(hsubmenu, id, filename, MAX_PATH, MF_BYCOMMAND));
+
+	if(id > ID_LF_1 && id <= ID_LF_1 + 10)
+	{
+		VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+	
+		recfilename.SetAs(filename+3); //to avoid recent index num, just incriment to +3
+		
+		retval = pcquerywnd->OpenFileinTab(&recfilename, wyFalse, wyTrue);
+		VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+	}	
+
+	return retval;
+}
+
+// Loads the recent sql file to editor.
+// If the current tab is other thae Query editor, creates a new editor & loads the file 
+wyBool
+FrameWindow::InsertFromLatestSQLFile(wyInt32 id, MDIWindow * pcquerywnd, wyWChar *filename)
+{
+	wyInt32		tabimage, tosave;
+	wyBool		retval;
+	EditorBase	*peditorbase = NULL;
+    MDIWindow*  wnd;
+	HANDLE      hfile;
+	
+    wnd = GetActiveWin();
+    
+    // Gets the file handle to process
+    hfile = CreateFile(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);                     
+	
+    if(hfile == INVALID_HANDLE_VALUE)
+	{
+        DisplayErrorText(GetLastError(), _("Could not open file."), wnd ? wnd->m_hwnd : NULL);
+		return wyFalse;
+	}
+	    
+	tabimage = pcquerywnd->m_pctabmodule->GetActiveTabImage();
+	
+    if(tabimage == IDI_QUERYBUILDER_16 || tabimage == IDI_SCHEMADESIGNER_16)
+		pcquerywnd->m_pctabmodule->CreateQueryEditorTab(pcquerywnd);
+
+    peditorbase = pcquerywnd->GetActiveTabEditor()->m_peditorbase;
+
+	// First check whether the existing file needs to be checked.
+	if((peditorbase->m_edit == wyTrue && IsConfirmOnTabClose() == wyTrue) 
+		|| ((peditorbase->m_save == wyTrue) && (peditorbase->m_edit == wyTrue)))
+	{
+		tosave = pcquerywnd->ConfirmSaveFile();
+		switch(tosave)
+		{
+		case IDYES:
+			if(!pcquerywnd->SaveFile())
+				return wyFalse;
+			break;
+
+		case IDNO:
+			break;
+
+		default:
+			return wyFalse;
+		}
+	}
+
+	peditorbase->m_filename.SetAs(filename);
+	retval = pcquerywnd->WriteSQLToEditor(hfile);
+	//if(retval == wyTrue)
+		//peditorbase->m_filename.SetAs(filename);
+
+	peditorbase->m_edit = wyFalse;
+	peditorbase->m_save = wyTrue;
+	pcquerywnd->SetQueryWindowTitle();
+
+	return wyTrue;
+}
+
+// Loads the recent Schema Design. 
+// If the current tab is other thae Schema Designer, creates a new Schema Designer & loads the file 
+wyBool	
+FrameWindow::InsertFromLatestSchemaDesignFile(wyInt32 id, MDIWindow * pcquerywnd, wyWChar *filename)
+{
+#ifndef COMMUNITY
+
+	wyInt32				tabimage, idmsg;
+	wyString			fname, jobbuff;
+	wyBool				issdactve = wyFalse, ret;
+	TabSchemaDesigner	*ptabsd = NULL, tabsd(NULL);
+	TiXmlDocument		*doc;
+		
+	// Gets the white space
+	TiXmlBase::SetCondenseWhiteSpace(false);
+
+	doc = new TiXmlDocument();
+	fname.SetAs(filename);	
+
+    //Handles the .schemadesign file
+	ret = ptabsd->HandleSchemaDesignfile(fname.GetAsWideChar(), &jobbuff);
+	
+    if(ret == wyFalse)
+    {
+        delete doc;
+		return ret;
+    }
+    		
+	tabimage = pcquerywnd->m_pctabmodule->GetActiveTabImage();
+	
+    if(tabimage != IDI_SCHEMADESIGNER_16)
+		pcquerywnd->m_pctabmodule->CreateSchemaDesigner(pcquerywnd);
+
+	else
+		issdactve = wyTrue;
+		
+	ptabsd = (TabSchemaDesigner*)pcquerywnd->m_pctabmodule->GetActiveTabType();
+
+    //handle if this is an active SD
+	if(issdactve == wyTrue)
+	{
+		idmsg = ptabsd->OnTabClosing(wyFalse);
+		
+        if(!idmsg)
+			return wyFalse;
+
+        //clear SD
+        ptabsd->ClearSD();
+	}
+
+    pcquerywnd->SetQueryWindowTitle();
+	doc->Parse(jobbuff.GetString());
+	ptabsd->CanvasLoadXML(doc, &fname);
+    delete doc;
+#endif
+
+	return wyTrue;    
+}
+
+//the function handles the inserting from latest QB files
+wyBool
+FrameWindow::InsertFromLatestQBFile(wyInt32 id, MDIWindow * pcquerywnd, wyWChar *filename)
+{
+#ifndef COMMUNITY
+    wyInt32				tabimage, idmsg;
+	wyString			fname, jobbuff;
+	wyBool				isqbactve = wyFalse, ret;
+    TabQueryBuilder     *ptabqb = NULL, tabqb(NULL);
+	TiXmlDocument		*doc;
+
+    // Gets the white space
+	TiXmlBase::SetCondenseWhiteSpace(false);
+
+	doc = new TiXmlDocument();
+	fname.SetAs(filename);	
+
+    //Handles the qb file
+    ret = tabqb.HandleQueryBuilderfile(fname.GetAsWideChar(), &jobbuff);
+
+    if(ret == wyFalse)
+    {
+        delete doc;
+		return ret;
+    }
+
+	tabimage = pcquerywnd->m_pctabmodule->GetActiveTabImage();
+
+    if(tabimage != IDI_QUERYBUILDER_16)
+		pcquerywnd->m_pctabmodule->CreateQueryBuilderTab(pcquerywnd);
+	else
+		isqbactve = wyTrue;
+		
+	ptabqb = (TabQueryBuilder*)pcquerywnd->m_pctabmodule->GetActiveTabType();
+
+	if(isqbactve == wyTrue)
+	{
+        idmsg = ptabqb->OnTabClosing(wyFalse);
+
+        if(!idmsg)
+			return wyFalse;
+
+        ptabqb->ClearQueryBuilder();
+	}
+
+	pcquerywnd->SetQueryWindowTitle();
+	doc->Parse(jobbuff.GetString());
+    
+    //set the m_isautomated flag, so that the file loading routine can use the existing QB functions to generate the query
+	ptabqb->m_isautomated = wyTrue;
+    ptabqb->LoadQueryXML(doc, &fname);
+    ptabqb->m_isautomated = wyFalse;
+    delete doc;
+#endif
+    return wyTrue;
+}
+
+//Shorcut for switching between Form & Grid
+void					
+FrameWindow::AccelaratorSwitchGridForm(MDIWindow *wnd, TabMgmt *ptabmgmt)
+{
+}
+
+// This function is called whenever a QueryWindow is activated, deactivaed, closed or a new one opened.
+// It checks the current status of various window and enables and disables verious menu item.
+wyBool
+FrameWindow::OnActiveConn()
+{
+    wyInt32     itemcount, size;
+	HMENU       hmenu;
+
+	wyInt32		menugrayitems[] = { IDM_FILE_NEWSAMECONN, IDM_FILE_CLOSECONNECTION, ID_NEW_EDITOR,
+								ID_OBJECT_CREATEVIEW, ID_DB_CREATEVIEW, ID_OBJECT_CREATESTOREDPROCEDURE, ID_DB_CREATESTOREDPROCEDURE,
+								ID_OBJECT_CREATEFUNCTION,ID_DB_CREATEFUNCTION, ID_OBJECT_CREATEEVENT, ID_DB_CREATEEVENT,
+								ID_OBJECT_CREATETRIGGER,ID_DB_CREATETRIGGER, ID_OBJECT_ALTERVIEW, ID_OBJECT_ALTERSTOREDPROCEDURE,
+								ID_OBJECT_ALTERFUNCTION, ID_OBJECT_ALTERTRIGGER, ID_OBJECT_DROPVIEW,
+								ID_OBJECT_DROPSTOREDPROCEDURE,ID_OBJECT_DROPFUNCTION, ID_OBJECT_DROPTRIGGER,
+								ID_OBJECTS_RENAMEVIEW, ID_OBJECTS_RENAMETRIGGER,
+								ID_FILE_CLOSETAB, IDM_FILE_CLOSECONNECTION, IDM_FILE_CLOASEALL, 
+								IDM_FILE_OPENSQL, IDM_FILE_OPENSQLNEW, 
+								IDM_FILE_SAVESQL, IDM_FILE_SAVEAS,
+								IDM_EDIT_UNDO, IDM_EDIT_REDO, IDM_EDIT_CUT, IDM_EDIT_COPY, IDM_COPYNORMALIZED,
+                                IDM_EDIT_PASTE, IDM_EDIT_SELECTALL, IDM_EDIT_FIND, IDM_EDIT_FINDNEXT, 
+								IDM_EDIT_REPLACE, IDM_EDIT_GOTO, IDM_REFRESHOBJECT, IDM_OBCOLOR , ID_EDIT_INSERTTEMPLATES, 
+								IDM_EDIT_RESULT_TEXT, IDC_EDIT_SHOWOBJECT, IDC_EDIT_SHOWRESULT, 
+								IDC_EDIT_SHOWEDIT, IDM_EDIT_ADVANCED_UPPER, IDM_EDIT_ADVANCED_LOWER,
+								IDM_EDIT_ADVANCED_COMMENT, IDM_EDIT_ADVANCED_REMOVE, 
+								IDM_EDIT_MANPF, IDM_EDIT_ADDSQL, 
+								IDM_IMEX_EXPORTDATA, ID_IMPORTEXPORT_EXPORTTABLES,ID_IMEX_TEXTFILE, ID_TOOLS_FLUSH, IDM_TOOLS_TABLEDIAG, ID_HISTORY, ID_INFOTAB,
+								ID_SHOW_STATUS, ID_SHOW_VARIABLES, ID_SHOW_PROCESSLIST, ID_TOOLS_USERMANAGER, IDC_DIFFTOOL, 
+								IDM_CREATEDATABASE,ID_OBJECT_TRUNCATEDATABASE, ID_DB_TABLE_MAKER, ID_TABLE_MAKER, IDM_ALTERDATABASE,ID_OPEN_COPYDATABASE, 
+								ID_IMPORTEXPORT_DBEXPORTTABLES, 
+								ID_OBJECT_DROPDATABASE, ID_OBJECT_EMPTYDATABASE, ID_OBJECT_CREATESCHEMA, 
+								ID_OBJECT_TABLEEDITOR, ID_OBJECT_MANINDEX, ID_IMPORTEXPORT_TABLESEXPORTTABLES, 
+								ID_EXPORT_AS, ID_EXPORT_ASXML, ID_EXPORT_ASHTML, 
+								ID_OBJECT_COPYTABLE, ID_IMPORT_FROMCSV, ID_OBJECT_RENAMETABLE, ID_OBJECT_CLEARTABLE, 
+								ID_OBJECT_DROPTABLE, ID_OBJECT_REORDER, ID_OBJECT_CHANGETABLETYPE_ISAM, 
+								ID_OBJECT_CHANGETABLETYPE_MYISAM, ID_OBJECT_CHANGETABLETYPE_HEAP, 
+								ID_OBJECT_CHANGETABLETYPE_MERGE, ID_OBJECT_CHANGETABLETYPE_INNODB, ID_OBJECT_CHANGETABLETYPE_BDB, 
+								ID_OBJECT_CHANGETABLETYPE_GEMINI,
+								ID_OBJECT_VIEWDATA, ID_TABLE_OPENINNEWTAB, ID_OBJECT_ADVANCED, ID_OBJECT_INSERTSTMT, ID_OBJECT_UPDATESTMT,ID_OBJECT_DELETESTMT, ID_OBJECT_SELECTSTMT,
+								ID_OBJECT_DROPFIELD, ID_COLUMNS_DROPINDEX, ID_OBJECT_MAINMANINDEX, IDM_TABLE_RELATION,
+								IDM_WINDOW_CASCADE, IDM_WINDOW_TILE, IDM_WINDOWS_ICONARRANGE, ID_OPEN_COPYTABLE, 
+								ID_IMPORTEXPORT_DBEXPORTTABLES2, ID_IMEX_TEXTFILE2, ID_REBUILDTAGS, ID_ORGANIZEFAVORITES, ID_REFRESHFAVORITES,
+                                ID_EXPORT_EXPORTTABLEDATA, ID_OBJECT_EXPORTVIEW, IDM_DB_REFRESHOBJECT, ID_DATASEARCH};
+
+	if(pGlobals->m_conncount == 0)
+	{
+		VERIFY(hmenu = GetMenu(m_hwndmain));
+
+		size = sizeof(menugrayitems)/ sizeof(menugrayitems[0]);
+
+		for(itemcount = 0; itemcount < size; itemcount++)
+			EnableMenuItem(hmenu, menugrayitems[itemcount], MF_GRAYED | MF_BYCOMMAND);
+						
+		// grey the latest files.
+		for(itemcount = 0; itemcount <= MAX_RECENT_FILES; itemcount++)
+			EnableMenuItem(hmenu, ID_LF_1 + itemcount, MF_GRAYED);
+				
+		EnableMenuItem(hmenu, ID_QUERYBUILDER, MF_GRAYED | MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ID_SCHEMADESIGNER, MF_GRAYED | MF_BYCOMMAND);
+
+		//disable format query options
+		EnableMenuItem(hmenu, ACCEL_FORMATALLQUERIES, MF_GRAYED | MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ACCEL_FORMATCURRENTQUERY, MF_GRAYED | MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ACCEL_FORMATSELECTEDQUERY, MF_GRAYED | MF_BYCOMMAND);
+
+		//EnableToolButtonsAndCombo(m_hwndtool, m_hwndsecondtool, m_hwndtoolcombo, wyFalse);
+        PostMessage(m_hwndmain, UM_UPDATEMAINTOOLBAR, 0, 0);
+						
+		// change the status bar text also.
+		AddTextInStatusBar(CONNECT_MYSQL_MSG);
+        m_statusbarmgmt->ShowInformation(L"", 3);
+        m_statusbarmgmt->ShowInformation(L"", 2);
+        m_statusbarmgmt->ShowInformation(L"", 4);
+        m_statusbarmgmt->ShowInformation(L"", 5);
+
+		//do not display execution time when connection is closed
+        m_statusbarmgmt->ShowInformation(L"", 1);
+	}
+	else
+	{
+		hmenu = GetMenu(m_hwndmain);
+		
+		for(itemcount = 0; itemcount < (sizeof(menugrayitems)/sizeof(menugrayitems[0])); itemcount++)
+			EnableMenuItem(hmenu, menugrayitems[itemcount], MF_ENABLED);
+
+		// enable the latest files.
+		for(itemcount=0; itemcount <= MAX_RECENT_FILES; itemcount++)
+			EnableMenuItem(hmenu, ID_LF_1 + itemcount, MF_ENABLED);
+
+		for(itemcount=0; itemcount <= MAX_RECENT_FILES; itemcount++)
+			EnableMenuItem(hmenu, ID_SDLF_1 + itemcount, MF_ENABLED);
+
+		//EnableToolButtonsAndCombo(m_hwndtool, m_hwndsecondtool, m_hwndtoolcombo, wyTrue);
+        PostMessage(m_hwndmain, UM_UPDATEMAINTOOLBAR, 0, 0);
+	}
+
+    if(!m_languagecount)
+    {
+        EnableMenuItem(hmenu, ID_TOOLS_CHANGELANGUAGE, MF_GRAYED | MF_BYCOMMAND);
+    }
+    else
+    {
+        EnableMenuItem(hmenu, ID_TOOLS_CHANGELANGUAGE, MF_ENABLED);
+    }
+	
+	return wyTrue;
+}
+
+/* helper function to stop a query */
+wyBool
+FrameWindow::StopQuery(HWND hwndactive, MDIWindow * wnd)
+{
+    VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+
+	if(hwndactive && wnd->m_executing && wnd->m_tunnel->IsTunnel())
+    {
+        EnterCriticalSection(&wnd->m_cs);
+		/* just need to set the m_stopquery flag to true */
+		wnd->StopQueryExecution();
+        LeaveCriticalSection(&wnd->m_cs);
+    }
+    else if(hwndactive && wnd->m_executing)
+    { 
+		// try to stop the query and if successful then enable the correct the toolbar buttons 
+		if(wnd->StopQuery())
+        {
+			wnd->EnableToolOnNoQuery();
+            wnd->OnInitDialog();
+			//PostMessage(wnd->m_hwnd, WM_INITDLGVALUES, 0, 0);
+			Sleep(100);
+		}
+        else
+        {
+            VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+            return wyFalse;
+        }
+	}
+    VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::HandleCheckMenu(MDIWindow * pcquerywnd, wyBool ischecked, wyUInt32 menuid)
+{
+    long        lstyle;		
+	HMENU       hmenu, hsubmenu;
+
+	VERIFY(hmenu = GetMenu(pGlobals->m_pcmainwin->m_hwndmain));
+	
+	lstyle = GetWindowLongPtr(pcquerywnd->m_hwnd, GWL_STYLE);
+
+	if((lstyle & WS_MAXIMIZE) && wyTheme::IsSysmenuEnabled(pcquerywnd->m_hwnd))
+		VERIFY(hsubmenu = GetSubMenu(hmenu, 2));
+	else
+		VERIFY(hsubmenu = GetSubMenu(hmenu, 1));
+	
+	lstyle = (ischecked == wyFalse)?(MF_UNCHECKED):(MF_CHECKED);
+
+	CheckMenuItem(hsubmenu, menuid, MF_BYCOMMAND | lstyle);
+
+	return wyTrue;
+
+}
+
+// Function to toggle result in text option. The function is called whenever the user clicks on it.
+wyBool
+FrameWindow::CheckOrUncheckTextResult(MDIWindow * pcquerywnd)
+{    
+	/*if(!pcquerywnd->GetActiveTabEditor())		
+        return wyFalse;
+
+	if(pcquerywnd->GetActiveTabEditor()->m_pctabmgmt->GetSelectedItem() == IDI_TABLE)
+	{
+		if(pcquerywnd->GetActiveTabEditor()->m_resultviewtype == GRID_VIEW)
+		{
+			if(!pGlobals->m_entlicense.CompareI("Professional"))
+			{
+				pcquerywnd->GetActiveTabEditor()->m_resultviewtype = TEXT_VIEW;		
+			}
+
+			else
+			{
+				pcquerywnd->GetActiveTabEditor()->m_resultviewtype = FORM_VIEW;		
+			}
+		
+		}
+		else if(pcquerywnd->GetActiveTabEditor()->m_resultviewtype == FORM_VIEW)
+		{
+			pcquerywnd->GetActiveTabEditor()->m_resultviewtype = TEXT_VIEW;
+		}
+		else if(pcquerywnd->GetActiveTabEditor()->m_resultviewtype == TEXT_VIEW)
+		{
+			pcquerywnd->GetActiveTabEditor()->m_resultviewtype = GRID_VIEW;
+		}
+	}	
+
+	if(pcquerywnd->GetActiveTabEditor()->m_pctabmgmt->GetSelectedItem() == IDI_QUERYRECORD)
+	{
+		if(pcquerywnd->GetActiveTabEditor()->m_resultviewtype == GRID_VIEW)
+		{
+			pcquerywnd->GetActiveTabEditor()->m_resultviewtype = TEXT_VIEW;
+		}
+		else if(pcquerywnd->GetActiveTabEditor()->m_resultviewtype == FORM_VIEW)
+		{
+			pcquerywnd->GetActiveTabEditor()->m_resultviewtype = TEXT_VIEW;
+		}
+		else
+		{
+			pcquerywnd->GetActiveTabEditor()->m_resultviewtype = GRID_VIEW;
+		}
+	}
+
+		
+	pcquerywnd->GetActiveTabEditor()->m_istextresult = (pcquerywnd->GetActiveTabEditor()->m_istextresult == wyTrue)?wyFalse:wyTrue;
+	
+	HandleCheckMenu(pcquerywnd, pcquerywnd->GetActiveTabEditor()->m_istextresult, IDM_EDIT_RESULT_TEXT);*/
+
+	if(!pcquerywnd->GetActiveTabEditor() && pcquerywnd->m_pctabmodule->GetActiveTabImage() != IDI_DATASEARCH)		
+    {
+		return wyFalse;
+	}
+	if(pcquerywnd->m_pctabmodule->GetActiveTabImage() == IDI_DATASEARCH)
+	{
+		HandleCheckMenu(pcquerywnd,  pcquerywnd->m_pctabmodule->GetActiveTabType()->m_istextresult == wyTrue?wyFalse:wyTrue, IDM_EDIT_RESULT_TEXT);
+	}
+	else
+	{
+		pcquerywnd->GetActiveTabEditor()->m_istextresult = (pcquerywnd->GetActiveTabEditor()->m_istextresult == wyTrue)?wyFalse:wyTrue;
+		HandleCheckMenu(pcquerywnd, pcquerywnd->GetActiveTabEditor()->m_istextresult, IDM_EDIT_RESULT_TEXT);
+	}
+	
+
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::CheckOrUncheckObjBrowserVis(MDIWindow * pcquerywnd)
+{
+	HandleCheckMenu(pcquerywnd, pcquerywnd->m_isobjbrowvis, IDC_EDIT_SHOWOBJECT);
+    pcquerywnd->m_isobjbrowvis = (pcquerywnd->m_isobjbrowvis == wyTrue)?wyFalse:wyTrue;
+
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::CheckOrUncheckResultWindowVis(MDIWindow * pcquerywnd)
+{
+	TabTypes	*ptabeditor;
+
+	if(pcquerywnd->GetActiveTabEditor() == NULL)
+        return wyFalse;
+
+	ptabeditor =  pcquerywnd->GetActiveTabEditor();
+
+	if(ptabeditor->m_iseditwnd == wyFalse)
+		return wyFalse;
+
+	HandleCheckMenu(pcquerywnd, ptabeditor->m_isresultwnd, IDC_EDIT_SHOWRESULT);  
+    ptabeditor->m_isresultwnd = (ptabeditor->m_isresultwnd == wyTrue)?wyFalse:wyTrue;
+
+	return wyTrue;
+}
+
+wyBool 
+FrameWindow::CheckOrUncheckEditWindowVis(MDIWindow *pcquerywnd)
+{
+	TabTypes	*ptabeditor;
+
+	if(pcquerywnd->GetActiveTabEditor() == NULL)   
+        return wyFalse;
+
+	ptabeditor =  pcquerywnd->GetActiveTabEditor();
+
+    if(ptabeditor->m_isresultwnd == wyFalse)
+		return wyFalse;
+
+    HandleCheckMenu(pcquerywnd, ptabeditor->m_iseditwnd, IDC_EDIT_SHOWEDIT);
+	ptabeditor->m_iseditwnd = (ptabeditor->m_iseditwnd == wyTrue)?wyFalse:wyTrue;
+
+	return wyTrue;
+}
+
+// Function returns TRUE if result in text is checked. else it return wyFalse.
+// Required to know whether to show result in text or grid mode.
+
+wyBool
+FrameWindow::IsTextResult()
+{
+	wyUInt32    menustate;
+	HMENU       hmenu = GetMenu(pGlobals->m_pcmainwin->m_hwndmain);
+
+	menustate = GetMenuState(hmenu, IDM_EDIT_RESULT_TEXT, MF_BYCOMMAND);
+
+	if(!(menustate & MF_CHECKED))
+		return wyFalse;
+	
+    return wyTrue;
+}
+
+
+// Callback function for the create database dialog box.
+INT_PTR CALLBACK
+FrameWindow::CreateObjectDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	wyChar *object = (wyChar *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+
+	switch(message)
+	{
+	case WM_INITDIALOG:
+	    SetWindowLongPtr(hwnd, GWLP_USERDATA,lParam);
+        LocalizeWindow(hwnd);
+		PostMessage(hwnd, WM_INITDLGVALUES, 0, 0);
+        return 1;
+        
+	case WM_CTLCOLORSTATIC:
+		{
+		 if(GetDlgCtrlID((HWND)lParam) == IDC_TEXTFILTERDB)
+		 {
+			 SetTextColor((HDC)wParam, RGB(255, 0, 0));
+			 SetBkMode((HDC)wParam, TRANSPARENT);
+
+			 return(wyInt32)GetStockObject(HOLLOW_BRUSH);
+		 }
+		}
+
+		break;
+
+	case WM_INITDLGVALUES:
+		pGlobals->m_pcmainwin->InitCreateObjectDlg(hwnd, object);
+		break;
+
+	case WM_HELP:
+		pGlobals->m_pcmainwin->OnCreateObjectWmHelp(hwnd, object);
+		return 1;
+
+	case WM_COMMAND:
+        pGlobals->m_pcmainwin->OnCreateObjectWmCommand(hwnd, wParam, object);
+		break;
+	}
+
+	return 0;
+}
+
+
+/* Function used to Enable or Disable the buttons on the toolbar */
+void 
+FrameWindow::HandleFirstToolBar()
+{
+	HWND		hwnd;
+    wyInt32     nid[] = { IDM_EXECUTE, ACCEL_QUERYUPDATE, ACCEL_EXECUTESEL};
+	MDIWindow   *pcquerywnd;
+    EditorBase  *pceditorbase;;
+    wyInt32     size = sizeof(nid)/ sizeof(nid[0]), count;
+	
+	pcquerywnd = GetActiveWin(); 	
+
+	if(!pcquerywnd)
+		return;
+	hwnd = GetFocus();
+	
+	//If active tab is QB disable tool bar
+    if(pcquerywnd->GetActiveTabEditor() == NULL)
+       return;
+       
+    pceditorbase = pcquerywnd->GetActiveTabEditor()->m_peditorbase;     
+
+    SendMessage(m_hwndtool, TB_SETSTATE,(WPARAM)ACCEL_EXECUTEALL, TBSTATE_ENABLED);
+
+    if(pceditorbase && pceditorbase->GetAdvancedEditor() == wyFalse)
+    {
+        for(count = 0; count < size; count++)
+    	    SendMessage(m_hwndtool, TB_SETSTATE,(WPARAM)nid[count], TBSTATE_ENABLED);
+    }
+}
+
+void 
+FrameWindow::InitCreateObjectDlg(HWND hwnd, wyChar *object)
+{  
+	MDIWindow	*wnd;
+
+   	if(stricmp(object, "CreateView")== 0 )
+	{
+		SetWindowText(hwnd, L"Create View");
+		SendMessage(GetDlgItem(hwnd, IDC_CAPTION), WM_SETTEXT, 0, (LPARAM)_(L"Enter new view name"));
+	}
+	else if(stricmp(object, "CreateProcedure")== 0 )
+	{
+		SetWindowText(hwnd, L"Create Procedure");
+		SendMessage(GetDlgItem(hwnd, IDC_CAPTION), WM_SETTEXT, 0, (LPARAM)_(L"Enter new procedure name"));
+	}
+	else if(stricmp(object, "CreateFunction")== 0 )
+	{
+		SetWindowText(hwnd, L"Create Function");
+		SendMessage(GetDlgItem(hwnd, IDC_CAPTION), WM_SETTEXT, 0, (LPARAM)_(L"Enter new function name"));
+	}
+	else if(stricmp(object, "CreateEvent")== 0 )
+	{
+		SetWindowText(hwnd, L"Create Event");
+		SendMessage(GetDlgItem(hwnd, IDC_CAPTION), WM_SETTEXT, 0, (LPARAM)_(L"Enter new event name"));
+	}
+	else if(stricmp(object, "CreateTrigger")== 0 )
+	{
+		SetWindowText(hwnd, L"Create Trigger");
+		SendMessage(GetDlgItem(hwnd, IDC_CAPTION), WM_SETTEXT, 0, (LPARAM)_(L"Enter new trigger name"));
+	}
+	else if(stricmp(object, "GoToLine")== 0 )
+	{
+		SetWindowText(hwnd, L"Go To");
+		SendMessage(GetDlgItem(hwnd, IDC_CAPTION), WM_SETTEXT, 0, (LPARAM)_(L"Enter line number"));
+		SendMessage(GetDlgItem(hwnd, IDOK), WM_SETTEXT, 0, (LPARAM)_(L"&Go To"));
+		SetWindowLongPtr(GetDlgItem(hwnd, IDC_DBNAME), GWL_STYLE, GetWindowLongPtr(GetDlgItem(hwnd, IDC_DBNAME), GWL_STYLE) | ES_NUMBER);
+	}
+    else if(stricmp(object, "createdb") == 0)
+    {
+       SendMessage(GetDlgItem(hwnd, IDC_DBEDIT), EM_LIMITTEXT, 64, 0);
+		if(GetActiveWin()->m_ismysql41 == wyFalse)
+        {
+            EnableWindow((GetDlgItem(hwnd, IDC_CHARSETCOMBO)), FALSE);
+            EnableWindow((GetDlgItem(hwnd, IDC_COLLATECOMBO)), FALSE);
+        }
+        else
+        {
+            InitCharacterSetCombo(hwnd);
+            InitCollationCombo(hwnd);
+        }
+
+		VERIFY(wnd = GetActiveWin());
+		if(wnd && wnd->m_conninfo.m_db.GetLength())
+		{
+			ShowWindow(GetDlgItem(hwnd, IDC_TEXTFILTERDB), SW_SHOW);
+		}
+    }
+	else if(stricmp(object, "AlterDB") == 0)
+	{  	
+		EnableWindow((GetDlgItem(hwnd, IDC_DBEDIT)), FALSE);
+		SetWindowText(hwnd, _(L"Alter Database"));
+		SendMessage(GetDlgItem(hwnd, IDOK), WM_SETTEXT, 0, (LPARAM)_(L"&Alter"));
+		InitCharsetAndCollationInfo(hwnd);
+	}
+
+    //disable the OK button initially
+    //EnableWindow(GetDlgItem(hwnd, IDOK), FALSE);
+}
+void 
+FrameWindow::InitCharsetAndCollationInfo(HWND hwnd)
+{  
+	wyString        query, dbcollation, dbname, dbcharset;
+	MYSQL_RES		*res;
+	MYSQL_ROW		row;
+
+	MDIWindow *wnd = GetActiveWin();
+    HWND hwndCharsetCombo = GetDlgItem(hwnd, IDC_CHARSETCOMBO);
+    HWND hwndCollateCombo = GetDlgItem(hwnd, IDC_COLLATECOMBO);
+	
+	SendMessage(GetDlgItem(hwnd, IDC_DBEDIT), WM_SETTEXT, 0, (LPARAM)wnd->m_pcqueryobject->m_seldatabase.GetAsWideChar());
+    
+	InitCharacterSetCombo(hwnd);
+	query.Sprintf("show variables like 'character_set_database'");
+	res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
+	if(!res)
+	{
+        ShowMySQLError(hwnd, wnd->m_tunnel, &wnd->m_mysql, query.GetString());
+		return;
+	}
+	
+    while(row = wnd->m_tunnel->mysql_fetch_row(res))
+	{ 
+		dbcharset.SetAs(row[1]);
+	   	SendMessage(hwndCharsetCombo, CB_SELECTSTRING, -1, (LPARAM)dbcharset.GetAsWideChar());
+	}
+
+    wnd->m_pcqueryobject->m_dbcharset.SetAs(dbcharset.GetAsWideChar());
+	ReInitRelatedCollations(hwnd);
+	query.Sprintf("show variables like 'collation_database'");
+	res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
+	if(!res)
+	{
+        ShowMySQLError(hwnd, wnd->m_tunnel, &wnd->m_mysql, query.GetString());
+		return;
+	}
+	while(row = wnd->m_tunnel->mysql_fetch_row(res))
+	{  
+		dbcollation.SetAs(row[1]);
+	   	SendMessage(hwndCollateCombo, CB_SELECTSTRING, -1, (LPARAM)dbcollation.GetAsWideChar());
+	}
+	SetFocus(hwndCharsetCombo);
+
+    if(res)
+    {
+        wnd->m_tunnel->mysql_free_result(res);
+    }
+}
+    
+void
+FrameWindow::InitCollationCombo(HWND hwnd)
+{
+    MDIWindow   *wnd = GetActiveWin();
+    wyString    query, collationstr;
+    MYSQL_ROW   myrow;
+    MYSQL_RES   *myres;
+    wyInt32     index;
+    
+    HWND        hwndcombo = GetDlgItem(hwnd, IDC_COLLATECOMBO);
+
+    query.SetAs("show collation");
+    myres = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
+    if(!myres)
+	{
+        ShowMySQLError(hwnd, wnd->m_tunnel, &wnd->m_mysql, query.GetString());
+		return;
+	}
+    while(myrow = wnd->m_tunnel->mysql_fetch_row(myres))
+    {
+        collationstr.SetAs(myrow[0]);
+        SendMessage(hwndcombo , CB_ADDSTRING, 0,(LPARAM)collationstr.GetAsWideChar());
+    }
+    if((index = SendMessage(hwndcombo , CB_ADDSTRING, 0,(LPARAM)TEXT(STR_DEFAULT))) != CB_ERR)
+        SendMessage(hwndcombo, CB_SELECTSTRING, index, (LPARAM)TEXT(STR_DEFAULT));
+	if(myres)
+	{
+		wnd->m_tunnel->mysql_free_result(myres);
+	}
+}
+
+wyBool 
+FrameWindow::HandleCreateDatabase(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *dbname)
+{
+	wyInt32     len;
+	HWND		hwndedit;
+	MYSQL_RES	*res;
+    wyString    query;
+	wyString	dbnamestr, tempcharset;
+	MDIWindow	*wnd = NULL;
+
+	VERIFY(wnd = GetActiveWin());
+	if(!wnd)
+		return wyFalse;
+
+    if(!dbname)
+		return wyFalse;
+
+	FetchSelectedCharset(hwnd, &tempcharset, wyTrue);
+
+	if(tempcharset.GetLength())
+		GetDBCharset(&tempcharset);
+   
+	// get the db name.
+	VERIFY(hwndedit = GetDlgItem(hwnd, IDC_DBEDIT));
+
+	VERIFY(len = SendMessage(hwndedit, WM_GETTEXT, SIZE_64, (LPARAM)dbname));
+	
+    if(IsFieldBlank(hwndedit) != 1)
+    {
+		yog_message(hwndedit, _(L"Please provide a valid database name"), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR | MB_HELP);
+		SetFocus(hwndedit);
+		return wyFalse;
+	}
+
+	dbnamestr.SetAs(dbname); 
+
+	//to trim empty spaces from right, to avoid mysql errors
+	dbnamestr.RTrim();
+
+	query.Sprintf("create database `%s`", dbnamestr.GetString());
+    
+    if(pcquerywnd->m_pcqueryobject->m_dbcharset.GetLength() != 0 && 
+       pcquerywnd->m_pcqueryobject->m_dbcharset.CompareI(STR_DEFAULT) != 0)
+    {
+        query.AddSprintf("character set %s ", pcquerywnd->m_pcqueryobject->m_dbcharset.GetString());
+    }
+    if(pcquerywnd->m_pcqueryobject->m_dbcollation.GetLength() != 0 && 
+       pcquerywnd->m_pcqueryobject->m_dbcollation.CompareI(STR_DEFAULT) != 0)
+    {
+        query.AddSprintf("collate %s", pcquerywnd->m_pcqueryobject->m_dbcollation.GetString());
+    }
+
+    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
+	{
+		ShowMySQLError(hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
+		return wyFalse;
+	}
+
+	pcquerywnd->m_tunnel->mysql_free_result(res);
+
+	///New db select and insert into db combo only if database(s) not specified in Con.window
+    if(!wnd->m_filterdb.GetLength())
+	{
+        HTREEITEM hti = TreeView_GetRoot(pcquerywnd->m_pcqueryobject->m_hwnd);
+        TVITEM    tvi;
+
+        tvi.mask = TVIF_PARAM;
+        tvi.hItem = hti;
+        TreeView_GetItem(pcquerywnd->m_pcqueryobject->m_hwnd, &tvi);
+        if(tvi.lParam && /*!wcscmp(((OBDltElementParam *)tvi.lParam)->m_filterText,L"") &&*/ wcsstr(dbname, ((OBDltElementParam *)tvi.lParam)->m_filterText))
+        {
+	        query.Sprintf("use `%s`", dbnamestr.GetString());
+            res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+	        if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
+	        {
+		        ShowMySQLError(hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
+		        return wyFalse;
+	        }
+
+	        pcquerywnd->m_tunnel->mysql_free_result(res);
+	        /* Show the selected dbname in combo */
+	        pGlobals->m_pcmainwin->AddTextInCombo(dbname);
+        }
+	}
+
+	return wyTrue;
+}
+
+void
+FrameWindow::GetDBCharset(wyString *charset)
+{
+	MDIWindow *wnd = NULL;
+
+	if(!charset)
+		return;
+
+	VERIFY(wnd = GetActiveWin());
+
+	wnd->m_pcqueryobject->m_dbcharset.SetAs(*charset);
+}
+
+wyBool
+FrameWindow::HandleAlterDatabase(HWND hwnd, MDIWindow *pcquerywnd, wyWChar *dbname)
+{	
+	HWND		hwndedit;
+	MYSQL_RES	*res;
+    wyString    query;
+	wyString	dbnamestr, tempcharset;
+
+	hwndedit = GetDlgItem(hwnd, IDC_DBEDIT);
+	CQueryObject *pcqueryobject=pcquerywnd->m_pcqueryobject;
+	SendMessage(hwndedit, WM_GETTEXT, SIZE_64, (LPARAM)dbname);
+
+	FetchSelectedCharset(hwnd, &tempcharset, wyTrue);
+	if(tempcharset.GetLength())
+		GetDBCharset(&tempcharset);
+
+	FetchSelectedCollation(hwnd);
+
+	dbnamestr.SetAs(dbname); 
+
+	query.Sprintf("alter database `%s` ", dbnamestr.GetString());
+    
+    if(pcqueryobject->m_dbcharset.GetLength() != 0 && 
+       pcqueryobject->m_dbcharset.CompareI(STR_DEFAULT) != 0)
+    {
+        query.AddSprintf("character set %s ", pcqueryobject->m_dbcharset.GetString());
+    }
+    if(pcqueryobject->m_dbcollation.GetLength() != 0 && 
+       pcqueryobject->m_dbcollation.CompareI(STR_DEFAULT) != 0)
+    {
+        query.AddSprintf("collate %s", pcqueryobject->m_dbcollation.GetString());
+    }
+
+    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+
+	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql) == -1)
+	{
+		ShowMySQLError(hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
+		return wyFalse;
+	}
+	
+	AddTextInCombo(dbname);
+	yog_message(hwnd, _(L"Database altered successfully"), pGlobals->m_appname.GetAsWideChar(), MB_OK|MB_ICONINFORMATION);
+    return wyTrue;
+
+}
+
+wyBool 
+FrameWindow::HandleCreateView(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *viewname)
+{
+	wyInt32		len;
+	HWND		hwndedit;
+	wyString    query, msg, db;
+	MYSQL_RES	*res;
+	wyString	viewnamestr;
+
+	if(!viewname)
+		return wyFalse;
+	
+	GetSelectedDB(pcquerywnd, db);
+	// get the db name.
+	VERIFY(hwndedit = GetDlgItem(hwnd, IDC_DBNAME));
+
+	VERIFY(len = SendMessage(hwndedit, WM_GETTEXT, SIZE_64,(LPARAM)viewname));
+	
+	if(IsFieldBlank(hwndedit) != 1)
+	{
+		yog_message(hwndedit, _(L"Please provide a valid view name"), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR | MB_HELP);
+		SetFocus(hwndedit);
+		return wyFalse;
+	}
+
+	viewnamestr.SetAs(viewname);
+
+	//to trim empty spaces from right, to avoid mysql errors
+	viewnamestr.RTrim();
+
+	query.Sprintf("show tables from `%s` like '%s'", db.GetString(), viewnamestr.GetString());
+    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
+	{
+		ShowMySQLError(hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
+		return wyFalse;
+	}
+	if(pcquerywnd->m_tunnel->mysql_num_rows(res) > 0)
+	{
+		msg.Sprintf(_("Can't create view '%s'; a table or view with that name already exists"), viewnamestr.GetString());
+		yog_message(hwndedit, msg.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR);
+		SetFocus(hwndedit);
+		return wyFalse;
+	}
+
+	pcquerywnd->m_tunnel->mysql_free_result(res);
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::HandleCreateEvent(HWND hwnd, MDIWindow *pcquerywnd, wyWChar *eventname)
+{
+	wyInt32     len;
+	HWND        hwndedit;
+    wyString    query, msg, db;
+    MYSQL_RES	*res;
+	wyString	eventnamestr;
+		
+	GetSelectedDB(pcquerywnd, db);
+	// get the db name.
+	hwndedit = GetDlgItem(hwnd, IDC_DBNAME);
+
+	len = SendMessage(hwndedit, WM_GETTEXT, SIZE_64, (LPARAM)eventname);
+	
+	if(eventname)
+		eventnamestr.SetAs(eventname);
+
+	//to trim empty spaces from right, to avoid mysql errors
+	eventnamestr.RTrim();
+
+	if(IsFieldBlank(hwndedit) != 1)
+	{
+		yog_message(hwndedit, _(L"Please provide a valid event name"), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR |MB_HELP);
+		SetFocus(hwndedit);
+		return wyFalse;
+	}
+
+	query.Sprintf("show events where db = '%s' and name = '%s'", db.GetString(), eventnamestr.GetString());
+	
+    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+
+	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
+	{
+		ShowMySQLError(hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
+		return wyFalse;
+	}
+	if(pcquerywnd->m_tunnel->mysql_num_rows(res)> 0)
+	{
+		msg.Sprintf(_("Can't create event '%s'; Event exists"), eventnamestr.GetString());
+		yog_message(hwndedit, msg.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR);
+		SetFocus(hwndedit);
+		return wyFalse;
+	}
+
+	pcquerywnd->m_tunnel->mysql_free_result(res);
+	return wyTrue;
+}
+
+wyBool 
+FrameWindow::HandleCreateProcedure(HWND hwnd, MDIWindow *pcquerywnd, wyWChar *procedurename)
+{
+	wyInt32     len;
+	HWND        hwndedit;
+    wyString    query, msg, db;
+    MYSQL_RES	*res;
+	wyString	procedurenamestr;
+         
+        if(!procedurename)
+		return wyFalse;	    		
+	
+        GetSelectedDB(pcquerywnd, db);
+	// get the db name.
+	VERIFY(hwndedit = GetDlgItem(hwnd, IDC_DBNAME));
+
+	VERIFY(len = SendMessage(hwndedit, WM_GETTEXT, SIZE_64, (LPARAM)procedurename));
+
+	if(IsFieldBlank(hwndedit) != 1)
+	{
+		yog_message(hwndedit, _(L"Please provide a valid procedure name"), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR |MB_HELP);
+		SetFocus(hwndedit);
+		return wyFalse;
+	}
+
+	procedurenamestr.SetAs(procedurename);
+
+	//to trim empty spaces from right, to avoid mysql errors
+	procedurenamestr.RTrim();
+
+	query.Sprintf("show procedure status where db = '%s' and name = '%s'", db.GetString(), procedurenamestr.GetString());
+    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+
+	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
+	{
+		ShowMySQLError(hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
+		return wyFalse;
+	}
+	if(pcquerywnd->m_tunnel->mysql_num_rows(res)> 0)
+	{
+		msg.Sprintf(_("Can't create procedure '%s'; Procedure exists"), procedurenamestr.GetString());
+		yog_message(hwndedit, msg.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR);
+		SetFocus(hwndedit);
+		return wyFalse;
+	}
+
+	pcquerywnd->m_tunnel->mysql_free_result(res);
+	return wyTrue;
+}
+
+wyBool 
+FrameWindow::HandleCreateFunction(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *functionname)
+{
+	wyInt32     len;
+	HWND        hwndedit;
+    wyString    query, msg, db;
+	MYSQL_RES	*res;
+	wyString	functionnamestr;
+
+	if(!functionname)
+		return wyFalse;
+
+	GetSelectedDB(pcquerywnd, db);
+	// get the db name.
+	VERIFY(hwndedit = GetDlgItem(hwnd, IDC_DBNAME));
+
+	VERIFY(len = SendMessage(hwndedit, WM_GETTEXT, SIZE_64,(LPARAM)functionname));
+
+	if(IsFieldBlank(hwndedit) != 1)
+	{
+		yog_message(hwndedit, _(L"Please provide a valid function name"), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR |MB_HELP);
+		SetFocus(hwndedit);
+		return wyFalse;
+	}
+
+	functionnamestr.SetAs(functionname);
+
+	//to trim empty spaces from right, to avoid mysql errors
+	functionnamestr.RTrim();
+
+	query.Sprintf("show function status where db = '%s' and name = '%s'", db.GetString(), functionnamestr.GetString());
+
+    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
+	{
+		ShowMySQLError(hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
+		return wyFalse;
+	}
+	if(pcquerywnd->m_tunnel->mysql_num_rows(res)> 0)
+	{
+		msg.Sprintf(_("Can't create function '%s'; Function exists"), functionnamestr.GetString());
+		yog_message(hwndedit, msg.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR);
+		SetFocus(hwndedit);
+		return wyFalse;
+	}
+
+	pcquerywnd->m_tunnel->mysql_free_result(res);
+	return wyTrue;
+}
+
+
+wyBool 
+FrameWindow::HandleCreateTrigger(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *triggername)
+{
+	wyInt32	    len;
+	HWND		hwndedit;    
+    wyString    query, msg, db;
+	MYSQL_RES	*res;
+	wyString	triggernamestr;
+
+	if(!triggername)
+		return wyFalse;
+
+	GetSelectedDB(pcquerywnd, db);
+	// get the db name.
+	VERIFY(hwndedit = GetDlgItem(hwnd, IDC_DBNAME));
+	VERIFY(len = SendMessage(hwndedit, WM_GETTEXT, SIZE_64, (LPARAM)triggername));
+
+	if(IsFieldBlank(hwndedit) != 1)
+	{
+		yog_message(hwndedit, _(L"Please provide a valid trigger name"), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR |MB_HELP);
+		SetFocus(hwndedit);
+		return wyFalse;
+	}
+
+	triggernamestr.SetAs(triggername);
+
+	//to trim empty spaces from right, to avoid mysql errors
+	triggernamestr.RTrim();
+	
+	//query.Sprintf("select `TRIGGER_NAME` from `INFORMATION_SCHEMA`.`TRIGGERS`  where `TRIGGER_SCHEMA` = '%s' and  TRIGGER_NAME ='%s'", 
+		//db.GetString(), triggernamestr.GetString());
+
+	query.Sprintf("show triggers from `%s` where `Trigger` = '%s'", db.GetString(), triggernamestr.GetString());
+
+	res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
+	{
+		ShowMySQLError(hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
+		return wyFalse;
+	}
+
+	if(pcquerywnd->m_tunnel->mysql_num_rows(res) > 0)
+	{
+		msg.Sprintf(_("Can't create trigger '%s'; already exists"), triggernamestr.GetString());
+		yog_message(hwndedit, msg.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR);
+		SetFocus(hwndedit);
+		return wyFalse;
+	}
+
+	pcquerywnd->m_tunnel->mysql_free_result(res);
+	return wyTrue;
+}
+
+void  
+FrameWindow::PrepareCreateProcedure(MDIWindow *pcquerywnd, const wyChar *procedurename, wyString &strproc)
+{
+	wyString    db;
+
+	GetSelectedDB(pcquerywnd, db);
+
+	if(db.GetLength() == 0)
+        db.SetAs("db");
+
+    strproc.Sprintf("CREATE\r\n    /*[DEFINER = { user | CURRENT_USER }]*/\r\n    PROCEDURE `%s`.`%s`()\r\n\
+    /*LANGUAGE SQL\r\n\
+    | [NOT] DETERMINISTIC\r\n\
+    | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }\r\n\
+    | SQL SECURITY { DEFINER | INVOKER }\r\n\
+    | COMMENT 'string'*/\r\n\
+    BEGIN\r\n\r\n\
+    END",
+    db.GetString(), procedurename, db.GetString(), procedurename);
+
+	return;
+}
+
+void  
+FrameWindow::PrepareCreateFunction(MDIWindow	*pcquerywnd, const wyChar *functionname, wyString &strfunc)
+{
+	wyString    db;
+
+	GetSelectedDB(pcquerywnd, db);
+
+	if(db.GetLength() == 0)
+        db.SetAs("db");
+
+    strfunc.Sprintf("CREATE\r\n    /*[DEFINER = { user | CURRENT_USER }]*/\r\n    FUNCTION `%s`.`%s`()\r\n    RETURNS type\r\n\
+    /*LANGUAGE SQL\r\n\
+    | [NOT] DETERMINISTIC\r\n\
+    | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }\r\n\
+    | SQL SECURITY { DEFINER | INVOKER }\r\n\
+    | COMMENT 'string'*/\r\n\
+    BEGIN\r\n\r\n\
+    END",
+    db.GetString(), functionname, db.GetString(), functionname);
+
+	return ;
+}
+
+
+void 
+FrameWindow::PrepareCreateTrigger(MDIWindow *pcquerywnd, const wyChar *triggername, wyString &strtrigg)
+{
+	wyString	db, tbl;
+	wyInt32     image;
+
+	GetSelectedDB(pcquerywnd, db);
+
+	image = pcquerywnd->m_pcqueryobject->GetSelectionImage();
+
+	///Insert table name into the trigger template if current selection on table in object browser
+	if(image == NTABLE)
+		GetSelectedTable(pcquerywnd, tbl);
+
+	else	
+		tbl.SetAs("<Table Name>");
+	
+	if(db.GetLength() == 0)
+        db.SetAs("db");
+
+    strtrigg.Sprintf("CREATE\r\n    /*[DEFINER = { user | CURRENT_USER }]*/\r\n    TRIGGER `%s`.`%s` BEFORE/AFTER INSERT/UPDATE/DELETE\r\n    ON `%s`.`%s`\r\n    FOR EACH ROW BEGIN\r\n\r\n    END",
+                        db.GetString(), triggername, db.GetString(), tbl.GetString());
+
+	return;
+}
+
+void  
+FrameWindow::PrepareCreateView(MDIWindow *pcquerywnd, const wyChar *viewname, wyString &strview, wyString *qbquery)
+{
+	wyString		db;
+	    
+	GetSelectedDB(pcquerywnd, db);
+
+	if(db.GetLength() == 0)
+        db.SetAs("db");
+	
+
+    strview.Sprintf("\r\nCREATE\r\n\
+    /*[ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]\r\n\
+    [DEFINER = { user | CURRENT_USER }]\r\n\
+    [SQL SECURITY { DEFINER | INVOKER }]*/\r\n\
+    VIEW `%s`.`%s` \r\n    AS\r\n",db.GetString(), viewname, db.GetString(), viewname);
+	
+	//If view is created from object browser
+	if(!qbquery) 
+		strview.AddSprintf("(SELECT * FROM ...);\r\n");
+
+#ifndef COMMUNITY
+	if(qbquery)
+		strview.Add(qbquery->GetString());		
+#endif
+
+	return;
+}
+void  
+FrameWindow::PrepareCreateEvent(MDIWindow *pcquerywnd, const wyChar *eventname, wyString &strevent)
+{
+	wyString    db;
+
+	GetSelectedDB(pcquerywnd, db);
+
+	if(db.GetLength() == 0)
+        db.SetAs("db");
+
+    strevent.Sprintf("-- SET GLOBAL event_scheduler = ON$$     -- required for event to execute but not create\
+    \r\n\r\nCREATE\t/*[DEFINER = { user | CURRENT_USER }]*/\
+	EVENT `%s`.`%s`\r\n\r\nON SCHEDULE\r\n\t /* uncomment the example below you want to use */\r\n\r\n\
+	-- scheduleexample 1: run once\r\n\r\n\
+	   --  AT 'YYYY-MM-DD HH:MM.SS'/CURRENT_TIMESTAMP { + INTERVAL 1 [HOUR|MONTH|WEEK|DAY|MINUTE|...] }\r\n\r\n\
+	-- scheduleexample 2: run at intervals forever after creation\r\n\r\n\
+	   -- EVERY 1 [HOUR|MONTH|WEEK|DAY|MINUTE|...]\r\n\r\n\
+	-- scheduleexample 3: specified start time, end time and interval for execution\r\n\
+	   /*EVERY 1  [HOUR|MONTH|WEEK|DAY|MINUTE|...]\r\n\r\n\
+	   STARTS CURRENT_TIMESTAMP/'YYYY-MM-DD HH:MM.SS' { + INTERVAL 1[HOUR|MONTH|WEEK|DAY|MINUTE|...] }\r\n\r\n\
+	   ENDS CURRENT_TIMESTAMP/'YYYY-MM-DD HH:MM.SS' { + INTERVAL 1 [HOUR|MONTH|WEEK|DAY|MINUTE|...] } */\r\n\r\n\
+/*[ON COMPLETION [NOT] PRESERVE]\r\n[ENABLE | DISABLE]\r\n[COMMENT 'comment']*/\r\n\r\nDO\r\n\tBEGIN\r\n\t    (sql_statements)\r\n\tEND",		          
+	db.GetString(), eventname, db.GetString(), eventname);
+	
+	return;
+}
+//using this fun getting query for alter event displaing on the adv EditorTab of event
+wyBool 
+FrameWindow::PrepareAlterEvent(MDIWindow *pcquerywnd, wyString &altereventstmt)
+{
+	wyInt32      index = 0;
+	wyString     db, alterevent;
+    wyString     query;
+	MYSQL_RES	 *res;
+	MYSQL_ROW	 row;	
+	
+	db.SetAs(pcquerywnd->m_pcqueryobject->m_seldatabase.GetString());
+	alterevent.SetAs(pcquerywnd->m_pcqueryobject->m_seltable.GetString());// currently selected event will get from m_seltable string
+
+	if((db.GetLength() == 0) || (alterevent.GetLength() == 0)) 
+		return wyFalse;
+
+	query.Sprintf("show create event `%s`.`%s`", db.GetString(), alterevent.GetString());
+	
+    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+
+	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
+	{
+		ShowMySQLError(pcquerywnd->m_hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
+		return wyFalse;
+	}
+
+	index = GetFieldIndex(res, "Create Event", pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+	if(index == -1)
+		return wyFalse;
+
+	if(row = pcquerywnd->m_tunnel->mysql_fetch_row(res))
+		altereventstmt.SetAs(row[index]);
+	else
+		return wyFalse;    	
+
+	pcquerywnd->m_tunnel->mysql_free_result(res);
+	altereventstmt.Replace(0, 6, "ALTER");   
+   
+	return wyTrue;
+}
+
+wyBool 
+FrameWindow::HandleGoTo(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *linenumber)
+{
+    wyInt32     lineno, linecount;
+    wyString    line;
+	EditorBase	*peditorbase = pcquerywnd->GetActiveTabEditor()->m_peditorbase;
+
+	SendMessage(GetDlgItem(hwnd, IDC_DBNAME), WM_GETTEXT,(WPARAM)SIZE_128-1,(LPARAM)linenumber);
+
+		SetFocus(peditorbase->m_hwnd);      
+	lineno = _wtoi(linenumber);
+    
+	linecount = SendMessage(peditorbase->m_hwnd, SCI_GETLINECOUNT, 0, 0); 
+
+    if(lineno == 0 || linecount < (lineno))
+    {
+        yog_message(hwnd, _(L"Line number out of range!"), pGlobals->m_appname.GetAsWideChar(), MB_ICONINFORMATION);
+        line.Sprintf("%d", linecount);
+        SendMessage(GetDlgItem(hwnd, IDC_DBNAME), WM_SETTEXT, 0, (LPARAM)line.GetAsWideChar());
+        SendMessage(GetDlgItem(hwnd, IDC_DBNAME), EM_SETSEL, 0, -1);
+		return wyFalse;
+    }
+    else
+    {
+        SendMessage(peditorbase->m_hwnd, SCI_GOTOLINE,
+					 (WPARAM)(lineno - 1), 0);
+
+	    return wyTrue;
+    }
+}
+
+
+void  
+FrameWindow::GetSelectedDB(MDIWindow *pcquerywnd, wyString &db)
+{
+	HTREEITEM	hitem;
+	wyInt32     image = pcquerywnd->m_pcqueryobject->GetSelectionImage();
+	
+	VERIFY(hitem = TreeView_GetSelection(pcquerywnd->m_pcqueryobject->m_hwnd));
+
+	switch(image)
+	{
+		case NPRIMARYKEY:
+		case NCOLUMN:
+		case NPRIMARYINDEX:
+		case NINDEX:
+			VERIFY(hitem = TreeView_GetParent(pcquerywnd->m_pcqueryobject->m_hwnd, hitem));
+			
+		case NFOLDER:
+			VERIFY(hitem = TreeView_GetParent(pcquerywnd->m_pcqueryobject->m_hwnd, hitem));
+
+		case NFUNCITEM:
+		case NSPITEM:
+		case NEVENTITEM:
+		case NVIEWSITEM:
+		case NTRIGGERITEM:
+		case NTABLE:
+			VERIFY(hitem = TreeView_GetParent(pcquerywnd->m_pcqueryobject->m_hwnd, hitem));	
+
+		case NEVENTS:
+		case NTRIGGER:
+		case NFUNC:
+		case NVIEWS:
+		case NSP:
+		case NTABLES:
+			VERIFY(hitem = TreeView_GetParent(pcquerywnd->m_pcqueryobject->m_hwnd, hitem));			
+	}
+	
+	 pcquerywnd->m_pcqueryobject->GetDatabaseName(hitem);
+	 db.SetAs(pcquerywnd->m_pcqueryobject->m_seldatabase.GetString());
+	 return;
+}
+
+void  
+FrameWindow::GetSelectedTable(MDIWindow *pcquerywnd, wyString &table)
+{
+	HTREEITEM	hitem;
+	wyInt32     image= pcquerywnd->m_pcqueryobject->GetSelectionImage();
+	
+	VERIFY(hitem = TreeView_GetSelection(pcquerywnd->m_pcqueryobject->m_hwnd));
+
+	switch(image)
+	{
+		case NPRIMARYKEY:
+		case NCOLUMN:
+		case NPRIMARYINDEX:
+		case NINDEX:
+			VERIFY(hitem = TreeView_GetParent(pcquerywnd->m_pcqueryobject->m_hwnd, hitem));
+
+		case NFOLDER:
+		case NTRIGGER:
+		case NFUNCITEM:
+		case NSPITEM:
+		//case NVIEWSITEM:
+		case NTRIGGERITEM:
+			VERIFY(hitem = TreeView_GetParent(pcquerywnd->m_pcqueryobject->m_hwnd, hitem));
+	}
+	
+	pcquerywnd->m_pcqueryobject->GetTableDatabaseName(hitem);
+	table.SetAs(pcquerywnd->m_pcqueryobject->m_seltable.GetString());
+	return;
+}
+
+void  
+FrameWindow::GetObjectName(MDIWindow *pcquerywnd, wyString &objectname)
+{
+	HTREEITEM	hitem;
+	
+	VERIFY(hitem = TreeView_GetSelection(pcquerywnd->m_pcqueryobject->m_hwnd));
+	pcquerywnd->m_pcqueryobject->GetTableDatabaseName(hitem);
+	objectname.SetAs(pcquerywnd->m_pcqueryobject->m_seltable.GetString());
+	return;
+}
+void 
+FrameWindow::Refresh(MDIWindow	*pcquerywnd)
+{
+	EditorBase		*peditorbase = pcquerywnd->GetActiveTabEditor()->m_peditorbase;
+	//pcquerywnd->m_pcqueryobject->RefreshObjectBrowserOnCreateAlterTable()
+	if(pcquerywnd->m_pcqueryobject->GetSelectionImage()== NSERVER)
+		pcquerywnd->m_pcqueryobject->RefreshObjectBrowser(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+	else
+	{
+	/*	Refresh Parent node only, leaving others unchanged, So we can
+		reduce the flickering little more */
+		SendMessage(pcquerywnd->m_pcqueryobject->m_hwnd, WM_SETREDRAW, FALSE, 0);
+		
+		HTREEITEM hitem = peditorbase->m_hitem;
+
+		//..Code that makes Selection in the Object Browser when the procedure is executed and the database node is never expanded..
+        if(TreeView_GetItemState(pcquerywnd->m_pcqueryobject->m_hwnd, pcquerywnd->m_pcqueryobject->GetDatabaseNode() , TVIS_EXPANDEDONCE) & TVIS_EXPANDEDONCE)
+			pcquerywnd->m_pcqueryobject->RefreshParentNode(hitem);
+		
+		SendMessage(pcquerywnd->m_pcqueryobject->m_hwnd, WM_SETREDRAW, TRUE, 0);
+	}	
+
+	return;
+}
+
+void 
+FrameWindow::InitFavorites(HWND hwnd)
+{	
+	m_pcfavoritemenu    = new  CFavoriteMenu();
+	m_pcaddfavorite     = new FavoriteAdd();
+	m_pcorganizefavorite= new COrganizeFavorite();
+
+	m_pcfavoritemenu->CreateFavoriteFolder();
+	m_pcfavoritemenu->Display(hwnd);
+
+	return;
+}
+
+wyBool
+FrameWindow::ReadFromFavorite(HMENU hmenu, wyInt32  id)
+{
+	wyWChar         menuname[MAX_PATH + 1]={0};
+    wyString        completepath;
+	wyString		menunamestr;
+	wyChar          *text = 0, *trimmed = 0, *temp = NULL;
+	DWORD			dwfilesize,dwbyteswritten;
+	HANDLE			hfile;
+	MENUITEMINFO	lpmii = {0};
+	MDIWindow       *wnd = GetActiveWin();
+	EditorBase		*peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+	wyString		menuitemstr,textbufferstr;
+    wyBool          isutf8 = wyTrue, isansi, ischecked = wyFalse;
+
+	memset((void *)&lpmii, 0, sizeof(MENUITEMINFO));
+
+	lpmii.cbSize		= sizeof(MENUITEMINFO);
+	lpmii.fMask			= MIIM_DATA | MIIM_STRING | MIIM_ID;
+	lpmii.cch			= MAX_PATH;
+	lpmii.dwTypeData	= menuname;
+
+	VERIFY(GetMenuItemInfo(GetMenu(pGlobals->m_pcmainwin->m_hwndmain), id, FALSE, &lpmii));
+	
+	menunamestr.SetAs(menuname);
+
+	completepath.Sprintf("%s\\%s.sql", (wyChar *)lpmii.dwItemData, menunamestr.GetString());
+	
+	hfile = CreateFile(completepath.GetAsWideChar(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+								NULL, NULL);
+	
+	if(hfile == INVALID_HANDLE_VALUE)
+    {
+		DisplayErrorText(GetLastError(), _("Could not open the referenced query file.\r\nMake sure that the query file exists."));
+		return wyFalse;
+	}
+
+	dwfilesize = GetFileSize(hfile, NULL);
+
+	if(dwfilesize == 0)
+    {
+		yog_message(pGlobals->m_pcmainwin->m_hwndmain, _(L"The selected Favorite item is empty. Nothing to add."), pGlobals->m_appname.GetAsWideChar(), MB_ICONERROR | MB_OK);
+		CloseHandle(hfile);
+		return wyFalse;
+	}
+
+	text = AllocateBuff((dwfilesize) + 1);
+
+	if(!ReadFile(hfile, text, dwfilesize, &dwbyteswritten, NULL))
+	{
+    	DisplayErrorText(GetLastError(), _("Error reading favorite file."));
+		free(text);
+		CloseHandle(hfile);
+		return wyFalse;
+	}
+
+	text[dwbyteswritten] = 0;
+	
+	textbufferstr.SetAs(text);
+    
+    isutf8 = CheckForUtf8(textbufferstr);
+    
+    if(isutf8 == wyFalse)
+    {
+        ischecked = wyTrue;
+        textbufferstr.SetAs(text, wyFalse);
+    }
+    else
+    {
+        isansi = CheckForUtf8Bom(completepath);
+        if(isansi == wyFalse)
+        {
+            temp = text + 3;
+            textbufferstr.SetAs(temp);
+        }
+    }
+
+	if(text)
+		free(text);
+	
+	text = AllocateBuff(textbufferstr.GetLength() + 1);
+	strcpy(text, textbufferstr.GetString());
+
+	trimmed = TrimLeft(text);
+
+    if(trimmed == NULL)
+        return wyFalse;
+    	
+	if(strnicmp(trimmed, "file", 4) == 0)
+    {
+		trimmed += 5; // to remove the "File:" string in the startup
+		ReadFromFile(trimmed);
+	}
+	else 
+    {
+		SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, 
+					(WPARAM)strlen(text), (LPARAM)text);
+		
+		//SendMessage(peditorbase->m_hwnd, SCI_SETSEL, -1, -1);
+	}
+	
+	EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);     
+	VERIFY(CloseHandle(hfile));
+	
+	free(text);
+	return wyFalse;
+}
+
+wyBool	
+FrameWindow::ReadFromFile(wyChar *completepath)
+{	
+	wyChar      *sqltext = 0;
+    wyString    msg, completepathstr;
+	DWORD	    dwfilesize, dwbyteswritten;
+	HANDLE		hfile;
+	MDIWindow   *wnd = GetActiveWin();
+	wyString	sqltextstr;
+	EditorBase	*peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+
+         if(completepath)
+		completepathstr.SetAs(completepath);
+
+	hfile = CreateFile(completepathstr.GetAsWideChar(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
+								NULL, NULL);
+	
+	if(hfile == INVALID_HANDLE_VALUE)
+    {
+		if(GetLastError()== ERROR_FILE_NOT_FOUND)
+		{	
+			wyString comppathstr(completepath);
+			msg.Sprintf(_("Could not find '%s'\nPlease verify the referenced file exists."), comppathstr.GetString());
+			DisplayErrorText(GetLastError(), msg.GetString());
+		}
+		else
+			DisplayErrorText(GetLastError(), _("Could not Open Favorite File."));
+
+		return wyFalse;
+	}
+
+	dwfilesize = GetFileSize(hfile, NULL);
+	
+	if(dwfilesize == 0)
+    {
+		yog_message(pGlobals->m_pcmainwin->m_hwndmain, _(L"File is Empty"), pGlobals->m_appname.GetAsWideChar(), MB_ICONERROR | MB_OK);
+		CloseHandle(hfile);
+		return wyFalse;
+	}
+
+	sqltext = AllocateBuff(dwfilesize+1);
+
+	if(!ReadFile(hfile, sqltext, dwfilesize, &dwbyteswritten, NULL))
+	{	
+		DisplayErrorText(GetLastError(), _("Error reading favorite file."));
+		VERIFY(CloseHandle(hfile));
+		free(sqltext);
+		return wyFalse;
+	}
+
+	if(sqltext)
+		sqltextstr.SetAs(sqltext);
+
+    
+	//Testing .. image handling
+/*
+	wyInt32	headersize;
+
+	wyInt32	filetype = DetectFileFormat(sqltext, dwfilesize, &headersize);
+
+	if(filetype != NCP_UTF8)
+	{
+		sqltextstr.SetAs(sqltext);
+
+		if(CheckForUtf8(sqltextstr) == wyFalse)
+			sqltextstr.SetAs(sqltext, wyFalse);
+	}*/
+
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, (WPARAM)sqltextstr.GetLength(), (LPARAM)sqltextstr.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_SETSEL, -1, -1);
+	
+	VERIFY(CloseHandle(hfile));
+	free(sqltext);
+
+	return wyFalse;
+}
+
+
+wyBool
+FrameWindow::ConvertIniFileToUtf8()
+{
+	wyWChar     directory[MAX_PATH+1]={0}, *lpfileport=0;
+	wyInt32		ret;
+	wyString	dirstr;
+	wyString	encoding;
+	wyBool		isconv;
+
+	// Get the complete path.
+	ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+	if(ret == wyFalse)
+		return wyFalse;
+
+	dirstr.SetAs(directory);
+	
+	ret = wyIni::IniGetString(SECTION_NAME, "Encoding", "", &encoding, dirstr.GetString());
+	
+	if(encoding.CompareI("utf8") == 0)
+	{
+		return wyTrue;
+	}
+	else
+	{
+		isconv = Convert(dirstr);
+		if(isconv == wyTrue)
+		{
+			wyIni::IniWriteString(SECTION_NAME, "Encoding", "utf8", dirstr.GetString());
+		}
+
+		return isconv;
+	}
+}
+
+wyBool
+FrameWindow::Convert(wyString &dirstr)
+{
+	DWORD		filesize, byteswritten = 0, bytesread = 0;
+    wyWChar		file[MAX_PATH + 1] = {0}, path[MAX_PATH + 1] = {0};
+	wyChar		*filebuf = NULL, *tempfilebuf = NULL;
+	HANDLE		htempfile;
+	wyString	connnumber, passwordstr, temppwd, filebuffconv;	
+	wyString	temppathstr, tempfilename;
+	wyChar		*pwdarr[] = {"Password", "Password01", "SshPwd", "SshPwd01", 
+							 "ProxyPwd", "ProxyPwd01", "401Pwd", "401Pwd01", NULL};
+	wyInt32		pwdcounter = 0, counter;
+	
+	
+	HANDLE	hfile = CreateFile(dirstr.GetAsWideChar(), GENERIC_READ, 0, NULL, 
+							   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if(hfile == INVALID_HANDLE_VALUE)
+	{
+		if(GetLastError() == ERROR_FILE_NOT_FOUND)
+		{
+			return wyTrue;
+		}
+		else
+		{
+			DisplayErrorText(GetLastError(), _("Could not open the referenced file."));
+			return wyFalse;
+		}
+	}
+
+	filesize = GetFileSize(hfile, NULL);
+	filebuf = AllocateBuff(filesize + 1);
+	
+	if(ReadFile(hfile, filebuf, filesize, &bytesread, NULL) == 0)
+	{
+		DisplayErrorText(GetLastError(), _("Could not open the referenced file."));
+		return wyFalse;
+	}
+
+	if(pGlobals->m_configdirpath.GetLength() ||  SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, (LPWSTR)path)))
+    {
+		if(pGlobals->m_configdirpath.GetLength())
+		{
+			//wcscpy(path, pGlobals->m_configdirpath.GetAsWideChar());
+			wcsncpy(path, pGlobals->m_configdirpath.GetAsWideChar(), MAX_PATH);
+			path[MAX_PATH] = '\0';
+		}
+		else
+		{
+			wcscat(path, L"\\");
+			wcscat(path, L"SQLyog");
+		}
+
+	    if(GetTempFileName(path, L"ini", 0, file))
+	    {
+		    temppathstr.SetAs(file);
+
+		    if((htempfile = CreateFile(temppathstr.GetAsWideChar(),GENERIC_WRITE, 0, NULL, 
+                                    CREATE_ALWAYS, NULL, NULL)) != INVALID_HANDLE_VALUE) 
+		    {
+			    if(filebuf)
+				    filebuffconv.SetAs(filebuf, wyFalse);
+                
+			    if(WriteFile(htempfile, filebuffconv.GetString(), bytesread, &byteswritten, NULL) == 0)
+			    {
+				    DisplayErrorText(GetLastError(), _("Could not Write into referenced file."));
+				    return wyFalse;
+			    }
+			    else
+			    {
+				    CloseHandle(htempfile);		
+                    for(counter = 0; counter < MAX_CONN; counter++)
+				    {
+					    connnumber.Sprintf("Connection %u", counter + 1);
+
+					    for(pwdcounter = 0; pwdarr[pwdcounter] != NULL; pwdcounter++)
+						    ConvertAndWritePwd(connnumber, pwdarr[pwdcounter], temppathstr);
+
+				    }
+			    }
+		    }
+		    else
+		    {
+			    DisplayErrorText(GetLastError(), _("Could not open the referenced file."));
+			    return wyFalse;
+		    }
+        }
+        else
+	    {
+		    DisplayErrorText(GetLastError(), _("Could not open the referenced file."));
+		    return wyFalse;
+	    }
+    }
+
+	if((htempfile = CreateFile(temppathstr.GetAsWideChar(),GENERIC_READ, 0, NULL, 
+                                OPEN_EXISTING, NULL, NULL)) != INVALID_HANDLE_VALUE) 
+	{
+		filesize = GetFileSize(htempfile, NULL);
+		tempfilebuf = AllocateBuff(filesize + 1);
+		if(ReadFile(htempfile, tempfilebuf, filesize, &bytesread, NULL) == 0)
+		{
+			DisplayErrorText(GetLastError(), _("Could not open the referenced file."));
+			return wyFalse;
+		}
+	}
+	else
+	{
+		DisplayErrorText(GetLastError(), _("Could not open the referenced file."));
+		return wyFalse;
+	}
+	CloseHandle(hfile);
+
+	hfile = CreateFile(dirstr.GetAsWideChar(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	
+	if(hfile == INVALID_HANDLE_VALUE)
+	{
+		DisplayErrorText(GetLastError(), _("Could not open the referenced file."));
+		return wyFalse;
+	}
+
+	if(WriteFile(hfile, tempfilebuf, bytesread, &byteswritten, NULL) == 0)
+	{
+		DisplayErrorText(GetLastError(), _("Could not open the referenced file."));
+		return wyFalse;
+	}
+	
+	CloseHandle(hfile);	
+	free(tempfilebuf);
+	CloseHandle(htempfile);
+	free(filebuf);
+	DeleteFile(temppathstr.GetAsWideChar());
+
+	return wyTrue;
+}
+
+void
+FrameWindow::ConvertAndWritePwd(wyString &conncount, wyChar	*whichpwd, wyString	&path)
+{
+	wyString	passwordstr, temppwd;
+
+	wyIni::IniGetString(conncount.GetString(), whichpwd, "", &passwordstr, path.GetString());						
+	if(passwordstr.GetLength())
+	{
+		DecodePassword(passwordstr);
+		temppwd.SetAs(passwordstr.GetString(), wyFalse);
+		EncodePassword(temppwd);
+		wyIni::IniWriteString(conncount.GetString(), whichpwd, temppwd.GetString(), path.GetString());
+	}
+
+}
+void 
+FrameWindow::LoadMainIcon()
+{
+    HICON	mainicon;
+
+	VERIFY(m_hmainiml = ImageList_Create(ICON_SIZE, ICON_SIZE, ILC_COLOR32  | ILC_MASK, 1, 0));
+	VERIFY(mainicon = (HICON)LoadImage(pGlobals->m_hinstance, MAKEINTRESOURCE(IDI_SMALL), IMAGE_ICON, DEF_IMG_WIDTH, DEF_IMG_HEIGHT, LR_DEFAULTCOLOR));
+	VERIFY((ImageList_AddIcon(m_hmainiml, mainicon))!= -1);
+	VERIFY(DestroyIcon(mainicon));
+}
+
+void 
+FrameWindow::OnCreate()
+{    
+ //   CreateToolBarWindow();
+	CreateStatusBarWindow();
+	CreateMDIWindow();
+	m_findmsg = RegisterWindowMessage(FINDMSGSTRING);
+    CheckForAutoKeywords();
+	ConvertIniFileToUtf8();
+    MigrateFiles();
+	//MigratePersonalFolderToFavorites();
+    return;
+}
+
+void
+FrameWindow::HandleFiles(wyWChar *filename, wyWChar *extension)
+{
+    wyWChar         fullpath[MAX_PATH] = {0}, pathbuffer[MAX_PATH] = {0};
+    wyString        apppath, directorystr, newpath, pwdpath, bak(".bak");
+	wyWChar		    directory[MAX_PATH+1] = {0};
+    wyWChar         **lpfileport = 0;
+    wyString        filenamestr, extensionstr, renamepath, bakupini;
+    wyInt32         pos;
+	
+    if(filename && extension)
+    {
+        filenamestr.SetAs(filename);
+        extensionstr.SetAs(extension);
+    }
+
+	if(pGlobals->m_configdirpath.GetLength())
+		apppath.SetAs(pGlobals->m_configdirpath);
+
+	//Handle ini file migration
+    else if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, fullpath))) 
+	{
+        apppath.SetAs(fullpath);
+		apppath.Add("\\SQLyog");
+	}
+    else
+        return;
+
+    if(GetModuleFileName(NULL, directory, MAX_PATH) != 0)
+        pwdpath.SetAs(directory);
+    else
+        return;
+    
+    pos = StripExe(directory, pwdpath);
+    if(pos == -1)
+        return;
+    
+    //First search in the app folder
+    if(SearchPath(apppath.GetAsWideChar(), filename, extension, MAX_PATH, pathbuffer, lpfileport) == 0)
+    {
+        //if not found search in the installation path
+        if(SearchPath(NULL, filename, extension, MAX_PATH, pathbuffer, lpfileport) == 0)
+        {
+            return;
+        }
+        else
+        {
+            // copy the file from installation path app folder
+            if(MigrateSpecificFileToAppFolder(pwdpath, apppath, filename, extension) == wyFalse)
+            {
+                filenamestr.SetAs(filename);
+                extensionstr.SetAs(extension);
+                bakupini.SetAs(pwdpath);
+
+                bakupini.AddSprintf("%s%s%s", filenamestr.GetString(), bak.GetString(), extensionstr.GetString());
+                if(_wrename(pwdpath.GetAsWideChar(), bakupini.GetAsWideChar()) != 0)
+                {                    
+                    return;
+                }
+            }
+        }
+    }
+    else
+    {
+        // search for the same file in installation path if found rename
+        if(SearchPath(NULL, filename, extension, MAX_PATH, pathbuffer, lpfileport) != 0)
+        {   
+            bakupini.SetAs(pwdpath);
+            pwdpath.AddSprintf("%s%s", filenamestr.GetString(), extensionstr.GetString());
+            bakupini.AddSprintf("%s%s%s", filenamestr.GetString(), bak.GetString(), extensionstr.GetString());
+            if(_wrename(pwdpath.GetAsWideChar(), bakupini.GetAsWideChar()) != 0)
+            {
+                return;
+            }
+        }
+   }
+}
+
+wyBool 
+FrameWindow::MigrateSpecificFileToAppFolder(wyString &pwdpath, wyString &apppath, wyWChar *filename, wyWChar *extension)
+{
+    wyBool      iscopiedandrenamed;
+    wyString    renamepath, newinipath, oldinipath, bakup(".bak");
+    wyString    filenamestr, extensionstr;
+    wyWChar     directory[MAX_PATH];
+    
+    if(filename && extension)
+    {
+        filenamestr.SetAs(filename);
+        extensionstr.SetAs(extension);
+    }
+
+    newinipath.SetAs(apppath);
+    newinipath.AddSprintf("\\%s%s", filenamestr.GetString(), extensionstr.GetString());
+
+    if(wcscpy(directory, pwdpath.GetAsWideChar()) == NULL)
+        return wyFalse;
+
+    oldinipath.SetAs(pwdpath);
+    oldinipath.AddSprintf("%s%s", filenamestr.GetString(), extensionstr.GetString());
+    
+    renamepath.SetAs(pwdpath);
+    renamepath.AddSprintf("%s%s%s", filenamestr.GetString(), bakup.GetString(), extensionstr.GetString());
+
+    //Copy the ini file from source path to 
+    iscopiedandrenamed = CopyAndRename(oldinipath, newinipath, renamepath);
+	if(iscopiedandrenamed == wyFalse)
+        return wyFalse;
+    
+    apppath.SetAs(newinipath);
+    pwdpath.SetAs(oldinipath);
+
+    return wyTrue;
+}
+
+void
+FrameWindow::MigrateFiles()
+{
+    //The below file types will be migrated
+    HandleFiles(L"sqlyog", L".ini");
+    HandleFiles(L"sja", L".log");
+    HandleFiles(L"sjasession", L".xml");
+    HandleFiles(L"sqlyog", L".err");
+    HandleAutocompleteTagFiles();
+}
+
+// Strip the Executable name off.
+wyInt32
+FrameWindow::StripExe(wyWChar *directory, wyString &directorystr)
+{
+    wyWChar *rev = NULL;
+    wyString tempstr;
+    wyInt32  pos;
+
+    rev = wcsrev(directory);
+    if(rev)
+        tempstr.SetAs(rev);
+    else
+        return -1;
+    pos = tempstr.Find("\\", 0);
+	directorystr.Strip(pos);
+    wcsrev(directory);
+    return pos;
+}
+void
+FrameWindow::HandleAutocompleteTagFiles()
+{
+    wyWChar		    directory[MAX_PATH], fullpath[MAX_PATH];
+    wyString        directorystr, fullpathstr, tagfilename, tempstr;
+    wyString        newpath;
+    WIN32_FIND_DATA	wfd;
+    HANDLE          hfile;
+    wyInt32         count;
+    
+    if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, fullpath)))
+        fullpathstr.SetAs(fullpath);
+
+    VERIFY(count = GetModuleFileName(NULL, directory, MAX_PATH - 1));
+	
+	// change it to .ini
+	directory[count - pGlobals->m_modulenamelength] = '\0';
+
+	wcscat(directory, L"Tags");
+    directorystr.SetAs(directory);
+    wcscat(directory, L"\\*");
+
+    if(_wchdir(directorystr.GetAsWideChar()) != -1)
+    {
+        fullpathstr.Add("\\SQLyog\\Tags");
+       
+        if(!CreateDirectory(fullpathstr.GetAsWideChar(), NULL))
+	    {
+    	    /* If the folder is there , then we will continue the process, otherwise we will return wyFalse */
+	    	if(GetLastError()!= ERROR_ALREADY_EXISTS)
+		    	return;
+	    }
+        
+        hfile = FindFirstFile(directory, &wfd);
+        if(hfile == INVALID_HANDLE_VALUE)
+            return;
+        
+        //Search for the Source tags folder and copy the new 
+        do
+        {
+            if(wfd.cFileName)
+            {
+                if(wcscmp(wfd.cFileName, L".") != 0)
+                {
+                    if(wcscmp(wfd.cFileName, L"..") != 0)
+                    {
+                        tagfilename.SetAs(wfd.cFileName);
+                        fullpathstr.SetAs(fullpath);
+                        fullpathstr.Add("\\SQLyog\\Tags\\");
+                        fullpathstr.Add(tagfilename.GetString());
+                        newpath.SetAs(directorystr.GetString());
+                        tempstr.SetAs(directorystr.GetString());
+                        tempstr.Add("\\");
+                        tempstr.Add(tagfilename.GetString());
+                    
+                        CopyAndRename(tempstr, fullpathstr, newpath);
+                    }
+                }
+            }
+
+            FindNextFile(hfile, &wfd);  
+
+		}while(GetLastError()!= ERROR_NO_MORE_FILES);
+
+        fullpathstr.Strip(tagfilename.GetLength());
+
+        if(_wchdir(fullpathstr.GetAsWideChar()) == -1)
+            return;
+            
+        FindClose(hfile); 
+   
+    }
+    
+    //renaming Tags folder to tags_bakup
+    /*tempstr.SetAs(directorystr.GetString());
+    tempstr.Strip(strlen("Tags"));
+    tempstr.Add("Tags_Backup");
+    
+    //rename the source
+    MoveFile(directorystr.GetAsWideChar(), tempstr.GetAsWideChar());*/
+}
+
+wyBool
+FrameWindow::CopyAndRename(wyString& directorystr, wyString& fullpathstr, wyString& newpath)
+{
+	fullpathstr.Strip(strlen("sqlyog.ini") + 1);
+	if(!CreateDirectory(fullpathstr.GetAsWideChar(), NULL))
+	{
+		/* If the folder is there , then we will continue the process, otherwise we will return wyFalse */
+		if(GetLastError()!= ERROR_ALREADY_EXISTS)
+			return wyFalse;
+	}
+	fullpathstr.AddSprintf("\\sqlyog.ini");
+    if(CopyFile(directorystr.GetAsWideChar(), fullpathstr.GetAsWideChar(), TRUE))
+    {
+        if(_wrename(directorystr.GetAsWideChar(), newpath.GetAsWideChar()) == 0)
+        {
+			return wyTrue;
+        }
+    }
+    else
+    {
+		return wyFalse;
+	}
+	return wyTrue;
+}
+void 
+FrameWindow::OnWmMenuCommand(HWND hwnd, WPARAM wparam, LPARAM lparam)
+{
+	wyUInt32    id = 0;
+
+	if(pGlobals->m_windowsbuild)
+    {			
+		id = GetMenuItemID((HMENU)lparam, wparam);
+
+		if((id < FAVORITEMENUID_START || id > FAVORITEMENUID_END) &&
+            (id < ENGINE_ID_START || id > ENGINE_ID_END))
+
+		{
+			SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(id, 0), NULL);
+			return;
+		}
+	}
+	else if(!pGlobals->m_windowsbuild && (LOWORD(wparam) < FAVORITEMENUID_START || LOWORD(wparam)> FAVORITEMENUID_END ))// Windows Me/98/95
+	{
+		SendMessage(hwnd, WM_COMMAND, MAKEWPARAM(LOWORD(wparam), 0), NULL);
+		return;
+	}
+
+	if(!pGlobals->m_windowsbuild)
+    {
+        if(LOWORD(wparam) >= ENGINE_ID_START && LOWORD(wparam) < ENGINE_ID_END)
+        {
+            if(HandleChangeTabletype((HMENU)lparam, LOWORD(wparam)) == wyTrue)
+                return;
+        }
+        else
+		    ReadFromFavorite((HMENU)lparam, LOWORD(wparam));
+    }
+	else
+    {
+        if(id >= ENGINE_ID_START && id < ENGINE_ID_END)
+        {
+            if(HandleChangeTabletype((HMENU)lparam, id) == wyTrue)
+                return;
+        }
+        else
+	    	ReadFromFavorite((HMENU)lparam, id);
+    }
+
+    return;
+}
+
+void
+FrameWindow::OnActivate(WPARAM wparam)
+{
+	MDIWindow			*pcquerywnd = NULL;
+#ifndef COMMUNITY
+	wyInt32				imgid = 0;
+	HWND				tabhwnd = NULL;
+	TabSchemaDesigner	*tabsd = NULL;
+	TabQueryBuilder		*tabqb = NULL;
+#endif
+
+	VERIFY(pcquerywnd = GetActiveWin());
+
+	if(!pcquerywnd)
+		return;
+
+	if(wparam == WA_ACTIVE || wparam == WA_CLICKACTIVE)
+	{
+		PostMessage(pcquerywnd->m_hwnd, UM_FOCUS, 0, 0);
+
+#ifndef COMMUNITY
+		//To solve Painting ob SD/QB canvas and its tables when switching between different SQLyogs
+		imgid = pcquerywnd->m_pctabmodule->GetActiveTabImage();
+		
+		if(imgid == IDI_SCHEMADESIGNER_16)
+		{
+			tabsd = (TabSchemaDesigner*)pcquerywnd->m_pctabmodule->GetActiveTabType();
+			if(!tabsd)
+				return;
+
+			tabhwnd = tabsd->m_hwndcanvas;
+		}
+
+		else if(imgid == IDI_QUERYBUILDER_16)
+		{
+			tabqb = (TabQueryBuilder*)pcquerywnd->m_pctabmodule->GetActiveTabType();
+			if(!tabqb)
+				return;
+
+			tabhwnd = tabqb->m_hwndtabview;
+		}
+
+		if(tabhwnd)
+		{
+			InvalidateRect(tabhwnd , NULL, TRUE);
+			UpdateWindow(tabhwnd);
+		}
+#endif
+	}
+
+	else
+	{
+		if(GetFocus())
+			pcquerywnd->m_lastfocus = GetFocus();
+	}
+
+	return;
+}
+
+
+wyBool 
+FrameWindow::OnWmClose(HWND hwnd)
+{
+	wyInt32 ret = 1;
+#ifndef COMMUNITY
+    HWND    hwndvdd;
+	wyString  vddmsg;
+#endif
+
+	wyBool retval;
+
+#ifndef COMMUNITY
+	if(pGlobals->m_entlicense.CompareI("Professional"))
+	{
+		if(pGlobals->m_conncount)
+		{
+			retval = SaveConnectionDetails();
+			if(retval == wyFalse)
+				return wyFalse;
+		}
+	}
+#endif
+	SendMessage(hwnd, WM_CLOSEALLWINDOW, 0,(LPARAM)&ret);
+
+    if(m_iscloseallmdi == wyTrue)
+    {
+        SendMessage(m_hwndconntab, WM_SETREDRAW, TRUE, 0);
+        InvalidateRect(m_hwndconntab, NULL, TRUE);
+        UpdateWindow(m_hwndconntab);
+    }
+
+	if(!ret)
+    {
+		return wyFalse;
+    }
+	else
+	{
+#ifndef COMMUNITY
+        if((hwndvdd = VisualDataDiff::FindInstance()))
+        {
+			vddmsg.Sprintf(_("There are one or more open instances of %s. Please close them to close SQLyog."), _("Visual Data Compare"));
+			MessageBox(m_hwndmain,vddmsg.GetAsWideChar(), 
+                pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
+
+            ShowWindow(hwndvdd, SW_SHOWNORMAL);
+            return wyFalse;
+        }
+#endif
+        m_connection->OnClose();
+    /* for mysql pro we dont have to do anything */
+		WriteSplitterPos(TEXT(HSPLITTER_SECTION_NAME));
+		WriteSplitterPos(TEXT(VSPLITTER_SECTION_NAME));
+		VERIFY(WriteInitPos(m_hwndmain));
+		VERIFY(DestroyWindow(m_hwndmain));
+	}
+    return wyTrue;
+}
+
+wyBool 
+FrameWindow::OnWmInitPopup(WPARAM wparam, LPARAM lparam)
+{
+	wyInt32     lstyle, menuindex;
+	HWND	    hwndactive = (HWND)SendMessage(pGlobals->m_hwndclient, WM_MDIGETACTIVE, 0, NULL);
+	HMENU       menu = GetMenu(m_hwndmain);
+    wyBool      iswindowmenu = wyFalse;
+	MDIWindow	*wnd;
+    TabEditor*  pte = NULL;
+		
+    wnd = (MDIWindow*)GetWindowLongPtr(hwndactive, GWLP_USERDATA);
+						
+	if(!hwndactive)
+	{
+        HandleMenuOnNoConnection(wparam, lparam);
+		return wyTrue;		
+	}
+    else
+	{
+		// now we check whether the window is maximized or not.
+		lstyle = GetWindowLongPtr(hwndactive, GWL_STYLE);
+		menuindex = (LOWORD(lparam));
+
+		wnd = (MDIWindow*)GetWindowLongPtr(hwndactive, GWLP_USERDATA);
+
+		if(GetSubMenu(menu, menuindex) != (HMENU)wparam)
+		{
+			return wyTrue;
+		}
+		if(!(lstyle & WS_MAXIMIZE))
+			menuindex++;
+		else if(menuindex == 0 && (wnd->m_executing == wyTrue || wnd->m_pingexecuting == wyTrue))
+            return wyTrue;
+
+        iswindowmenu = m_connection->IsWindowMenu(menuindex);
+		
+		if(wnd->m_executing == wyTrue || wnd->m_pingexecuting == wyTrue)
+        {
+			RecursiveMenuEnable((HMENU)wparam, iswindowmenu);
+			
+			// if its the first menu then we allow two option - new window and exit 
+			if(menuindex < MNUEDIT_INDEX)
+            {
+				EnableMenuItem((HMENU)wparam,IDM_FILE_NEWCONNECTION, MF_ENABLED | MF_BYCOMMAND);
+				EnableMenuItem((HMENU)wparam,IDM_FILE_EXIT, MF_ENABLED | MF_BYCOMMAND);
+				EnableMenuItem((HMENU)wparam,IDM_FILE_NEWSAMECONN, MF_ENABLED | MF_BYCOMMAND);
+			} 
+
+			return wyFalse;
+		} 
+
+		RecursiveMenuEnable((HMENU)wparam, iswindowmenu, MF_ENABLED);
+        m_connection->HandleMenu(menuindex, (HMENU)wparam);
+	}
+
+    /// Dissable list all tags and list matching tags menu items if qb/sd is on
+    if(wnd)
+	{
+        if(!(pte = (TabEditor*)wnd->m_pctabmodule->GetActiveTabEditor()) || 
+            wnd->m_pctabmodule->GetActiveTabImage() == IDI_DATASEARCH ||
+            GetFocus() != pte->m_peditorbase->m_hwnd)
+        {
+            EnableMenuItem((HMENU)wparam, ID_EDIT_LISTALLTAGS,  MF_GRAYED | MF_BYCOMMAND);
+            EnableMenuItem((HMENU)wparam, ID_EDIT_LISTMATCHINGTAGS, MF_GRAYED | MF_BYCOMMAND);   
+            EnableMenuItem((HMENU)wparam, ID_EDIT_LISTFUNCTIONANDROUTINEPARAMETERS, MF_GRAYED | MF_BYCOMMAND);   
+        }
+#ifdef COMMUNITY
+        else
+        {
+            EnableMenuItem((HMENU)wparam, ID_EDIT_LISTALLTAGS,  MF_ENABLED);
+            EnableMenuItem((HMENU)wparam, ID_EDIT_LISTMATCHINGTAGS, MF_ENABLED);   
+            EnableMenuItem((HMENU)wparam, ID_EDIT_LISTFUNCTIONANDROUTINEPARAMETERS, MF_ENABLED);   
+        }
+#endif
+
+    }
+
+    return wyTrue;
+}
+
+/*
+-This function gets called when destroy menu
+-This used to handle the Table->Engine type menu, should execute query only once when the main menu(table menu) is popped up.
+when closing the Table menu clearing the 'string' holds the engine
+*/
+void
+FrameWindow::HandleOnMenuDestroy(HMENU hmenu)
+{
+	wyWChar			name[SIZE_128];
+	MENUITEMINFO	menuinfo;
+
+	if(!hmenu)
+	{
+		pGlobals->m_menutableengine.Clear();
+		return;
+	}
+	
+	menuinfo.cbSize = sizeof(MENUITEMINFO);
+	menuinfo.fMask = MIIM_STRING;
+	menuinfo.cch = SIZE_128;
+	menuinfo.dwTypeData = name;
+	GetMenuItemInfo(hmenu, 0, TRUE, &menuinfo);
+
+	if(!wcsicmp(name, _(L"&Paste SQl Statement")))
+	{
+		pGlobals->m_menutableengine.Clear();
+	}
+}
+
+void 
+FrameWindow::HandleMenuOnNoConnection(WPARAM wparam, LPARAM lparam)
+{
+//    DEBUG_ENTER("HandleMenuOnNoConnection");
+		
+    if((LOWORD(lparam))== MNUOBJ_INDEX - 1)
+	    /* if it is objects menu while there is no connection*/
+	    EnableColumnItems((HMENU)wparam);
+    else if((LOWORD(lparam)) == MNUDB_INDEX - 1 ||(LOWORD(lparam))== MNUTBL_INDEX - 1)
+    {
+	    EnableMenuItem((HMENU)wparam, ID_TABLE_MAKER, MF_GRAYED | MF_BYCOMMAND);
+		EnableMenuItem((HMENU)wparam, ID_OBJECT_CREATETRIGGER , MF_GRAYED | MF_BYCOMMAND);
+
+		HandleDBMenuOptionsPRO((HMENU)wparam);      
+    }
+
+	else if((LOWORD(lparam)) == MNUFILE_INDEX - 1) 
+		HandleFileMenuOptionsProEnt((HMENU)wparam);
+
+    else if((LOWORD(lparam)) == MNUEDIT_INDEX - 1)
+	    ChangeEditMenuItem((HMENU)wparam);
+	
+    else if((LOWORD(lparam)) == MNUFAV_INDEX - 1)
+	    EnableFavoriteMenu((HMENU)wparam);
+		
+    else if((LOWORD(lparam))== MNUENGINE_INDEX)
+    {
+        wyInt32 count, menucount = GetMenuItemCount((HMENU)wparam);
+
+        for(count = 0; count < menucount; count++)
+        {
+               EnableMenuItem((HMENU)wparam, count, MF_BYPOSITION | MF_GRAYED);
+        }
+        
+    }
+
+    else if((LOWORD(lparam))== MNUPTOOL_INDEX - 1)
+    {
+		if(m_connection->m_enttype == ENT_PRO)
+			HandlePowertoolsOptionsPRO((HMENU)wparam);
+
+      //  EnableMenuItem((HMENU)wparam, MNU_QUERYBUILDER, MF_BYPOSITION | MF_GRAYED);
+		EnableMenuItem((HMENU)wparam, MNU_SCHEMADESIGNER, MF_BYPOSITION | MF_GRAYED);
+        EnableMenuItem((HMENU)wparam, MNU_REBUILDTAGS, MF_BYPOSITION | MF_GRAYED);
+
+        if(m_connection->m_enttype != ENT_ULTIMATE && m_connection->m_enttype != ENT_TRIAL)
+        {
+            RemoveMenu((HMENU)wparam, ID_VDDTOOL, MF_BYCOMMAND);
+        }
+	}
+
+    return;
+}
+
+wyInt32 
+FrameWindow::ONWmMainWinNotify(HWND hwnd, LPARAM lparam, WPARAM wparam)
+{
+	LPNMHDR			lpnmhdr =(LPNMHDR)lparam;
+	HWND            hwndwindow, hwndtemp;
+	MDIWindow       *wnd;
+    HMENU           hmenu, htrackmenu;
+    POINT           pnt;
+	
+    if(((LPNMTTDISPINFO)lparam)->hdr.code == TTN_GETDISPINFO)
+	{
+		OnToolTipInfo((LPNMTTDISPINFO)lparam);
+	}
+
+	else if(((LPNMTOOLBAR)lparam)->hdr.code == TBN_DROPDOWN)
+	{
+		OnTBDropDown((NMTOOLBAR*)lparam);
+		return TBDDRET_DEFAULT;
+	}
+
+	switch(lpnmhdr->code)
+	{
+		case CTCN_TABCLOSING:
+			if(lpnmhdr->idFrom == IDC_CONNECTIONTAB)
+			{
+				//close the respective connection, on closing a connection tab
+				wnd = GetActiveWin();
+
+				if(!wnd)
+					return 0;
+
+				//get active tab handle
+				hwndwindow = m_conntab->GetActiveWindowHandle(GetDlgItem(hwnd, lpnmhdr->idFrom));
+
+				if(wnd->m_hwnd == hwndwindow)
+				{
+					//check if tab is alredy closed by MDI window close
+					if(wnd->m_iswinclosed == wyFalse)
+					{
+                        wnd->m_iswinclosed = wyTrue;
+						SendMessage(wnd->m_hwnd, WM_CLOSE, 0, 0);
+					}
+					else
+					{
+						m_closetab = wyTrue;
+						return 1;
+					}
+				}
+				else
+				{
+					return 0;
+				}
+			}
+			break;
+
+		case CTCN_TABCLOSED:
+			return 1;
+
+		case CTCN_SELCHANGING:
+            return 1;
+			break;
+
+		case CTCN_SELCHANGE:
+			//Set the flag of custom WM_MDINEXT message to true
+			pGlobals->m_iscustomwmnext  = wyTrue;
+
+			//on changing a tab, check the handle and focus on the selected window
+			hwndwindow = m_conntab->GetActiveWindowHandle(GetDlgItem(hwnd, lpnmhdr->idFrom));
+                        
+            if(hwndwindow)
+			{
+				hwndtemp = hwndwindow;
+				
+				/*to avoid flickering/restoring while switching between connections, 
+				WM_MDINEXT message will be send, where wparam is 1. But in case of creating  
+				or deleting a connection WM_MDIACTIVATE will be send where wparam is 0*/
+				if(wparam)
+				{
+					EnumChildWindows(GetActiveWin()->m_hwndparent, FrameWindow::EnumMDIChildren, (LPARAM)&hwndtemp);
+					SendMessage(GetActiveWin()->m_hwndparent, WM_MDINEXT, (WPARAM)hwndtemp, (LPARAM)0);
+				}
+				else
+				{
+				    SendMessage(GetActiveWin()->m_hwndparent, WM_MDIACTIVATE, (WPARAM)hwndwindow, 0);
+				}
+
+				//Set the flag of custom WM_MDINEXT message to false
+				pGlobals->m_iscustomwmnext  = wyFalse;
+				return 0;
+			}
+
+			//Set the flag of custom WM_MDINEXT message to false
+			pGlobals->m_iscustomwmnext  = wyFalse;
+
+			break;
+
+		/*case CTCN_WMDESTROY:
+			break;	*/
+
+        case CTCN_PLUSBUTTONCLICK:
+            if(lpnmhdr->idFrom == IDC_CONNECTIONTAB)
+            {
+                LoadConnTabPlusMenu(lparam);
+            }
+            break;
+
+		case CTCN_LBUTTONDBLCLK:
+			if(lpnmhdr->idFrom == IDC_CONNECTIONTAB)
+			{
+				//if double clicked on empty space , then open the connection window
+				CreateConnDialog();
+			}
+			break;
+
+        case CTCN_ONCONTEXTMENU:
+            if(lpnmhdr->idFrom == IDC_CONNECTIONTAB)
+            {
+                hmenu = LoadMenu(pGlobals->m_hinstance, MAKEINTRESOURCE(IDR_FIXTABMENU));
+                LocalizeMenu(hmenu);
+	            htrackmenu = GetSubMenu(hmenu, 0);
+                wyTheme::SetMenuItemOwnerDraw(htrackmenu);
+                GetCursorPos(&pnt);
+			    TrackPopupMenu(htrackmenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, pnt.x, pnt.y, 0, hwnd, NULL);
+                FreeMenuOwnerDrawItem(htrackmenu);
+                DestroyMenu(hmenu);
+            }
+            break;
+
+        case CTCN_PAINTTIMERSTART:
+            CustomTab_SetBufferedDrawing(wyTrue);
+            break;
+
+        case CTCN_PAINTTIMEREND:
+            CustomTab_SetBufferedDrawing(wyFalse);
+            break;
+	}
+
+    return 1;
+}
+
+void
+FrameWindow::HandleToolCombo(WPARAM wparam)
+{
+    switch(HIWORD(wparam))
+	{
+	case CBN_DROPDOWN:
+		OnToolComboDropDown();
+		break;
+
+	case CBN_SELCHANGE:
+		PostMessage(pGlobals->m_pcmainwin->m_hwndmain, UM_COMBOCHANGE, 0, 0);
+		break;
+
+	case CBN_SELENDCANCEL:
+		SetOldDB();
+		break;
+	}
+
+    return;
+}
+
+void 
+FrameWindow::HandleExecuteCurrentQuery(HWND hwndactive, MDIWindow *pcquerywnd, EditorBase *pceditorbase, WPARAM wparam)
+{
+	wyBool		isedit = wyFalse;
+	TabEditor	*pctabeditor = NULL;
+
+	//if it is execute & edit result set
+	if((LOWORD(wparam) == ACCEL_QUERYUPDATE) ||(LOWORD(wparam) == ACCEL_QUERYUPDATE_KEY))
+		isedit = wyTrue;
+
+	//Check whether the tab is QueryBuilder or Schema designer or Advance editor and execute & edit result set 
+	if((pcquerywnd->m_pctabmodule->GetActiveTabEditor() == NULL) ||(pceditorbase->GetAdvancedEditor() == wyTrue && isedit == wyTrue))
+		return;
+
+	pctabeditor = (TabEditor*)pcquerywnd->m_pctabmodule->GetActiveTabEditor();
+
+	if(!pctabeditor->m_pctabmgmt || !pctabeditor->m_pctabmgmt->m_hwnd)
+		return;
+
+	if(hwndactive)
+    {
+		//SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, FALSE, 0);
+		
+		/* if a query is being executed then we need to interpret it as stop query */
+		if(pcquerywnd->m_executing == wyTrue && pcquerywnd->IsStopQueryVariableReset() == wyTrue)
+        {
+			if(StopQuery(hwndactive, pcquerywnd) == wyFalse)
+			{
+				SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+                return;
+			}
+        }
+		else if(pcquerywnd->IsStopQueryVariableReset() == wyTrue) 
+		{
+			pceditorbase->ExecuteCurrentQuery(&pcquerywnd->m_stopquery, isedit);
+		}
+
+		OnQueryExecFinish(pcquerywnd);
+		SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+	}
+
+    return;
+}
+
+void 
+FrameWindow::HandleExecuteExplain(HWND hwndactive, MDIWindow *pcquerywnd, EditorBase *pceditorbase, wyBool isExtended)
+{
+    TabEditor   *pctabeditor = NULL;
+
+    pctabeditor = (TabEditor *)pcquerywnd->m_pctabmodule->GetActiveTabEditor();
+
+    if(hwndactive)
+    {
+        if(pcquerywnd->m_executing == wyTrue && pcquerywnd->IsStopQueryVariableReset() == wyTrue)
+        {
+			if(StopQuery(hwndactive, pcquerywnd) == wyFalse)
+			{
+				SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+                return;
+			}
+        }
+		else if(pcquerywnd->IsStopQueryVariableReset() == wyTrue) 
+		{
+			pceditorbase->ExecuteExplainQuery(&pcquerywnd->m_stopquery, isExtended);
+		}
+
+		OnQueryExecFinish(pcquerywnd);
+		SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+	}
+    return;
+}
+
+void 
+FrameWindow::HandleExecuteAllQuery(HWND hwndactive, MDIWindow *pcquerywnd, EditorBase *pceditorbase)
+{
+	TabEditor	*pctabeditor = NULL;
+
+	if(!pcquerywnd->m_pctabmodule->GetActiveTabEditor())
+	{
+		return;
+	}
+	
+	pctabeditor = (TabEditor*)pcquerywnd->m_pctabmodule->GetActiveTabEditor();
+    
+	if(!pctabeditor->m_pctabmgmt || !pctabeditor->m_pctabmgmt->m_hwnd)
+	{
+		return;
+	}
+
+	if(hwndactive)
+    {
+		//SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, FALSE, 0);
+
+		/* if a query is being executed then we need to interpret it as stop query */
+		if(pcquerywnd->m_executing == wyTrue && pcquerywnd->IsStopQueryVariableReset() == wyTrue)
+        {
+			if(StopQuery(hwndactive, pcquerywnd) == wyFalse)
+			{
+				SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+                return;
+			}
+        }
+		else if(pcquerywnd->IsStopQueryVariableReset() == wyTrue) 
+		{
+			pceditorbase->ExecuteAllQuery(&pcquerywnd->m_stopquery);
+		}
+
+        OnQueryExecFinish(pcquerywnd);
+        pGlobals->m_pcmainwin->HandleFirstToolBar();
+
+		SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+	}
+    return;
+}
+void 
+FrameWindow::HandleExecuteSelQuery(HWND hwndactive, MDIWindow *pcquerywnd, EditorBase *pceditorbase)
+{
+	TabEditor	*pctabeditor = NULL;
+
+	if(!pcquerywnd->m_pctabmodule->GetActiveTabEditor())
+	{
+		return;
+	}
+	
+	pctabeditor = (TabEditor*)pcquerywnd->m_pctabmodule->GetActiveTabEditor();
+    
+	if(!pctabeditor->m_pctabmgmt || !pctabeditor->m_pctabmgmt->m_hwnd)
+	{
+		return;
+	}
+
+	if(hwndactive)
+	{
+		//SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, FALSE, 0);
+
+		if(pcquerywnd->m_executing == wyTrue && pcquerywnd->IsStopQueryVariableReset() == wyTrue)
+        {
+			if(StopQuery(hwndactive, pcquerywnd) == wyFalse)
+			{
+				SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+                return;
+			}
+        }
+
+        else if(pcquerywnd->IsStopQueryVariableReset() == wyTrue) 
+		{
+		    pceditorbase->ExecuteSelQuery(&pcquerywnd->m_stopquery);
+		}
+
+        OnQueryExecFinish(pcquerywnd);
+
+		SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+	}
+
+	return;
+}
+
+HTREEITEM
+FrameWindow ::GetTreeItem(MDIWindow *wnd, wyString& hitemname)
+{
+    EditorBase		*peditorbase	= NULL; //wnd->GetActiveTabEditor()->m_peditorbase;
+    HTREEITEM       dbhitem = NULL, folderhitem = NULL, objhitem = NULL;
+    wyWChar         database[SIZE_512] = {0}, object[SIZE_512] = {0};
+    wyString        objname, objname2;
+    wyInt32         image, tabimageid, dbfound = 0;
+
+    if(!wnd && wnd->GetActiveTabEditor() == NULL)
+    {
+        return NULL;
+    }
+
+    peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+    dbhitem = TreeView_GetChild(wnd->m_pcqueryobject->m_hwnd, TreeView_GetRoot(wnd->m_pcqueryobject->m_hwnd));
+
+    while(dbhitem)
+    {
+        GetNodeText(wnd->m_pcqueryobject->m_hwnd, dbhitem, database, SIZE_512 - 1);
+        objname.SetAs(database);
+        if(!peditorbase->m_dbname.CompareI(objname))
+        {
+            dbfound = 1;
+            break;
+        }
+        dbhitem = TreeView_GetNextSibling(wnd->m_pcqueryobject->m_hwnd, dbhitem);
+    }
+    
+    if(!dbfound)
+        return TreeView_GetRoot(wnd->m_pcqueryobject->m_hwnd);
+    
+    TreeView_Expand(wnd->m_pcqueryobject->m_hwnd, dbhitem, TVM_EXPAND);
+    tabimageid = wnd->m_pctabmodule->GetActiveTabImage();
+    
+    switch(tabimageid)
+    {
+    case IDI_CREATEPROCEDURE:
+        peditorbase->m_nodeimage = NSP;
+        break;
+    case IDI_CREATEVIEW:
+        peditorbase->m_nodeimage = NVIEWS;
+        break;
+    case IDI_CREATETRIGGER:
+        peditorbase->m_nodeimage = NTRIGGER;
+        break;
+    case IDI_CREATEFUNCTION:
+        peditorbase->m_nodeimage = NFUNC;
+        break;
+    case IDI_CREATEEVENT:
+        peditorbase->m_nodeimage = NEVENTS;
+        break;
+    }
+
+    folderhitem = TreeView_GetChild(wnd->m_pcqueryobject->m_hwnd, dbhitem);
+
+    while(folderhitem)
+    {
+        image = GetItemImage(wnd->m_pcqueryobject->m_hwnd, folderhitem);
+        if(image == peditorbase->m_nodeimage)
+            break;
+        folderhitem = TreeView_GetNextSibling(wnd->m_pcqueryobject->m_hwnd, folderhitem);
+    }
+
+    objname.SetAs(hitemname);
+    if(objname.GetLength() == 0)
+        return folderhitem;
+
+    TreeView_Expand(wnd->m_pcqueryobject->m_hwnd, folderhitem, TVM_EXPAND);
+    
+    objhitem = TreeView_GetChild(wnd->m_pcqueryobject->m_hwnd, folderhitem);
+    while(objhitem)
+    {
+        GetNodeText(wnd->m_pcqueryobject->m_hwnd, objhitem, object, SIZE_512 - 1);
+        objname2.SetAs(object);
+        if(!objname.CompareI(objname2))
+            return objhitem;
+        objhitem = TreeView_GetNextSibling(wnd->m_pcqueryobject->m_hwnd, objhitem);
+    }
+       
+    return folderhitem;
+}
+
+void 
+FrameWindow::OnQueryExecFinish(MDIWindow *pcquerywnd)
+{
+	EditorBase		*peditorbase	= pcquerywnd->GetActiveTabEditor()->m_peditorbase;
+	TabMgmt			*ptabmgmt		= pcquerywnd->GetActiveTabEditor()->m_pctabmgmt;	
+	HWND			hwndfocus;
+
+  	if(peditorbase->GetAdvancedEditor())
+    {
+        //peditorbase->m_hitem = GetTreeItem(pcquerywnd);
+        pGlobals->m_pcmainwin->Refresh(pcquerywnd);
+        //peditorbase->m_hitemname
+        peditorbase->m_hitem = GetTreeItem(pcquerywnd, peditorbase->m_hitemname);
+		TreeView_SelectItem(pcquerywnd->m_pcqueryobject->m_hwnd, peditorbase->m_hitem);
+		SetFocus(pcquerywnd->m_pcqueryobject->m_hwnd);
+		
+        //pGlobals->m_pcmainwin->Refresh(pcquerywnd);
+
+		
+		//if IsEditorFocus() is true or query execution is not successful then we are setting focus to editor
+		if(IsEditorFocus() == wyTrue || pcquerywnd->m_querysuccessful != 0 )
+		{
+			if(pcquerywnd == GetActiveWin())
+				PostMessage(pGlobals->m_pcmainwin->m_hwndmain, UM_SETFOCUS, (WPARAM)peditorbase->m_hwnd, 0);
+			else
+				pcquerywnd->m_lastfocus = peditorbase->m_hwnd;
+		}		
+	}
+    else
+    { 
+	   if(IsEditorFocus() == wyFalse)
+		{	
+            hwndfocus = peditorbase->m_hwnd;
+
+            if(ptabmgmt->m_presultview)
+            {
+                hwndfocus = ptabmgmt->m_presultview->GetActiveDispWindow();
+            }
+			
+			if(pcquerywnd == GetActiveWin())
+				PostMessage(pGlobals->m_pcmainwin->m_hwndmain, UM_SETFOCUS, (WPARAM)hwndfocus, 0); 
+			else
+				pcquerywnd->m_lastfocus = hwndfocus;
+		}
+	}
+    return;
+}
+// move focus to next or previous tab based on key action.
+void
+FrameWindow::HandleTabNavigation(MDIWindow *pcquerywnd, wyBool movetoup)
+{
+	wyInt32  itemindex, itemcount, index;
+
+	itemcount= CustomTab_GetItemCount(pcquerywnd->m_pctabmodule->m_hwnd);
+
+	//if  tabs count equal to one.
+	if(itemcount == 1)
+		return;
+
+	itemindex = CustomTab_GetCurSel(pcquerywnd->m_pctabmodule->m_hwnd); 
+    
+	//move to next tab
+	if(movetoup == wyTrue)
+	{
+		if(itemcount  == itemindex + 1)
+			index = 0;
+		else
+			index = itemindex + 1;
+	}
+	//move to previous tab
+	else
+	{
+		if(itemindex != 0)
+			index = itemindex - 1;
+		else
+			index = itemcount - 1;
+			
+	}
+
+	//POst 8.04 Beta 2 to avoid flicker on Tab Navigation
+	CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd, index);
+
+	CustomTab_EnsureVisible(pcquerywnd->m_pctabmodule->m_hwnd, index); 	
+}
+
+void 
+FrameWindow::DeleteQueryTabItem(MDIWindow *pcquerywnd)
+{
+	wyInt32  itemindex;
+
+	if(CustomTab_GetItemCount(pcquerywnd->m_pctabmodule->m_hwnd) <= 1)
+		return;	
+
+	itemindex = CustomTab_GetCurSel(pcquerywnd->m_pctabmodule->m_hwnd);    
+	CustomTab_DeleteItem(pcquerywnd->m_pctabmodule->m_hwnd, itemindex);	
+}
+
+void 
+FrameWindow::CreateNewTableDataTab(MDIWindow *pcquerywnd, wyBool isnewtab)
+{
+	TabModule	*ptabmodule  = pcquerywnd->m_pctabmodule;
+
+    //CustomTab_SetBufferedDrawing(wyTrue);
+	
+    ptabmodule->CreateTabDataTab(pcquerywnd, isnewtab, wyTrue); 
+
+	//pcquerywnd->SetQueryWindowTitle();
+	//CustomTab_SetBufferedDrawing(wyFalse);		
+	return;
+}
+
+
+void 
+FrameWindow::CreateNewQueryEditor(MDIWindow *pcquerywnd)
+{
+	EditorBase	*peditorbase; 
+	TabModule	*ptabmodule  = pcquerywnd->m_pctabmodule;
+
+    //CustomTab_SetBufferedDrawing(wyTrue);
+	ptabmodule->CreateQueryEditorTab(pcquerywnd); 
+	peditorbase = pcquerywnd->GetActiveTabEditor()->m_peditorbase;
+	
+	SetFocus(peditorbase->m_hwnd);
+	pcquerywnd->SetQueryWindowTitle();
+	//CustomTab_SetBufferedDrawing(wyFalse);		
+	return;
+}
+
+
+void 
+FrameWindow::CreateNewQueryBuilder(MDIWindow *pcquerywnd)
+{
+	TabModule	*ptabmodule  = pcquerywnd->m_pctabmodule;
+
+    //CustomTab_SetBufferedDrawing(wyTrue);
+	ptabmodule->CreateQueryBuilderTab(pcquerywnd);
+    //CustomTab_SetBufferedDrawing(wyFalse);
+
+	return;
+}
+//Function for Calling Refresh or Excute query functions based on Switching F5 and F9 functionalities
+void 
+FrameWindow::HandleOnRefreshExecuteQuery(HWND hwndactive, MDIWindow *pcquerywnd, WPARAM wparam, wyBool isrefresh)
+{
+	wyBool				issd		= wyFalse;
+	TabEditor			*ptabeditor = NULL;
+	EditorBase			*peditorbase = NULL;
+	wyInt32				 tabimageid = 0;
+	
+	tabimageid = pcquerywnd->m_pctabmodule->GetActiveTabImage();
+	
+	if(tabimageid != IDI_DATASEARCH)
+	{
+	ptabeditor = pcquerywnd->GetActiveTabEditor();
+	}
+    
+	if(!hwndactive)
+		return;
+
+#ifndef COMMUNITY
+	TabSchemaDesigner	*ptabsd = NULL;		
+	HWND				  hwndfocus	= NULL;
+
+	tabimageid = pcquerywnd->m_pctabmodule->GetActiveTabImage();
+	if(tabimageid == IDI_SCHEMADESIGNER_16)
+	{
+		ptabsd = (TabSchemaDesigner*)pcquerywnd->m_pctabmodule->GetActiveTabType();
+		if(ptabsd && pcquerywnd->m_pcqueryobject && pcquerywnd->m_pcqueryobject->m_hwnd)
+		{
+			VERIFY(hwndfocus = GetFocus());
+			if(hwndfocus != pcquerywnd->m_pcqueryobject->m_hwnd)
+				issd = wyTrue;
+		}
+	}
+#endif
+	
+	if(pGlobals->m_isrefreshkeychange == wyFalse)//if refresh key option switches from f9 to f5
+	{
+		if(isrefresh == wyTrue)//flag using for differentiating ACCEL_REFRESH,ACCEL_EXECUTE cases
+		{	
+			if(!ptabeditor)
+				return;
+			peditorbase = ptabeditor->m_peditorbase;
+			HandleExecuteCurrentQuery(hwndactive, pcquerywnd, peditorbase, wparam);	
+		}		
+		else
+		{			
+			/// For refreshing the SD- canvas if focus is on that window
+			if(issd == wyTrue)	
+			{
+#ifndef COMMUNITY
+				ptabsd->CanvasRefresh();							
+#endif
+			}
+			
+			else
+				HandleOnRefresh(pcquerywnd);
+		}
+	}
+	else
+	{
+		if(isrefresh == wyTrue)
+		{
+			if(issd == wyTrue)	
+			{
+#ifndef COMMUNITY
+				ptabsd->CanvasRefresh();
+#endif
+			}
+
+			else
+				HandleOnRefresh(pcquerywnd);		
+		}
+
+		else 
+		{
+			if(!ptabeditor)
+				return;
+			peditorbase = ptabeditor->m_peditorbase;
+			HandleExecuteCurrentQuery(hwndactive, pcquerywnd, peditorbase, wparam);		
+		}
+	}
+}
+
+void 
+FrameWindow::HandleOnRefresh(MDIWindow *pcquerywnd)
+{
+	if(pcquerywnd->m_pcqueryobject->GetSelectionImage() == NSERVER)
+	{
+		pcquerywnd->m_pcqueryobject->RefreshObjectBrowser(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+	}
+	else
+	{
+		/*	Refresh Parent node only, leaving others unchanged, So we can
+			eliminate the flickering little more */
+		pcquerywnd->m_pcqueryobject->RefreshParentNodeHelper();
+	}
+
+	SetFocus(pcquerywnd->m_pcqueryobject->m_hwnd);
+
+    return;
+}
+
+wyInt32 
+FrameWindow::OnWmSize(WPARAM wparam)
+{
+	/* no need to handle SIZE_MINIMIZED */
+	if(wparam == SIZE_MINIMIZED)
+		return 0;
+
+	Resize(wparam);
+
+	//Repaint tha tabs
+	if(m_connection)
+		m_connection->RepaintTabs(wparam);
+
+	return 0;
+}
+ 
+void 
+FrameWindow::GoToLine(HWND hwndactive, MDIWindow *wnd)
+{
+    HWND hedit;
+
+    if(!wnd->GetActiveTabEditor())
+        return;
+
+    hedit = wnd->GetActiveTabEditor()->m_peditorbase->GetHWND();	
+
+    int ret;
+    if(GetFocus() == hedit)
+    {
+        wnd->m_lastfocus = hedit;
+        ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_DBMAKER), 
+	                            hwndactive, FrameWindow::CreateObjectDlgProc,(LPARAM)"GoToLine");
+    }
+    return;
+}
+
+wyBool 
+FrameWindow::OnExportData(MDIWindow *wnd)
+{
+	CExportResultSet    cer;
+    MySQLDataEx         *ptrp;
+
+	ptrp = wnd->GetActiveTabEditor()->m_pctabmgmt->GetResultData();    
+    
+	// if the user has pressed the keypboard shortcut bogusly then we
+	// exit.
+	if(!ptrp)
+		return wyFalse;
+
+	cer.Export(wnd->m_hwnd, ptrp);
+
+    return wyTrue;
+}
+
+void 
+FrameWindow::OnCreateDatabase(HWND hwndactive, MDIWindow *wnd)
+{
+	wyWChar     *dbname;
+	wyInt32		ret;
+
+	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_CREATEDB), 
+			hwndactive, FrameWindow::CreateObjectDlgProc,(LPARAM)"CreateDB" );
+    
+	if(ret)
+    {        
+		dbname = (wyWChar*)ret;
+
+		if(wcslen(dbname) == 0)
+            return;
+		
+        SendMessage(wnd->m_pcqueryobject->m_hwnd, WM_SETREDRAW, FALSE, 0);
+        wnd->m_pcqueryobject->GetTreeState();
+		wnd->m_pcqueryobject->RefreshObjectBrowser(wnd->m_tunnel, &wnd->m_mysql);				
+        wnd->m_pcqueryobject->RestoreTreeState();
+        wnd->m_pcqueryobject->m_seltype = NDATABASE;
+		wnd->m_pcqueryobject->m_seldatabase.SetAs(dbname);
+        wnd->m_pcqueryobject->m_seltable.Strip(wnd->m_pcqueryobject->m_seldatabase.GetLength());
+		wnd->m_pcqueryobject->ExpandDatabase();
+		SendMessage(wnd->m_pcqueryobject->m_hwnd, WM_SETREDRAW, TRUE, 0);
+		free(dbname);
+	}
+    return;
+}
+
+void 
+FrameWindow::OnCreateFunction(HWND hwndactive, MDIWindow *wnd)
+{
+	wyWChar     *functionname;
+	wyInt32     ret;
+	HTREEITEM	hfunctionitem;
+    wyString    buff;
+	EditorBase	*peditorbase;
+	wyString	functionnamestr;
+
+	hfunctionitem = wnd->m_pcqueryobject->GetDatabaseNode();
+
+	if(hfunctionitem)
+		hfunctionitem = wnd->m_pcqueryobject->GetNode(hfunctionitem, NFUNC);
+
+	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_DBMAKER), 
+			hwndactive, FrameWindow::CreateObjectDlgProc,(LPARAM)"CreateFunction");
+
+	if(ret)
+		functionname = (wyWChar*)ret;
+    else
+		return;
+	
+	if(wcslen(functionname) == 0)
+        return;
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+
+    functionnamestr.SetAs(functionname);
+
+	//to trim empty spaces from right, to avoid mysql errors
+	functionnamestr.RTrim();
+
+	wnd->m_pctabmodule->CreateAdvEditorTab(wnd, (wyChar *)functionnamestr.GetString(), IDI_CREATEFUNCTION, hfunctionitem, &functionnamestr);
+	
+	peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+    peditorbase->m_isdiscardchange = wyTrue;
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITEROPEN);
+
+	pGlobals->m_pcmainwin->PrepareCreateFunction(wnd, functionnamestr.GetString(), buff);
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)buff.GetString());
+
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITERCLOSE);
+    SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+    SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+    peditorbase->m_isdiscardchange = wyFalse;
+	EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);
+	PostMessage(pGlobals->m_pcmainwin->m_hwndmain, UM_SETFOCUS,(WPARAM)peditorbase->m_hwnd,0);
+	
+	//wnd->SetQueryWindowTitle();
+	
+	pGlobals->m_pcmainwin->HandleGoTo(pGlobals->m_pcmainwin->m_hwndmain, wnd, L"8"); // set focus on 8th line
+
+	free(functionname);
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+
+    return;
+}
+
+void 
+FrameWindow::OnCreateProcedure(HWND hwndactive, MDIWindow *wnd)
+{
+	wyWChar     *procedurename;
+	wyInt32     ret;
+	HTREEITEM	hprocedureitem;
+    wyString    buff;
+	EditorBase	*peditorbase;
+	wyString	procedurenamestr;
+
+	hprocedureitem = wnd->m_pcqueryobject->GetDatabaseNode();
+
+	if(TreeView_GetItemState(wnd->m_pcqueryobject->m_hwnd, hprocedureitem, TVIS_EXPANDEDONCE) & TVIS_EXPANDEDONCE)
+	{
+		hprocedureitem = wnd->m_pcqueryobject->GetNode(hprocedureitem, NSP);
+	}
+
+	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_DBMAKER), 
+			hwndactive, FrameWindow::CreateObjectDlgProc,(LPARAM)"CreateProcedure");
+
+	if(ret)
+		procedurename = (wyWChar*)ret;
+	else
+		return;
+
+	if(wcslen(procedurename)== 0)
+        return;
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+	
+	procedurenamestr.SetAs(procedurename);
+
+	//to trim empty spaces from right, to avoid mysql errors
+	procedurenamestr.RTrim();
+
+	wnd->m_pctabmodule->CreateAdvEditorTab(wnd, (wyChar *)procedurenamestr.GetString(), IDI_CREATEPROCEDURE, hprocedureitem, &procedurenamestr);
+	
+	peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+	peditorbase->m_isdiscardchange = wyTrue;
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITEROPEN);
+	
+	pGlobals->m_pcmainwin->PrepareCreateProcedure(wnd, procedurenamestr.GetString(), buff);
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)buff.GetString());
+
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITERCLOSE);
+    SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+    SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+    peditorbase->m_isdiscardchange = wyFalse;
+	EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);
+	PostMessage(pGlobals->m_pcmainwin->m_hwndmain, UM_SETFOCUS,(WPARAM)peditorbase->m_hwnd,0);
+
+	//wnd->SetQueryWindowTitle();
+	pGlobals->m_pcmainwin->HandleGoTo(pGlobals->m_pcmainwin->m_hwndmain, wnd, L"7"); // set focus on 7th line
+	free(procedurename);
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+
+    return;
+}
+void 
+FrameWindow::OnCreateEvent(HWND hwndactive, MDIWindow *wnd)
+{
+	wyWChar     *eventname;
+	wyInt32     ret;
+	HTREEITEM   heventitem;
+    wyString    buff;
+	EditorBase	*peditorbase;
+	wyString	eventnamestr;
+
+	heventitem = wnd->m_pcqueryobject->GetDatabaseNode();
+
+	if(heventitem)
+		heventitem = wnd->m_pcqueryobject->GetNode(heventitem, NEVENTS);
+    
+
+	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_DBMAKER), 
+			hwndactive, FrameWindow::CreateObjectDlgProc,(LPARAM)"CreateEvent");
+
+	if(ret)
+		eventname = (wyWChar*)ret;
+	else
+		return;
+
+	if(wcslen(eventname) == 0)
+        return;
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+
+	eventnamestr.SetAs(eventname);
+
+	//to trim empty spaces from right, to avoid mysql errors
+	eventnamestr.RTrim();
+
+	wnd->m_pctabmodule->CreateAdvEditorTab(wnd, (wyChar *)eventnamestr.GetString(), IDI_CREATEEVENT, heventitem, &eventnamestr);
+	
+    peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+    peditorbase->m_isdiscardchange = wyTrue;
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITEROPEN);
+	pGlobals->m_pcmainwin->PrepareCreateEvent(wnd, eventnamestr.GetString(), buff);
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)buff.GetString());
+    SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITERCLOSE);
+    SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+    SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+    peditorbase->m_isdiscardchange = wyFalse;
+	EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);
+	PostMessage(pGlobals->m_pcmainwin->m_hwndmain, UM_SETFOCUS,(WPARAM)peditorbase->m_hwnd, 0);
+
+	//wnd->SetQueryWindowTitle();
+
+	pGlobals->m_pcmainwin->HandleGoTo(pGlobals->m_pcmainwin->m_hwndmain, wnd, L"7"); // set focus on 7th line
+	
+	free(eventname);
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+
+    return;
+
+}
+
+void 
+FrameWindow::OnCreateView(HWND hwndactive, MDIWindow *wnd, wyString *qbquery)
+{
+	wyWChar     *viewname;
+	wyInt32     ret;
+	HTREEITEM   hviewitem;
+    wyString    buff;
+	EditorBase	*peditorbase;
+	wyString	viewnamestr;
+
+	hviewitem = wnd->m_pcqueryobject->GetDatabaseNode();
+
+	if(TreeView_GetItemState(wnd->m_pcqueryobject->m_hwnd, hviewitem, TVIS_EXPANDEDONCE) & TVIS_EXPANDEDONCE)
+	{
+		hviewitem = wnd->m_pcqueryobject->GetNode(hviewitem, NVIEWS);
+	}
+
+	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_DBMAKER), 
+			hwndactive, FrameWindow::CreateObjectDlgProc,(LPARAM)"CreateView");
+
+	if(ret)
+		viewname = (wyWChar*)ret;
+	else
+		return;
+
+	if(wcslen(viewname) == 0)
+        return;
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+
+	viewnamestr.SetAs(viewname);
+
+	//to trim empty spaces from right, to avoid mysql errors
+	viewnamestr.RTrim();
+
+    wnd->m_pctabmodule->CreateAdvEditorTab(wnd, (wyChar *)viewnamestr.GetString(), IDI_CREATEVIEW, hviewitem, &viewnamestr);
+	
+    peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+    peditorbase->m_isdiscardchange = wyTrue;
+	pGlobals->m_pcmainwin->PrepareCreateView(wnd, viewnamestr.GetString(), buff, qbquery);
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)buff.GetString());
+    SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+    SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+    peditorbase->m_isdiscardchange = wyFalse;
+
+	EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);
+	PostMessage(pGlobals->m_pcmainwin->m_hwndmain, UM_SETFOCUS,(WPARAM)peditorbase->m_hwnd,0);
+
+	//wnd->SetQueryWindowTitle();
+
+	// set focus on line after PrepareCreateView query.
+	pGlobals->m_pcmainwin->HandleGoTo(pGlobals->m_pcmainwin->m_hwndmain, wnd, L"8");
+	
+	free(viewname);
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+
+    return;
+}
+
+void 
+FrameWindow::OnCreateTrigger(HWND hwndactive, MDIWindow *wnd)
+{
+	wyWChar     *triggername;
+	wyInt32     ret;
+	HTREEITEM	htriggeritem;
+    wyString    buff;
+	EditorBase	*peditorbase ;
+	wyString	triggernamestr;
+
+	//htriggeritem = wnd->m_pcqueryobject->GetTableNode();
+
+    htriggeritem = wnd->m_pcqueryobject->GetDatabaseNode();
+
+    if(TreeView_GetItemState(wnd->m_pcqueryobject->m_hwnd, htriggeritem, TVIS_EXPANDEDONCE) & TVIS_EXPANDEDONCE)
+	{
+		htriggeritem = wnd->m_pcqueryobject->GetNode(htriggeritem, NTRIGGER);
+	}
+		
+    /*
+	if(htriggeritem)
+		htriggeritem = wnd->m_pcqueryobject->GetNode(htriggeritem, NTRIGGER);
+    */
+
+	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_DBMAKER), 
+			hwndactive, FrameWindow::CreateObjectDlgProc,(LPARAM)"CreateTrigger");
+
+	if(ret)
+		triggername = (wyWChar*)ret;
+	else
+		return;
+
+	if(wcslen(triggername) == 0)
+		return;
+	
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+
+	triggernamestr.SetAs(triggername);
+
+	//to trim empty spaces from right, to avoid mysql errors
+	triggernamestr.RTrim();
+
+	wnd->m_pctabmodule->CreateAdvEditorTab(wnd, (wyChar *)triggernamestr.GetString(), IDI_CREATETRIGGER, htriggeritem, &triggernamestr);
+	peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+    peditorbase->m_isdiscardchange = wyTrue;         
+    SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITEROPEN);
+	pGlobals->m_pcmainwin->PrepareCreateTrigger(wnd, triggernamestr.GetString(), buff);
+
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)buff.GetString());
+
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITERCLOSE);
+    SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+    SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+    peditorbase->m_isdiscardchange = wyFalse;
+	EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);
+	PostMessage(pGlobals->m_pcmainwin->m_hwndmain, UM_SETFOCUS,(WPARAM)peditorbase->m_hwnd, 0);
+
+	//wnd->SetQueryWindowTitle();
+
+	pGlobals->m_pcmainwin->HandleGoTo(pGlobals->m_pcmainwin->m_hwndmain, wnd, L"7"); // set focus on 7th line 
+
+	free(triggername);
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+
+    return;
+}
+
+void
+FrameWindow::OnAlterDatabase(HWND hwndactive, MDIWindow *wnd)
+{
+	wyWChar     *dbname;
+	wyInt32		ret;
+	MYSQL_RES	*res;
+    wyString    query;
+    
+	if(IsMySQL41(wnd->m_tunnel, &wnd->m_mysql) == wyFalse)
+		return;
+
+	query.Sprintf("use `%s`", wnd->m_pcqueryobject->m_seldatabase.GetString());
+    res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
+	if(!res && wnd->m_tunnel->mysql_affected_rows(wnd->m_mysql)== -1)
+	{
+		ShowMySQLError(hwndactive, wnd->m_tunnel, &wnd->m_mysql, query.GetString());
+		return ;
+	}
+
+	wnd->m_tunnel->mysql_free_result(res);
+
+	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_CREATEDB), 
+			hwndactive, FrameWindow::CreateObjectDlgProc, (LPARAM)"AlterDB" );
+
+	if(ret)
+	{
+		dbname = (wyWChar*)ret;
+
+		if(wcslen(dbname) == 0)
+            return;
+
+		wnd->m_pcqueryobject->m_seltype = NDATABASE;
+		wnd->m_pcqueryobject->m_seldatabase.SetAs(dbname);
+		wnd->m_pcqueryobject->m_seltable.Strip(wnd->m_pcqueryobject->m_seldatabase.GetLength());
+		free(dbname);
+	}
+	return;
+}
+void 
+FrameWindow::OnAlterEvent(MDIWindow *wnd)
+{
+	wyString      altereventstmt, usedb;
+	EditorBase	  *peditorbase;
+	HTREEITEM     hitem;
+	wyBool        ret = wyFalse;
+	
+	VERIFY(hitem = TreeView_GetSelection(wnd->m_pcqueryobject->m_hwnd));
+	// selected event and database name will get from the following fun
+	wnd->m_pcqueryobject->GetTableDatabaseName(hitem);	
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+	// query for alter event
+	ret = PrepareAlterEvent(wnd, altereventstmt);	
+
+	if(ret == wyFalse)
+		return;
+
+	wnd->m_pctabmodule->CreateAdvEditorTab(wnd, (wyChar*)wnd->m_pcqueryobject->m_seltable.GetString()
+											, IDI_ALTEREVENT, TreeView_GetParent(wnd->m_pcqueryobject->m_hwnd, hitem));
+
+	peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+    peditorbase->m_isdiscardchange = wyTrue;
+	//usedb.Sprintf("USE `%s`$$\r\n\r\n", wnd->m_pcqueryobject->m_seldatabase.GetString());
+	
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITEROPEN);	
+	//SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)usedb.GetString());
+		
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)altereventstmt.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITERCLOSE);
+    SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+    SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+    peditorbase->m_isdiscardchange = wyFalse;
+	
+	EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);
+	
+	SetFocus(peditorbase->m_hwnd);
+
+	//wnd->SetQueryWindowTitle();
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));   
+
+
+}
+void 
+FrameWindow::OnAlterView(MDIWindow *wnd)
+{
+    wyString createview, dropview, viewname;
+	EditorBase	*peditorbase;
+
+	wnd->m_pcqueryobject->GetCreateView(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, createview);
+
+	if(createview.GetLength()== 0)
+		return;
+	
+	wnd->m_pcqueryobject->GetDropView(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, dropview);
+	pGlobals->m_pcmainwin->GetObjectName(wnd, viewname);
+	
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+
+	//Format the SELECT clause in 'Create View' statement
+	FormatCreateViewStatement(&createview, viewname.GetString(), wyFalse);
+
+	wnd->m_pctabmodule->CreateAdvEditorTab(wnd,(wyChar*)viewname.GetString(), IDI_ALTERVIEW,
+	TreeView_GetParent(wnd->m_pcqueryobject->m_hwnd, 
+	TreeView_GetSelection(wnd->m_pcqueryobject->m_hwnd)));
+	
+	peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+    peditorbase->m_isdiscardchange = wyTrue;
+    SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITEROPEN);
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)dropview.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)createview.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITERCLOSE);
+    SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+    SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+    peditorbase->m_isdiscardchange = wyFalse;
+	
+	EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);
+	
+	SetFocus(peditorbase->m_hwnd);
+	//wnd->SetQueryWindowTitle();
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+
+    return;
+}
+
+void 
+FrameWindow::OnAlterProcedure(MDIWindow *wnd)
+{
+    wyString createsp, dropsp, spname;
+	EditorBase	*peditorbase;
+
+    wnd->m_pcqueryobject->GetCreateProcedure(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, createsp);
+
+    if(createsp.GetLength()== 0)
+	    return;
+
+    wnd->m_pcqueryobject->GetDropProcedure(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, dropsp);
+    pGlobals->m_pcmainwin->GetObjectName(wnd, spname);
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+
+	wnd->m_pctabmodule->CreateAdvEditorTab(wnd,(wyChar*)spname.GetString(), IDI_ALTERPROCEDURE, 
+			TreeView_GetParent(wnd->m_pcqueryobject->m_hwnd, 
+			TreeView_GetSelection(wnd->m_pcqueryobject->m_hwnd)));
+    peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+    peditorbase->m_isdiscardchange = wyTrue;
+    SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITEROPEN);
+    SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)dropsp.GetString());
+    SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)createsp.GetString());
+    SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITERCLOSE);
+    SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+    SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+    peditorbase->m_isdiscardchange = wyFalse;
+
+    EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);
+
+    SetFocus(peditorbase->m_hwnd);
+    //wnd->SetQueryWindowTitle();
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+
+    return;
+}
+
+void
+FrameWindow::OnAlterFunction(MDIWindow *wnd)
+{
+    wyString createfunction, dropfunction, functionname;
+	EditorBase	*peditorbase;
+
+	wnd->m_pcqueryobject->GetCreateFunction(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, createfunction);
+
+	if(createfunction.GetLength()== 0)
+		return;
+
+	wnd->m_pcqueryobject->GetDropFunction(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, dropfunction);
+	pGlobals->m_pcmainwin->GetObjectName(wnd, functionname);
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+	
+	wnd->m_pctabmodule->CreateAdvEditorTab(wnd, (wyChar*)functionname.GetString(), IDI_ALTERFUNCTION,
+		TreeView_GetParent(wnd->m_pcqueryobject->m_hwnd, 
+		TreeView_GetSelection(wnd->m_pcqueryobject->m_hwnd)));
+	peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+    
+    peditorbase->m_isdiscardchange = wyTrue;
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITEROPEN);
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)dropfunction.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)createfunction.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITERCLOSE);
+    SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+    SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+    peditorbase->m_isdiscardchange = wyFalse;
+	
+	EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);
+	SetFocus(peditorbase->m_hwnd);
+	//wnd->SetQueryWindowTitle();
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+
+    return;
+}
+
+void 
+FrameWindow::OnAlterTrigger(MDIWindow *wnd)
+{
+    wyString createtrigger, droptrigger, triggername;
+	EditorBase	*peditorbase;
+
+	wnd->m_pcqueryobject->GetCreateTrigger(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, createtrigger);
+
+	if(createtrigger.GetLength()== 0)
+		return;
+
+	wnd->m_pcqueryobject->GetDropTrigger(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, droptrigger);
+	pGlobals->m_pcmainwin->GetObjectName(wnd, triggername);
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
+
+	wnd->m_pctabmodule->CreateAdvEditorTab(wnd,(wyChar*)triggername.GetString(), IDI_ALTERTRIGGER, 
+		TreeView_GetParent(wnd->m_pcqueryobject->m_hwnd, 
+		TreeView_GetSelection(wnd->m_pcqueryobject->m_hwnd)));
+
+	peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
+	peditorbase->m_isdiscardchange = wyTrue;
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITEROPEN);
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)droptrigger.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)createtrigger.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITERCLOSE);
+    SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+    SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+    peditorbase->m_isdiscardchange = wyFalse;
+	
+	EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);
+	SetFocus(peditorbase->m_hwnd);
+	wnd->SetQueryWindowTitle();
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+
+    return;
+}
+
+wyInt32 
+FrameWindow::OnAbout()
+{
+    return(DialogBox(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_ABOUTDIALOG), m_hwndmain, ConnectionBase::AboutDialogProc));
+}
+
+void 
+FrameWindow::OnShowValues(MDIWindow *wnd, wyInt32 type)
+{
+	CShowValue csv;
+	csv.Create(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, type);
+}
+
+void 
+FrameWindow::OnManageUser()
+{
+    CreateUserManager();
+}
+
+void 
+FrameWindow::OnTableDiag(MDIWindow *wnd)
+{
+	TableDiag* pctablediag	= new TableDiag(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql);
+    if(pctablediag)
+	    delete pctablediag;
+
+    return;
+}
+
+void 
+FrameWindow::OnImportFromSQL(MDIWindow *wnd)
+{
+    ImportBatch *cib = new ImportBatch();
+
+	if(cib)
+	{
+		cib->Create(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql);
+		delete cib;
+	}
+    return;	
+}
+
+void 
+FrameWindow::ManagePreferences()
+{
+	PreferenceBase* pref = CreatePreferences();
+    
+    if(pref)
+    {
+	    pref->Create();
+        delete pref;
+    }
+
+    return;
+}
+
+wyInt32 
+FrameWindow::OnExit()
+{
+	wyInt32 ret = 1;
+
+	SendMessage(m_hwndmain, WM_CLOSEALLWINDOW, 0,(LPARAM)&ret);
+	if(ret == 0)
+		return 0;
+	else
+		DestroyWindow(m_hwndmain);
+
+    return 1;
+}
+
+wyInt32 
+FrameWindow::GetCommand(wyWChar *menustring, wyWChar *cmdstring)
+{
+    wyInt32 count = 0, cmdlen = 0;
+
+    for(count = 0; *(menustring+count); count++, cmdlen++)
+	{
+		if(*(menustring + count) == C_TAB)
+        {
+			count++; cmdlen++;
+			break;
+		}
+
+		*(cmdstring+cmdlen) = *(menustring+count);
+	}
+    return cmdlen;
+}
+
+wyInt32 
+FrameWindow::GetKBShortcut(wyWChar *menustring, wyWChar *shortcut)
+{
+    wyInt32 count = 0, scutlen = 0;
+
+    for(count = 0; *(menustring+count); count++)
+	{
+		if(*(menustring + count) == C_TAB)
+        {
+			count++;
+			break;
+		}
+	}
+
+    for(;*(menustring+count); count++, scutlen++)
+    {
+        *(shortcut+scutlen) = *(menustring+count);
+    }
+    return scutlen;
+}
+
+void 
+FrameWindow::HandleTBDropDown(NMTOOLBAR *tbh, wyUInt32 buttonid)
+{
+	RECT		rc;
+	HMENU		hmenu, hmenutrack, hmenutracksub;
+	TPMPARAMS	tpm;
+	wyInt32     isstyle, menuindex = MNUTOOL_INDEX;
+	MDIWindow	*wnd = NULL;
+
+	VERIFY(wnd = GetActiveWin());
+	if(!wnd)
+		return;
+
+	///If focussed con.window not maximized mainmenu get reduced by 1
+	isstyle = GetWindowLongPtr(wnd->m_hwnd, GWL_STYLE);
+	
+	if(isstyle & WS_MAXIMIZE)
+		menuindex = MNUTOOL_INDEX;
+	else
+		menuindex = MNUTOOL_INDEX - 1;
+
+	VERIFY(hmenu = GetMenu(pGlobals->m_pcmainwin->m_hwndmain));
+	VERIFY(hmenutrack =	GetSubMenu(hmenu, menuindex));
+
+	switch(buttonid)
+	{
+	case IDM_TOOL_ADDUSER:
+		{
+		VERIFY(hmenutracksub = GetSubMenu(hmenutrack, MNUTOOL_INDEX));
+			
+			//if mysql version is less than 5.0.2, then disable rename user
+			if(IsMySQL502(wnd->m_tunnel, &wnd->m_mysql) == wyFalse)
+				EnableMenuItem(hmenu, IDM_TOOL_RENAMEUSER,  MF_GRAYED | MF_BYCOMMAND);
+			else
+				EnableMenuItem(hmenu, IDM_TOOL_RENAMEUSER,  MF_ENABLED | MF_BYCOMMAND);
+		}
+
+		break;
+
+	case ID_SHOW_VARIABLES:
+		VERIFY(hmenutracksub = GetSubMenu(hmenutrack, MNUTOOL_INDEX + 1));
+		break;
+
+	default:
+		return;
+	}
+
+    SendMessage(tbh->hdr.hwndFrom, TB_GETRECT,(WPARAM)tbh->iItem,(LPARAM)&rc);
+
+    MapWindowPoints(tbh->hdr.hwndFrom, HWND_DESKTOP,(LPPOINT)&rc, 2);                         
+
+    tpm.cbSize		=	sizeof(TPMPARAMS);
+    tpm.rcExclude	=	rc;
+	
+    VERIFY(TrackPopupMenu(hmenutracksub, TPM_LEFTALIGN | TPM_RIGHTBUTTON, rc.left, rc.bottom, 0, pGlobals->m_pcmainwin->m_hwndmain, NULL));
+
+//  SetFocus(m_hwndsecondtool);
+    
+
+    return;
+}
+
+void 
+FrameWindow::OnCreateObjectWmCommand(HWND hwnd, WPARAM wParam, wyChar *object)
+{
+    wyString	tempcharset;
+	
+    switch(LOWORD(wParam))
+    {
+    case IDCANCEL:
+	    yog_enddialog(hwnd, 0);
+		
+		//post 8.01
+		//RepaintTabModule();
+
+	    break;
+
+    // get the database and get the name else
+    case IDOK:
+	    {
+		    wyWChar      *objectname;
+		    MDIWindow	*pcquerywnd = GetActiveWin();
+		    wyBool		ret = wyFalse;
+			wyString    objectstr;
+    		
+		    // just check for safety.
+		    if(!pcquerywnd)
+			    break;
+
+            objectname = AllocateBuffWChar(SIZE_128 + 1);
+
+		    if(stricmp(object, "CreateDB") == 0)
+			    ret = pGlobals->m_pcmainwin->HandleCreateDatabase(hwnd, pcquerywnd, objectname);
+			else if(stricmp(object, "AlterDB") == 0)
+			    ret = pGlobals->m_pcmainwin->HandleAlterDatabase(hwnd, pcquerywnd, objectname);
+			else if(stricmp(object, "CreateProcedure") == 0)
+			    ret = pGlobals->m_pcmainwin->HandleCreateProcedure(hwnd, pcquerywnd, objectname);
+		    else if(stricmp(object, "CreateFunction") == 0)
+			    ret = pGlobals->m_pcmainwin->HandleCreateFunction(hwnd, pcquerywnd, objectname);
+		    else if(stricmp(object, "CreateTrigger") == 0)
+			    ret = pGlobals->m_pcmainwin->HandleCreateTrigger(hwnd, pcquerywnd, objectname);
+			else if(stricmp(object, "CreateEvent") == 0)
+				ret = pGlobals->m_pcmainwin->HandleCreateEvent(hwnd, pcquerywnd, objectname);
+		    else if(stricmp(object, "CreateView") == 0)
+			    ret = pGlobals->m_pcmainwin->HandleCreateView(hwnd, pcquerywnd, objectname);
+		    else if(stricmp(object, "GoToLine") == 0)
+			    ret = pGlobals->m_pcmainwin->HandleGoTo(hwnd, pcquerywnd, objectname);
+
+		    if(ret == wyTrue)
+			{
+				objectstr.SetAs(objectname);
+				objectstr.RTrim();
+
+				swprintf(objectname, L"%s", objectstr.GetAsWideChar());
+
+			    VERIFY(yog_enddialog(hwnd, (wyUInt32)objectname));
+			}
+			else
+				free(objectname);
+	    }
+	    break;
+
+    case IDC_CHARSETCOMBO:
+        {
+           /* if((HIWORD(wParam))== CBN_SELENDOK)
+            {
+                FetchSelectedCharset(hwnd, &tempcharset, wyFalse);
+				if(tempcharset.GetLength())
+					GetDBCharset(&tempcharset);
+
+                ReInitRelatedCollations(hwnd);
+            }*/
+			
+			if((HIWORD(wParam) == CBN_CLOSEUP) || ((HIWORD(wParam))== CBN_SELENDOK))
+			{
+				//CBN_CLOSEUP is a matter when select combo listbox item by using tab key
+				FetchSelectedCharset(hwnd, &tempcharset, wyFalse);
+				
+				if(tempcharset.GetLength())
+				{
+					GetDBCharset(&tempcharset);
+				}
+				
+				ReInitRelatedCollations(hwnd);								
+			}			
+        }
+		break;
+    
+    case IDC_COLLATECOMBO:
+        {
+            if((HIWORD(wParam))== CBN_SELENDOK)
+            {
+                FetchSelectedCollation(hwnd);
+            }
+        }
+
+    /*
+    case IDC_DBNAME:
+        {
+            //handle the notification
+            if(HIWORD(wParam) == EN_CHANGE)
+            {
+                //if a modification is notified, then check whether the field is blank or not and make changes
+                if(IsFieldBlank(GetDlgItem(hwnd, IDC_DBNAME)) < 1)
+                    EnableWindow(GetDlgItem(hwnd, IDOK), FALSE);
+                else
+                    EnableWindow(GetDlgItem(hwnd, IDOK), TRUE);
+            }
+        }
+        break;
+    */
+    }
+    return;
+}
+// Fetch The Selected Collation
+void
+FrameWindow::FetchSelectedCollation(HWND hwnd)
+{
+    MDIWindow	*pcquerywnda = GetActiveWin();
+    wyInt32     length = 0, ncursel;
+    wyWChar     *collation = NULL;
+    wyString    chsetnamestr;
+    HWND        hwndcombo;
+
+    hwndcombo = GetDlgItem(hwnd, IDC_COLLATECOMBO);
+
+    ncursel = SendMessage(hwndcombo, CB_GETCURSEL, 0, 0);;
+    length  = SendMessage(hwndcombo, CB_GETLBTEXTLEN, ncursel, NULL);
+	collation  = AllocateBuffWChar(length + 1);
+    SendMessage(hwndcombo, CB_GETLBTEXT,(WPARAM)ncursel,(LPARAM)collation);
+    pcquerywnda->m_pcqueryobject->m_dbcollation.SetAs(collation);
+    free(collation);
+}
+
+//Filtering of Collation Based on selected charset
+void
+FrameWindow::ReInitRelatedCollations(HWND hwnd)
+{
+    MDIWindow	*pcquerywnd = GetActiveWin();
+    MYSQL_RES   *myres;
+    MYSQL_ROW   myrow;
+    wyWChar     *relcollation = NULL;
+    wyString    query, collationstr;
+    wyInt32      ret, index = 0;
+    
+    HWND    hwndcombo = GetDlgItem(hwnd, IDC_COLLATECOMBO);
+    
+    query.SetAs("show collation");
+
+    myres = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+    if(!myres)
+	{
+        ShowMySQLError(hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
+		return;
+	}
+    
+    VERIFY(SendMessage(hwndcombo, CB_RESETCONTENT, 0, 0));
+    
+    while(myrow = pcquerywnd->m_tunnel->mysql_fetch_row(myres))
+    {
+        collationstr.SetAs(myrow[0]);
+        ret = SendMessage(hwndcombo, CB_FINDSTRINGEXACT, -1,(LPARAM)collationstr.GetAsWideChar());
+	    if(ret != CB_ERR)
+        {
+            if(wcsstr(collationstr.GetAsWideChar(), pcquerywnd->m_pcqueryobject->m_dbcharset.GetAsWideChar()) == NULL)
+                SendMessage(hwndcombo, CB_DELETESTRING, ret, 0);
+        }
+        else if((relcollation = wcsstr(collationstr.GetAsWideChar(), pcquerywnd->m_pcqueryobject->m_dbcharset.GetAsWideChar())) != NULL)
+        {
+            if(collationstr.GetCharAt(pcquerywnd->m_pcqueryobject->m_dbcharset.GetLength()) == '_')
+                SendMessage(hwndcombo, CB_ADDSTRING, 0, (LPARAM)collationstr.GetAsWideChar());
+        }
+        else if(pcquerywnd->m_pcqueryobject->m_dbcharset.CompareI(STR_DEFAULT) == 0)
+            SendMessage(hwndcombo, CB_ADDSTRING, 0, (LPARAM)collationstr.GetAsWideChar());
+    }
+    
+    //Select 'Default'	
+	 if((index = SendMessage(hwndcombo , CB_ADDSTRING, 0,(LPARAM)TEXT(STR_DEFAULT))) != CB_ERR)
+        SendMessage(hwndcombo, CB_SELECTSTRING, 0, (LPARAM)TEXT(STR_DEFAULT));
+
+    pcquerywnd->m_tunnel->mysql_free_result(myres);
+}
+
+wyBool  
+FrameWindow::CheckForAutoKeywords()
+{
+	wyInt32     count = 0, ret, tblcount = 0;
+	wyWChar		directory[MAX_PATH + 16] = {0};
+	wyString	err, query;	
+	wyString	directorynamestr;
+	sqlite3		*hdb; // SQLite db handle 
+    HANDLE      hfind;
+	_WIN32_FIND_DATAW fdata;
+	
+	VERIFY(count = GetModuleFileName(NULL, directory, MAX_PATH - 1));
+	
+	// change it to .ini
+	directory[count - pGlobals->m_modulenamelength] = '\0';
+	wcscat(directory, L"Keywords.db");
+
+	directorynamestr.SetAs(directory);
+
+	hfind = FindFirstFile(directory, &fdata);
+	
+	if(hfind == INVALID_HANDLE_VALUE)
+		goto onErr;
+		
+	FindClose(hfind);
+	
+	ret = sqlite3_open(directorynamestr.GetString(), &hdb);
+	
+	if(ret != SQLITE_OK)
+		goto onErr;
+		
+	query.Sprintf("select * from sqlite_master where type = 'table' and name = 'objects'");
+	YogSqliteExec( hdb, query.GetString(), callback_count, &tblcount);
+	sqlite3_close(hdb);
+	
+	if(!tblcount)
+		goto onErr;
+	
+	return wyTrue;
+
+onErr:
+	err.Sprintf(_("%s not found or corrupted.\nPlease reinstall %s."), directorynamestr.GetString(), pGlobals->m_appname.GetString());
+	yog_message(NULL, err.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONERROR | MB_OK);
+	return wyFalse;
+}
+
+// This function implements the main dialog window which asks for the hostname, username
+// password and port number so that we connect to a mySQL server. The dialog box returns
+// 0 if any error ouucred or if the connection was successful it returns a pointer to a
+// valid mysql structure.
+wyBool 
+FrameWindow::CreateConnDialog(wyBool readsession)
+{
+	MDIWindow		*pcquerywnd = NULL;//, *wnd;
+	wyInt32         ret;
+	ConnectionInfo	conninfo;
+    
+    InitializeConnectionInfo(conninfo);
+
+	VERIFY(IsWindow(pGlobals->m_hwndclient));
+	
+	pGlobals->m_pcmainwin->AddTextInStatusBar(CONNECT_MYSQL_MSG);
+
+	//pOST 8.01
+	//wnd = GetActiveWin();
+	/*if(wnd)
+    {
+		//InvalidateRect(wnd->m_pctabmodule->GetHwnd(), NULL, FALSE);                 
+		//InvalidateRect(wnd->m_pcqueryobject->m_hwnd, NULL, FALSE);
+		UpdateWindow(wnd->m_pctabmodule->GetHwnd());
+		UpdateWindow(wnd->m_pcqueryobject->m_hwnd);
+	}*/
+
+
+	//check if pref option says do not open connection dlg
+
+	if(readsession)
+		ret = pGlobals->m_pcmainwin->m_connection->ActivateDialog(&conninfo, wyTrue);
+	else
+		ret = pGlobals->m_pcmainwin->m_connection->ActivateDialog(&conninfo, wyFalse);
+    
+	// Now check what was returned from the dialog box.
+	switch(ret)
+	{
+	case ZERO:
+		//CustomTab_SetCurSel(pGlobals->m_pcmainwin->m_hwndconntab, pGlobals->m_pcmainwin->m_focussedcon);
+		break;
+
+	default:
+
+		if(m_hwndconntab == NULL)
+		{
+			//create connection tab
+			m_hwndconntab = pGlobals->m_pcmainwin->m_conntab->CreateConnectionTabControl(GetHwnd());
+		}
+			
+//		DEBUG_LOG("starting mdiwindow");
+		pcquerywnd	= new MDIWindow(pGlobals->m_pcmainwin->GetMDIWindow(), &conninfo, conninfo.m_db, conninfo.m_title);
+//		DEBUG_LOG("starting mdiwindow creation");
+		pcquerywnd->Create();
+//		DEBUG_LOG("created");
+		// if successful then create a new MDI child window with the just connected mysql
+		// info.
+		if(pcquerywnd)
+        {
+			pGlobals->m_conncount++;
+            pGlobals->m_pcmainwin->SetConnectionNumber();
+			pGlobals->m_pcmainwin->OnActiveConn();
+			pcquerywnd->m_pcqueryobject->OnSelChanged(TreeView_GetSelection(pcquerywnd->m_pcqueryobject->m_hwnd));
+			SetForegroundWindow(pcquerywnd->m_hwnd);
+            PostMessage(pGlobals->m_pcmainwin->m_hwndmain, WM_SETACTIVEWINDOW, (WPARAM)pcquerywnd->m_hwnd, 0 );
+			SetCursor(LoadCursor(NULL, IDC_ARROW));
+		}
+
+		break;
+	}
+
+	SetCursor(LoadCursor(NULL, IDC_ARROW));
+	return wyTrue;
+}
+
+
+wyBool 
+FrameWindow::OnNewSameConnection(HWND hwndactive, MDIWindow *pcquerywnd)
+{
+    wyBool          ret;
+    MDIWindow	    *pcquerywndnew;
+    ConnectionInfo  conninfo;
+		
+    //Changes Made to fix issue#1654
+    pGlobals->m_pcmainwin->m_connection->m_currentconn.SetAs(pcquerywnd->m_currentconn.GetString());
+    pGlobals->m_pcmainwin->m_connection->m_rgbobbkcolor=pcquerywnd->m_conninfo.m_rgbconn;
+    pGlobals->m_pcmainwin->m_connection->m_rgbobfgcolor=pcquerywnd->m_conninfo.m_rgbfgconn;
+    
+    
+    ret = m_connection->OnNewSameConnection(hwndactive, pcquerywnd, conninfo);
+		
+	//use same color if user presses ctrl N
+	m_connection->m_rgbobbkcolor  =  conninfo.m_rgbconn;
+	m_connection->m_rgbobfgcolor  =  conninfo.m_rgbfgconn;
+
+    
+
+	if(pcquerywnd && hwndactive && ret == wyTrue)
+    {
+        pcquerywndnew	= new MDIWindow(pGlobals->m_pcmainwin->GetMDIWindow(), 
+            &conninfo, pcquerywnd->m_filterdb, pcquerywnd->m_title);
+		pcquerywndnew->Create();
+
+		pGlobals->m_conncount++;
+		pGlobals->m_pcmainwin->SetConnectionNumber();
+		pGlobals->m_pcmainwin->OnActiveConn();
+	}
+
+	VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+	ShowCursor(1);
+
+    return wyTrue;
+}
+
+wyBool
+FrameWindow::EnableToolButtonsAndCombo(HWND hwndtool, HWND hwndsecondtool, HWND hwndcombo, wyBool enable, wyBool isexec)
+{
+    wyInt32     id, tabicon = 0, state, count, i, image;
+    MDIWindow   *wnd = GetActiveWin();
+    HTREEITEM hitem;
+
+    wyInt32 tb1id[] = {IDM_FILE_CONNECT, ID_NEW_EDITOR, IDM_EXECUTE, ACCEL_EXECUTEALL, ACCEL_QUERYUPDATE, IDM_REFRESHOBJECT};
+
+    wyInt32 tb2id[] = {	
+        IDM_TOOL_ADDUSER, 
+        ID_IMPORTEXPORT_DBEXPORTTABLES,
+        ID_IMEX_TEXTFILE, 
+        ID_OPEN_COPYDATABASE,
+        ID_EXPORT_AS,
+        ID_OBJECT_MAINMANINDEX,
+        ACCEL_MANREL,
+        ID_FORMATCURRENTQUERY,
+        IDC_DIFFTOOL,
+        ID_QUERYBUILDER,
+        ID_SCHEMADESIGNER
+    };
+
+    wyInt32	tb3id[] = {	IDM_DATASYNC, ID_IMPORT_EXTERNAL_DATA, IDC_TOOLS_NOTIFY, ID_POWERTOOLS_SCHEDULEEXPORT};
+
+    if(wnd && wnd->m_executing == wyFalse)
+    {
+        count = sizeof(tb2id)/sizeof(tb2id[0]);
+        image = wnd->m_pcqueryobject->GetSelectionImage();
+        tabicon = wnd->m_pctabmodule->GetActiveTabImage();
+
+        for(i = 0; i < count; ++i)
+        {
+            state = TBSTATE_ENABLED;
+
+            if(tb2id[i] == ID_EXPORT_AS || tb2id[i] == ID_OBJECT_MAINMANINDEX || tb2id[i] == ACCEL_MANREL)
+            {      
+                id = image;
+
+                if(id == NFOLDER)
+                {
+                    if((hitem = TreeView_GetSelection(wnd->m_pcqueryobject->m_hwnd)) && 
+                        (hitem = TreeView_GetParent(wnd->m_pcqueryobject->m_hwnd, hitem)))
+                    {
+                        id = GetItemImage(wnd->m_pcqueryobject->m_hwnd, hitem);
+                    }
+                }
+
+                switch(id)
+                {
+                    case NTABLE:
+                    case NCOLUMN:
+                    case NPRIMARYKEY:
+                    case NINDEX:
+                    case NPRIMARYINDEX:
+                        break;
+
+                    default:
+                        state = TBSTATE_INDETERMINATE;
+                }
+            }
+            else if(tb2id[i] == ID_OPEN_COPYDATABASE)
+            {
+                if(image == NSERVER)
+                {
+                    state = TBSTATE_INDETERMINATE;
+                }
+            }
+            else if(tb2id[i] == ID_FORMATCURRENTQUERY)
+            {
+                if(tabicon == IDI_SCHEMADESIGNER_16 || tabicon == IDI_QUERYBUILDER_16 || tabicon == IDI_DATASEARCH || tabicon == IDI_CREATETABLE || tabicon == IDI_ALTERTABLE
+                    || tabicon == IDI_HISTORY || tabicon == IDI_TABLEINDEX || tabicon == IDI_TABLE) 
+                {
+                    state = TBSTATE_INDETERMINATE;
+                }
+            }
+
+            SendMessage(hwndsecondtool, TB_SETSTATE, (WPARAM)tb2id[i], state);
+        }
+
+        EnableWindow(hwndcombo, TRUE);
+		
+        count = sizeof(tb1id)/sizeof(tb1id[0]);
+
+        for(i = 0; i < count; ++i)
+        {
+            state = TBSTATE_ENABLED;
+
+            if(tb1id[i] == IDM_EXECUTE || tb1id[i] == ACCEL_QUERYUPDATE)
+            {
+                if(tabicon != IDI_QUERY_16)
+                {
+                    state = TBSTATE_INDETERMINATE;
+                }
+            }
+            else if(tb1id[i] == ACCEL_EXECUTEALL)
+            {
+                if(tabicon == IDI_SCHEMADESIGNER_16 || tabicon == IDI_QUERYBUILDER_16 || tabicon == IDI_DATASEARCH || tabicon == IDI_CREATETABLE || tabicon == IDI_ALTERTABLE
+                    || tabicon == IDI_HISTORY || tabicon == IDI_TABLEINDEX || tabicon == IDI_TABLE)
+                {
+                    state = TBSTATE_INDETERMINATE;
+                }
+            }
+
+            SendMessage(hwndtool, TB_SETSTATE, (WPARAM)tb1id[i], state);
+        }
+
+        count = sizeof(tb3id)/sizeof(tb3id[0]);
+
+        for(i = 0; i < count; ++i)
+        {
+            SendMessage(hwndsecondtool, TB_SETSTATE, (WPARAM)tb3id[i], TBSTATE_ENABLED);
+        }
+	}
+    else
+    {
+        count = sizeof(tb2id)/sizeof(tb2id[0]);
+
+        for(i = 0; i < count; ++i)
+        {
+            SendMessage(hwndsecondtool, TB_SETSTATE, (WPARAM)tb2id[i], TBSTATE_INDETERMINATE);
+        }
+
+        EnableWindow(hwndcombo, FALSE);
+
+        count = sizeof(tb1id)/sizeof(tb1id[0]);
+
+        for(i = 0; i < count; ++i)
+        {
+            SendMessage(hwndtool, TB_SETSTATE, (WPARAM)tb1id[i], TBSTATE_INDETERMINATE);
+        }
+
+        count = sizeof(tb3id)/sizeof(tb3id[0]);
+
+        for(i = 0; i < count; ++i)
+        {
+            SendMessage(hwndsecondtool, TB_SETSTATE, (WPARAM)tb3id[i], wnd == NULL ? TBSTATE_ENABLED : TBSTATE_INDETERMINATE);
+        }
+    }
+
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::HandleChangeTabletype(HMENU hmenu, wyInt32 id) 
+{
+    MENUITEMINFO	lpmii;
+    wyWChar          menuname[64] = {0};
+
+    MDIWindow       *wnd = GetActiveWin();
+
+    if(!wnd)
+        return wyFalse;
+
+    memset((void*)&lpmii, 0, sizeof(MENUITEMINFO));
+
+	lpmii.cbSize		= sizeof(MENUITEMINFO);
+    lpmii.fMask			= MIIM_STRING | MIIM_ID | MIIM_STATE;
+	lpmii.cch			= MAX_PATH;
+	lpmii.dwTypeData	= menuname;
+
+	VERIFY(GetMenuItemInfo(hmenu, id, FALSE, &lpmii));
+
+    if(!(lpmii.fState & MFS_CHECKED))
+    {
+        wnd->m_pcqueryobject->ChangeTableType(wnd->m_tunnel, &wnd->m_mysql, menuname);
+    }
+
+    return wyTrue;
+}
+// 
+// find any query is selected in Query editor if selected return true
+wyBool
+FrameWindow::IsQuerySelected(EditorBase *peditorbase)
+{
+	wyInt32			ret;
+	CHARRANGE		chr;
+
+	chr.cpMin = SendMessage(peditorbase->m_hwnd, SCI_GETSELECTIONSTART, 0, 0);
+	chr.cpMax = SendMessage(peditorbase->m_hwnd, SCI_GETSELECTIONEND, 0, 0);
+	ret = chr.cpMin != chr.cpMax;
+    return(ret)?(wyTrue):(wyFalse);
+}
+
+
+void	
+FrameWindow::OnCreateObjectWmHelp(HWND hwnd, wyChar *object)
+{
+	
+	if(stricmp(object, "createdb") == 0)
+	{
+		ShowHelp("Create%20Database%20SQLyog%20MySQL%20Manager.htm");
+	}
+	else if(stricmp(object, "CreateView")== 0 )
+	{
+		ShowHelp("Views%20in%20SQLyog%20MySQL%20Management%20Tool.htm");
+	}
+	else if(stricmp(object, "CreateProcedure")== 0 )
+	{
+		ShowHelp("Stored%20Procedures%20in%20SQLyog%20MySQL%20GUI.htm");
+	}
+	else if(stricmp(object, "CreateFunction")== 0 )
+	{
+		ShowHelp("Functions%20in%20SQLyog%20GUI%20for%20MySQL.htm");
+	}
+	else if(stricmp(object, "CreateEvent")== 0 )
+	{
+		ShowHelp("Event%20in%20SQLyog%20MySQL%20Client.htm");
+	}
+	else if(stricmp(object, "CreateTrigger")== 0 )
+	{
+		ShowHelp("Triggers%20in%20SQLyog%20MySQL%20Client.htm");
+	}	
+}
+
+////check for upgrade	
+
+void
+FrameWindow::CheckForUpgrade(wyBool isexplict)
+{	
+	UpgradeCheck *upgradeexplicit = NULL;
+		
+	if(isexplict == wyTrue)
+	{
+		upgradeexplicit = new UpgradeCheck();
+		upgradeexplicit->m_hwndmain = m_hwndmain;
+		upgradeexplicit->HandleUpgradeCheck(isexplict);						
+
+		delete upgradeexplicit;
+	}
+
+	else
+	{
+		m_upgrdchk->m_hwndmain = m_hwndmain;
+		m_upgrdchk->HandleUpgradeCheck(isexplict);						
+	}
+}
+
+///Handles the community ribbon
+void				
+FrameWindow::HandleCommunityRibbon()
+{
+#ifdef COMMUNITY
+	m_commribbon = new CommunityRibbon();
+
+	m_commribbon->HandleCommunityHeader();	
+#endif
+}
+
+void
+FrameWindow::DestroyToolBarResources()
+{
+	if(m_hsecondiml)
+	{
+		VERIFY(ImageList_Destroy(m_hsecondiml));
+		m_hsecondiml = NULL;
+	}
+
+	if(m_hwndtool)
+	{
+		VERIFY(DestroyWindow(m_hwndtool));
+		m_hwndtool =  NULL;
+	}
+
+	if(m_hwndsecondtool)
+	{
+		VERIFY(DestroyWindow(m_hwndsecondtool));
+		m_hwndsecondtool =  NULL;
+	}
+
+	if(m_hwndtoolcombo)
+	{
+		VERIFY(DestroyWindow(m_hwndtoolcombo));
+		m_hwndtoolcombo =  NULL;
+	}
+}
+
+//Tool bar is re arranging according to the icon size selected in Preferences
+void
+FrameWindow::ReArranageToolBar()
+{
+	MDIWindow	*wnd = NULL;
+	RECT		rectmain;
+
+	VERIFY(wnd = GetActiveWin());
+	
+	CreateToolBarWindow();
+	Resize();
+
+	if(wnd)
+	{
+		EnableToolButtonsAndCombo(m_hwndtool, m_hwndsecondtool, m_hwndtoolcombo, wyTrue);
+		wnd->m_pcqueryobject->OnSelChanged(TreeView_GetSelection(wnd->m_pcqueryobject->m_hwnd));
+	}
+	else
+		EnableToolButtonsAndCombo(m_hwndtool, m_hwndsecondtool, m_hwndtoolcombo, wyFalse);
+
+	//Paint after changing the tool bar icon size	
+	GetClientRect(m_hwndmain, &rectmain);
+	rectmain.bottom = m_toolbariconsize + 30;
+
+	//post 8.01 painting
+	InvalidateRect(m_hwndmain, NULL, TRUE);
+	UpdateWindow(GetParent(m_hwndmain));		
+}
+
+wyBool
+FrameWindow::OnTBDropDown(NMTOOLBAR* tbh)
+{
+	MDIWindow*	pcquerywnd = GetActiveWin();
+
+	_ASSERT(pcquerywnd);
+
+    if(!pcquerywnd)
+        return wyFalse;
+
+	SciRedraw(pcquerywnd, wyFalse);
+
+	//Pop up corresponding menus
+	HandleTBDropDown(tbh, tbh->iItem);		
+
+	SciRedraw(pcquerywnd, wyTrue);
+	return wyTrue;
+}
+
+// Callback procedure to MDI child window.
+BOOL CALLBACK 
+FrameWindow::EnumMDIChildren(HWND hwnd, LPARAM lParam)
+{
+    HWND* hwndtoactivate;
+    static HWND hwndtemp = NULL;
+    
+    hwndtoactivate = (HWND*)lParam;
+
+    if(GetParent(hwnd) == GetParent(*hwndtoactivate))
+    {
+        if(hwnd == *hwndtoactivate)
+        {
+            *hwndtoactivate = hwndtemp;
+            return FALSE;
+        }
+        hwndtemp = hwnd;
+    }
+    return TRUE;
+}
+
+void 
+FrameWindow::LoadConnTabPlusMenu(LPARAM lparam)
+{
+    LPNMCTC lpnmctc;
+	HMENU	hmenu, htrackmenu;
+
+    lpnmctc = (LPNMCTC)lparam;
+    hmenu =	LoadMenu(pGlobals->m_hinstance, MAKEINTRESOURCE(IDR_CONNTABPLUSMENU));
+    LocalizeMenu(hmenu);
+	htrackmenu = GetSubMenu(hmenu, 0);
+	// Set menu draw property for drawing icon
+	wyTheme::SetMenuItemOwnerDraw(htrackmenu);
+    TrackPopupMenu(htrackmenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, lpnmctc->curpos.x, lpnmctc->curpos.y, 0, pGlobals->m_pcmainwin->m_hwndmain, NULL);
+    FreeMenuOwnerDrawItem(htrackmenu);
+   	VERIFY(DestroyMenu(hmenu));	
+}
+
+void CALLBACK 
+FrameWindow::TooltipTimerProc(HWND hwnd, UINT message, UINT_PTR id, DWORD time)
+{
+    wyInt32 timerid;
+
+    KillTimer(hwnd, id);
+
+    if(pGlobals->m_pcmainwin->m_hwndtooltip)
+    {
+        timerid = GetWindowLongPtr(pGlobals->m_pcmainwin->m_hwndtooltip, GWLP_USERDATA);
+
+        if(timerid == id)
+        {
+            FrameWindow::ShowQueryExecToolTip(wyFalse);
+        }
+    }
+}
+
+void
+FrameWindow::ShowQueryExecToolTip(wyBool show)
+{
+    POINT           pt;
+    TOOLINFO        ti = {0};
+    static wyInt32  timerid = 100;
+
+    if(pGlobals->m_pcmainwin->m_hwndtooltip)
+    {
+        KillTimer(pGlobals->m_pcmainwin->m_hwndmain, timerid);
+        DestroyWindow(pGlobals->m_pcmainwin->m_hwndtooltip);
+        pGlobals->m_pcmainwin->m_hwndtooltip = NULL;
+    }
+
+    if(show == wyFalse)
+    {
+        return;
+    }
+        
+    GetCursorPos(&pt);
+    pGlobals->m_pcmainwin->m_hwndtooltip = CreateWindowEx(0, TOOLTIPS_CLASS, NULL, 
+            TTS_NOPREFIX | TTS_ALWAYSTIP | TTS_BALLOON, 
+                                 CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, 
+                                 pGlobals->m_pcmainwin->m_hwndmain, NULL, GetModuleHandle(NULL),NULL);    
+
+    if(!pGlobals->m_pcmainwin->m_hwndtooltip)
+    {
+        return;
+    }
+
+    timerid = (timerid == 100) ? 101 : 100;
+    SetWindowLongPtr(pGlobals->m_pcmainwin->m_hwndtooltip, GWLP_USERDATA, timerid);
+    ti.cbSize   = sizeof(TOOLINFO);
+    ti.hwnd     = pGlobals->m_pcmainwin->m_hwndmain;
+    ti.uId      = (UINT_PTR)pGlobals->m_pcmainwin->m_hwndmain;
+    ti.lpszText = L"You cannot switch to another tab. Please create another connection (Ctrl+N)";
+    ti.uFlags   = TTF_IDISHWND | TTF_TRACK;
+    ti.hinst    = GetModuleHandle(NULL);
+    ti.lParam   = (LPARAM)&pGlobals->m_pcmainwin->m_hwndtooltip;
+    GetClientRect (pGlobals->m_pcmainwin->m_hwndmain, &ti.rect);
+    SendMessage(pGlobals->m_pcmainwin->m_hwndtooltip, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO) &ti);
+    SendMessage(pGlobals->m_pcmainwin->m_hwndtooltip, TTM_SETTITLE, TTI_INFO, (LPARAM)L"Query execution in progress!");
+    SendMessage(pGlobals->m_pcmainwin->m_hwndtooltip, TTM_TRACKPOSITION, 0, (LPARAM)MAKELONG(pt.x, pt.y));
+    SendMessage(pGlobals->m_pcmainwin->m_hwndtooltip, TTM_TRACKACTIVATE, TRUE, (LPARAM)&ti);
+    SendMessage(pGlobals->m_pcmainwin->m_hwndtooltip, TTM_UPDATE, 0, 0);
+    SetTimer(pGlobals->m_pcmainwin->m_hwndmain, timerid, 4000, FrameWindow::TooltipTimerProc);
+}
+wyBool
+FrameWindow::SaveConnectionDetails()
+{
+	wyInt32 tabcount, i;
+	CTCITEM contabitem = {0};
+	contabitem.m_mask = CTBIF_LPARAM | CTBIF_COLOR;
+	MDIWindow	*wnd;
+ 	wyBool isfocussed;
+	wyWChar		directory[MAX_PATH+1]= {0};
+	wyWChar		*lpfileport=0;
+	wyString	dirstr;
+
+	SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+			dirstr.SetAs(directory);
+	
+	
+		CreateSessionFile(wyTrue);
+		if(m_hwndconntab)
+			tabcount = CustomTab_GetItemCount(m_hwndconntab);
+		else
+			return wyTrue;
+
+		for(i= 0; i< tabcount; i++)
+		{
+			CustomTab_GetItem(m_hwndconntab, i, &contabitem);
+			wnd = (MDIWindow*)contabitem.m_lparam;
+			if(GetActiveWin() == wnd)
+				isfocussed = wyTrue;
+			else
+				isfocussed = wyFalse;
+			WriteSessionDetails((wyChar*)wnd->m_title.GetString(), &wnd->m_conninfo, i, isfocussed);
+		}
+
+		/*GetSessionFile(directory, wyTrue);
+		GetSessionFile(dir2, wyFalse);
+
+		CopyFile(directory, dir2, FALSE);
+		DeleteFile(directory);*/
+
+	
+	return wyTrue;
+}
+

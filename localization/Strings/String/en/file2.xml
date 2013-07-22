@@ -1,0 +1,300 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1240">S&amp;QL Formatter</string>
+	<string name="1241">R&amp;ecent Schema Design Files</string>
+	<string name="1242">%s already exists.
+Do you want to replace it?</string>
+	<string name="1243">Save As...</string>
+	<string name="1244">Refresh &amp;Object Browser	F5</string>
+	<string name="1245">Exe&amp;cute Query	F9</string>
+	<string name="1246">Execute &amp;Current Query	F9</string>
+	<string name="1247">Execute &amp;Selected Query	Ctrl+F9</string>
+	<string name="1248">Execute &amp;All Queries	Ctrl+F9</string>
+	<string name="1249">Refresh &amp;Object Browser	F9</string>
+	<string name="1250">Execute &amp;Current Query	F5</string>
+	<string name="1251">Exe&amp;cute Query	F5</string>
+	<string name="1252">Execute &amp;Selected Query	Ctrl+F5</string>
+	<string name="1253">Execute &amp;All Queries	Ctrl+F5</string>
+	<string name="1254">Error with path used</string>
+	<string name="1255"> Other Colors...</string>
+	<string name="1256">Calculate Optimal Datatypes</string>
+	<string name="1257">The current database context is `%s`. SQL statements in the file will be executed here, unless one or more USE statement(s) specifying another database context is in the file. Do you want to continue?</string>
+	<string name="1258">&amp;Execute</string>
+	<string name="1259">Can&apos;t import dump file of size 0.</string>
+	<string name="1260">Query(s) Executed: %u
+</string>
+	<string name="1261">Import unsuccessful</string>
+	<string name="1262">Import unsuccessful. Error opening batch file</string>
+	<string name="1263">Import successful</string>
+	<string name="1264">Open</string>
+	<string name="1265">Query(s) executed: %lld</string>
+	<string name="1266">There was an error while executing a query.
+The query and the error message has been logged at:
+%s.
+Please click on &quot;Open Error File...&quot; to open the error file.</string>
+	<string name="1267">Unable to get SQLyog.err file information!</string>
+	<string name="1268">Select at least one field</string>
+	<string name="1269">Select a folder where your database is backed up</string>
+	<string name="1270"> Restore Table Information</string>
+	<string name="1271">Could not locate any .MYD files in the folder!</string>
+	<string name="1272">Query:
+%s
+
+Error occured at:%s
+Error Code: %d - %s
+</string>
+	<string name="1273">Query:
+%s
+
+Error occured at:%s
+Line no.:%d
+Error Code: %d - %s
+</string>
+	<string name="1274">Unable to establish connection</string>
+	<string name="1275">Unable to issue `use` statement</string>
+	<string name="1276">Unable to get Tunnel version</string>
+	<string name="1277">Unable to get resultset</string>
+	<string name="1278">Grid control not created</string>
+	<string name="1279">Do you really want to drop the index?</string>
+	<string name="1280"> Create New Index In %s.%s</string>
+	<string name="1281"> Edit Existing Index In %s.%s</string>
+	<string name="1282">Select at least one column for indexing</string>
+	<string name="1283">Could not open resource file</string>
+	<string name="1284">Please restart SQLyog for the language change to take effect</string>
+	<string name="1285">Dropping database %s</string>
+	<string name="1286">This option cannot be used in HTTP Tunneling mode. 
+
+If you directly want to upload a local CSV file to a Remote Server, you can use SQLyog&apos;s Migration Toolkit. 
+The ODBC driver that you could use is Microsoft Text Driver (*.txt, *.csv) ODBC driver that ships with the OS.</string>
+	<string name="1287">This option cannot be used in HTTP Tunneling mode.</string>
+	<string name="1288"> Refreshing ObjectBrowser</string>
+	<string name="1289">Could not Refresh ObjectBrowser</string>
+	<string name="1290"> ObjectBrowser Refreshed</string>
+	<string name="1291">No database selected</string>
+	<string name="1292">New Data &amp;Search	Ctrl+Shift+D</string>
+	<string name="1293">New Data Searc&amp;h	Ctrl+Shift+D</string>
+	<string name="3459">New Data Sea&amp;rch	Ctrl+Shift+D</string>
+	
+	<string name="1294">Do you really want to drop the database (%s)?
+
+Warning: You will lose all data!</string>
+	<string name="1295">Error dropping %s</string>
+	<string name="1296">Dropping %s successful</string>
+	<string name="1297">Do you really want to drop the table (%s)?
+
+Warning: You will lose all data!</string>
+	<string name="1298">You can&apos;t delete all columns </string>
+	<string name="1299">Do you really want to drop the column (%s)?
+
+Warning: You will lose all data for the column!</string>
+	<string name="1300">Do you really want to drop the index (%s)?)</string>
+	<string name="1301">Index deleted successfully</string>
+	<string name="1302">Do you really want to truncate the table (%s)?
+
+Warning: You will lose all data!</string>
+	<string name="1303">Index created successfully</string>
+	<string name="1304">Do you really want to truncate data for all table(s) in the database (%s)?
+
+Warning: You will lose all data!</string>
+	<string name="1305">Do you really want to drop the %s (%s)?</string>
+	<string name="1306">Do you really want to drop the trigger (%s)?</string>
+	<string name="1307">No View defination found.
+
+Probably this view was created like 
+&quot;CREATE VIEW...SQL SECURITY DEFINER...&quot;
+and you are not the DEFINER</string>
+	<string name="1308">No information available!</string>
+	<string name="1309"> Advanced Properties - &apos;%s&apos; in &apos;%s&apos;</string>
+	<string name="1310"> Server Status</string>
+	<string name="1311"> Server Variables</string>
+	<string name="1312"> Server Processlist</string>
+	<string name="1313">Cannot kill the process. 
+It is the current connections thread id</string>
+	<string name="1314">Schema generation successful</string>
+	<string name="1315">Error while generating schema.</string>
+	<string name="1316"> Create Schema For - &apos;%s&apos;</string>
+	<string name="1317">Creating Schema...</string>
+	<string name="1318">Schema created successfully...</string>
+	<string name="1319">Error In Creating Schema...</string>
+	<string name="1320">Fetching field information for %s</string>
+	<string name="1321">Writing field information for %s</string>
+	<string name="1322">Fetching index information for %s</string>
+	<string name="1323">Writing index information for %s</string>
+	<string name="1324">Writing FK information for %s</string>
+	<string name="1325">Fetching FK information for %s</string>
+	<string name="1326">Please give a table name</string>
+	<string name="1327">Please select atleast one field</string>
+	<string name="1328">Could not alter table to add Foreign Key Relationship(s)for the table.
+However the structure and data were successfully copied.</string>
+	<string name="1329">There were errors while copying Foreign Key Relationship(s)for the table.
+Structure and data were successfully copied.</string>
+	<string name="1330">Copy of table successful</string>
+	<string name="1331"> Table Diagnostics Information</string>
+	<string name="1332"> Confirm Column Reordering</string>
+	<string name="1333"> Confirm Drop Relationship</string>
+	<string name="1334">Columns reordered successfully</string>
+	<string name="1335">Columns reordered unsuccessful</string>
+	<string name="1336">Reordering of columns unsuccessful.
+You can recover your data from the temporary table </string>
+	<string name="1337">Error In Reordering Columns</string>
+	<string name="1338">Operation cancelled by user</string>
+	<string name="1339">Reordering Columns...</string>
+	<string name="1340">Please select a process from the list</string>
+	<string name="1341">Cannot kill processlist...</string>
+	<string name="1342">Enum Value List</string>
+	<string name="1343">Set Value List</string>
+	<string name="1344">Duplicate value</string>
+	<string name="1345">Preferences</string>
+	<string name="1346">Note: To see complete list of warning(s), enable Tools -> Preferences -> General -> Show Warning(s) in Messages Tab</string>
+	<string name="1347">Execution Time</string>
+	<string name="1348">Total Time</string>
+	<string name="1349">Query: %s</string>
+	<string name="1350">Error Code: %d
+%s</string>
+	<string name="1351">%lu row(s) returned</string>
+	<string name="1352">%lu row(s) affected</string>
+	<string name="1353">, %lu warning(s)</string>
+	<string name="1354">Are you sure you want to delete this foreign key from the database?</string>
+	<string name="1355">The selected table does not support foreign keys.
+Table engine must be InnoDB, PBXT or SolidDB.</string>
+	<string name="1356">Edit Relationship</string>
+	<string name="1357">No table found to create relations</string>
+	<string name="1358">Please select a reference table</string>
+	<string name="1359">Please select a column to reference</string>
+	<string name="1360">Please select equal number of source and reference columns</string>
+	<string name="1361">Give a valid foreign key name</string>
+	<string name="1362"> Exec: %s</string>
+	<string name="1363"> Total: %s</string>
+	<string name="1364"> %lu row(s)</string>
+	<string name="1365"> Query batch completed successfully</string>
+	<string name="1366"> Query batch completed with error(s)</string>
+	<string name="1367">Comment</string>
+	<string name="1368">Auto increment</string>
+	<string name="1369">Avg. row length</string>
+	<string name="1370">Maximum rows</string>
+	<string name="1371">Minimum rows</string>
+	<string name="1372">Row format</string>
+	<string name="1373">Delay key write</string>
+	<string name="1374">Checksum</string>
+	<string name="1375">Could not read data for the table!</string>
+	<string name="1376">The content of this tab has been changed.
+
+Do you want to save the changes?</string>
+	<string name="1377">The content of the %s file has been changed.
+
+Do you want to save the changes?</string>
+	<string name="1378">Do you really want to drop the column?</string>
+	<string name="1379">The selected column is referenced by indexes/foreign keys.
+Dropping will modify Index/ForeignKeys also..
+Do you want to continue?</string>
+	<string name="1380">Do you want to drop the selected columns?</string>
+	<string name="1381">One or more selected columns are referenced by indexes/foreign keys.
+Dropping will modify Index/ForeignKeys also..
+Do you want to continue?</string>
+	<string name="1382">Hide language options</string>
+	<string name="1383">Default empty string (&apos;&apos;) is not supported for the datatype (%s)</string>
+	<string name="1384">Do You want to drop the selected Foreign Keys?</string>
+	<string name="1385">Do you really want to drop the foreign key?</string>
+	<string name="1386">Multiple primary keys can not be defined.</string>
+	<string name="1387">Do You want to drop the selected Indexes?</string>
+	<string name="1388">Do you really want to drop the field?</string>
+	<string name="1389">Please add atleast one row to the table</string>
+	<string name="1390">Nothing was altered.</string>
+	<string name="1391">Default empty string(&apos;&apos;) is not supported for the datatype </string>
+	<string name="1392">Datatype not specified for field name (%s)</string>
+	<string name="1393">Create a new table</string>
+	<string name="1394">Enter new table name</string>
+	<string name="1395">Please provide table name</string>
+	<string name="1396">Table created successfully. Do you want to add more tables?</string>
+	<string name="1397"> New table in &apos;%s&apos;</string>
+	<string name="1398">Table Name</string>
+	<string name="1399">Database</string>
+	<string name="1400">Table Type</string>
+	<string name="1401">Character Set</string>
+	<string name="1402">Collation</string>
+	<string name="1403">Save</string>
+	<string name="1404">Revert</string>
+	<string name="1405">You will lose changes. Do you really want to Exit?</string>
+	<string name="1406">&amp;1 Columns</string>
+	<string name="1407">&amp;2 Indexes</string>
+	<string name="1408">&amp;3 Foreign Keys</string>
+	<string name="1409">&amp;5 SQL Preview</string>
+	<string name="1410">&amp;4 Advanced Properties</string>
+	<string name="1411">Result</string>
+	<string name="1412">Messages</string>
+	<string name="1413">Table Data</string>
+	<string name="1414">Data Set</string>
+	<string name="1415">Objects</string>
+	<string name="1416">History</string>
+	<string name="1417">&amp;%u Result</string>
+	<string name="1418">%u Result</string>
+	<string name="1419">&amp;%u Messages</string>
+	<string name="1420">%u Messages</string>
+	<string name="1421">&amp;%u Info</string>
+	<string name="1422">%u Info</string>
+	<string name="1423">&amp;%u History</string>
+	<string name="1424">%u History</string>
+	<string name="1425">&amp;%u Table Data</string>
+	<string name="1426">%u Table Data</string>
+	<string name="1427">&amp;%u Profiler</string>
+	<string name="1428">%u Profiler</string>
+	<string name="1429">New Table</string>
+	<string name="1430">Find the redundant indexes of this table. &lt;a href=&quot;redundantindexes_help &quot; target=&quot;_blank&quot;> Read more&lt;/a></string>
+	<string name="1431">Find the redundant indexes of each table in the database. &lt;a href=&quot;redundantindexes_help &quot; target=&quot;_blank&quot;> Read more&lt;/a></string>
+	<string name="1432">/*Table: %s*/
+</string>
+	<string name="1433">/*View: %s*/
+</string>
+	<string name="1434">/*Column Information*/
+</string>
+	<string name="1435">/*Index Information*/
+</string>
+	<string name="1436">/*DDL Information*/
+</string>
+	<string name="1437">Table altered successfully</string>
+	<string name="1438">Table name not specified.</string>
+	<string name="1439">Index not specified properly.</string>
+	<string name="1440">Foreign Key not specified properly.</string>
+	<string name="1441">Table created successfully.</string>
+	<string name="1442">Cannot find &quot;%s&quot;</string>
+	<string name="1443">SQLyog cannot retrieve what information is required to populate the User Manager dialog. Most likely the user does not have SELECT privilege to privileges tables in the `mysql` database. Without that information SQLyog User Manager cannot continue.</string>
+	<string name="1444">Global Privileges</string>
+	<string name="1445">Object Level Privileges</string>
+	<string name="1446">New User</string>
+	<string name="1447">Rename User</string>
+	<string name="1448">Edit User</string>
+	<string name="1449">Edit the user name, password and various limitations of this user</string>
+	<string name="1450">Create a new user with limitations</string>
+	<string name="1451">GRANT/REVOKE global privileges for this user</string>
+	<string name="1452">GRANT/REVOKE privileges to selected objects for this user</string>
+	<string name="1453">&amp;Save Changes</string>
+	<string name="1454">&amp;Cancel Changes</string>
+	<string name="1455">Passwords do not match</string>
+	<string name="1456">You have not specifed a username. Do you want to create anonymous user?</string>
+	<string name="1457">&amp;Cancel</string>
+	<string name="1458">Creat&amp;e</string>
+	<string name="1459">User Manager cannot continue with empty user set. Closing now</string>
+	<string name="1460">You have not specifed a username. Do you want to rename it as anonymous user?</string>
+	<string name="1461">Do you really want to delete the user?</string>
+	<string name="1462">Error loading SciLexer.dll</string>
+	<string name="1463">Error loading riched20.dll</string>
+	<string name="1464">GetModuleFileName length failed!</string>
+	<string name="1465">SQLyog is getting terminated</string>
+	<string name="1466">Warnings</string>
+	<string name="1467">MySQL Warning</string>
+	<string name="1468">Error message</string>
+	<string name="1469">MySQL Error</string>
+	<string name="1470">Executed SQL Statement : %s 
+</string>
+	<string name="1471">Error Number : %s 
+</string>
+	<string name="1472">Error Message: %s 
+</string>
+	<string name="1473">(Select an existing connection...)</string>
+	<string name="1474"> Finished searching the document</string>
+	<string name="1475"> Beginning of the document is reached. Do you want to continue searching from the end?</string>
+	<string name="1476"> End of the document is reached. Do you want to continue searching from the beginning?</string>
+	<string name="1477"> Finished searching the document. The search item not found</string>
+	<string name="1478">Not enough memory, application terminated! </string>
+	<string name="1479">(Select a database...)</string>
+</resources>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3527">すべて</string>
+	<string name="3528">エラーに関する問い合わせ</string>
+	<string name="3529">警告に関する問い合わせ</string>
+	<string name="3530">エラー／警告に関する問い合わせ</string>
+	<string name="3531">結果セットを伴うクエリ</string>
+	<string name="3532">結果セットを伴わないクエリ</string>
+	<string name="3533">実行されたクエリ %d 回、成功 %d 回、エラー %d 回、警告 %d 回</string>
+	<string name="3534">あなたが探しているデータベースが見つかりませんか？</string>
+	<string name="3535">異なるホストにあるデータベースを同期するには、\'File -> New-Connection\'を使って複数のホストに接続してください。</string>
+	<string name="3536">&amp;このバージョンをスキップする</string>
+	<string name="3537">すべて選択する/すべて選択解除する</string>
+	<string name="3538">データベースをフィルタリングする</string>
+	<string name="3539">フィルタリング (Ctrl+Shift+B)</string>
+	<string name="3540">オブジェクトブラウザに選択したテーブルが見つかりません。
+
+オブジェクトブラウザとリフレッシュオブジェクトブラウザに適用されているフィルターを削除してください (もしあれば)。</string>
+	<string name="3541">全てのデータベースを見る</string>
+	<string name="3542">～内の機能</string>
+	<string name="3543">～内の手続き</string>
+	<string name="3544">～内のテーブル</string>
+	<string name="3545">～内のイベント</string>
+	<string name="3546"> %d 実行された質問、%d 成功、%d エラー、%d 警告</string>
+	<string name="3547">フィルタリング </string>
+	<string name="3548">～内のトリガー</string>
+	<string name="3549">～内のビュー</string>
+
+</resources>

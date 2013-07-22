@@ -1,0 +1,286 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1240">SQLフォーマッター</string>
+	<string name="1241">最新スキーマ設計ファイル</string>
+	<string name="1242">%s はすでに存在しています
+置き換えてもよろしいですか?</string>
+	<string name="1243">名前を付けて保存...</string>
+	<string name="1244">Object Browser の更新	F5</string>
+	<string name="1245">クエリを実行	F9</string>
+	<string name="1246">現在のクエリを実行	F9</string>
+	<string name="1247">選択したクエリを実行	Ctrl+F9</string>
+	<string name="1248">全てのクエリを実行	Ctrl+F9</string>
+	<string name="1249">Object Browser を更新	F9</string>
+	<string name="1250">現在のクエリを実行	F5</string>
+	<string name="1251">クエリを実行	F5</string>
+	<string name="1252">選択されたクエリを実行	Ctrl+F5</string>
+	<string name="1253">全てのクエリを実行	Ctrl+F5</string>
+	<string name="1254">パス使用中エラー</string>
+	<string name="1255">他の色...</string>
+	<string name="1256">最適なデータータイプを計算する</string>
+	<string name="1257">現在のデーターベースコンテキストは %s です。 ファイル内の SQL文はここに対して実行されますが、他のデーターベースコンテキストを指定する USE分は含まれていません。　継続しても良いですか?</string>
+	<string name="1258">&amp;実行</string>
+	<string name="1259">大きさがゼロのダンプファイルをインポートすることはできません</string>
+	<string name="1260">クエリが実行されました：　%u</string>
+	<string name="1261">インポート失敗</string>
+	<string name="1262">インポート失敗。 バッチファイルのオープンエラー</string>
+	<string name="1263">インポートは成功しました</string>
+	<string name="1264">開く</string>
+	<string name="1265">実行されたクエリ：　%lld</string>
+	<string name="1266">クエリ実行中にエラーが発生しました。
+クエリとエラーメッセージが以下にログされました：
+%s
+エラーファイルを開くには &quot;エラーファイルを開く...&quot; をクリックして下さい</string>
+	<string name="1267">SQLyog.err ファイルから情報を取り出せません!</string>
+	<string name="1268">少なくとも一つのフィールドを選択</string>
+	<string name="1269">データーベースがバックアップされているフォルダを一つ選択して下さい</string>
+	<string name="1270">テーブル情報を格納</string>
+	<string name="1271">このフォルダには .MYD ファイルがありません</string>
+	<string name="1272">クエリ：
+%s
+
+エラー発生場所： %s
+エラーコード： %d - %s</string>
+	<string name="1273">クエリ：
+%s
+
+エラー発生場所； %s
+行番号： %d
+エラーコード： %d - %s</string>
+	<string name="1274">接続を確立できません</string>
+	<string name="1275">&apos;use&apos; 文を発行することができません</string>
+	<string name="1276">トンネルバージョンを取得できません</string>
+	<string name="1277">resultset オブジェクトを取り出せません</string>
+	<string name="1278">グリッドコントロールは作成されませんでした</string>
+	<string name="1279">本当にそのインデックスをドロップしても良いですか?</string>
+	<string name="1280">%s.%s に新しいインデックスを作成</string>
+	<string name="1281">既存のインデックス %s.%s を編集</string>
+	<string name="1282">インデックスを付けるカラムを少なくとも一つ選択して下さい</string>
+	<string name="1283">リソースファイルを開けません</string>
+	<string name="1284">言語変更を有効にするために SQLyog を再起動して下さい</string>
+	<string name="1285">データーベース %s をドロップ中</string>
+	<string name="1286">このオプションは HTTP トンネリングモードでは使用できません。
+
+もしローカル CSV ファイルをリモートサーバーに直接アップロードしたいのならば、SQLyogの移行ツールキットを使用できます。
+使用できる ODBC ドライバーは Microsoft Text Driver (*.txt, *.csv) ODBC driver で、これらは OS に含まれています。</string>
+	<string name="1287">このオプションは HTTP トンネリングモードでは使用できません</string>
+	<string name="1288">ObjectBrowser を更新</string>
+	<string name="1289">ObjectBrowser を更新できません</string>
+	<string name="1290">ObjectBrowser が更新されました</string>
+	<string name="1291">データーベースが選択されていません</string>
+	<string name="1292">新しいデータ &amp;検索	Ctrl+Shift+D</string>
+	<string name="1293">新しいデータ検索	Ctrl+Shift+D</string>
+	<string name="3459">新しいデータ検索&amp;	Ctrl+Shift+D</string>
+	<string name="1294">本当にデーターベース (%s) をドロップしてよいですか?
+
+警告：　全てのデーターが失われます!</string>
+	<string name="1295">%s のドロップでエラー</string>
+	<string name="1296">%s のドロップ処理が成功しました</string>
+	<string name="1297">本当にテーブル (%s) をドロップしても良いですか?
+
+警告：全てのデーターが失われます!</string>
+	<string name="1298">全カラムを削除することはできません</string>
+	<string name="1299">本当にカラム (%s) をドロップしても良いですか?
+
+警告：　カラム内の全てのデータが失われます!</string>
+	<string name="1300">本当にインデックス (%s) をドロップしても良いですか?</string>
+	<string name="1301">インデックスは正常に削除されました</string>
+	<string name="1302">本当にテーブル (%s)  をトランケートとしても良いですか?
+
+警告：　全てのデータが失われます!</string>
+	<string name="1303">インデックスは正常に作成されました</string>
+	<string name="1304">本当にデーターベース (%s) の全テーブルのデーターをトランケートしても良いですか?
+
+警告：　全てのデータが失われます!</string>
+	<string name="1305">本当に %s (%s) をドロップしても良いですか?</string>
+	<string name="1306">本当にトリガー (%s) をドロップしても良いですか?</string>
+	<string name="1307">View 定義が見つかりません
+
+多分このビューは、&quot;ビューを作成...SQL SECURITY DEFINER...&quot; のように作成されたようですが、あなたはその時の DEFINER ではありません。</string>
+	<string name="1308">有効な情報がありません!</string>
+	<string name="1309">上級設定情報 - &apos;%s&apos; の &apos;%s&apos;</string>
+	<string name="1310">サーバーステータス</string>
+	<string name="1311">サーバー変数</string>
+	<string name="1312">サーバープロセスリスト</string>
+	<string name="1313">プロセスを強制終了できません。
+これは現在接続されているスレッドid です。</string>
+	<string name="1314">スキーマ生成は成功しました</string>
+	<string name="1315">スキーマ生成中のエラー</string>
+	<string name="1316">スキーマを生成する - &apos;%s&apos;</string>
+	<string name="1317">スキーマを生成...</string>
+	<string name="1318">正常に生成されたスキーマ...</string>
+	<string name="1319">スキーマ作成中のエラー...</string>
+	<string name="1320">%s のフィールド情報を取り出し中</string>
+	<string name="1321">%s のフィールド情報を書き込み中</string>
+	<string name="1322">%s のインデックス情報を取り出し中</string>
+	<string name="1323">%s のインデックス情報を書き込み中</string>
+	<string name="1324">%s の FK 情報を書き込み中</string>
+	<string name="1325">%s の FK 情報を取り出し中</string>
+	<string name="1326">テーブル名を与えて下さい</string>
+	<string name="1327">少なくとも一つのフィールドを選択して下さい</string>
+	<string name="1328">外部キー関係をテーブルに追加するためのテーブルの変更ができません。
+しかし、構成とデーターは正しくコピーされました。</string>
+	<string name="1329">外部キー関係をテーブルにコピーする際にエラーが発生しました。
+構成とデーターは正しくコピーされました。</string>
+	<string name="1330">テーブルのコピー成功</string>
+	<string name="1331">テーブル診断情報</string>
+	<string name="1332">カラム記録を確認</string>
+	<string name="1333">関係のドロップを確認</string>
+	<string name="1334">正しく並べ替えられたカラム</string>
+	<string name="1335">正しく並べ替えられなかったカラム</string>
+	<string name="1336">カラムの並べ替えは失敗しました。
+テンポラリーテーブルからデーターを復旧できます。</string>
+	<string name="1337">カラムの並べ替え中のエラー</string>
+	<string name="1338">操作はユーザーによって取り消されました</string>
+	<string name="1339">カラムを並べ替える...</string>
+	<string name="1340">処理をリストから選択して下さい</string>
+	<string name="1341">プロセスリストを中止できません</string>
+	<string name="1342">Enum値リスト</string>
+	<string name="1343">値リストを設定</string>
+	<string name="1344">重複した値</string>
+	<string name="1345">設定</string>
+	<string name="1346">注： 警告の全リストを見るには以下を有効にする　ツール -> 設定 -> 一般 -> メッセージタブに警告を表示</string>
+	<string name="1347">実行時間</string>
+	<string name="1348">合計時間</string>
+	<string name="1349">クエリ：　%s</string>
+	<string name="1350">エラーコード：　%d
+%s</string>
+	<string name="1351">%lu 列が返されました</string>
+	<string name="1352">%lu 列が影響を受けました</string>
+	<string name="1353">、　%lu 個の警告</string>
+	<string name="1354">本当にこの外部キーをデーターベースから削除しても良いですか?</string>
+	<string name="1355">選択されたテーブルは外部キーをサポートしていません。
+テーブルエンジンはInnoDB、PBXT、SolidDBのどれかでなくてはなりません。</string>
+	<string name="1356">Relationship を編集</string>
+	<string name="1357">リレーションを生成するテーブルはありません</string>
+	<string name="1358">リファレンステーブルを選択して下さい</string>
+	<string name="1359">参照するカラムを一つ選んで下さい</string>
+	<string name="1360">参照先と元カラムは同数を選んで下さい</string>
+	<string name="1361">有効な外部キー名称を与えて下さい</string>
+	<string name="1362">実行：　%s</string>
+	<string name="1363">合計：　%s</string>
+	<string name="1364">%lu 列</string>
+	<string name="1365">クエリバッチは正常に完了しました</string>
+	<string name="1366">クエリバッチがエラーで終了しました</string>
+	<string name="1367">コメント</string>
+	<string name="1368">自動増加</string>
+	<string name="1369">平均列長</string>
+	<string name="1370">最大列数</string>
+	<string name="1371">最小列数</string>
+	<string name="1372">列フォーマット</string>
+	<string name="1373">キー書き込み遅延</string>
+	<string name="1374">チェックサム</string>
+	<string name="1375">そのテーブルのデータを読み出せません</string>
+	<string name="1376">このテーブルの内容は変更されています。
+
+変更を保存しますか?</string>
+	<string name="1377">ファイル %s の内容が変更されています。
+
+変更を保存しますか?</string>
+	<string name="1378">本当にカラムをドロップしても良いですか?</string>
+	<string name="1379">選択されたカラムはインデックス/外部キーから参照されています。
+ドロップを実行するとインデックス/外部キーもまた変更されます。
+続行しても良いですか?</string>
+	<string name="1380">選択したカラムをドロップしてよいですか?</string>
+	<string name="1381">一つあるいは複数の選択されたカラムはインデックス/外部キーから参照されています。
+ドロップを実行するとインデックス/外部キーもまた変更されます。
+続行しても良いですか?</string>
+	<string name="1382">言語オプションを隠す</string>
+	<string name="1383">デフォルト空文字列 (&apos;&apos;) は、データタイプ (%s) ではサポートされていません。</string>
+	<string name="1384">選択された外部キーをドロップして良いですか?</string>
+	<string name="1385">本当に外部キーをドロップしても良いですか?</string>
+	<string name="1386">複数のプライマリーキーは定義できません</string>
+	<string name="1387">選択されたインデックスをドロップして良いですか?</string>
+	<string name="1388">本当にこのフィールドをドロップしても良いですか?</string>
+	<string name="1389">少なくとも一つの列をテーブルに追加して下さい</string>
+	<string name="1390">変更されたものはありません</string>
+	<string name="1391">デフォルト空文字列 (&apos;&apos;) はデータータイプとしてサポートされていません</string>
+	<string name="1392">フィールド名 (%s) のデータータイプが指定されていません</string>
+	<string name="1393">新しいテーブルを作成</string>
+	<string name="1394">新しいテーブル名を入力して下さい</string>
+	<string name="1395">テーブル名を記述して下さい</string>
+	<string name="1396">テーブルが正しく生成されました。 他のテーブルを追加しますか?</string>
+	<string name="1397">&apos;%s&apos; 内の新規テーブル</string>
+	<string name="1398">テーブル名</string>
+	<string name="1399">データーベース</string>
+	<string name="1400">テーブルタイプ</string>
+	<string name="1401">文字セット</string>
+	<string name="1402">照合順序</string>
+	<string name="1403">保存</string>
+	<string name="1404">元に戻す</string>
+	<string name="1405">変更は失われます。本当に終了しても良いですか?</string>
+	<string name="1406">&amp;1 カラム</string>
+	<string name="1407">&amp;2 インデックス</string>
+	<string name="1408">&amp;3 外部キー</string>
+	<string name="1409">&amp;5 SQL プレビュー</string>
+	<string name="1410">&amp;4 上級設定情報</string>
+	<string name="1411">結果</string>
+	<string name="1412">メッセージ</string>
+	<string name="1413">テーブルデーター</string>
+	<string name="1414">データーセット</string>
+	<string name="1415">オブジェクト</string>
+	<string name="1416">履歴</string>
+	<string name="1417">&amp;%u 結果</string>
+	<string name="1418">%u 結果</string>
+	<string name="1419">&amp;%u メッセージ</string>
+	<string name="1420">%u メッセージ</string>
+	<string name="1421">&amp;%u 情報</string>
+	<string name="1422">%u 情報</string>
+	<string name="1423">&amp;%u 履歴</string>
+	<string name="1424">%u 履歴</string>
+	<string name="1425">&amp;%u テーブルデータ</string>
+	<string name="1426">%u テーブルデータ</string>
+	<string name="1427">&amp;%u プロファイラー</string>
+	<string name="1428">%u プロファイラ―</string>
+	<string name="1429">新規テーブル</string>
+	<string name="1430">このテーブルの冗長なインデックスを見つける。 &lt;a href=&quot;redundantindexes_help &quot; target=&quot;_blank&quot;> 続きを読む&lt;/a></string>
+	<string name="1431">データーベースの各テーブルから冗長なインデックスを探す。&lt;a href=&quot;redundantindexes_help &quot; target=&quot;_blank&quot;> 続きを読む&lt;/a></string>
+	<string name="1432">/*テーブル: %s*/</string>
+	<string name="1433">/*ビュー: %s*/</string>
+	<string name="1434">/*カラム情報*/</string>
+	<string name="1435">/*インデックス情報*/</string>
+	<string name="1436">/*DDL 情報*/</string>
+	<string name="1437">テーブルは正しく変更されました</string>
+	<string name="1438">テーブル名が指定されていません</string>
+	<string name="1439">インデックスが正しく指定されていません</string>
+	<string name="1440">外部キーが適切に記述されていません</string>
+	<string name="1441">テーブルは正しく生成されました</string>
+	<string name="1442">&quot;%s&quot; は見つかりませんでした</string>
+	<string name="1443">SQLyog は User Manager ダイアログ内で必要とされる情報を扱うことはできません。 最も考えられるのは、ユーザーがその mysql データーベースに対する SELECT 権限を持っていないことです。 その情報なしでは、SQLyog User Manager は処理を続行できません。</string>
+	<string name="1444">グローバル権限</string>
+	<string name="1445">オブジェクトレベル権限</string>
+	<string name="1446">新規ユーザー</string>
+	<string name="1447">ユーザー名を変更</string>
+	<string name="1448">ユーザーを編集</string>
+	<string name="1449">このユーザーの、ユーザー名、パスワード、制限事項を編集する</string>
+	<string name="1450">制限付きユーザーを新規作成</string>
+	<string name="1451">このユーザーのグローバル権限を付与/剥奪する</string>
+	<string name="1452">このユーザーの選択されたオブジェクトへの権限を付与/剥奪する</string>
+	<string name="1453">&amp;変更を保存</string>
+	<string name="1454">&amp;変更を取り消し</string>
+	<string name="1455">パスワードが正しくありません</string>
+	<string name="1456">ユーザー名が指定されていません。　匿名ユーザーを作成しても良いですか?</string>
+	<string name="1457">&amp;取り消し</string>
+	<string name="1458">作成</string>
+	<string name="1459">User Manager は空のユーザーセットでは続行できません。クローズします。</string>
+	<string name="1460">ユーザー名が指定されていません。 匿名ユーザーとしてリネームしても良いですか?</string>
+	<string name="1461">本当にこのユーザーを削除しても良いですか?</string>
+	<string name="1462">SciLexer.dll の読み込みエラー</string>
+	<string name="1463">riched20.dll を読み込み中にエラーが発生しました</string>
+	<string name="1464">GetModuleFileName の長さが正しくありませんでした</string>
+	<string name="1465">SQLyog は終了中です</string>
+	<string name="1466">警告</string>
+	<string name="1467">MySQLの警告</string>
+	<string name="1468">エラーメッセージ</string>
+	<string name="1469">MySQLのエラー</string>
+	<string name="1470">実行された SQL 文：　%s</string>
+	<string name="1471">エラー番号：　%s</string>
+	<string name="1472">エラーメッセージ：　%s</string>
+	<string name="1473">(既存の接続を選択...)</string>
+	<string name="1474">そのドキュメントの検索を完了しました</string>
+	<string name="1475">ドキュメントの先頭に到達しました。末尾から検索を継続しますか?</string>
+	<string name="1476">ドキュメントの末尾に到達しました。冒頭から検索を続行しますか?</string>
+	<string name="1477">ドキュメントの検索が完了しました。検索項目は見つかりませんでした。</string>
+	<string name="1478">メモリが不足しているのでアプリケーションは終了しました。</string>
+	<string name="1479">(データーベースを選択...)</string>
+</resources>

@@ -1,0 +1,282 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1000">テキスト</string>
+	<string name="1001">イメージ</string>
+	<string name="1002">NULL値を書き込むことができません!</string>
+	<string name="1003">ファイルを作成できませんでした!</string>
+	<string name="1004">ファイルを開けませんでした!</string>
+	<string name="1005">ファイルを開けませんでした。データは変更されません</string>
+	<string name="1006">すべての変更は失われます。終了しますか?</string>
+	<string name="1007">情報を取得できません。許可を確認してください。</string>
+	<string name="1008">このトリガーのテーブルを取得できません</string>
+	<string name="1009">開いているポート検索にエラーが発生しました</string>
+	<string name="1010">致命的なエラー: ネットワークエラー: 接続がタイムアウトしました</string>
+	<string name="1011">HTTPトンネリング (プロフェッショナル/エンタープライズ/アルティメットのみ)</string>
+	<string name="1012">SSHトンネリング (プロフェッショナル/エンタープライズ/アルティメットのみ)</string>
+	<string name="1013">SSL暗号化 (プロフェッショナル/エンタープライズ/アルティメットのみ)</string>
+	<string name="1014">これやその他多数の素晴らしい機能を有効にするために、今日、SQLyogプロフェッショナル/エンタープライズ/アルティメットを手に入れてください。</string>
+	<string name="1015">警告 : このコンピュータプログラムは著作権法によって保護されています。このプログラム、またはその一部を無許可で転載、配布することは、民事および刑事上の厳しい処罰の対象となる場合があり、また法律上、最大限に可能な範囲において告訴されます。</string>
+	<string name="1016">SQLyogについて</string>
+	<string name="1017">SQLyogコミュニティについて</string>
+	<string name="1018">新しい接続に接続しようとしています。 
+接続は保存されます。</string>
+	<string name="1019">接続の詳細を変更しました。 
+変更を保存しますか?</string>
+	<string name="1020">新しい接続</string>
+	<string name="1021">接続名を変更する</string>
+	<string name="1022">有効な名前を入力してください</string>
+	<string name="1023">接続が既に存在します。別の名前を入力してください。</string>
+	<string name="1024">クエリのフォーマット</string>
+	<string name="1025">予定されたバックアップウィザード (Ctrl+Alt+S)</string>
+	<string name="1026">外部データウィザードをインポートする (Ctrl+Alt+O)</string>
+	<string name="1027">スキーマの同期ツール (Ctrl+Q)</string>
+	<string name="1028">データベースの同期ウィザード (Ctrl+Alt+W)</string>
+	<string name="1029">SQLスケジューラとレポートツール (Ctrl+Alt+N)</string>
+	<string name="1030">新しいクエリビルダー (Ctrl+K)</string>
+	<string name="1031">新しいスキーマデザイナ (Ctrl+Alt+D)</string>
+	<string name="1032">SQLyogプロフェッショナル/エンタープライズ/アルティメットを取得</string>
+	<string name="1033">この機能はSQLyogのプロフェッショナル/エンタープライズ/ アルティメットバージョンで使用可能です。</string>
+	<string name="1034">このソフトウェアは、おそらく最もよく知られているオープンソースのライセンスであるGNU一般公衆利用許諾契約書 (GPL) の下でリリースされます。 GPLライセンスの正式な条件は下記のURLをご参照ください。http://www.fsf.org/licence/</string>
+	<string name="1035">SQLyogプロフェッショナル/エンタープライズ/アルティメットにアップグレード</string>
+	<string name="1036">本当に接続の詳細を削除してもいいですか?</string>
+	<string name="1037">接続成功!
+MySQL バージョン: %s</string>
+	<string name="1038">接続情報</string>
+	<string name="1039">新しいウィンドウを初期化できませんでした。</string>
+	<string name="1040">HTTPトンネリングを使用して接続している場合、この機能は利用できません</string>
+	<string name="1041">&amp;復元</string>
+	<string name="1042">HTTP エラー番号 %d
+%s</string>
+	<string name="1043">エラー番号 %d
+%s</string>
+	<string name="1044">接続: %d</string>
+	<string name="1045">タグファイルを構築</string>
+	<string name="1046">タグファイルを再構築</string>
+	<string name="1047">レディ</string>
+	<string name="1048">テーブルの種類を &amp; に変える</string>
+	<string name="1049">最近使ったファイルなし</string>
+	<string name="1050">ファイルを開けませんでした。</string>
+	<string name="1051">MySQLサーバーに接続してください</string>
+	<string name="1052">新しいビューの名前を入力してください</string>
+	<string name="1053">新しいプロシージャの名前を入力してください</string>
+	<string name="1054">新しいファンクション名を入力してください</string>
+	<string name="1055">新しいイベントの名前を入力してください</string>
+	<string name="1056">新しいトリガーの名前を入力してください</string>
+	<string name="1057">行番号を入力してください</string>
+	<string name="1058">&amp;に行く</string>
+	<string name="1059">データベースを変更</string>
+	<string name="1060">&amp;変更</string>
+	<string name="1061">有効なデータベース名を入力してください</string>
+	<string name="1062">データベースの変更に成功しました</string>
+	<string name="1063">有効なビュー名を入力してください</string>
+	<string name="1064">ビュー &apos;%s&apos;; を作成することはできません。同じ名前のテーブルまたはビューが既に存在します</string>
+	<string name="1065">有効なイベント名を入力してください</string>
+	<string name="1066">イベント &apos;%s&apos;; を作成することはできません。イベントは存在します</string>
+	<string name="1067">有効なプロシージャ名を入力してください</string>
+	<string name="1068">プロシージャ &apos;%s&apos;; を作成することはできません。プロシージャが存在します</string>
+	<string name="1069">有効なファンクション名を入力してください</string>
+	<string name="1070">ファンクション &apos;%s&apos;; を作成できません。ファンクションが存在します</string>
+	<string name="1071">有効なトリガー名を入力してください</string>
+	<string name="1072">トリガー &apos;%s&apos;; を作成できません。既に存在しています</string>
+	<string name="1073">範囲外の行番号です!</string>
+	<string name="1074">参照先のクエリファイルを開けませんでした。 
+クエリファイルが存在することを確認してください。</string>
+	<string name="1075">選択したお気に入りアイテムは空です。追加するものは何もありません。</string>
+	<string name="1076">お気に入りファイルを読み取り中にエラーが発生しました。</string>
+	<string name="1077">&apos;%s&apos; を見つけることができませんでした
+参照先のファイルが存在するかどうか確認してください。</string>
+	<string name="1078">お気に入りファイルを開けませんでした。</string>
+	<string name="1079">ファイルは空です</string>
+	<string name="1080">参照先のファイルを開けませんでした。</string>
+	<string name="1081">参照先のファイルに書き込めませんでした。</string>
+	<string name="1082">&amp;SQlステートメントをペースト</string>
+	<string name="1083">%s は見つからないか壊れています。
+%s を再度インストールしてください。</string>
+	<string name="1084">(既に入力された値のフィルタ)</string>
+	<string name="1085">1つ以上のストアドプログラムかビューがコピーされました。 
+それらはSQL-referencing the &lt;source> データベース名を含んでいる可能性があり、手動で調整する必要があります。</string>
+	<string name="1086">少なくとも1つのオブジェクトを選択してください</string>
+	<string name="1087">ソースサーバーへの接続</string>
+	<string name="1088">ターゲットサーバーへの接続</string>
+	<string name="1089">コピーに成功しました</string>
+	<string name="1090">コピーするものはありませんでした</string>
+	<string name="1091">コピー中にエラーが発生しました</string>
+	<string name="1092">コピーを終了中...</string>
+	<string name="1093">データベースサマリーをコピー</string>
+	<string name="1094">%s のテーブル構造を作成</string>
+	<string name="1095">%s にデータをコピー中 (%ld 行が完了)</string>
+	<string name="1096">%s にデータをコピー中</string>
+	<string name="1097">コピー中 %s ...</string>
+	<string name="1098">サーバから%s のリストを取得中...</string>
+	<string name="1099">(%lu 行))</string>
+	<string name="1100">コピーされました</string>
+	<string name="1101">ビュー &apos;%s&apos; はコピーされました</string>
+	<string name="1102">ファンクション &apos;%s&apos; はコピーされました</string>
+	<string name="1103">プロシージャ &apos;%s&apos; はコピーされました</string>
+	<string name="1104">トリガー &apos;%s&apos; はコピーされました</string>
+	<string name="1105">イベント &apos;%s&apos; はコピーされました</string>
+	<string name="1106">%d %s はコピーされました</string>
+	<string name="1107">&amp;コピー</string>
+	<string name="1108">&amp;停止</string>
+	<string name="1109">スキーマファイルを開けませんでした。</string>
+	<string name="1110">このファイルはエディタに対して大きすぎます。 ツール -> SQLダンプから復元 を代わりに使用してください。</string>
+	<string name="1111">クエリ</string>
+	<string name="1112">- %s@%s - SSHトンネルを使用して %s へ</string>
+	<string name="1113">- %s@%s - %s でHTTPトンネルを使用</string>
+	<string name="1114">サーバーへの接続成功...</string>
+	<string name="1115">接続を閉じることができませんでした。クエリが実行されています。</string>
+	<string name="1116">オブジェクトブラウザのリフレッシュ...</string>
+	<string name="1117">タブの内容が変更されました。 
+
+変更を保存しますか?</string>
+	<string name="1118">%s ファイルの内容が変更されました。 
+
+変更を保存しますか?</string>
+	<string name="1119">ファイルを保存できませんでした。閉じるアクションはキャンセルされました。</string>
+	<string name="1120">ファイルを作成できませんでした。</string>
+	<string name="1121">ファイルに書き込めませんでした。</string>
+	<string name="1122">操作中にエラーが発生しました。</string>
+	<string name="1123">操作に成功しました</string>
+	<string name="1124">このオプションを使用するにはクエリウィンドウを見えるようにしてください</string>
+	<string name="1125">挿入するテンプレートを選択してください</string>
+	<string name="1126">データベース: %s</string>
+	<string name="1127">スキーマデザイナ</string>
+	<string name="1128">クエリビルダー</string>
+	<string name="1129">%s, エラー番号 : %d</string>
+	<string name="1130">この操作は %d 行が %s になります。続行しますか? 
+
+注意 : ツール - > 設定 - > その他 - > プロンプト 複数の行が更新している場合を無効にすることで、この警告をオフにすることができます</string>
+	<string name="1131">更新</string>
+	<string name="1132">削除されました</string>
+	<string name="1133">本当に選択した行を削除してもいいですか?</string>
+	<string name="1134">本当に現在選択されている行を削除しますか?</string>
+	<string name="1135">クリップボードにデータをコピーできませんでした</string>
+	<string name="1136">空間データタイプのINSERTとUPDATEはサポートされていません。</string>
+	<string name="1137">フィルタのリセット</string>
+	<string name="1138">突発的な損傷からデータを保護するために、SQLyogは更新が実行されるデータベースコンテキストをチェックします。 
+この結果セット内のデータは、現在選択されているデータベースから生じたものではありません。 
+
+更新を実行するには、まず、この結果が生じたデータベースを選択する必要があります。その後、SQLyogはこの結果セットから更新できるデータベースからテーブルを表示します。</string>
+	<string name="1139">この結果セットは、オブジェクトブラウザで現在選択されているデータベースから生じたものではない可能性があります。 
+データベースコンテキストが間違っている場合、この結果を編集するとデータが破損する可能性があります。 
+この操作を実行したいデータベースが選択されていることを確認してください。 
+続行しますか?</string>
+	<string name="1140">行を制限</string>
+	<string name="1141">最初の行:</string>
+	<string name="1142">行数:</string>
+	<string name="1143">リフレッシュ</string>
+	<string name="1144">書き出し... (Ctrl+Shift+E)</string>
+	<string name="1145">データをコピー</string>
+	<string name="1146">クリップボードに選択された行のデータをコピー</string>
+	<string name="1147">新しい行を挿入</string>
+	<string name="1148">変更を保存</string>
+	<string name="1149">選択された行を削除</string>
+	<string name="1150">変更を取り消す</string>
+	<string name="1151">この結果を編集することはできません。 
+ドロップダウンウィンドウから、有効なテーブルを選択してください。</string>
+	<string name="1152">[BLOB(ダブルクリックで表示)](%u バイト)</string>
+	<string name="1153">...[BLOB(ダブルクリックで表示)]</string>
+	<string name="1154">変更を保存しますか?</string>
+	<string name="1155">(読み取り専用)</string>
+	<string name="1156">削除する行を選択してください!</string>
+	<string name="1157">停止</string>
+	<string name="1158">フォーム</string>
+	<string name="1159">グリッド</string>
+	<string name="1160">データは変更は保存されていません</string>
+	<string name="1161">データセットを更新/削除するには検索を停止してください</string>
+	<string name="1162">データベース: %s テーブル: %s</string>
+	<string name="1163">エラーコード: %d
+%s
+(%lu ms 取得)</string>
+	<string name="1164">(%lu 行の影響)
+(%lu ms 取得)</string>
+	<string name="1165">(%lu 行 返還)
+(%d ms 取得)</string>
+	<string name="1166">クエリは実行されませんでした。 SQLのウィンドウにクエリを入力するか、クエリ内にカーソルを配置してください。</string>
+	<string name="1167">クエリを実行中...</string>
+	<string name="1168">エラー番号 : %d</string>
+	<string name="1169">ユーザーによって中止されました</string>
+	<string name="1170">構造の書き出しに成功しました</string>
+	<string name="1171">%d 行が書き出されました</string>
+	<string name="1172">エクスポートファイルをを開く際にエラーが発生しました。スキーマファイルの詳細を確認してください。</string>
+	<string name="1173">ファイルに書き込み中にエラーが発生しました。</string>
+	<string name="1174">データベースが選択されていません。ドロップダウンからデータベースを選択してください。</string>
+	<string name="1175">名前を付けて保存</string>
+	<string name="1176">&amp;停止</string>
+	<string name="1177">書き出しに成功しました</string>
+	<string name="1178">ダンプファイルを作成できませんでした。 
+ダンプファイルが 
+1、読み取り専用ではない 
+2、別のプロセスによって開かれていない 
+3、既存のファイルのパスである
+ことを確認してください</string>
+	<string name="1179">エラー番号: %d
+%s</string>
+	<string name="1180">書き出しに失敗しました</string>
+	<string name="1181">&amp;書き出し</string>
+	<string name="1182">テーブルのみにデータがあります。ダンピングするためにテーブルのみを選択する必要があります (データのみ)</string>
+	<string name="1183">テーブルのみにデータがあります。ダンピングするために少なくとも1つのテーブルを選択する必要があります (データのみ)</string>
+	<string name="1184">少なくとも一つのオブジェクトを選択</string>
+	<string name="1185">書き出すものはありません</string>
+	<string name="1186">テーブル書き出し中: %s</string>
+	<string name="1187">ビュー書き出し中: %s</string>
+	<string name="1188">プロシージャ書き出し中: %s</string>
+	<string name="1189">ファンクション書き出し中: %s</string>
+	<string name="1190">イベント書き出し中: %s</string>
+	<string name="1191">トリガー書き出し中: %s</string>
+	<string name="1192">テーブル書き出し中: %s 
+書き出された行: %d</string>
+	<string name="1193">SQLステートメントの最も単純な形式でデータを保存します。 
+追加のテーブルの情報 (インデックス、文字セット、コメントなど) は保存されません。 
+
+データのバックアップをとる場合、代わりに [SQLダンプとしてテーブルバックアップ] を使用してください</string>
+	<string name="1194">フォルダを指定してください</string>
+	<string name="1195">少なくとも1つのテーブルを選択してください</string>
+	<string name="1196">データベースをバックアップするフォルダを選択してください</string>
+	<string name="1197">データベースをバックアップ中...</string>
+	<string name="1198">テーブル情報をバックアップ</string>
+	<string name="1199">行を取得中:</string>
+	<string name="1200">ファイル名を指定してください</string>
+	<string name="1201">少なくとも1つの列を選択してください</string>
+	<string name="1202">: で任意に囲まれた</string>
+	<string name="1203">: で囲まれた</string>
+	<string name="1204">書き出し</string>
+	<string name="1205">ファイルを作成できませんでした</string>
+	<string name="1206">データの書き出しに成功しました</string>
+	<string name="1207">書き出し中にエラーが発生しました</string>
+	<string name="1208">ファイルに書き込めませんでした!</string>
+	<string name="1209">メニューの追加にエラーが発生しました</string>
+	<string name="1210">お気に入り</string>
+	<string name="1211">お気に入りにエラーが発生しました</string>
+	<string name="1212">入力したショートカットの名前は、既にお気に入りメニューに存在しています。
+上書きしますか?</string>
+	<string name="1213">お気に入りに追加</string>
+	<string name="1214">お気に入りファイルに書き込むことができません</string>
+	<string name="1215">お気に入りフォルダを作成することはできません</string>
+	<string name="1216">クエリの参照名を入力してください</string>
+	<string name="1217">SQLファイルの名前を入力してください</string>
+	<string name="1218">クエリエディタは空です!
+エディタでいくつかのクエリを入力してください。</string>
+	<string name="1219">フォルダ名を指定してください</string>
+	<string name="1220">お気に入りフォルダを作成中にエラーが発生しました</string>
+	<string name="1221">ファイル名変更のエラー</string>
+	<string name="1222">&apos;%s&apos; をそれ自体に移動することはできません。</string>
+	<string name="1223">本当に &apos;%s&apos; を削除しますか?</string>
+	<string name="1224">お気に入りアイテムの削除中にエラーが発生しました。</string>
+	<string name="1225">参照先のクエリファイルを開けませんでした。 
+クエリファイルが存在することを確認してください。</string>
+	<string name="1226">ファイルを開く</string>
+	<string name="1227">文書の検索が終わりました。 &quot;％s&quot; を見つけることができません</string>
+	<string name="1228">%d インスタンスの交換</string>
+	<string name="1229">置き換え</string>
+	<string name="1230">すべてを置き換え</string>
+	<string name="1231">検索</string>
+	<string name="1232">ここにフィルタテキストを入力してください...</string>
+	<string name="1233">&amp;リフレッシュ</string>
+	<string name="1234">親テーブルの行を取得する検索を停止してください</string>
+	<string name="1235">&amp;コラム</string>
+	<string name="1236">&amp;テーブル</string>
+	<string name="1237">&amp;データベース</string>
+	<string name="1238">SQLyogに再接続しました</string>
+	<string name="1239">SQLyogへの再接続に失敗しました</string>
+</resources>

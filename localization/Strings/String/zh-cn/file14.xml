@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3527">全部</string>
+	<string name="3528">出错的查询</string>
+	<string name="3529">带警告的查询</string>
+	<string name="3530">出错的或带警告的查询</string>
+	<string name="3531">带结果集的查询</string>
+	<string name="3532">没有结果集的查询</string>
+	<string name="3533">%d 个已执行查询、%d 个成功、%d 个错误、%d 个警告</string>
+	<string name="3534">无法找到您正在寻找的数据库？</string>
+	<string name="3535">想要对位于不同主机上的数据库进行同步，可以通过‘文件->新建连接’来与多台主机取得连接。</string>
+	<string name="3536">&amp; 跳过这个版本</string>
+	<string name="3537">&amp; 全选/取消全选</string>
+	<string name="3538">过滤器数据库</string>
+	<string name="3539">过滤器 (Ctrl+Shift+B)</string>
+	<string name="3540">无法在对象浏览器（Object Browser）中找到选定的表格。
+
+删除已用于对象浏览器的过滤器（如果有）并刷新对象浏览器。</string>
+	<string name="3541">查看所有数据库</string>
+	<string name="3542">中的功能</string>
+	<string name="3543">中的进程</string>
+	<string name="3544">中的表格</string>
+	<string name="3545">中的事件</string>
+	<string name="3546"> %d 已执行的查询，%d 个成功，%d 个错误，%d 个警告</string>
+	<string name="3547">过滤器 </string>
+	<string name="3548">中的触发</string>
+	<string name="3549">中的意见</string>
+
+</resources>

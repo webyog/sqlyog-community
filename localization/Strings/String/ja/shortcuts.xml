@@ -1,0 +1,195 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+	<string name="100">接続</string>
+
+	<string name="101">新しい接続を作成</string>
+
+	<string name="102">現在の接続のプロパティで新しい接続を作成</string>
+
+	<string name="103">現在の接続を切断</string>
+
+	<string name="104">次の接続へ切り替える</string>
+
+	<string name="105">前の接続に切り替える</string>
+
+	<string name="106">接続を選択（1～8）</string>
+
+	<string name="107">最後の接続を選択</string>
+
+	<string name="109">オブジェクトブラウザ</string>
+
+	<string name="110">オブジェクトブラウザ（デフォルト）を更新</string>
+
+	<string name="111">オブジェクトブラウザにフォーカスを設定</string>
+
+	<string name="112">SQLウィンドウ</string>
+
+	<string name="113">新しいクエリエディタ</string>
+
+	<string name="114">SQLウィンドウにフォーカスを設定</string>
+
+	<string name="115">再実行</string>
+
+	<string name="116">元に戻す</string>
+
+	<string name="117">カット</string>
+
+	<string name="118">ペースト</string>
+
+	<string name="120">へ移動</string>
+
+	<string name="122">選択範囲を大文字にする</string>
+
+	<string name="123">選択範囲を小文字にする</string>
+
+	<string name="124">SQLウィンドウでのコメント選択</string>
+
+	<string name="125">選択範囲からコメントを削除する</string>
+
+	<string name="126">テンプレートを挿入</string>
+
+	<string name="127">すべてのタグのリストを表示する</string>
+
+	<string name="128">一致するタグのリストを表示する</string>
+
+	<string name="224">ファンクションとルーティンのパラメータのリストを表示</string>
+
+	<string name="129">履歴タブを開く</string>
+
+	<string name="130">情報タブを開く</string>
+
+	<string name="131">クエリの実行</string>
+
+	<string name="132">現在のクエリを実行じ結果を編集</string>
+
+	<string name="133">クエリを実行（デフォルト）</string>
+
+	<string name="135">すべてのクエリを実行（デフォルト）</string>
+
+	<string name="137">現在のクエリをフォーマットする</string>
+
+	<string name="138">選択したクエリをフォーマットする</string>
+
+	<string name="139">すべてのクエリをフォーマットする</string>
+
+	<string name="140">SQLのステートメントをペースト</string>
+
+	<string name="141">ステートメントを挿入</string>
+
+	<string name="142">ステートメントをアップデート</string>
+
+	<string name="143">ステートメントを削除</string>
+
+	<string name="144">ステートメントを選択</string>
+
+	<string name="146">アップデートダイアログを挿入</string>
+
+	<string name="147">結果ペインで有効なタブにフォーカスを設定する</string>
+
+	<string name="148">結果ウィンドウ・グリッド間のテーブルデータ・テキストモードを切り替える</string>
+
+	<string name="149">テーブルデータをCSV、Excel、SQLなどとして書き出す</string>
+
+	<string name="150">SQLダンプとしてデータをバックアップする</string>
+
+	<string name="151">CSVからデータを読み込む</string>
+
+	<string name="152">結果の書き出し</string>
+
+	<string name="153">外部キーの検索を開く</string>
+
+	<string name="154">結果ウィンドウのタブを選択 (1～8)</string>
+
+	<string name="155">結果ウィンドウの最後のタブを選択</string>
+
+	<string name="156">表示・非表示</string>
+
+	<string name="157">オブジェクトブラウザを表示・非表示</string>
+
+	<string name="158">結果ペインを表示・非表示</string>
+
+	<string name="159">クエリウィンドウを表示・非表示</string>
+
+	<string name="160">データベース・テーブル</string>
+
+	<string name="161">データベースを作成</string>
+
+	<string name="162">データベース・テーブルの構造・インデックス・表示・プロシージャを保存・ファンクション・トリガ・イベントを変更</string>
+
+	<string name="163">テーブル・表示・トリガ・イベントの名前を変更</string>
+
+	<string name="164">データベース・テーブルを切り捨てる</string>
+
+	<string name="165">インデックスウィンドウの管理</string>
+
+	<string name="166">関係・外部キー</string>
+
+	<string name="167">列の順序を変更</string>
+
+	<string name="168">テーブルの診断</string>
+
+	<string name="169">ダイアログをフラッシュ</string>
+
+	<string name="170">HTMLでデータベースのスキーマを作成</string>
+
+	<string name="171">SQLスクリプトを実行</string>
+
+	<string name="172">パワーツール</string>
+
+	<string name="174">スキーマ同期ツール</string>
+
+	<string name="176">知サービスウィザード</string>
+
+	<string name="177">スケジュール済みバックアップウィザード</string>
+
+	<string name="182">ユーザーマネージャーを開く</string>
+
+	<string name="184">現在のSQLをお気に入りに追加する</string>
+
+	<string name="185">その他</string>
+
+	<string name="186">ヘルプ</string>
+
+	<string name="187">コピー</string>
+
+	<string name="188">すべてを選択</string>
+
+	<string name="189">検索（SQLウィンドウ・結果ウィンドウおよびテキストモードのテーブルデータ・ブロブビューア）</string>
+
+	<string name="190">次を検索（SQLウィンドウ・結果ウィンドウおよびテキストモードのテーブルデータ）</string>
+
+	<string name="192">前のタブに切り替える</string>
+
+	<string name="193">次のタブに切り替える</string>
+
+	<string name="194">選択範囲を削除</string>
+	
+	<string name="225">言語を変更</string>
+
+	<string name="195">タブを閉じる</string>
+
+	<string name="196">終了</string>
+	
+	<string name="197">オブジェクトブラウザのフィルタにフォーカスを設定</string>
+	
+	<string name="198">ビジュアルデータを比較</string>
+	
+	<string name="199">表を選択する</string>
+	
+	<string name="200">次の差異</string>
+	
+	<string name="201">前の差異</string>
+	
+	<string name="202">対象をマージする</string>
+	
+	<string name="203">ソースをマージする</string>
+	
+	<string name="204">変更を適用する</string>
+	
+	<string name="205">変更を取り消す</string>
+	
+	<string name="206">選択した変更を取り消す</string>
+
+</resources>

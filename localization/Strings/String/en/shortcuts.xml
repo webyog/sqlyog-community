@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<resources>
+
+	<string name="100">Connection</string>
+
+	<string name="101">Create A New Connection</string>
+
+	<string name="102">Create A New Connection With Current Connection Properties</string>
+
+	<string name="103">Disconnect The Current Connection</string>
+
+	<string name="104">Switch to Next Connection</string>
+
+	<string name="105">Switch to Previous Connection</string>
+
+	<string name="106">Select Connection (1 to 8)</string>
+
+	<string name="107">Select Last Connection</string>
+
+	<string name="109">Object Browser</string>
+
+	<string name="110">Refresh Object Browser (Default)</string>
+
+	<string name="111">Set Focus On Object Browser</string>
+
+	<string name="112">SQL Window</string>
+
+	<string name="113">New Query Editor</string>
+
+	<string name="114">Set Focus On SQL Window</string>
+
+	<string name="115">Redo</string>
+
+	<string name="116">Undo</string>
+
+	<string name="117">Cut</string>
+
+	<string name="118">Paste</string>
+
+	<string name="120">Go to</string>
+
+	<string name="122">Make Selection Uppercase</string>
+
+	<string name="123">Make Selection Lowercase</string>
+
+	<string name="124">Comment Selection In SQL Window</string>
+
+	<string name="125">Remove Comment From Selection</string>
+
+	<string name="126">Insert Templates</string>
+
+	<string name="127">List All Tags</string>
+
+	<string name="128">List Matching Tags</string>
+	
+	<string name="224">List Function and Routine Parameters</string>
+
+	<string name="129">Open History Tab</string>
+
+	<string name="130">Open Info Tab</string>
+
+	<string name="131">Query Execution</string>
+
+	<string name="132">Execute Current Query And Edit Result</string>
+
+	<string name="133">Execute Query (Default)</string>
+
+	<string name="135">Execute All Query(s) (Default)</string>
+
+	<string name="137">Format Current Query</string>
+
+	<string name="138">Format Selected Query</string>
+
+	<string name="139">Format All Queries</string>
+
+	<string name="140">Paste SQL Statements</string>
+
+	<string name="141">Insert Statement</string>
+
+	<string name="142">Update Statement</string>
+
+	<string name="143">Delete Statement</string>
+
+	<string name="144">Select Statement</string>
+
+	<string name="146">Insert Update Dialog</string>
+
+	<string name="147">Set Focus To The Active Tab In Result Pane</string>
+
+	<string name="148">Switch Result Window/Table Data Between Grid/Text Mode</string>
+
+	<string name="149">Export Table Data As CSV, Excel, SQL etc...</string>
+
+	<string name="150">Backup Data As SQL Dump</string>
+
+	<string name="151">Import Data From CSV</string>
+
+	<string name="152">Export Resultset</string>
+
+	<string name="153">Open Foreign Key lookup</string>
+
+	<string name="154">Select Tab in the Result Window (1 to 8)</string>
+
+	<string name="155">Select Last Tab in the Result Window</string>
+
+	<string name="156">Show/Hide</string>
+
+	<string name="157">Show/Hide Object Browser</string>
+
+	<string name="158">Show/Hide Result Pane</string>
+
+	<string name="159">Show/Hide Query Window</string>
+
+	<string name="160">Database/Table</string>
+
+	<string name="161">Create Database</string>
+
+	<string name="162">Alter Database/Table Structure/Index/View/Store Proc/Function/Trigger/Event</string>
+
+	<string name="163">Rename Table/View/Trigger/Event</string>
+
+	<string name="164">Truncate Database/Table</string>
+
+	<string name="165">Manage Index Window</string>
+
+	<string name="166">Relationships/Foreign Keys</string>
+
+	<string name="167">Reorder Column(s)</string>
+
+	<string name="168">Table Diagnostics</string>
+
+	<string name="169">Flush Dialog</string>
+
+	<string name="170">Create Schema For Database In HTML</string>
+
+	<string name="171">Execute SQL Script</string>
+
+	<string name="172">PowerTools</string>
+
+	<string name="174">Schema Synchronization Tool</string>
+
+	<string name="176">Notification Services Wizard</string>
+
+	<string name="177">Scheduled Backup Wizard</string>
+
+	<string name="182">Open User Manager</string>
+
+	<string name="184">Add Current SQL To Favorites</string>
+
+	<string name="185">Other</string>
+
+	<string name="186">Help</string>
+
+	<string name="187">Copy</string>
+
+	<string name="188">Select All</string>
+
+	<string name="189">Find (SQL Window/Result Window And Table Data In Text Mode/Blob Viewer)</string>
+
+	<string name="190">Find Next (SQL Window/Result Window And Table Data In Text Mode)</string>
+
+	<string name="192">Switch To Previous Tab</string>
+
+	<string name="193">Switch To Next Tab</string>
+
+	<string name="194">Delete Selected</string>
+	
+	<string name="225">Change Language</string>
+
+	<string name="195">Close Tab</string>
+
+	<string name="196">Exit</string>
+	
+	<string name="197">Set Focus On Object Browser Filter </string>
+	
+	<string name="198">Visual Data Compare</string>
+	
+	<string name="199">Select a table</string>
+	
+	<string name="200">Next difference</string>
+	
+	<string name="201">Previous Difference</string>
+	
+	<string name="202">Merge to target</string>
+	
+	<string name="203">Merge to source</string>
+	
+	<string name="204">Apply changes</string>
+	
+	<string name="205">Revert changes</string>
+	
+	<string name="206">Revert selected changes</string>
+
+</resources>
+

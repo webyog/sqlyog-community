@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3595">64 bit drivers for Microsoft Office not found. To download</string>
+	<string name="3596">Finding first batch of differences%.*s</string>
+	<string name="3597">Finding next batch of differences%.*s</string>
+	<string name="3598">Finding previous batch of differences%.*s</string>
+	<string name="3599">Table does not exist</string>
+	<string name="3600">Schema mismatch! Use the Schema Synchronization Tool to fix it.</string>
+	<string name="3601">Comparison of table without Primary Key/Unique Key is not supported.</string>
+	<string name="3602">There are unsaved changes with the current table.</string>
+	<string name="3603">There are one or more open instances of %s. Please close them to close SQLyog.</string>
+	<string name="3604">Do you want to continue?</string>
+	<string name="3605">Profiler</string>
+</resources>

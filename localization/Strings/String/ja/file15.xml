@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3550">発見した全体差異: %d</string>
+	<string name="3551">&lt; 前の差異</string>
+	<string name="3552">次の差異 &gt;</string>
+	<string name="3553">最初の差異を探す%.*s</string>
+	<string name="3554">差異が見つかりませんでした</string>
+	<string name="3555">次の差異を探す%.*s</string>
+	<string name="3556">&amp; 視覚的データ比較ウィザード...	Ctrl+Alt+Q</string>
+	<string name="3557">視覚的データ比較ウィザードへようこそ!</string>
+	<string name="3558">このウィザードはステップを踏んで2つのデータベース間のデータの比較をガイドし、変化を合併します。
+
+作業ファイルはこのタスクの構成を蓄積します。作業ファイルを使用して、後でこのタスクを再実行できます。</string>
+	<string name="3559">ポーズ</string>
+	<string name="3560">比較するテーブルを選択…</string>
+	<string name="3561">視覚的データ比較ウィザード</string>
+	<string name="3563">&amp; 視覚的データ合併</string>
+	<string name="3564">視覚的合併でソースに並んだ行と選択した目標テーブルを比較し、変化を合併できます。</string>
+	<string name="3565">類似の行を隠す</string>
+	<string name="3566">SQLのプレビュー</string>
+	<string name="3567">説明する</string>
+	<string name="3568">表を選択する</string>
+	<string name="3569">表をフィルターにかける </string>
+	<string name="3570">表示をフィルターにかける </string>
+	<string name="3571">手続きをフィルターにかける </string>
+	<string name="3572">ファンクションをフィルターにかける </string>
+	<string name="3573">イベントをフィルターにかける </string>
+	<string name="3574">トリガーをフィルターにかける </string>
+	<string name="3575">すべてのデータベースを見る</string>
+	<string name="3576">適用</string>
+</resources>

@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1480">只读结果</string>
+	<string name="1481">点击此处刷新目录</string>
+	<string name="1482">停止计算</string>
+	<string name="1483">隐藏最优数据类型</string>
+	<string name="1484">找出多余索引</string>
+	<string name="1485">隐藏多余索引信息</string>
+	<string name="1486">Power Tools 选项（专业版/企业版/旗舰版）</string>
+	<string name="1487">SQL 格式化选项（企业版/基本版）</string>
+	<string name="1488">Query Profiler 仅在 SQLyog 旗舰版中提供。 &lt;br>&amp;nbsp;&lt;br>Click &lt;a href=&quot;http://www.webyog.com/en/buy.php?ref=community.queryprofiler &quot; 
+target=&quot;_blank&quot;>here&lt;/a> 购买 SQLyog 旗舰版 &lt;br>&amp;nbsp;&lt;br> Query Profiler 
+功能: &lt;UL> &lt;LI> 帮您找出 SQL 的问题 &lt;LI> 帮您微调 SQL &lt;LI> 帮您建立正确索引 &lt;LI> 分析查询并帮您进行优化 &lt;LI> 报告执行查询每一个步骤所花的精确时间 &lt;LI> 帮您写出更好的 SQL &lt;LI> 确认索引是否被有效利用 &lt;LI> 帮您改善整体的应用响应时间&lt;/UL></string>
+	<string name="1489">复制栏位名称</string>
+	<string name="1490">必须指定可变长字符串数据类型的长度</string>
+	<string name="1491">必须指定可变二进制数据类型的长度</string>
+	<string name="1492">该表中没有任何栏位，请定义至少一个栏位</string>
+	<string name="1493">您不能删除“修改表”中的所有栏位，可选择“删除表&quot;来替代</string>
+	<string name="1494">未指定栏位名称</string>
+	<string name="1495">没有为栏位名称（ %s ）指定数据类型</string>
+	<string name="1496">/* 错误 /*</string>
+	<string name="1497">复制字段名称</string>
+	<string name="1498">该表中没有字段，请定义至少一个字段</string>
+	<string name="1499">未指定字段名称</string>
+	<string name="1500">显示警告</string>
+	<string name="1501">无法找到升级信息</string>
+	<string name="1502">SQLyog 已有更新版本。
+请下载并安装最新版本</string>
+	<string name="1503">SQLyog 专业版已有更新版本。
+请下载并安装最新版本。</string>
+	<string name="1504">SQLyog 企业版已有更新版本。
+请下载并安装最新版本。</string>
+	<string name="1505">SQLyog 基本版已有更新版本。
+请下载并安装最新版本。</string>
+	<string name="1506">您现在使用的是 SQLyog 最新版本</string>
+	<string name="1507">您现在使用的是 SQLyog 专业版最新版本</string>
+	<string name="1508">您正在使用的是 SQLyog 企业版最新版本</string>
+	<string name="1509">您正在使用的是 SQLyog 基本版最新版本</string>
+	<string name="1510">检查更新...</string>
+	<string name="1511">（按 TAB 键插入）</string>
+	<string name="1512">重建标签文件已完成</string>
+	<string name="1513">建立标签文件已完成</string>
+	<string name="1514">重建标签文件</string>
+	<string name="1515">建立标签文件</string>
+	<string name="1516">请输入您的私有秘钥路径</string>
+	<string name="1517">%s 测试信息</string>
+	<string name="1518">这是一条由 %s 的客户经理为测试您的 SMTP 账户自动发送的邮件信息。</string>
+	<string name="1519">发送测试邮件失败。
+%s</string>
+	<string name="1520">测试邮件已成功发送</string>
+	<string name="1521">您已经选择 HTTP 隧道，请提供有效 URL 。</string>
+	<string name="1522">请输入一个数据库名称</string>
+	<string name="1523">请选择一个数据库</string>
+	<string name="1524">请指定一个工作文件名</string>
+	<string name="1525">无法创建工作文件</string>
+	<string name="1526">请输入您的名字</string>
+	<string name="1527">请输入“收件人”邮件地址</string>
+	<string name="1528">请输入“发送方”邮件地址</string>
+	<string name="1529">请输入您的 SMTP 服务器地址</string>
+	<string name="1530">请输入您的 SMTP 服务器端口号</string>
+	<string name="1531">请输入您的账户名</string>
+	<string name="1532">请输入您的密码</string>
+	<string name="1533">%s
+文件未找到／已损坏！您需要重新安装 %s 。</string>
+	<string name="1534">在评估期间获取帮助</string>
+	<string name="1535">成功完成格式化</string>
+	<string name="1536">格式化完成但是有错误</string>
+	<string name="1537">注册： %s</string>
+	<string name="1538">注册：</string>
+	<string name="1539">SQLyog %s 副本注册于 %s</string>
+	<string name="1540">这是“已注册版” SQLyog</string>
+	<string name="1541">请输入主机地址</string>
+	<string name="1542">请输入端口号</string>
+	<string name="1543">请输入 PHP 隧道 URL</string>
+	<string name="1544">请输入 HTTP 超时值</string>
+	<string name="1545">连接 MySQL 失败</string>
+	<string name="1546">连接到 MySQL  开始</string>
+	<string name="1547">退出连接 MySQL</string>
+	<string name="1548">您正尝试通过 SSL 连接一个没有 SSL 配置的服务器。
+SQLyog 将继续用普通模式进行连接</string>
+	<string name="1549">&amp;密码</string>
+	<string name="1550">&amp;保存密码</string>
+	<string name="1551">&amp; 口令</string>
+	<string name="1552">&amp;保存口令</string>
+	<string name="1553">停止重建 &amp;标签</string>
+	<string name="1554">停止建立 &amp;标签</string>
+	<string name="1555">重建&amp;标签</string>
+	<string name="1556">建立&amp;标签</string>
+	<string name="1557"> 自动完成： [Tab]-> 下一个标签， [Ctrl+Space]-> 列出所有标签， [Ctrl+Enter]-> 列出匹配标签</string>
+	<string name="1558">无法启动 Plink</string>
+	<string name="1559">请提供您的 SSH 服务器用户名</string>
+	<string name="1560">请提供您的 SSH 服务器密码</string>
+	<string name="1561">请输入您的 SSH 服务器主机地址</string>
+	<string name="1562">请提供您的 SSH 服务器端口号</string>
+	<string name="1563">加载 SQLyog.dll 出错</string>
+	<string name="1564">您的查找没有任何匹配数据</string>
+	<string name="1565">所选等级不支持查找功能</string>
+	<string name="1566">在全部数据库 %s 中查找</string>
+	<string name="1567">在所有表 %s 中的数据库 `%s` 中查询</string>
+	<string name="1568">在所有栏位 %s 的表 `%s` 中查找</string>
+	<string name="1569">在栏位 `%s` ， `%s` ， `%s` 中查找</string>
+	<string name="1570">点击修改</string>
+	<string name="1571">查找</string>
+	<string name="1572">无法返回之前索引页面，请重新开始或刷新搜索</string>
+	<string name="1573">无法返回首页，请重新查找</string>
+	<string name="1574">数据查找</string>
+	<string name="1575">停止查找...</string>
+	<string name="1576">开始查找...</string>
+	<string name="1577">第一</string>
+	<string name="1578">先前的</string>
+	<string name="1579">下一个</string>
+	<string name="1580">返回要求生成数据集信息失败</string>
+	<string name="1581">错误</string>
+	<string name="1582">在您的正则表达式发现错误</string>
+	<string name="1583">在 `%s` ， `%s` ， `%s` 中查找过</string>
+	<string name="1584">在 %d 表查找过</string>
+	<string name="1585">所选数据类型中不包含任何列</string>
+	<string name="1586">所选等级中没有任何表</string>
+	<string name="1587">由于用户端出现错误，搜索在 %d 表之后停止</string>
+	<string name="1588">在 %d 表之后停止查找</string>
+	<string name="1589">在 `%s` ， `%s` ， `%s` 中查找</string>
+	<string name="1590">在 `%s` , `%s` 中查询</string>
+	<string name="1591">该服务器没有数据库</string>
+	<string name="1592">数据库</string>
+	<string name="1593">在 %s %s 中查找</string>
+	<string name="1594">在 %s 和另一个数据库 %s 中查找</string>
+	<string name="1595">在 %s ， 和另一个数据库 %s 中查找</string>
+	<string name="1596">在 %s 和 %d 其他数据库 %s 中查找</string>
+	<string name="1597">在 %s ，和 %d 其他数据库 %s 中查找</string>
+	<string name="1598">该数据库中没有任何表</string>
+	<string name="1599">表</string>
+	<string name="1600">在 %s %s 的数据库 `%s` 中查找</string>
+	<string name="1601">在 %s 的数据库 `%s` 和另一表 %s 中查找</string>
+	<string name="1602">在 %s 的数据库 `%s` 中查找</string>
+	<string name="1603">在 %s 的数据库 `%s` ，和另一个表 %s 中查找</string>
+	<string name="1604">在 %s 的数据库 `%s` ，和 %d 其他表 %s 中查找</string>
+	<string name="1605">在 %s 的数据库 `%s` ，和 %d 其他表 %s 中查找</string>
+	<string name="1606">在 %s 的数据库 `%s` 和 %d 其他表 %s 中查找</string>
+	<string name="1607">在 %s 的数据库 `%s` 和 %d 其他表 %s 中查找</string>
+	<string name="1608">该表中没有任何栏位</string>
+	<string name="1609">栏位</string>
+	<string name="1610">在所有栏位的表 `%s` 中查找</string>
+	<string name="1611">在 %s 的表 `%s` 中查找</string>
+	<string name="1612">在 %s 的表 `%s` 和另一个栏位中查询</string>
+	<string name="1613">在 %s 的表 `%s` 和另一个栏位中查找</string>
+	<string name="1614">在 %s 的表 `%s` 和其他两个栏位中查找</string>
+	<string name="1615">在 %s 的表 `%s` 和 %d 其他栏位中查找</string>
+	<string name="1616">在 %s 的表 `%s` 和 %d 其他栏位中查找</string>
+	<string name="1617">（所有数据类型）</string>
+	<string name="1618">（数字的</string>
+	<string name="1619">，短字符串</string>
+	<string name="1620">（短字符串</string>
+	<string name="1621">，日期/时间</string>
+	<string name="1622">（时间/日期</string>
+	<string name="1623">，二进制</string>
+	<string name="1624">（二进制</string>
+	<string name="1625">，和 `%s`</string>
+	<string name="1626">无效工作文件</string>
+	<string name="1627">无法打开工作文件</string>
+	<string name="1628">未提供源服务器详细信息</string>
+	<string name="1629">以批处理脚本向导导出数据</string>
+	<string name="1630">所有数据库使用同一文件</string>
+	<string name="1631">每个数据库使用不同文件</string>
+	<string name="1632">【注意：此选项允许你将 SQL 文件中的多个表进行数据备份， SQLyog 将为每个数据库生成一个以 db_{databasename}.sql 命名的文件】</string>
+	<string name="1633">所有目标使用同一文件</string>
+	<string name="1634">每个目标使用单独文件</string>
+	<string name="1635">【注意：该选项允许你备份 SQL 文件中多个表的数据， SQLyog 将为每个表生成一个以 tbl_{tablename}.sql 命名的文件】</string>
+	<string name="1636">【全部－包括 mysql 系统数据库】</string>
+	<string name="1637">【全部－不包括 mysql 系统数据库】</string>
+	<string name="1638">欢迎使用 SQLyog&apos;s 计划备份安装向导！</string>
+	<string name="1639">该安装向导将引导您按照步骤安排导出 SQL 数据，您可以利用该安装向导将导出的数据生成一个 SQL 文件或多个文件。
+
+一个工作文件里存储了这个任务的配置，将来您可以使用这个工作文件再次运行该任务。</string>
+	<string name="1640">*栏位</string>
+	<string name="1641">栏位</string>
+	<string name="1642">无法初始化调度器！</string>
+	<string name="1643">工作已存在。您想替换已经存在的工作吗？</string>
+	<string name="1644">出现错误！创建工作失败</string>
+	<string name="1645">请指定一个计划表名称</string>
+	<string name="1646">工作名称保存成功</string>
+	<string name="1647">创建 MMF 过程中出错</string>
+	<string name="1648">MapViewOfFile 有错误</string>
+	<string name="1649">SSH 错误：</string>
+	<string name="1650">这是 SQLyog 试用版本。
+您一次只能选择两个目标。
+打开一个文件夹选择任意两个目标以继续。</string>
+	<string name="1651">这是 SQLyog 试用版本。
+您一次只能选择两个表。</string>
+	<string name="1652">这是 SQLyog 使用版本。
+您一次只能导出一个数据库。</string>
+	<string name="1653">SQLyog 外部数据导入向导</string>
+	<string name="1654">欢迎使用 SQLyog 外部数据导入向导！</string>
+	<string name="1655">该安装向导将引导您导入外部数据，并在您安排导入过程中提供帮助。
+
+一个工作文件里存储了这个任务的配置，将来您可以使用这个工作文件再次运行该任务。</string>
+	<string name="1656">您可以为该表指定一个有效的 SQL WHERE 语句，只有满足该 WHERE 语句的行才会被导入。
+（注意：语句中请不要包含 WHERE ）</string>
+	<string name="1657">为了从 Access 数据库中正确导入例如 Foreign Keys 的 meta-data ，您会被要求为 Access 系统表提供许可。
+ （请确保您已以 .mdb 格式保存了数据库，因为 User-Level Security 功能在例如 .accdb, .accde, .accdc, .accdr 等新的文件格式中不可用）。</string>
+	<string name="1658">该数据库似乎正被文本文件驱动导入。该驱动限制为以下：
+
+1）表最大为 255 字段。
+2）字段名称最大为 64 个字符，字段宽度最大为 32,766 个字符。
+3）记录最大为 65,000 个字节。</string>
+	<string name="1659">您不能导入一个没有任何栏位的表</string>
+	<string name="1660">请输入一个工作名称</string>
+	<string name="1661">工作名称有错误</string>
+	<string name="1662">设定 SQL 环境出错</string>
+	<string name="1663">该 ODBC 驱动不兼容 3.0 ，请您安装 ODBC 3.0 兼容驱动。</string>
+	<string name="1664">无法发起 HDBC 连接</string>
+	<string name="1665">请输入一个文件夹名称</string>
+	<string name="1666">请输入一个文件名</string>
+	<string name="1667">请输入关于 ODBC 源的详细说明</string>
+	<string name="1668">provider 初始化失败</string>
+	<string name="1669">ODBC 环境下初始化发生错误</string>
+	<string name="1670">查询出现错误</string>
+	<string name="1671">查询无结果！</string>
+	<string name="1672">该 SQL 语句无效</string>
+	<string name="1673">ODBC 源在所选表中没有返回任何行</string>
+	<string name="1674">请指定一个工作名</string>
+	<string name="1675">无法创建临时工作档案</string>
+	<string name="1676">您确定要中止导入进程吗？</string>
+	<string name="1677">该 SQL 对象有效</string>
+	<string name="1678">该 SQL 对象有效！</string>
+	<string name="1679">您的操作系统不支持该功能！</string>
+	<string name="1680">－尚未完成</string>
+	<string name="1681">- 最近运行时间为： %u/%u/%u ： %u ： %02u</string>
+	<string name="1682">您真的想删除此项工作吗？</string>
+	<string name="1683">成功删除工作</string>
+	<string name="1684">工作初始化成功</string>
+	<string name="1685">无法与 SMTP 服务器建立连接</string>
+	<string name="1686">发送失败！</string>
+	<string name="1687">无法初始化 WinSock</string>
+	<string name="1688">无法示例 WinSock 1.1 版本</string>
+	<string name="1689">无法解析主机</string>
+	<string name="1690">无法创建 socket</string>
+	<string name="1691">无法连接到已提供的服务器和端口</string>
+	<string name="1692">无法连接服务器</string>
+	<string name="1693">超时错误</string>
+	<string name="1694">无法向服务器发送数据</string>
+	<string name="1695">无效接收者</string>
+	<string name="1696">SJA 不支持明文认证</string>
+	<string name="1697">SJA 不支持 CRAM-MD5 认证</string>
+	<string name="1698">SMTP 认证失败</string>
+	<string name="1699">用户名或密码未认证</string>
+	<string name="1700">SMTP 帐户名称与密码不匹配</string>
+	<string name="1701">SQL 调度器和报告工具！</string>
+	<string name="1702">欢迎使用 SQL 调度器和报告工具！</string>
+	<string name="1703">该向导会引导您通过若干步骤调度查询的执行，结果可以发送给多个接收者，您还可以使用该功能执行例如 ANALYZE, REPAIR 等维护查询。
+
+一个工作文件存储着这个任务的配置，今后您可以使用该工作文件再次运行该任务。</string>
+	<string name="1704">输入查询正确</string>
+	<string name="1705">您确定要终止提示过程？</string>
+	<string name="1706">工作文件有错误： %s 行 %d</string>
+	<string name="1707">源服务器信息不完整</string>
+	<string name="1708">您应该指定至少一个查询</string>
+	<string name="1709">请确认您的 SMTP 主机地址</string>
+	<string name="1710">请指定“邮件发送方”名称</string>
+	<string name="1711">您应该提供“发送方”邮件地址</string>
+	<string name="1712">警告：未提供邮件主题</string>
+	<string name="1713">请指定一个“登录名称”用来认证</string>
+	<string name="1714">请指定一个“密码”用来认证</string>
+	<string name="1715">请指定一个 HTTP 隧道 URL</string>
+	<string name="1716">请指定 SSH 服务器主机</string>
+	<string name="1717">请输入至少一个查询</string>
+	<string name="1718">文件中没有查询</string>
+	<string name="1719">无法创建管道进程</string>
+</resources>

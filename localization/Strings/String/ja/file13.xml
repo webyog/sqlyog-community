@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3492">正規化したホワイトスペースでコピーする	Alt+C</string>
+	<string name="3493">キープアライブ間隔</string>
+	<string name="3494">データ/インフォメーション/履歴タブの位置を表にする</string>
+	<string name="3495">クエリータブのデータ</string>
+	<string name="3496">クエリータブのインフォメーション</string>
+	<string name="3497">クエリータブの履歴</string>
+	<string name="3498">コメント</string>
+	<string name="3499">ストリング</string>
+	<string name="3500">キーワード</string>
+	<string name="3501">ナンバー</string>
+	<string name="3502">オペレーター</string>
+	<string name="3503">隠しコマンド</string>
+	<string name="3504">ラインナンバーマージン</string>
+	<string name="3505">フォールディングマージン</string>
+	<string name="3506">テキスト選択</string>
+	<string name="3507">ブレースマッチ</string>
+	<string name="3508">ブレースアンマッチ</string>
+	<string name="3509">キャンバス</string>
+	<string name="3510">ライン</string>
+	<string name="3511">メッセージ/表データ/インフォメーション</string>
+	<string name="3512">結果をクリックしてデータを見る/編集する</string>
+	<string name="3513">&amp;接続情報をエクスポート...</string>
+	<string name="3514">&amp;接続情報をインポート...</string>
+	<string name="3515">接続情報をエクスポート／インポート</string>
+	<string name="3516">データのエクスポートに成功しました。ファイルを開きますか？</string>
+	<string name="3517">アーカイブするファイル名を指定してください</string>
+	<string name="3518">接続の種類</string>
+	<string name="3519">接続名</string>
+	<string name="3521">アンドマーク、ファイルを開く</string>
+	<string name="3522">ホスト</string>
+	<string name="3523">アンドマーク、すべて選択する/すべて選択解除する</string>
+	<string name="3524">アンドマーク、インポート</string>
+	<string name="3525">接続情報をエクスポート</string>
+	<string name="3526">接続情報をインポート</string>
+</resources>

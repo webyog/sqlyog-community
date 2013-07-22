@@ -1,0 +1,288 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1240">SQL 格式器</string>
+	<string name="1241">最近用过的架构设计文件</string>
+	<string name="1242">%s 已经存在。
+您是否想要替换？</string>
+	<string name="1243">另存为...</string>
+	<string name="1244">刷新对象浏览器	F5</string>
+	<string name="1245">执行查询	F9</string>
+	<string name="1246">执行当前查询	F9</string>
+	<string name="1247">执行所选查询	Ctrl+F9</string>
+	<string name="1248">执行所有查询	Ctrl+F9</string>
+	<string name="1249">刷新对象浏览器	F9</string>
+	<string name="1250">执行当前查询	F5</string>
+	<string name="1251">执行查询	F5</string>
+	<string name="1252">执行所选查询	Ctrl+F5</string>
+	<string name="1253">执行所有查询	Ctrl+F5</string>
+	<string name="1254">所用路径有误</string>
+	<string name="1255">其他颜色...</string>
+	<string name="1256">计算适合的数据类</string>
+	<string name="1257">当前数据库上下文为 `%s`。文件中的 SQL 语句将在此执行，除非在文件中使用一个或多个 USE 语句指定其他数据库上下文。您是否想要继续？</string>
+	<string name="1258">执行</string>
+	<string name="1259">无法导入体积为 0 的转储文件。</string>
+	<string name="1260">执行的查询：%u</string>
+	<string name="1261">导入不成功</string>
+	<string name="1262">导入不成功。打开批处理文件时出错</string>
+	<string name="1263">导入成功</string>
+	<string name="1264">打开</string>
+	<string name="1265">执行的查询：%lld</string>
+	<string name="1266">执行查询时遇到了错误。
+查询和错误信息已被记录到：
+%s。
+请点击“打开错误文件...”以打开该错误文件。</string>
+	<string name="1267">无法获取 SQLyog.err 文件信息！</string>
+	<string name="1268">选择至少一个字段</string>
+	<string name="1269">选择要将数据库备份到的文件夹</string>
+	<string name="1270">还原表信息</string>
+	<string name="1271">无法加载该文件夹中的任何 .MYD 文件！</string>
+	<string name="1272">查询：
+%s
+
+出错处：%s
+错误代码：%d - %s</string>
+	<string name="1273">查询：
+%s
+
+出错处：%s
+行号：%d
+错误代码： %d - %s</string>
+	<string name="1274">无法建立连接</string>
+	<string name="1275">无法使用 `use` 语句</string>
+	<string name="1276">无法获取 Tunnel 版本</string>
+	<string name="1277">无法获得结果集</string>
+	<string name="1278">尚未创建网格控制</string>
+	<string name="1279">您是否真的要丢弃该索引？</string>
+	<string name="1280">在 %s 中创建新索引。%s</string>
+	<string name="1281">在 %s 中修改现有索引。%s</string>
+	<string name="1282">选择至少一个创建索引的列</string>
+	<string name="1283">无法打开资源文件</string>
+	<string name="1284">为了让语言设置的改动生效，请重启动 SQLyog</string>
+	<string name="1285">正在丢弃数据库 %s</string>
+	<string name="1286">该选项无法在 HTTP 隧道模式下使用。
+
+如果您需要将本地 CSV 文件直接上传到远程服务器，您可以使用 SQLyog 的迁移工具包。 
+您可以使用的 ODBC 驱动为 Microsoft Text Driver （*.txt, *.csv） ODBC 驱动，操作系统内含该驱动。</string>
+	<string name="1287">该选项无法在 HTTP 隧道模式下使用。</string>
+	<string name="1288">正在刷新对象浏览器</string>
+	<string name="1289">无法刷新对象浏览器</string>
+	<string name="1290">对象浏览器已刷新</string>
+	<string name="1291">未选择数据库</string>
+	<string name="1292">新数据搜索	Ctrl+Shift+D</string>
+	<string name="1293">数据搜索	Ctrl+Shift+D</string>
+	<string name="3459">新数据搜索	Ctrl+Shift+D</string>
+	<string name="1294">您是否真的想要丢弃数据库 (%s)？
+
+警告：您的所有数据都将丢失！</string>
+	<string name="1295">丢弃操作出错 %s</string>
+	<string name="1296">已成功丢弃 %s</string>
+	<string name="1297">您是否真的要丢弃表 (%s)？
+
+警告：您的所有数据都将丢失！</string>
+	<string name="1298">您无法删除所有列</string>
+	<string name="1299">您是否真的要丢弃列 (%s)？
+
+警告：您的所有数据都将丢失！</string>
+	<string name="1300">您是否真的要丢弃索引 (%s)？)</string>
+	<string name="1301">索引已成功删除</string>
+	<string name="1302">您是否真的要修剪表 (%s)？
+
+警告：您的所有数据都将丢失！</string>
+	<string name="1303">索引已成功创建</string>
+	<string name="1304">您是否真的要修剪数据库 (%s) 所有表中的数据？
+
+警告：您的所有数据都将丢失！</string>
+	<string name="1305">您是否真的想要丢弃 %s (%s)？</string>
+	<string name="1306">您是否真的想要丢弃触发器 (%s)？</string>
+	<string name="1307">未找到视图定义。
+
+可能是因为该视图的创建类似 
+“创建视图...SQL 安全定义者...”
+而您不是该定义者</string>
+	<string name="1308">无可用信息！</string>
+	<string name="1309">高级属性 - &apos;%s&apos; 中的 &apos;%s&apos;</string>
+	<string name="1310">服务器状态</string>
+	<string name="1311">服务器变量</string>
+	<string name="1312">服务器过程列表</string>
+	<string name="1313">无法杀掉该进程。 
+这是当前连接线程的 ID</string>
+	<string name="1314">架构成功生成</string>
+	<string name="1315">生成架构时遇到了错误。</string>
+	<string name="1316">为 &apos;%s&apos; 创建架构</string>
+	<string name="1317">正在创建架构...</string>
+	<string name="1318">架构已成功创建...</string>
+	<string name="1319">创建架构时出错...</string>
+	<string name="1320">正在为 %s 获取字段信息</string>
+	<string name="1321">正在为 %s 写入失败信息</string>
+	<string name="1322">正在为 %s 获取索引信息</string>
+	<string name="1323">正在为 %s 写入索引信息</string>
+	<string name="1324">正在为 %s 写入 FK 信息</string>
+	<string name="1325">正在为 %s 获取 FK 信息</string>
+	<string name="1326">请为表设置名称</string>
+	<string name="1327">请至少选择一个字段</string>
+	<string name="1328">无法调整表，并为该表添加外部键关系。
+然而结构和数据已成功复制。</string>
+	<string name="1329">为该表复制外部键关系时遇到了错误。
+结构和数据已成功复制。</string>
+	<string name="1330">表已成功复制</string>
+	<string name="1331">表诊断信息</string>
+	<string name="1332">确认列重新排序</string>
+	<string name="1333">确认丢弃关系</string>
+	<string name="1334">列已成功重新排序</string>
+	<string name="1335">列重新排序未成功</string>
+	<string name="1336">列重新排序未成功。
+您可以从临时表中找回您的数据</string>
+	<string name="1337">列重新排序时出错</string>
+	<string name="1338">操作被用户取消</string>
+	<string name="1339">正在对列重新排序...</string>
+	<string name="1340">请从列表中选择一个过程</string>
+	<string name="1341">无法杀除过程列表...</string>
+	<string name="1342">枚举值列表</string>
+	<string name="1343">设置值列表</string>
+	<string name="1344">重复值</string>
+	<string name="1345">首选项</string>
+	<string name="1346">注意：要查看所有警告的完整列表，请启用 工具 -> 首选项 -> 常规 -> 在信息选项卡下显示警告</string>
+	<string name="1347">执行耗时</string>
+	<string name="1348">总耗时</string>
+	<string name="1349">查询：%s</string>
+	<string name="1350">错误代码： %d
+%s</string>
+	<string name="1351">返回了 %lu 行</string>
+	<string name="1352">共 %lu 行受到影响</string>
+	<string name="1353">， %lu 个警告</string>
+	<string name="1354">您是否要从数据库中删除该外部键？</string>
+	<string name="1355">所选表不支持外部键。
+表引擎必须为 InnoDB、PBXT，或 SolidDB。</string>
+	<string name="1356">修改关系</string>
+	<string name="1357">未找到可创建关系的表</string>
+	<string name="1358">请选则所引用的表</string>
+	<string name="1359">请选择要引用的列</string>
+	<string name="1360">请选则数量相同的来源和引用列</string>
+	<string name="1361">提供有效的外部键名称</string>
+	<string name="1362">执行：%s</string>
+	<string name="1363">总数：%s</string>
+	<string name="1364">%lu 行</string>
+	<string name="1365">批量查询成功完成</string>
+	<string name="1366">批量查询完成但存在错误</string>
+	<string name="1367">注释</string>
+	<string name="1368">自动增量</string>
+	<string name="1369">平均行长度</string>
+	<string name="1370">最大行数</string>
+	<string name="1371">最小行数</string>
+	<string name="1372">行格式</string>
+	<string name="1373">延迟键写入</string>
+	<string name="1374">校验</string>
+	<string name="1375">无法读取该表的数据！</string>
+	<string name="1376">该选项卡的内容已经被更改。
+
+您是否想保存这些改动？</string>
+	<string name="1377">%s 文件的内容已经被更改。
+
+您是否想保存这些改动？</string>
+	<string name="1378">您是否真的要丢弃该列？</string>
+	<string name="1379">所选列被索引/外部键所引用。
+丢弃这些内容也将更改索引/外部键...
+您是否想要继续？</string>
+	<string name="1380">您是否要丢弃所选列？</string>
+	<string name="1381">一个或多个所选列被索引/外部键所引用。
+丢弃这些内容也将更改索引/外部键...
+您是否要继续？</string>
+	<string name="1382">隐藏语言选项</string>
+	<string name="1383">数据类型 (%s) 不支持默认空字符串 (&apos;&apos;)</string>
+	<string name="1384">您是否真的要丢弃所选外部键？</string>
+	<string name="1385">您是否真的要丢弃外部键？</string>
+	<string name="1386">有多个主要键无法定义。</string>
+	<string name="1387">您是否要丢弃所选索引？</string>
+	<string name="1388">您是否真的要丢弃该字段？</string>
+	<string name="1389">请在表中至少添加一行</string>
+	<string name="1390">什么都没修改。</string>
+	<string name="1391">该数据类无法支持默认空字符串(&apos;&apos;)</string>
+	<string name="1392">字段名  (%s) 未指定数据类</string>
+	<string name="1393">创建新表</string>
+	<string name="1394">输入新表名</string>
+	<string name="1395">请提供表名</string>
+	<string name="1396">表已成功创建。您是否想要添加更多表？</string>
+	<string name="1397">&apos;%s&apos; 中的新表</string>
+	<string name="1398">表名称</string>
+	<string name="1399">数据库</string>
+	<string name="1400">表类型</string>
+	<string name="1401">字符集</string>
+	<string name="1402">核对</string>
+	<string name="1403">保存</string>
+	<string name="1404">回复</string>
+	<string name="1405">您的改动将丢失。您是否真的想要退出？</string>
+	<string name="1406">1 列</string>
+	<string name="1407">2 个索引</string>
+	<string name="1408">3 个外部键</string>
+	<string name="1409">5 个 SQL 预览</string>
+	<string name="1410">4 个高级属性</string>
+	<string name="1411">结果</string>
+	<string name="1412">信息</string>
+	<string name="1413">表数据</string>
+	<string name="1414">数据集</string>
+	<string name="1415">对象</string>
+	<string name="1416">历史记录</string>
+	<string name="1417">%u 个结果</string>
+	<string name="1418">%u 个结果</string>
+	<string name="1419">%u 条信息</string>
+	<string name="1420">%u 条信息</string>
+	<string name="1421">%u 条信息</string>
+	<string name="1422">%u 条信息</string>
+	<string name="1423">%u 条历史记录</string>
+	<string name="1424">%u 条历史记录</string>
+	<string name="1425">%u 条表数据</string>
+	<string name="1426">%u 个表数据</string>
+	<string name="1427">&amp;%u 个配置文件</string>
+	<string name="1428">%u 个配置文件</string>
+	<string name="1429">新表</string>
+	<string name="1430">找到该表的冗余索引。 &lt;a href=&quot;redundantindexes_help &quot; target=&quot;_blank&quot;> 了解详情&lt;/a></string>
+	<string name="1431">在数据库中为每个表找到冗余索引。 &lt;a href=&quot;redundantindexes_help &quot; target=&quot;_blank&quot;> 了解详情&lt;/a></string>
+	<string name="1432">/*表： %s*/</string>
+	<string name="1433">/*视图：%s*/</string>
+	<string name="1434">/*列信息*/</string>
+	<string name="1435">/*索引信息*/</string>
+	<string name="1436">/*DDL 信息*/</string>
+	<string name="1437">表已成功修改</string>
+	<string name="1438">表名称未指定。</string>
+	<string name="1439">索引未正确指定。</string>
+	<string name="1440">外部键未能正确指定。</string>
+	<string name="1441">表已成功创建。</string>
+	<string name="1442">找不到 &quot;%s&quot;</string>
+	<string name="1443">SQLyog 无法获取创建用户管理器对话框所需的必要信息。这可能是因为用户在 &apos;mysql&apos; 数据库中针对该表没有 SELECT 权限。如果缺少该信息，SQLyog 用户管理器将无法继续运行。</string>
+	<string name="1444">全局特权</string>
+	<string name="1445">对象级别特权</string>
+	<string name="1446">新用户</string>
+	<string name="1447">用户更名</string>
+	<string name="1448">修改用户</string>
+	<string name="1449">修改该用户的用户名、密码，以及各种限制</string>
+	<string name="1450">创建受到限制的用户</string>
+	<string name="1451">批准/撤销该用户的全局特权</string>
+	<string name="1452">批准/撤销该用户的所选特权</string>
+	<string name="1453">保存改动</string>
+	<string name="1454">取消改动</string>
+	<string name="1455">密码不匹配</string>
+	<string name="1456">您尚未指定用户名。您是否要创建匿名用户？</string>
+	<string name="1457">取消</string>
+	<string name="1458">创建</string>
+	<string name="1459">用户管理器无法在使用空用户集的情况下继续。正在关闭</string>
+	<string name="1460">您尚未指定用户名。您是否想要将其更名为匿名用户？</string>
+	<string name="1461">您是否真的要删除该用户？</string>
+	<string name="1462">加载 SciLexer.dll 时出错</string>
+	<string name="1463">加载 riched20.dll 时出错</string>
+	<string name="1464">GetModuleFileName 长度失败！</string>
+	<string name="1465">SQLyog 已被中止</string>
+	<string name="1466">警告</string>
+	<string name="1467">MySQL 警告</string>
+	<string name="1468">错误信息</string>
+	<string name="1469">MySQL 错误</string>
+	<string name="1470">已执行的 SQL 语句：%s</string>
+	<string name="1471">错误号：%s</string>
+	<string name="1472">错误信息：%s</string>
+	<string name="1473">（选择现有连接...）</string>
+	<string name="1474">文档搜索已完成</string>
+	<string name="1475">已到达文档开头。您是否想继续从结尾处开始搜索？</string>
+	<string name="1476">已到达文档末尾。您是否想继续从头开始搜索？</string>
+	<string name="1477">文档搜索已完成。要搜索的内容未找到</string>
+	<string name="1478">内存不足，应用程序将关闭！</string>
+	<string name="1479">（选择一个数据库...）</string>
+</resources>

@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3361">機能とルーチン・パラメータ一覧	Ctrl+Shift+Space</string>
+	<string name="3362">すべてはい</string>
+	<string name="3363">すべていいえ</string>
+	<string name="3364">&amp;取り消し</string>
+	<string name="3365">&amp;4 上級</string>
+	<string name="3366">エンジン</string>
+	<string name="3367">すべてをコピーします</string>
+	<string name="3368">カラム名</string>
+	<string name="3370">PK(プライマリーキー)?</string>
+	<string name="3371">Not Null?</string>
+	<string name="3372">Binary(バイナリ)？</string>
+	<string name="3373">Unsigned(符合なし)?</string>
+	<string name="3374">Auto Incr(自動加算)?</string>
+	<string name="3375">Zerofill?</string>
+	<string name="3376">インデックス名</string>
+	<string name="3377">インデックスタイプ</string>
+	<string name="3378">制約名</string>
+	<string name="3379">参照するカラム</string>
+	<string name="3380">参照されるデータベース</string>
+	<string name="3381">参照されるテーブル</string>
+	<string name="3382">参照されるカラム</string>
+	<string name="3383">On Update</string>
+	<string name="3384">On Delete</string>
+	<string name="3385">テーブル名が指定されていません</string>
+	<string name="3386">カラム名とデータタイプは必須です</string>
+	<string name="3387">データタイプが指定されていません</string>
+	<string name="3388">デフォルトの空白文字列('')は%sデータタイプではサポートされていません</string>
+	<string name="3389">長さは%sデータタイプで指定してください</string>
+	<string name="3390">このテーブルにはカラムがありません。最低でも１つカラムを定義してください</string>
+	<string name="3391">テーブルが作成されました</string>
+	<string name="3392">カラムが定義されていません</string>
+	<string name="3393">カラムが選択されていません</string>
+	<string name="3394">外部キーに対して参照するカラムが選択されていません</string>
+	<string name="3395">参照されるデータベースが選択されていません</string>
+	<string name="3396">参照されるテーブルが選択されていません</string>
+	<string name="3397">外部キーに対して参照されるカラムが選択されていません</string>
+	<string name="3398">参照するカラムの数と参照されるカラムの数が一致しません</string>
+	<string name="3399">データタイプ</string>
+	<string name="3400">長さ</string>
+	<string name="3401">カラムを選択してください。上下ボタンを使って並べ替えができます。</string>
+	<string name="3402">保留中のクエリーはありません</string>
+	<string name="3403">テーブルが作成されました。
+
+続けてテーブルを作成しますか？</string>
+	<string name="3404">選択されたカラムは1つ以上のインデックスから参照されています。これらのカラムを削除すると該当するインデックスも修正されます。
+
+続行しますか？</string>
+	<string name="3405">選択されたカラムは１つ以上の外部キーから参照されています。これらのカラムを削除すると該当する外部キーも修正されます。
+
+続行しますか？</string>
+	<string name="3406">選択されたカラムは１つ以上のインデックスと外部キーから参照されています。これらのカラムを削除すると該当するインデックスと外部キーも修正されます。
+
+続行しますか？</string>
+	<string name="3407">選択されたカラムは1つ以上のインデックスから参照されています。これらのカラムを削除すると該当するインデックスも修正されます。
+
+続行しますか？</string>
+	<string name="3408">選択されたカラムは１つ以上の外部キーから参照されています。これらのカラムを削除すると該当する外部キーも修正されます。
+
+続行しますか？</string>
+	<string name="3409">選択されたカラムは１つ以上のインデックスと外部キーから参照されています。これらのカラムを削除すると該当するインデックスと外部キーも修正されます。
+
+続行しますか？</string>
+	<string name="3410">複数のプライマリーキーは定義できません。</string>
+	<string name="3411">このインデックスを削除しますか？</string>
+	<string name="3412">選択したインデックスを削除しますか？</string>
+	<string name="3413">この外部キーを削除しますか？</string>
+	<string name="3414">選択した外部キーを削除しますか？</string>
+	<string name="3415">MySQLでは外部キーを直接ALTERする方法がありません。
+SQLyog は現在の外部キーを削除し、同様の名前の新しいキーを作成します。
+外部キーの作成条件(データタイプの整合性や適切なインデックスなど)が満たされない場合は、作成に失敗します。その結果、外部キーが削除されても新しいものは作成されません。
+この問題はキーに新しい名前を指定することで回避できます。
+
+続行しますか？</string>
+
+	<string name="3416">このカラムを削除しますか？</string>
+	
+	<string name="3417">選択したカラムを削除しますか？</string>
+	<string name="3418">テーブルを修正</string>
+	<string name="3419">データベースの名称を使用します</string>
+	<string name="3420">新しい行を挿入 (Alt+Ins)</string>
+	<string name="3421">選択された行を削除 (Alt+Del)</string>
+	<string name="3422">上へ移動 (Alt+Up)</string>
+	<string name="3423">下へ移動 (Alt+Down)</string>
+	<string name="3424">転送時間</string>
+	<string name="3425">他のタブに切り替えることはできません。他のコネクションを作成してください。(Ctrl＋N)</string>
+	<string name="3426">クエリの実行進行中！</string>
+	<string name="3427">エラーで中断</string>
+	<string name="3428">規則表現として</string>
+	<string name="3429">データベース照合</string>
+	<string name="3430">クエリをクリップボードにコピーする</string>
+	<string name="3431">クエリを新しいクエリタブにコピーする</string>
+	<string name="3432">クエリを同じクエリタブにコピーする</string>
+	<string name="3434">テーブルをキャンバスに加える</string>
+	<string name="3435">テーブルを作成する</string>
+	<string name="3436">スキーマデザインをロードする (Ctrl+O)</string>
+	<string name="3437">キャンバスを最新の情報に更新する (F5)</string>
+	<string name="3438">キャンバスを画像としてエクスポートする</string>
+	<string name="3439">印刷する</string>
+	<string name="3440">ズームインする</string>
+	<string name="3441">ズームアウトする</string>
+	<string name="3443">ビューを作成する</string>
+	<string name="3444">プロシージャを作成する</string>
+	<string name="3445">トリガーを作成する</string>
+	<string name="3446">ファンクションを作成する</string>
+	<string name="3447">イベントを作成する</string>
+	<string name="3448">initコマンド</string>
+	<string name="3449">(セミコロン &apos;;&apos; で複数のコマンドを分ける)</string>
+	<string name="3450">フォント&amp;&amp;エディタ設定</string>
+	<string name="3451">オブジェクトブラウザ</string>
+	<string name="3452">foreign_key_checksを0に設定</string>
+	
+	
+	<string name="3453">&amp;新しいタブでテーブルを開く</string>
+	<string name="3458">&amp;テーブルデータ</string>
+<!--string name="3459" is in file2.xml -->
+	<string name="3460">&amp;新しいタブでテーブルを開く	Ctrl+F11</string>
+	<string name="3461">初期コマンド</string>
+	
+	<string name="3463">&amp;テーブルデータ	F11</string>
+	<string name="3464">バックグラウンド カラー</string>
+	<string name="3465">フォアグラウンドカラー</string>
+	<string name="3466">オブジェクトブラウザーからテーブル/ビューを選択</string>
+	<string name="3467">新しい列を挿入 (Alt+Ins)</string>
+	<string name="3468">選択した列を削除 (Alt+Del)</string>
+	<string name="3469">選択したインデックスを削除 (Alt+Del)</string>
+	<string name="3470">新しいインデックスを挿入 (Alt+Ins)</string>
+	<string name="3471">選択したFKを削除 (Alt+Del)</string>
+	<string name="3472">新しいFKを挿入 (Alt+Ins)</string>
+	<string name="3477">テーブルデータ/結果タブに固定</string>
+	<string name="3478">&amp;行数の初期値</string>
+	<string name="3479">ツールバーのサイズ</string>
+	<string name="3480">テーマ</string>
+	<string name="3481">小さい</string>
+	<string name="3482">ノーマル</string>
+	<string name="3483">大きい</string>
+	<string name="3484">全て実行</string>
+	<string name="3486">( 注意:複数のクエリーを分割 ; )</string>
+	<string name="3487">テーブル/ビューを追加</string>
+	<string name="3488">&amp;更新	F9</string>
+	<string name="3489">クエリー%sの生成に失敗しました。</string>
+	<string name="3490">SQLyogは選択されたテーブルのデータベースを確認出来ませんでした。
+
+アクティブなデータベースのコンテキストを使用しますか?</string>
+	<string name="3491">データベースが選択されていません。データベースを選択して、もう一度お試しください。</string>
+</resources>

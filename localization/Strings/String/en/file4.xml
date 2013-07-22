@@ -1,0 +1,284 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1720">Please specify a subject</string>
+	<string name="1721">Invalid Logfile name</string>
+	<string name="1722">The file does not contain any query to execute</string>
+	<string name="1723">Enable Query Profiler (Ultimate only)</string>
+	<string name="1724">Select a folder where you want to save the tagfiles</string>
+	<string name="1725">EXPLAIN Result</string>
+	<string name="1726">EXPLAIN EXTENDED Information</string>
+	<string name="1727">SHOW PROFILE Result (ordered by duration)</string>
+	<string name="1728">Uptime</string>
+	<string name="1729">Uptime_since_flush_status</string>
+	<string name="1730">&lt;UL>&lt;LI>Query Profiling information will be displayed here when executing a SELECT statement as you have enabled this option in &apos;Preferences&apos;						&lt;LI>Note that only SELECT statements are supported with the Query Profiler					&lt;/UL></string>
+	<string name="1731">Note: Profiling results displayed below is for a query with a LIMIT clause added by SQLyog as					 &lt;a href=&quot;pref_others &quot; target=&quot;_blank&quot;> Enable Autopaging in Result tab&lt;/a> is selected</string>
+	<string name="1732">No Query Profiler option(s) selected. Go to Tools->Preferences and select atleast one.</string>
+	<string name="1733">Query Profiler is not supported with HTTP-tunnel</string>
+	<string name="1734">* Actual values after query execution (not changes due to query)</string>
+	<string name="1735"># Global values (affected by operations by all clients connected)</string>
+	<string name="1736">Session variables are not supported by this version of MySQL. All status variables listed below are Global (affected by operations by all clients connected)</string>
+	<string name="1737">A reconnect took place while executing query. No information is available</string>
+	<string name="1738">Profile information was not found, try to execute the query once again</string>
+	<string name="1739">This MySQL server version doesn&apos;t support EXPLAIN EXTENDED Information.</string>
+	<string name="1740">This MySQL server version doesn&apos;t support SHOW PROFILE</string>
+	<string name="1741">Change Of STATUS VARIABLES Due To Execution Of Query</string>
+	<string name="1742">This analysis requires MySQL 5.0 or higher</string>
+	<string name="1743">No index is defined for this table</string>
+	<string name="1744">No table is found in the database</string>
+	<string name="1745">Out of memory, Failed to continue the operation</string>
+	<string name="1746">Thank you for registering SQLyog %s - MySQL GUI.</string>
+	<string name="1747">Thank you for registering SQLyog %s - MySQL GUI.
+Please restart SQLyog to enable all settings</string>
+	<string name="1748">The trial period has expired.</string>
+	<string name="1749">This is a &quot;Fully loaded&quot; version of SQLyog</string>
+	<string name="1750">To get your License key, you need to purchase SQLyog from:</string>
+	<string name="1751">Please enter your license key</string>
+	<string name="1752">The table is empty. Optimizing the datatypes for this table is not possible without data.</string>
+	<string name="1753">Not enough memory to complete the operation</string>
+	<string name="1754">&amp;Table</string>
+	<string name="1755">Please select atleast one %s.</string>
+	<string name="1756">Please select atleast one data type.</string>
+	<string name="1757">column</string>
+	<string name="1758">All Columns</string>
+	<string name="1759">Database Synchronization Wizard</string>
+	<string name="1760">Welcome to Database Synchronization Wizard!</string>
+	<string name="1761">This wizard will guide you through the steps to synchronize data between two databases and also help you in Scheduling synchronization process.
+
+A job file stores the configuration of this task. You can use the job file to run this task again in the future.</string>
+	<string name="1762">Error No. 2003
+Can&apos;t connect to MySQL server on &apos;localhost&apos;</string>
+	<string name="1763">You have already selected [ALL] tables</string>
+	<string name="1764">show full fields from `%s`</string>
+	<string name="1765">Select at least one column for table [%s]</string>
+	<string name="1766">Incorrect WHERE clause in table [%s]
+
+%s</string>
+	<string name="1767">Could not create temporary job file.</string>
+	<string name="1768">Error in Create File Mapping</string>
+	<string name="1769">SOURCE server information not complete
+</string>
+	<string name="1770">TARGET server information not complete
+</string>
+	<string name="1771">You have to specify atleast one table.
+</string>
+	<string name="1772">Table name was not specified
+</string>
+	<string name="1773">Please specify atleast one column for &apos;%s&apos; table
+</string>
+	<string name="1774">Please provide HTTP tunnel URL.
+</string>
+	<string name="1775">Please provide SSH Host information.
+</string>
+	<string name="1776">Do you really want to terminate the synchronization process?</string>
+	<string name="1777">Please select source database</string>
+	<string name="1778">Please select target database</string>
+	<string name="1779">Data Sync with this SQLyog version will work with MySQL servers from version 4.1.1 and up. One or more of the servers you specified is a lower version. Please contact Webyog for a solution</string>
+	<string name="1780">Data Sync with this SQLyog version will work with MySQL servers from version 4.1.1 and up. One or more of the servers you specified is a lower version. Please contact Webyog for a solution.</string>
+	<string name="1781">WARNING !!! Could not open file mapping object (%d).
+</string>
+	<string name="1782">You must leave at least one of the last 3 checkboxes unchecked.
+ With all those 3 checked there is nothing to be synced.</string>
+	<string name="1783">This will change schema in the target. Do you want to continue?</string>
+	<string name="1784">Comparing tables</string>
+	<string name="1785">Comparing views</string>
+	<string name="1786">Comparing stored procs</string>
+	<string name="1787">Comparing events</string>
+	<string name="1788">Comparing functions</string>
+	<string name="1789">Comparing triggers</string>
+	<string name="1790">Could not read the key file.</string>
+	<string name="1791">Nothing to save!</string>
+	<string name="1792">Compare unsuccessful</string>
+	<string name="1793">Compare successful</string>
+	<string name="1794"> 
+
+/* The foreign keys that were dropped are now re-created*/
+</string>
+	<string name="1795"> 
+
+/* Foreign Keys must be dropped in the target to ensure that requires changes can be done*/
+</string>
+	<string name="1796">Drag Tables from Object Browser or Right Click -> Add Tables</string>
+	<string name="1797">Drag Tables/Views from Object Browser or Right Click -> Add Tables/Views</string>
+	<string name="1798">To select column, double-click on a column name or drag and drop column(s) into the grid</string>
+	<string name="1799">Currently Query Builder supports tables/views from single database only</string>
+	<string name="1800">You can&apos;t specify criteria for the asterisk(*)</string>
+	<string name="1801">Duplicate Alias/Table neme</string>
+	<string name="1802">Could not open Query Builder file.</string>
+	<string name="1803">Database not found</string>
+	<string name="1804">The content of %s file has been changed.
+
+Do you want to save the Query Design?</string>
+	<string name="1805">The content of this tab has been changed.
+
+Do you want to save the Query Design?</string>
+	<string name="1806">Do you want to close the Query Builder?</string>
+	<string name="1807">Invalid Query Builder file.</string>
+	<string name="1808">Drag Tables from Object Browser or Right Click -> Add Tables or Use Canvas Toolbar</string>
+	<string name="1809">Only tables from the same database can be used in one Schema Designer tab</string>
+	<string name="1810">Selected table already present on canvas</string>
+	<string name="1811">Are you sure you want to delete this foreign key</string>
+	<string name="1812">Could not open Schema Design file.</string>
+	<string name="1813">No tables are selected</string>
+	<string name="1814">Table mismatch. Refresh the canvas</string>
+	<string name="1815">Nothing to print!</string>
+	<string name="1816">The percentage must be between 10 and 600</string>
+	<string name="1817">&amp;Refresh 	F5</string>
+	<string name="1818">&amp;Refresh 	F9</string>
+	<string name="1819">There is not enough memory to create bitmap. Please close some programs and try again.</string>
+	<string name="1820">Error occured while printing</string>
+	<string name="1821">Could not create bitmap</string>
+	<string name="1822">Could not create bitmap. Not enough memory!</string>
+	<string name="1823">Invalid Schema file.</string>
+	<string name="1824">Invalid schema design.</string>
+	<string name="1825">Database name not provided.</string>
+	<string name="1826">Invalid Schema file</string>
+	<string name="1827">Error in CREATE Table statement</string>
+	<string name="1828">No database selected!</string>
+	<string name="1829">Select a Column to Delete</string>
+	<string name="1830">The table(%s) does not support foreign keys.
+Table engine must be InnoDB, PBXT or SolidDB.</string>
+	<string name="1831">The content of %s file has been changed.
+
+Do you want to save the Schema Design?</string>
+	<string name="1832">The content of this tab has been changed.
+
+Do you want to save the Schema Design?</string>
+	<string name="1833">Default printer not found</string>
+	<string name="1834">Error occured while selecting default printer</string>
+	<string name="1835">Please provide proxy server address</string>
+	<string name="1836">Please provide proxy server port number</string>
+	<string name="1837">Error in tunneling. The HTTP response may be invalid, PHP settings may not allow for tunneling or similar. You may send the HTTP response to support@webyog.com. You may also try the settings behind the &apos;advanced&apos; button to resolve the problem.</string>
+	<string name="1838">Error connecting to HTTP server.</string>
+	<string name="1839">SQLyog tunneling file version mismatch or PHP Error.
+Please upload the latest SQLyogTunnel.php from the installation folder of SQLyog.</string>
+	<string name="1840">Query stopped by user.</string>
+	<string name="1841">Error getting response from the tunnelpage.</string>
+	<string name="1842">PHP version was found to be &lt; 4.3.0. You will need to upgrade to v4.3.0 or greater to use HTTP Tunneling.</string>
+	<string name="1843">HTTP Error. Authorization Required!.</string>
+	<string name="1844">HTTP Error. Could not connect to the tunneling URL.</string>
+	<string name="1845">Unknown HTTP server error</string>
+	<string name="1846">The request could not be processed by the server due to invalid syntax.</string>
+	<string name="1847">The requested resource requires user authentication.</string>
+	<string name="1848">Not implemented in the HTTP protocol.</string>
+	<string name="1849">The server understood the request, but will not fulfill it.</string>
+	<string name="1850">The server has not found anything matching the requested URI.</string>
+	<string name="1851">The HTTP verb used is not allowed.</string>
+	<string name="1852">No responses acceptable to the client were found.</string>
+	<string name="1853">Proxy authentication required.</string>
+	<string name="1854">The server timed out waiting for the request.</string>
+	<string name="1855">The request could not be completed due to a conflict with the current state of the resource.</string>
+	<string name="1856">The requested resource is no longer available at the server, and no forwarding address is known.</string>
+	<string name="1857">The server will not accept the request without a defined content length.</string>
+	<string name="1858">The precondition given in one or more of the request header fields evaluated to false.</string>
+	<string name="1859">The server will not process the request because the request entity is larg.</string>
+	<string name="1860">The server will not service the request because the request URI is longer than the server can interpret.</string>
+	<string name="1861">The server will not service the request because the entity of the request is in an unsupported format.</string>
+	<string name="1862">The request should be retried after doing the appropriate action.</string>
+	<string name="1863">The server encountered an unexpected condition that prevented it from fulfilling the request.</string>
+	<string name="1864">The server does not support the functionality required to fulfill the request.</string>
+	<string name="1865">The server, while acting as a gateway or proxy, received an invalid response from the upstream server.</string>
+	<string name="1866">The service is temporarily overloaded.</string>
+	<string name="1867">The server does not support, the HTTP protocol version that was used in the request message.</string>
+	<string name="1868">You have selected to connect to your MySQL server using HTTP Tunneling. Please make sure that your MySQL host address contains the name of host accessible from the tunneling URL. 
+
+For more information on how to setup HTTP Tunneling, click on the Help button.</string>
+	<string name="1869">You have selected to connect to your MySQL server using SSH Tunneling. Please make sure that your MySQL host address contains the name of host accessible from the SSH host. 
+
+For more information on how to setup SSH port forwarding, click on the Help button.</string>
+	<string name="1870">You have selected to connect to your MySQL server using SSL encryption.
+Please make sure that the server accepts SSL encrypted connections and the user is configured to use SSL connections.
+
+For more information on how to setup SSL encrypted connections, click on the Help button.</string>
+	<string name="1871">Could not establish SSH connection.
+Make sure that the SSH server is running and you are entering correct values for SSH tunneling.</string>
+	<string name="1872"> Create schema</string>
+	<string name="1873">Select tables for schema generation</string>
+	<string name="1874">&amp;Create...</string>
+	<string name="1875">&amp;Select All</string>
+	<string name="1876">&amp;Deselect All</string>
+	<string name="1877">Cance&amp;l</string>
+	<string name="1878"> Restore Database</string>
+	<string name="1879">Restore A Database</string>
+	<string name="1880">Select A Directory</string>
+	<string name="1881">Select The Tables You Want To Restore</string>
+	<string name="1882">S&amp;elect All</string>
+	<string name="1883">Note: This option uses the MySQL RESTORE TABLE option.</string>
+	<string name="1884">OK</string>
+	<string name="1885">Cancel</string>
+	<string name="1886"> Schema Synchronization Tool</string>
+	<string name="1887">Hide and ignore object(s)</string>
+	<string name="1888">&amp;Identical </string>
+	<string name="1889">To be &amp;altered in target</string>
+	<string name="1890">To be c&amp;reated in target</string>
+	<string name="1891">To be dr&amp;opped in target</string>
+	<string name="1892">&amp;Compare</string>
+	<string name="1893">To&amp;ggle Selection</string>
+	<string name="1894">Deselec&amp;t All</string>
+	<string name="1895">E&amp;xecute All...</string>
+	<string name="1896">&amp;Save As...</string>
+	<string name="1897">C&amp;lose</string>
+	<string name="1898">Select source {Connection - Database}</string>
+	<string name="1899">Select target {Connection - Database} changes will be applied in the target</string>
+	<string name="1900">Note: To sync databases located at different host(s), connect to multiple host(s) using &apos;File -> New-Connection&apos;. The database dropdown will list all databases for all connections.</string>
+	<string name="1901">Select object(s)</string>
+	<string name="1902">Objects to be altered in  target</string>
+	<string name="1903">Objects to be created in target</string>
+	<string name="1904">Compare</string>
+	<string name="1905">Objects to be dropped in target</string>
+	<string name="1906">Identical objects </string>
+	<string name="1907">status</string>
+	<string name="1908">Only tables</string>
+	<string name="1909">All objects</string>
+	<string name="1910"> Reorder Column(s)</string>
+	<string name="1911">To reorder just change the order of the columns using Up / Down buttons, and press Reorder</string>
+	<string name="1912">Change column order</string>
+	<string name="1913">&amp;Up</string>
+	<string name="1914">&amp;Down</string>
+	<string name="1915">Reorder...</string>
+	<string name="1916">Welcome to SQLyog Database Synchronization Wizard!</string>
+	<string name="1917">This wizard will guide you through the steps to synchronize data between two databases.
+
+This wizard will also help you in Scheduling Database Synchronization.</string>
+	<string name="1918">&amp;Start a new job</string>
+	<string name="1919">&amp;Edit a saved job</string>
+	<string name="1920">Source</string>
+	<string name="1921">Copy connection from</string>
+	<string name="1922">Host address</string>
+	<string name="1923">Use HTTP Tunneling</string>
+	<string name="1924">URL</string>
+	<string name="1925">(seconds)</string>
+	<string name="1926">Advanced...</string>
+	<string name="1927">Us&amp;e Socket</string>
+	<string name="1928">F&amp;ile Path</string>
+	<string name="1929">Username</string>
+	<string name="1930">Password</string>
+	<string name="1931">Port</string>
+	<string name="1932">Use &amp;Compressed Protocol</string>
+	<string name="1933">Session Idle Timeout</string>
+	<string name="1934">&amp;Default</string>
+	<string name="1935">Use &amp;SSH Tunneling</string>
+	<string name="1936">SSH &amp;host</string>
+	<string name="1937">SSH &amp;port</string>
+	<string name="1938">Public Key</string>
+	<string name="1939">Private &amp;key</string>
+	<string name="1940">Use SS&amp;L Encryption</string>
+	<string name="1941">C&amp;A certificate</string>
+	<string name="1942">C&amp;ipher</string>
+	<string name="1943">Use A&amp;uthentication </string>
+	<string name="1944">&amp;Client key</string>
+	<string name="1945">C&amp;lient certificate</string>
+	<string name="1946">Target</string>
+	<string name="1947">Use Compress&amp;ed Protocol</string>
+	<string name="1948">De&amp;fault</string>
+	<string name="1949">When do you want to run this task?</string>
+	<string name="1950">&amp;Run immediately</string>
+	<string name="1951">&amp;Saving options</string>
+	<string name="1952">Save &amp;job file </string>
+	<string name="1953">Save &amp;&amp; Schedule &amp;it using Windows scheduler</string>
+	<string name="1954">Lo&amp;g file</string>
+	<string name="1955">Log file records all errors that occurred during the execution of this task.</string>
+	<string name="1956"> Column Mappings And Transformations</string>
+	<string name="1957">Source:</string>
+	<string name="1958">Destination:</string>
+	<string name="1959">&amp;Edit SQL...</string>
+</resources>
