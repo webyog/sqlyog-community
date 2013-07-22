@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3550">找到的全部差别： %d</string>
+	<string name="3551">&lt;上一处差别</string>
+	<string name="3552">下一处差别 &gt;</string>
+	<string name="3553">正在寻找第一处差别 %.*s</string>
+	<string name="3554">没找到差别</string>
+	<string name="3555">正在寻找下一处差别 %.*s</string>
+	<string name="3556">&amp;可视化数据比较向导...	Ctrl+Alt+Q</string>
+	<string name="3557">欢迎使用可视化数据比较向导！</string>
+	<string name="3558">本向导会指引你完成比较两个数据库的数据和合并变动的步骤。</string>
+	<string name="3559">暂停</string>
+	<string name="3560">选择一个表格进行比较......</string>
+	<string name="3561">可视化数据比较向导</string>
+	<string name="3563">&amp;从视觉上合并数据</string>
+	<string name="3564">通过视觉化合并，你可在选定的原表格和目标表格中并排比较各行，以及合并变动</string>
+	<string name="3565">隐藏类似的行</string>
+	<string name="3566">预览 SQL</string>
+	<string name="3567">解释</string>
+	<string name="3568">（选择一个表格...）</string>
+	<string name="3569">筛选表格 </string>
+	<string name="3570">筛选视图 </string>
+	<string name="3571">筛选程序 </string>
+	<string name="3572">筛选功能 </string>
+	<string name="3573">筛选事件 </string>
+	<string name="3574">筛选触发器 </string>
+	<string name="3575">（查看所有数据库）</string>
+	<string name="3576">应用</string>
+</resources>

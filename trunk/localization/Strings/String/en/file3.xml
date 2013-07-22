@@ -1,0 +1,278 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1480">Read-only result</string>
+	<string name="1481">Click here to refresh list</string>
+	<string name="1482">Stop Calculation</string>
+	<string name="1483">Hide Optimal Datatypes</string>
+	<string name="1484">Find Redundant Indexes</string>
+	<string name="1485">Hide Redundant Indexes Info</string>
+	<string name="1486">Power Tools Options (Professional/Enterprise/Ultimate only) </string>
+	<string name="1487">SQL Formatter Options (Enterprise/Ultimate only) </string>
+	<string name="1488">Query Profiler is available only in Ultimate version of SQLyog.&lt;br>&amp;nbsp;&lt;br>Click &lt;a href=&quot;http://www.webyog.com/en/buy.php?ref=community.queryprofiler &quot; target=&quot;_blank&quot;>here&lt;/a> to buy SQLyog Ultimate			   &lt;br>&amp;nbsp;&lt;br>			   Query Profiler Features:&lt;UL>			   &lt;LI>helps you identify problem SQL			   &lt;LI>helps you fine-tune SQL			   &lt;LI>helps you create the right indexes			   &lt;LI>analyzes queries and helps you optimize them			   &lt;LI>reports the exact time spent in each step of query execution			   &lt;LI>helps you write better SQL			   &lt;LI>identifies whether indexes are being used effectively			   &lt;LI>helps you improve overall response time of your application&lt;/UL></string>
+	<string name="1489">Duplicate column name</string>
+	<string name="1490">Length must be specified for varchar datatype</string>
+	<string name="1491">Length must be specified for varbinary datatype</string>
+	<string name="1492">There are no columns in this table, define at least one column</string>
+	<string name="1493">You cannot delete all columns with ALTER TABLE. Use DROP TABLE instead</string>
+	<string name="1494">Column name not specified</string>
+	<string name="1495">Datatype not specified for column name (%s)</string>
+	<string name="1496">/* Error */</string>
+	<string name="1497">Duplicate field name</string>
+	<string name="1498">There are no fields in this table, define at least one field</string>
+	<string name="1499">Field name not specified</string>
+	<string name="1500">Show warnings</string>
+	<string name="1501">Unable to find update information</string>
+	<string name="1502">Updates are available for SQLyog.
+Please download and install latest version from</string>
+	<string name="1503">Updates are available for SQLyog Professional.
+Please download and install latest version from</string>
+	<string name="1504">Updates are available for SQLyog Enterprise.
+Please download and install latest version from</string>
+	<string name="1505">Updates are available for SQLyog Ultimate.
+Please download and install latest version from</string>
+	<string name="1506">You are using the latest version of SQLyog</string>
+	<string name="1507">You are using the latest version of SQLyog Professional</string>
+	<string name="1508">You are using the latest version of SQLyog Enterprise</string>
+	<string name="1509">You are using the latest version of SQLyog Ultimate</string>
+	<string name="1510">Check for updates...</string>
+	<string name="1511">(Press TAB to Insert)</string>
+	<string name="1512"> Rebuilding tag file completed</string>
+	<string name="1513"> Building tag file completed</string>
+	<string name="1514"> Rebuilding tag files </string>
+	<string name="1515"> Building tag files </string>
+	<string name="1516">Please enter your private key path</string>
+	<string name="1517">%s Test Message</string>
+	<string name="1518">This is an e-mail message sent automatically by %s&apos;s Account Manager while testing the settings for your SMTP account.</string>
+	<string name="1519">Error while sending test mail.
+%s</string>
+	<string name="1520">Test mail successfully sent</string>
+	<string name="1521">You have selected HTTP Tunneling. Please provide a valid URL.</string>
+	<string name="1522">Please enter a database name.</string>
+	<string name="1523">Please select a database</string>
+	<string name="1524">Please specify a job filename</string>
+	<string name="1525">Could not create job file.</string>
+	<string name="1526">Please enter your name</string>
+	<string name="1527">Please enter a TO email address</string>
+	<string name="1528">Please enter FROM email address</string>
+	<string name="1529">Please enter your SMTP server address</string>
+	<string name="1530">Please enter your SMTP server port number</string>
+	<string name="1531">Please enter your account name</string>
+	<string name="1532">Please enter your password</string>
+	<string name="1533">%s
+File not found/corrupted!. You need to reinstall %s.</string>
+	<string name="1534">Get Support during evaluation!</string>
+	<string name="1535">Formatting completed successfully</string>
+	<string name="1536">Formatting completed with error(s)</string>
+	<string name="1537">Registered To: %s</string>
+	<string name="1538">Registered To: </string>
+	<string name="1539">This copy of SQLyog %s is registered to %s</string>
+	<string name="1540">This is a REGISTERED version of SQLyog.</string>
+	<string name="1541">Please enter Host Address</string>
+	<string name="1542">Please enter Port Number</string>
+	<string name="1543">Please enter PHP Tunneler URL</string>
+	<string name="1544">Please enter HTTP timeout value</string>
+	<string name="1545">ConnectToMySQL Failed</string>
+	<string name="1546">ConnectToMySQL Enter</string>
+	<string name="1547">ConnectToMySQL Exit</string>
+	<string name="1548">You are trying to connect through SSL to a server which is not configured for SSL.
+    SQLyog will continue connecting in normal mode.</string>
+	<string name="1549">&amp;Password</string>
+	<string name="1550">&amp;Save Password</string>
+	<string name="1551">&amp;Passphrase</string>
+	<string name="1552">&amp;Save Passphrase</string>
+	<string name="1553">Stop Rebuilding &amp;Tags</string>
+	<string name="1554">Stop Building &amp;Tags</string>
+	<string name="1555">Rebuild &amp;Tags</string>
+	<string name="1556">Build &amp;Tags</string>
+	<string name="1557"> Autocomplete: [Tab]->Next Tag. [Ctrl+Space]->List All Tags. [Ctrl+Enter]->List Matching Tags. [Ctrl+Shift+Space]->List Function and Routine Parameters.</string>
+	<string name="1558">Unable to start Plink</string>
+	<string name="1559">Please provide your SSH server&apos;s Username</string>
+	<string name="1560">Please provide your SSH server&apos;s Password</string>
+	<string name="1561">Please provide your SSH server&apos;s Host Address</string>
+	<string name="1562">Please provide your SSH server&apos;s Port Number</string>
+	<string name="1563">Error loading SQLyog.dll</string>
+	<string name="1564">Your search did not match any data</string>
+	<string name="1565">Search is not supported in the selected level</string>
+	<string name="1566">Search in all databases %s</string>
+	<string name="1567">Search in database `%s` in all tables %s</string>
+	<string name="1568">Search in table `%s` in all columns %s</string>
+	<string name="1569">Search in column `%s`.`%s`.`%s`</string>
+	<string name="1570">Click to change</string>
+	<string name="1571">Search</string>
+	<string name="1572">Could not retreive the previously indexed page. Please try First or do a fresh search</string>
+	<string name="1573">Could not retreive the first page. Please do a fresh search</string>
+	<string name="1574">Data Search</string>
+	<string name="1575">Stopping search...</string>
+	<string name="1576">Initializing search...</string>
+	<string name="1577">First</string>
+	<string name="1578">Previous</string>
+	<string name="1579">Next</string>
+	<string name="1580">Failed to retrieve the information required to populate the Data Set</string>
+	<string name="1581">Error</string>
+	<string name="1582">You have an error in your regular expression</string>
+	<string name="1583">Searched in `%s`.`%s`.`%s`</string>
+	<string name="1584">Searched in %d table(s)</string>
+	<string name="1585">No column is of the selected data type(s)</string>
+	<string name="1586">No table is present in the selected level</string>
+	<string name="1587">Search stopped after %d table(s) due to an error in the client side</string>
+	<string name="1588">Search stopped after %d table(s)</string>
+	<string name="1589">Searching in `%s`.`%s`.`%s`</string>
+	<string name="1590">Searching in `%s`.`%s`</string>
+	<string name="1591">There are no databases in this server</string>
+	<string name="1592">Databases</string>
+	<string name="1593">Search in %s %s</string>
+	<string name="1594">Search in %s and 1 other database %s</string>
+	<string name="1595">Search in %s, and 1 other database %s</string>
+	<string name="1596">Search in %s and %d other databases %s</string>
+	<string name="1597">Search in %s, and %d other databases %s</string>
+	<string name="1598">There are no tables in this database</string>
+	<string name="1599">Tables</string>
+	<string name="1600">Search in database `%s` in %s %s</string>
+	<string name="1601">Search in database `%s` in %s and 1 other table %s</string>
+	<string name="1602">Search in database `%s` in %s</string>
+	<string name="1603">Search in database `%s` in %s, and 1 other table %s</string>
+	<string name="1604">Search in database `%s` in %s and %d other table %s</string>
+	<string name="1605">Search in database `%s` in %s, and %d other table %s</string>
+	<string name="1606">Search in database `%s` in %s and %d other tables %s</string>
+	<string name="1607">Search in database `%s` in %s, and %d other tables %s</string>
+	<string name="1608">There are no columns in this table</string>
+	<string name="1609">Columns</string>
+	<string name="1610">Search in table `%s` in all columns </string>
+	<string name="1611">Search in table `%s` in %s </string>
+	<string name="1612">Search in table `%s` in %s and 1 other column </string>
+	<string name="1613">Search in table `%s` in %s, and 1 other column </string>
+	<string name="1614">Search in table `%s` in %s and 2 other columns </string>
+	<string name="1615">Search in table `%s` in %s and %d other columns </string>
+	<string name="1616">Search in table `%s` in %s, and %d other columns </string>
+	<string name="1617"> (all datatypes) </string>
+	<string name="1618"> (numeric</string>
+	<string name="1619">, short string</string>
+	<string name="1620"> (short string</string>
+	<string name="1621">, date/time</string>
+	<string name="1622"> (date/time</string>
+	<string name="1623">, binary</string>
+	<string name="1624"> (binary</string>
+	<string name="1625">, and `%s`</string>
+	<string name="1626">Invalid job file.</string>
+	<string name="1627">Could not open job file</string>
+	<string name="1628">Source server details not provided.</string>
+	<string name="1629">Export Data As Batch Script Wizard</string>
+	<string name="1630">Single file for all database(s)</string>
+	<string name="1631">Separate file for each database</string>
+	<string name="1632">[Note: This option allows you to backup data of multiple tables across SQL files. SQLyog will generate a file named db_{databasename}.sql for each database.]</string>
+	<string name="1633">Single file for all object(s)</string>
+	<string name="1634">Separate file for each object</string>
+	<string name="1635">[Note: This option allows you to backup data of multiple tables across SQL files. SQLyog will generate a file named tbl_{tablename}.sql for each table.]</string>
+	<string name="1636">[ALL - Including mysql system database]</string>
+	<string name="1637">[ALL - Excluding mysql system database]</string>
+	<string name="1638">Welcome to Scheduled Backup Wizard!</string>
+	<string name="1639">This wizard will guide you through the steps to Schedule Exporting of data as SQL dumps. You can use this wizard to export data into a single SQL file or as multiple files. 
+
+A job file stores the configuration of this task. You can use the job file to run this task again in the future.</string>
+	<string name="1640">*Column</string>
+	<string name="1641">Column</string>
+	<string name="1642">Could not initialize the scheduler!</string>
+	<string name="1643">Job already exists. Do you want to replace the existing job?</string>
+	<string name="1644">Error occoured! Failed to create Job</string>
+	<string name="1645">Please specify a schedule name</string>
+	<string name="1646">Job file saved successfully</string>
+	<string name="1647">Error while creating MMF</string>
+	<string name="1648">Error in MapViewOfFile</string>
+	<string name="1649">SSH Error: </string>
+	<string name="1650">This is a TRIAL version of SQLyog. 
+You can select only 2 objects at a time. 
+Expand a folder and select any of 2 objects to continue</string>
+	<string name="1651">This is a TRIAL version of SQLyog.
+You can select only two tables at a time.</string>
+	<string name="1652">This is a TRIAL version of SQLyog.
+You can export only one database at a time.</string>
+	<string name="1653">Import External Data Wizard</string>
+	<string name="1654">Welcome to Import External Data Wizard!</string>
+	<string name="1655">This wizard will guide you through the steps to Import External Data and also help you in Scheduling the importing process.
+
+A job file stores the configuration of this task. You can use the job file to run this task again in the future.</string>
+	<string name="1656">You can specify a valid SQL WHERE clause for the table. Only those rows that fulfill the WHERE clause will be imported.
+(Note: Don&apos;t include WHERE in the clause)</string>
+	<string name="1657">To correctly import meta-data like Foreign Keys from an Access database you will require to give permissions on Access system tables.
+(make sure you have saved the database in .mdb format as User-Level Security features are not available for databases in new file formats like .accdb, .accde, .accdc, .accdr).</string>
+	<string name="1658">The underlying database seems to be using Text File Driver to import. The limitations of the driver are : 
+
+1) Tables are limited to a maximum of 255 fields. 
+2) Field names are limited to 64 characters and field widths are limited to 32,766 characters. 
+3) Records are limited to 65,000 bytes.</string>
+	<string name="1659">You cannot import a table with out any column.</string>
+	<string name="1660">Please enter a job file name</string>
+	<string name="1661">Error in job file</string>
+	<string name="1662">Error setting the SQL environment</string>
+	<string name="1663">The ODBC driver is not 3.0 compliant. Please install an ODBC 3.0 compliant driver.</string>
+	<string name="1664">Could not init HDBC connection</string>
+	<string name="1665">Please enter a folder name</string>
+	<string name="1666">Please enter a file name</string>
+	<string name="1667">Please enter details about the ODBC source</string>
+	<string name="1668">Error during initialization of provider</string>
+	<string name="1669">Error during initialization of ODBC environment</string>
+	<string name="1670">There was error in the query</string>
+	<string name="1671">Query did not return a result!</string>
+	<string name="1672">The SQL Statement is Invalid!</string>
+	<string name="1673">ODBC Source did not return any row for the selected table!</string>
+	<string name="1674">Please specify a job name</string>
+	<string name="1675">Could not create temporary JOB file.</string>
+	<string name="1676">Do you really want to terminate the import process?</string>
+	<string name="1677">The SQL Statement is valid!</string>
+	<string name="1678">The SQL statement is valid!</string>
+	<string name="1679">This feature is not supported in your OS!</string>
+	<string name="1680"> - Not executed till now</string>
+	<string name="1681"> - Most recent run at: %u/%u/%u:%u:%02u</string>
+	<string name="1682">Do you really want to delete the job?</string>
+	<string name="1683">Job deleted successfully</string>
+	<string name="1684">Job successfully initialized</string>
+	<string name="1685">Can&apos;t connect to SMTP server!</string>
+	<string name="1686">Sending Failed!</string>
+	<string name="1687">Unable to Initialize WinSock</string>
+	<string name="1688">Unable to instantiate version 1.1 for WinSock</string>
+	<string name="1689">Unable to resolve host</string>
+	<string name="1690">Unable to create a socket</string>
+	<string name="1691">Unable to connect to Server and Port provided</string>
+	<string name="1692">Unable to connect to server</string>
+	<string name="1693">Timeout error</string>
+	<string name="1694">Unable to send data to Server</string>
+	<string name="1695">Invalid Recipients</string>
+	<string name="1696">PLAIN authentication not supported by SJA</string>
+	<string name="1697">CRAM-MD5 authentication not supported by SJA</string>
+	<string name="1698">SMTP Authentication failed</string>
+	<string name="1699">Username or Password not given for authentication</string>
+	<string name="1700">SMTP Account name and Password do not match.</string>
+	<string name="1701">SQL Scheduler and Reporting Wizard</string>
+	<string name="1702">Welcome to SQL Scheduler and Reporting Wizard!</string>
+	<string name="1703">This wizard will guide you through the steps to schedule execution of query(s). The resultset(s) can be emailed to multiple recipients. You can also use this feature to execute maintenance queries like ANALYZE, REPAIR etc.
+
+A job file stores the configuration of this task. You can use the job file to run this task again in the future. </string>
+	<string name="1704">Query(s) entered are correct</string>
+	<string name="1705">Do you really want to terminate the notification process?</string>
+	<string name="1706">Error in the job file : %s at line %d
+</string>
+	<string name="1707">Source SERVER information not complete
+</string>
+	<string name="1708">You should specify atleast one query
+</string>
+	<string name="1709">Please specify your SMTP host address
+</string>
+	<string name="1710">Please specify &quot;E-Mail from&quot; name
+</string>
+	<string name="1711">You should provide &quot;to&quot; email address
+
+</string>
+	<string name="1712">Warning : No subject for email provided
+</string>
+	<string name="1713">Please specify an &quot;login name&quot; for authorization
+</string>
+	<string name="1714">Please specify a &quot;password&quot; for authorization
+</string>
+	<string name="1715">Please specify a HTTP tunneling URL
+</string>
+	<string name="1716">Please specify the SSH server host
+</string>
+	<string name="1717">Please enter atleast one query</string>
+	<string name="1718">No query in file</string>
+	<string name="1719">Could not create pipe process.</string>
+</resources>

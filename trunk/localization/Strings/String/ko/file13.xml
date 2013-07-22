@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3492">Copy With Normalized &amp;Whitespace	Alt+C</string>
+	<string name="3493">접속 유지 시간</string>
+	<string name="3494">테이블 데이터/정보/내역 탭 위치</string>
+	<string name="3495">퀘리 탭 아래 테이블 데이터(&amp;l)</string>
+	<string name="3496">쿼리 탭 부속 정보(&amp;I)</string>
+	<string name="3497">쿼리 탭 부속 내역(&amp;H)</string>
+	<string name="3498">코멘트</string>
+	<string name="3499">문자열</string>
+	<string name="3500">키워드</string>
+	<string name="3501">숫자</string>
+	<string name="3502">연산자</string>
+	<string name="3503">숨겨진 명령</string>
+	<string name="3504">줄 번호 여백</string>
+	<string name="3505">접기 여백</string>
+	<string name="3506">텍스트 선택</string>
+	<string name="3507">괄호 일치</string>
+	<string name="3508">괄호 불일치</string>
+	<string name="3509">캔버스</string>
+	<string name="3510">줄</string>
+	<string name="3511">메시지/테이블 데이터/정보</string>
+	<string name="3512">데이터를 보거나 수정하려면 결과를 누르세요</string>
+	<string name="3513">&amp;연결 정보 내보내기...</string>
+	<string name="3514">&amp;연결 정보 가져오기...</string>
+	<string name="3515">연결 정보 내보내기/가져오기</string>
+	<string name="3516">데이터가 성공적으로 내보내졌습니다. 파일을 열겠습니까?</string>
+	<string name="3517">보관을 위한 파일 이름을 정하세요.</string>
+	<string name="3518">연결 유형</string>
+	<string name="3519">접속명</string>
+	<string name="3521">파일 열기...</string>
+	<string name="3522">호스트</string>
+	<string name="3523">전체 선택/선택 해제</string>
+	<string name="3524">가져오기</string>
+	<string name="3525">연결 정보 내보내기</string>
+	<string name="3526">연결 정보 가져오기</string>
+</resources>

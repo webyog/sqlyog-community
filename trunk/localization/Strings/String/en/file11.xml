@@ -1,0 +1,68 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3300">Advanced</string>
+	<string name="3301">/*Database: %s*/
+</string>
+	<string name="3302">Format:</string>
+	<string name="3303">Text/Detailed</string>
+	<string name="3304">Selected Color</string>
+	<string name="3305">Default</string>
+	<string name="3306">Auto Contrast</string>
+	<string name="3308">/*Server Information For -</string>
+	<string name="3309">/*Table Information*/
+</string>
+	<string name="3310">Tables (%d)</string>
+	<string name="3311">/*View Information*/
+</string>
+	<string name="3312">Views (%d)</string>
+	<string name="3313">/*Procedure Information*/
+</string>
+	<string name="3314">Procedures (%d)</string>
+	<string name="3315">/*Function Information*/
+</string>
+	<string name="3316">Functions (%d)</string>
+	<string name="3317">/*Trigger Information*/
+</string>
+	<string name="3318">Triggers (%d)</string>
+	<string name="3319">/*DDL Information For - %s*/
+</string>
+	<string name="3320">Columns (%d)</string>
+	<string name="3321">&amp;nbsp;Table: %s</string>
+	<string name="3322">Find the optimal datatypes for this table by reading existing data. &lt;a href=&quot;optimizer_help &quot; target=&quot;_blank&quot;> Read more&lt;/a></string>
+	<string name="3323">Indexes (%d)</string>
+	<string name="3324">DDL Information</string>
+	<string name="3325">/*Stored Proc: %s*/
+</string>
+	<string name="3326">&amp;nbsp;Stored Proc: %s</string>
+	<string name="3327">View Information</string>
+	<string name="3328">&amp;nbsp;View: %s</string>
+	<string name="3330">Execute Query (F5)</string>
+	<string name="3331">Create A New Connection (Ctrl+M)</string>
+	<string name="3332">Execute All Queries (Shift+F5)</string>
+	<string name="3333">Execute And Edit Resultset (F8)</string>
+	<string name="3336">New Query Editor (Ctrl+T)</string>
+	<string name="3337">Refresh Object Browser (F9)</string>
+	<string name="3338">User Manager (Ctrl+U)</string>
+	<string name="3339">Backup Database As SQL Dump (Ctrl+Alt+E)</string>
+	<string name="3340">Execute SQL Script (Ctrl+Shift+Q)</string>
+	<string name="3341">Copy Database To Different Host/Database</string>
+	<string name="3342">Export Table Data (Ctrl+Alt+C)</string>
+	<string name="3343">Manage Indexes (F7)</string>
+	<string name="3344">Relationships/Foreign Keys (F10)</string>
+    <string name="3345">Close</string>
+	<string name="3346">Events</string>
+	<string name="3347">Views</string>
+	<string name="3348">Stored Procs</string>
+	<string name="3349">Functions</string>
+	<string name="3350">Triggers</string>
+	<string name="3351">Indexes</string>
+	<string name="3352">Events (%d)</string>
+	<string name="3353">Execute Query (F9)</string>
+	<string name="3354">Execute All Queries (Shift+F9)</string>
+	<string name="3355"> Reasons for upgrading to Professional/Enterprise/Ultimate: </string>
+	<string name="3356">Stop Execution</string>
+	<string name="3357">Refresh Object Browser (F5)</string>
+	<string name="3358">Info</string>
+	<string name="3359">&amp;Info	Ctrl+Shift+I</string>
+	<string name="3360">&amp;History	Ctrl+Shift+H</string>
+</resources>

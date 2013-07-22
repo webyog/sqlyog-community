@@ -1,0 +1,3328 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+#include "Symbols.h"
+#include "AppInfo.h"
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "#include ""Symbols.h""\r\n"
+    "#include ""AppInfo.h""\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATOR ACCELERATORS
+BEGIN
+    "F",            ACCEL_ADDFAVORITE,      VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "U",            ACCEL_ADDUSER,          VIRTKEY, CONTROL, NOINVERT
+    VK_F6,          ACCEL_ALTERTABLE,       VIRTKEY, NOINVERT
+    "L",            ACCEL_CHANGELANGUAGE,   VIRTKEY, SHIFT, ALT, NOINVERT
+    "V",            ACCEL_CHANGEVIEW,       VIRTKEY, CONTROL, ALT, NOINVERT
+    "W",            ACCEL_CLOSECONNECTION,  VIRTKEY, CONTROL, NOINVERT
+    "L",            ACCEL_CLOSETAB,         VIRTKEY, ALT, NOINVERT
+    "C",            ACCEL_COMMENT,          VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "D",            ACCEL_CREATEDB,         VIRTKEY, CONTROL, NOINVERT
+    "D",            ACCEL_DATASEARCH,       VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "W",            ACCEL_DATASYNC,         VIRTKEY, CONTROL, ALT, NOINVERT
+    "D",            ACCEL_DELETE,           VIRTKEY, SHIFT, ALT, NOINVERT
+    "Q",            ACCEL_DIFFTOOL,         VIRTKEY, CONTROL, NOINVERT
+    VK_F4,          ACCEL_DISCONN,          VIRTKEY, CONTROL, NOINVERT
+    "U",            ACCEL_EDITUSER,         VIRTKEY, CONTROL, ALT, NOINVERT
+    "3",            ACCEL_EDITWINDOW,       VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "8",            ACCEL_EIGHTHTAB,        VIRTKEY, ALT, NOINVERT
+    "8",            ACCEL_EIGTHCONN,        VIRTKEY, CONTROL, NOINVERT
+    VK_F5,          ACCEL_EXECUTE,          VIRTKEY, NOINVERT
+    VK_F5,          ACCEL_EXECUTEALL_SHIFT_F5, VIRTKEY, SHIFT, NOINVERT
+    VK_F9,          ACCEL_EXECUTEALL_SHIFT_F9, VIRTKEY, SHIFT, NOINVERT
+    VK_F5,          ACCEL_EXECUTESEL_CTRL_F5, VIRTKEY, CONTROL, NOINVERT
+    VK_F9,          ACCEL_EXECUTESEL_CTRL_F9, VIRTKEY, CONTROL, NOINVERT
+    "E",            ACCEL_EXPORT,           VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "E",            ACCEL_EXPORTBATCH,      VIRTKEY, CONTROL, ALT, NOINVERT
+    "C",            ACCEL_EXPORTCSV,        VIRTKEY, CONTROL, ALT, NOINVERT
+    "H",            ACCEL_EXPORTHTML,       VIRTKEY, CONTROL, ALT, NOINVERT
+    "X",            ACCEL_EXPORTXML,        VIRTKEY, CONTROL, ALT, NOINVERT
+    "5",            ACCEL_FIFTHCONN,        VIRTKEY, CONTROL, NOINVERT
+    "5",            ACCEL_FIFTHTAB,         VIRTKEY, ALT, NOINVERT
+    "F",            ACCEL_FIND,             VIRTKEY, CONTROL, NOINVERT
+    VK_F3,          ACCEL_FINDNEXT,         VIRTKEY, NOINVERT
+    "1",            ACCEL_FIRSTCONN,        VIRTKEY, CONTROL, NOINVERT
+    "1",            ACCEL_FIRSTTAB,         VIRTKEY, ALT, NOINVERT
+    "F",            ACCEL_FLUSH,            VIRTKEY, CONTROL, ALT, NOINVERT
+    "E",            ACCEL_FOCUSEDITOR,      VIRTKEY, CONTROL, NOINVERT
+    "B",            ACCEL_FOCUSOBJECT,      VIRTKEY, CONTROL, NOINVERT
+    "R",            ACCEL_FOCUSRESULT,      VIRTKEY, CONTROL, NOINVERT
+    VK_F12,         ACCEL_FORMATALLQUERIES, VIRTKEY, SHIFT, NOINVERT
+    VK_F12,         ACCEL_FORMATCURRENTQUERY, VIRTKEY, NOINVERT
+    VK_F12,         ACCEL_FORMATSELECTEDQUERY, VIRTKEY, CONTROL, NOINVERT
+    "4",            ACCEL_FOURTHCONN,       VIRTKEY, CONTROL, NOINVERT
+    "4",            ACCEL_FOURTHTAB,        VIRTKEY, ALT, NOINVERT
+    "G",            ACCEL_GOTO,             VIRTKEY, CONTROL, NOINVERT
+    "L",            ACCEL_GRIDFORM,         VIRTKEY, CONTROL, ALT, NOINVERT
+    "H",            ACCEL_HISTORYTAB,       VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "Q",            ACCEL_IMPORTBATCH,      VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "M",            ACCEL_IMPORTCSV,        VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "I",            ACCEL_INFOTAB,          VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "I",            ACCEL_INSERT,           VIRTKEY, SHIFT, ALT, NOINVERT
+    VK_F11,         ACCEL_INSERTUPDATE,     VIRTKEY, NOINVERT
+    "L",            ACCEL_LOWERCASE,        VIRTKEY, SHIFT, CONTROL, NOINVERT
+    VK_F7,          ACCEL_MANINDEX,         VIRTKEY, NOINVERT
+    VK_F10,         ACCEL_MANREL,           VIRTKEY, NOINVERT
+    "W",            ACCEL_MANUSER,          VIRTKEY, SHIFT, CONTROL, NOINVERT
+    VK_NEXT,        ACCEL_NAVIGATETABDOWN,  VIRTKEY, CONTROL, NOINVERT
+    VK_PRIOR,       ACCEL_NAVIGATETABUP,    VIRTKEY, CONTROL, NOINVERT
+    "M",            ACCEL_NEWCONN,          VIRTKEY, CONTROL, NOINVERT
+    "T",            ACCEL_NEWEDITOR,        VIRTKEY, CONTROL, NOINVERT
+    "N",            ACCEL_NEWSAMECONN,      VIRTKEY, CONTROL, NOINVERT
+    "9",            ACCEL_NINTHCONN,        VIRTKEY, CONTROL, NOINVERT
+    "9",            ACCEL_NINTHTAB,         VIRTKEY, ALT, NOINVERT
+    "N",            ACCEL_NOTIFY,           VIRTKEY, CONTROL, ALT, NOINVERT
+    "B",            ACCEL_OBFILTER,         VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "1",            ACCEL_OBJECT,           VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "O",            ACCEL_ODBC,             VIRTKEY, CONTROL, ALT, NOINVERT
+    "O",            ACCEL_OPENNEW,          VIRTKEY, CONTROL, NOINVERT
+    VK_F11,         ACCEL_OPENTABLESTICKY,  VIRTKEY, CONTROL, NOINVERT
+    "P",            ACCEL_PMENU,            VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "K",            ACCEL_QUERYBUILDER,     VIRTKEY, CONTROL, NOINVERT
+    VK_F8,          ACCEL_QUERYUPDATE_KEY,  VIRTKEY, NOINVERT
+    VK_F9,          ACCEL_REFRESH,          VIRTKEY, NOINVERT
+    "R",            ACCEL_REMOVE_COMMENT,   VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "R",            ACCEL_REORDER,          VIRTKEY, CONTROL, ALT, NOINVERT
+    "R",            ACCEL_REORDER,          VIRTKEY, SHIFT, CONTROL, ALT, NOINVERT
+    "H",            ACCEL_REPLACE,          VIRTKEY, CONTROL, NOINVERT
+    "L",            ACCEL_RESULT,           VIRTKEY, CONTROL, NOINVERT
+    "2",            ACCEL_RESULTWINDOW,     VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "S",            ACCEL_SAVE,             VIRTKEY, CONTROL, NOINVERT
+    "S",            ACCEL_SCHDEXPORT,       VIRTKEY, CONTROL, ALT, NOINVERT
+    "S",            ACCEL_SCHEMA,           VIRTKEY, SHIFT, CONTROL, ALT, NOINVERT
+    "D",            ACCEL_SCHEMADESIGNER,   VIRTKEY, CONTROL, ALT, NOINVERT
+    "2",            ACCEL_SECONDCONN,       VIRTKEY, CONTROL, NOINVERT
+    "2",            ACCEL_SECONDTAB,        VIRTKEY, ALT, NOINVERT
+    "S",            ACCEL_SELECT,           VIRTKEY, SHIFT, ALT, NOINVERT
+    "F",            ACCEL_SETFONT,          VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "N",            ACCEL_SETNULL,          VIRTKEY, ALT, NOINVERT
+    "7",            ACCEL_SEVENTHCONN,      VIRTKEY, CONTROL, NOINVERT
+    "7",            ACCEL_SEVENTHTAB,       VIRTKEY, ALT, NOINVERT
+    "6",            ACCEL_SIXTHCONN,        VIRTKEY, CONTROL, NOINVERT
+    "6",            ACCEL_SIXTHTAB,         VIRTKEY, ALT, NOINVERT
+    "T",            ACCEL_TABLEDIAG,        VIRTKEY, CONTROL, ALT, NOINVERT
+    "3",            ACCEL_THIRDCONN,        VIRTKEY, CONTROL, NOINVERT
+    "3",            ACCEL_THIRDTAB,         VIRTKEY, ALT, NOINVERT
+    "T",            ACCEL_TMENU,            VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "U",            ACCEL_UPDATE,           VIRTKEY, SHIFT, ALT, NOINVERT
+    "U",            ACCEL_UPPERCASE,        VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "Q",            ACCEL_VDDTOOL,          VIRTKEY, CONTROL, ALT, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_GREEN               BITMAP                  "bitmaps\\greenback.bmp"
+IDB_WATERMARK           BITMAP                  "bitmaps\\Watermrk.bmp"
+IDB_BANNER              BITMAP                  "bitmaps\\Header.bmp"
+IDB_DBICON              BITMAP                  "bitmaps\\sqlyog2.bmp"
+IDB_ARROW               BITMAP                  "bitmaps\\sqlyog3.bmp"
+IDB_DSYNC1              BITMAP                  "bitmaps\\dsync1.bmp"
+IDB_DSYNC2              BITMAP                  "bitmaps\\dsync2.bmp"
+IDB_BLUE                BITMAP                  "bitmaps\\blueback.bmp"
+IDB_JOBBIG              BITMAP                  "bitmaps\\jobbig.bmp"
+IDB_JOBSMALL            BITMAP                  "bitmaps\\jobsmall.bmp"
+IDB_CONNECTION          BITMAP                  "bitmaps\\connection.bmp"
+IDB_SCHDBIG             BITMAP                  "bitmaps\\schexport_big.bmp"
+IDB_SCHDSMALL           BITMAP                  "bitmaps\\schdexport_small.bmp"
+IDB_SCHDODBC            BITMAP                  "bitmaps\\odbc_schd.bmp"
+IDB_COMSPLASH           BITMAP                  "bitmaps\\splash.bmp"
+IDB_TWILIGHT_THEME_BITMAP BITMAP                  "bitmaps\\bg.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_TMAKERDROP MENU
+BEGIN
+    POPUP "Items"
+    BEGIN
+        MENUITEM "Set Primary Key",             IDM_TMAKER_SETPRIMARY
+        MENUITEM "Insert Column",               IDM_TMAKER_INSERTCOLUMN
+        MENUITEM "Delete Column",               IDM_TMAKER_DELETECOLUMN
+    END
+END
+
+IDR_QUERYLISTMENU MENU
+BEGIN
+    POPUP "Open"
+    BEGIN
+        MENUITEM "Insert New Row",              ID_RESULT_INSERT
+        MENUITEM "Save Changes",                ID_RESULT_SAVE
+        MENUITEM "Delete Selected Row(s)",      ID_RESULT_DELETE
+        MENUITEM "Cancel Changes",              ID_RESULT_CANCEL
+        MENUITEM SEPARATOR
+        MENUITEM "Set To Empty String",         IDC_SETEMPTY
+        MENUITEM "Set To NULL",                 1169
+        MENUITEM "Set To Default",              IDC_SETDEF
+        MENUITEM SEPARATOR
+        POPUP "Filter"
+        BEGIN
+            MENUITEM "Field = Value",               ID_FILTER_FIELD_EQUALS
+            MENUITEM "Field <> Value",              ID_FILTER_FIELD_NOTEQUALS
+            MENUITEM SEPARATOR
+            MENUITEM "Field > Value",               ID_FILTER_FIELD_GREATERTHEN
+            MENUITEM "Field < Value",               ID_FILTER_FIELD_LESSTHEN
+            MENUITEM SEPARATOR
+            MENUITEM "Field Like %Value",           ID_FILTER_FIELDLIKEBEGIN
+            MENUITEM "Field Like Value%",           ID_FILTER_FIELDLIKEEND
+            MENUITEM "Field Like %Value%",          ID_FILTER_FIELDLIKEBOTH
+            MENUITEM SEPARATOR
+            MENUITEM "Custom Filter",               ID_FILTER_CUSTOMFILTER
+            MENUITEM SEPARATOR
+            MENUITEM "Reset Filter",                ID_RESETFILTER
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Export All Rows Of Table Data/Result As...\tCtrl+Shift+E", IDM_IMEX_EXPORTDATA
+        POPUP "Copy "
+        BEGIN
+            MENUITEM "Copy Cell Data To Clipboard", IDM_IMEX_EXPORTCELL
+            MENUITEM "Copy All Rows To Clipboard...", IDM_DATATOCLIPBOARD
+            MENUITEM "Copy Selected Row(s) To Clipboard...", IDM_SELDATATOCLIPBOARD
+        END
+        MENUITEM "Duplicate Current Row",       IDM_DUPLICATE_ROW
+    END
+END
+
+IDR_TEDITORDROP MENU
+BEGIN
+    POPUP "Items"
+    BEGIN
+        MENUITEM "Set Primary Key",             IDM_TEDITOR_SETPRIMARY
+        MENUITEM "Insert Column",               IDM_TEDITOR_INSERTCOLUMN
+        MENUITEM "Drop Column",                 IDM_TEDITOR_DELETECOLUMN
+    END
+END
+
+IDR_SHOWMORE MENU
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "Refresh Object Browser\tF9",  IDM_REFRESHOBJECT
+        MENUITEM "Show Values",                 ID_OBJECT_SHOWMORE
+    END
+END
+
+IDR_PROCESS MENU
+BEGIN
+    POPUP "Open"
+    BEGIN
+        MENUITEM "Kill Process...",             ID_OBJECT_KILLPROCESS
+    END
+END
+
+IDR_QUERYINFOMENU MENU
+BEGIN
+    POPUP "Open"
+    BEGIN
+        MENUITEM "&Remove History",             ID_QUERYINFO_DELETEALL
+        MENUITEM "&Copy\tCtrl+C",               ID_OPEN_COPY
+        MENUITEM "Co&py All",                   ID_QUERYINFO_COPY
+        MENUITEM "&Save History To File...\tCtrl+S", ID_OPEN_SAVEHISTORY
+        MENUITEM "Select &All\tCtrl+A",         ID_QUERYINFO_SELECTALL
+        MENUITEM SEPARATOR
+        MENUITEM "&Find...\tCtrl+F",            ID_QUERYINFO_FIND
+        MENUITEM "Find Next\tF3",               ID_QUERYINFO_FINDNEXT
+    END
+END
+
+IDR_OTHEROPTION MENU
+BEGIN
+    POPUP "Open"
+    BEGIN
+        MENUITEM "Refresh Object Browser\tF9",  IDM_REFRESHOBJECT
+        MENUITEM SEPARATOR
+        MENUITEM "Create &Database...\tCtrl+D", IDM_CREATEDATABASE
+        MENUITEM "New Data Searc&h\tCtrl+Shift+D", ID_DATASEARCH
+        MENUITEM SEPARATOR
+        MENUITEM "&Scheduled Backups...\tCtrl+Alt+S", ID_POWERTOOLS_SCHEDULEEXPORT2
+        MENUITEM "&Import External Data...\tCtrl+Alt+O", ID_IMPORT_EXTERNAL_DATA
+        MENUITEM "&Execute SQL Script...\tCtrl+Shift+Q", ID_IMEX_TEXTFILE2
+        MENUITEM SEPARATOR
+        MENUITEM "Change Objec&t Browser Color...", IDM_OBCOLOR
+    END
+END
+
+IDR_SHOW MENU
+BEGIN
+    POPUP "Open"
+    BEGIN
+        MENUITEM "&Variables...",               ID_SHOW_VARIABLES
+        MENUITEM "&Processlist...",             ID_SHOW_PROCESSLIST
+        MENUITEM "&Status...",                  ID_SHOW_STATUS
+    END
+END
+
+IDR_USERMANAGER MENU
+BEGIN
+    POPUP "User Manager"
+    BEGIN
+        MENUITEM "&Add User...\tCtrl+U",        IDM_TOOL_ADDUSER
+        MENUITEM "&Rename User...",             IDM_TOOL_RENAMEUSER
+        MENUITEM "&Edit User...\tCtrl+Alt+U",   IDM_TOOL_EDITUSER
+        MENUITEM "Manage Permissions...\tCtrl+Shift+W", ID_TOOLS_MANPERM
+    END
+END
+
+IDR_XMLHTML MENU
+BEGIN
+    POPUP "Open"
+    BEGIN
+        MENUITEM "As CSV...\tCtrl+Alt+C",       ID_EXPORT_AS
+        MENUITEM "As XML...\tCtrl+Alt+X",       ID_EXPORT_ASXML
+        MENUITEM "As HTML...\tCtrl+Alt+H",      ID_EXPORT_ASHTML
+    END
+END
+
+IDR_FILTER MENU
+BEGIN
+    POPUP "Quick Filter"
+    BEGIN
+        MENUITEM "Field = Value",               40145
+        MENUITEM "Field <> Value",              40146
+        MENUITEM "Field < Value",               40147
+        MENUITEM "Field > Value",               40148
+        MENUITEM SEPARATOR
+        MENUITEM "Remove Filter",               40149
+    END
+END
+
+IDR_TABLEDATAMENU MENU
+BEGIN
+    POPUP ""
+    BEGIN
+        MENUITEM "Set To NULL",                 1169
+        MENUITEM "Set To Empty String",         40310
+        MENUITEM "Set To Default",              IDC_SETDEF
+    END
+END
+
+IDR_MENUFAV MENUEX
+BEGIN
+    POPUP "Favorites",                      65535,MFT_STRING | MFT_RIGHTJUSTIFY,MFS_ENABLED
+    BEGIN
+        MENUITEM "&Open",                       40363,MFT_STRING,MFS_ENABLED
+        MENUITEM MFT_SEPARATOR
+        MENUITEM "&Delete",                     40364,MFT_STRING,MFS_ENABLED
+        MENUITEM "&Rename",                     40362,MFT_STRING,MFS_ENABLED
+    END
+END
+
+IDR_TABMENU MENU
+BEGIN
+    POPUP "Tab"
+    BEGIN
+        MENUITEM "&Close\tAlt+L",               ID_FILE_CLOSETAB
+    END
+END
+
+IDR_QBGRIDMENU MENU
+BEGIN
+    POPUP "Grid Menu"
+    BEGIN
+        MENUITEM "&Insert Column",              ID_GRIDMENU_INSERTCOLUMN
+        MENUITEM "&Delete Column",              ID_GRIDMENU_DELETECOLUMN
+        MENUITEM "&Clear All Columns",          ID_GRIDMENU_CLEARALL
+    END
+END
+
+IDR_QBLINEOPTION MENU
+BEGIN
+    POPUP "&Line"
+    BEGIN
+        MENUITEM "&Delete",                     40384
+        POPUP "&Join Type"
+        BEGIN
+            MENUITEM "&Inner Join",                 40385
+            MENUITEM "&Left Join",                  40388
+            MENUITEM "&Right Join",                 40389
+        END
+    END
+END
+
+IDR_EDITORCONTEXT MENU
+BEGIN
+    POPUP "Menu"
+    BEGIN
+        MENUITEM "&Copy Query To Clipboard",    ID_CONTEXT_COPYQUERYTOCLIPBOARD
+        MENUITEM "Copy Query To &New Query Tab", ID_CONTEXT_COPYQUERYTONEWQUERYTAB
+        MENUITEM "Copy Query To &Same Query Tab", ID_CONTEXT_COPYQUERYTOSAMEQUERY
+        MENUITEM "Create View Using Current &Query", ID_CONTEXT_CREATEVIEWFROMQB
+    END
+END
+
+IDR_TABLESMENU MENU
+BEGIN
+    POPUP "Tables Menu"
+    BEGIN
+        MENUITEM "Create &Table",               ID_TABLE_MAKER
+        MENUITEM "&Copy Table(s) To Different Host/Database...", ID_OPEN_COPYTABLE
+        MENUITEM "New Data Searc&h\tCtrl+Shift+D", ID_DATASEARCH
+        MENUITEM SEPARATOR
+        MENUITEM "&Scheduled Backups...\tCtrl+Alt+S", ID_POWERTOOLS_SCHEDULEEXPORT2
+        MENUITEM "&Backup Table(s) As SQL Dump...\tCtrl+Alt+E", ID_IMPORTEXPORT_TABLESEXPORTTABLES
+    END
+END
+
+IDR_MAINMENU MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New Connection Using Current Settings\tCtrl+N", IDM_FILE_NEWSAMECONN
+        MENUITEM "New &Connection...\tCtrl+M",  IDM_FILE_NEWCONNECTION
+        MENUITEM SEPARATOR
+        MENUITEM "New &Query Editor\tCtrl+T",   ID_NEW_EDITOR
+        MENUITEM "New Query &Builder\tCtrl+K",  ID_QUERYBUILDER
+        MENUITEM "Ne&w Schema Designer\tCtrl+Alt+D", ID_SCHEMADESIGNER
+        MENUITEM "New Data Searc&h\tCtrl+Shift+D", ID_DATASEARCH
+        MENUITEM SEPARATOR
+        MENUITEM "Close &Tab\tAlt+L",           ID_FILE_CLOSETAB
+        MENUITEM "&Disconnect\tCtrl+F4/Ctrl+W", IDM_FILE_CLOSECONNECTION
+        MENUITEM "Disconnect Al&l",             IDM_FILE_CLOASEALL
+        MENUITEM SEPARATOR
+        MENUITEM "Open...\tCtrl+O",             IDM_FILE_OPENSQLNEW
+        MENUITEM "&Save...\tCtrl+S",            IDM_FILE_SAVESQL
+        MENUITEM "S&ave As...",                 IDM_FILE_SAVEAS
+        MENUITEM SEPARATOR
+        POPUP "&Recent Files"
+        BEGIN
+            MENUITEM "No Recent Files",             ID_LF_1
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit\tAlt+F4",               IDM_FILE_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "Refresh &Object Browser\tF5", IDM_REFRESHOBJECT
+        MENUITEM "Change Objec&t Browser Color\t", IDM_OBCOLOR
+        POPUP "Execute Quer&y"
+        BEGIN
+            MENUITEM "Exe&cute Query\tF9",          ACCEL_EXECUTE_MENU
+            MENUITEM "Execute &All Queries\tCtrl+F9", ACCEL_EXECUTEALL
+            MENUITEM "Execute And Edit &Resultset\tF8", ACCEL_QUERYUPDATE
+        END
+        POPUP "Execute Explain"
+        BEGIN
+            MENUITEM "EXPLAIN <Query>",             ID_EXPLAIN_EXPLAIN
+            MENUITEM "EXPLAIN EXTENDED <Query>",    ID_EXPLAIN_EXTENDED
+        END
+        MENUITEM SEPARATOR
+        POPUP "S&QL Formatter"
+        BEGIN
+            MENUITEM "Format &Current Query\tF12",  ACCEL_FORMATCURRENTQUERY
+            MENUITEM "Format &Selected Query\tCtrl+F12", ACCEL_FORMATSELECTEDQUERY
+            MENUITEM "Format &All Queries\tShift+F12", ACCEL_FORMATALLQUERIES
+        END
+        MENUITEM "&Insert Templates...\tCtrl+Shift+T", ID_EDIT_INSERTTEMPLATES
+        MENUITEM SEPARATOR
+        MENUITEM "&Undo\tCtrl+Z",               IDM_EDIT_UNDO
+        MENUITEM "&Redo\tCtrl+Y",               IDM_EDIT_REDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                IDM_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               IDM_EDIT_COPY
+        MENUITEM "Copy With Normalized &Whitespace\tAlt+C", IDM_COPYNORMALIZED
+        MENUITEM "&Paste\tCtrl+V",              IDM_EDIT_PASTE
+        MENUITEM "Insert From Fi&le...",        ID_EDIT_INSERTFILE
+        MENUITEM "Select &All\tCtrl+A",         IDM_EDIT_SELECTALL
+        MENUITEM SEPARATOR
+        MENUITEM "&Find...\tCtrl+F",            IDM_EDIT_FIND
+        MENUITEM "Find Next\tF3",               IDM_EDIT_FINDNEXT
+        MENUITEM "R&eplace...\tCtrl+H",         IDM_EDIT_REPLACE
+        MENUITEM "&Go To...\tCtrl+G",           IDM_EDIT_GOTO
+        MENUITEM SEPARATOR
+        MENUITEM "Li&st All Tags\tCtrl+Space",  ID_EDIT_LISTALLTAGS
+        MENUITEM "List &Matching Tags\tCtrl+Enter", ID_EDIT_LISTMATCHINGTAGS
+        MENUITEM "List Function and Routine Parameters\tCtrl+Shift+Space", ID_EDIT_LISTFUNCTIONANDROUTINEPARAMETERS
+        MENUITEM SEPARATOR
+        MENUITEM "Hide Object &Browser\tCtrl+Shift+1", IDC_EDIT_SHOWOBJECT
+        MENUITEM "Hide Result Pa&ne\tCtrl+Shift+2", IDC_EDIT_SHOWRESULT
+        MENUITEM "&Hide SQL Editor\tCtrl+Shift+3", IDC_EDIT_SHOWEDIT
+        MENUITEM "Switch To Pre&vious Tab\tCtrl+PgUp", ID_EDIT_SWITCHTABSTOLEFT
+        MENUITEM "Switch To Ne&xt Tab\tCtrl+PgDown", ID_EDIT_SWITCHTABSTORIGHT
+        MENUITEM SEPARATOR
+        POPUP "A&dvanced"
+        BEGIN
+            MENUITEM "Make Selection &Uppercase\tCtrl+Shift+U", IDM_EDIT_ADVANCED_UPPER
+            MENUITEM "Make Selection &Lowercase\tCtrl+Shift+L", IDM_EDIT_ADVANCED_LOWER
+            MENUITEM SEPARATOR
+            MENUITEM "&Comment Selection\tCtrl+Shift+C", IDM_EDIT_ADVANCED_COMMENT
+            MENUITEM "&Remove Comment From Selection\tCtrl+Shift+R", IDM_EDIT_ADVANCED_REMOVE
+        END
+    END
+    POPUP "Fa&vorites"
+    BEGIN
+        MENUITEM "&Add To Favorites...\t  Ctrl+Shift+F", ID_ADDTOFAVORITES
+        MENUITEM "&Organize Favorites...",      ID_ORGANIZEFAVORITES
+        MENUITEM "&Refresh Favorites",          ID_REFRESHFAVORITES
+        MENUITEM SEPARATOR
+    END
+    POPUP "&Database"
+    BEGIN
+        MENUITEM "&Copy Database To Different Host/Database...", ID_OPEN_COPYDATABASE
+        MENUITEM "Create &Database...\tCtrl+D", IDM_CREATEDATABASE
+        MENUITEM "&Alter Database...\tF6",      IDM_ALTERDATABASE
+        POPUP "C&reate"
+        BEGIN
+            MENUITEM "&Table",                      ID_DB_TABLE_MAKER
+            MENUITEM "&View...",                    ID_DB_CREATEVIEW
+            MENUITEM "&Stored Procedure...",        ID_DB_CREATESTOREDPROCEDURE
+            MENUITEM "&Function...",                ID_DB_CREATEFUNCTION
+            MENUITEM "Tri&gger... ",                ID_DB_CREATETRIGGER
+            MENUITEM "&Event...",                   ID_DB_CREATEEVENT
+        END
+        POPUP "More Database &Operations"
+        BEGIN
+            MENUITEM "Dro&p Database...\tDel",      ID_OBJECT_DROPDATABASE
+            MENUITEM "Tr&uncate Database...\tShift+Del", ID_OBJECT_TRUNCATEDATABASE
+            MENUITEM "E&mpty Database...",          ID_OBJECT_EMPTYDATABASE
+        END
+        MENUITEM SEPARATOR
+        POPUP "&Backup/Export"
+        BEGIN
+            MENUITEM "&Scheduled Backups...\tCtrl+Alt+S", ID_POWERTOOLS_SCHEDULEEXPORT2
+            MENUITEM "&Backup Database As SQL Dump...\tCtrl+Alt+E", 40214
+        END
+        POPUP "&Import "
+        BEGIN
+            MENUITEM "Import E&xternal Data...\tCtrl+Alt+O", ID_IMPORT_EXTERNAL_DATA
+            MENUITEM "&Execute SQL Script...\tCtrl+Shift+Q", 40047
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Create Schema For Database In &HTML...\tCtrl+Shift+Alt+S", ID_OBJECT_CREATESCHEMA
+    END
+    POPUP "T&able"
+    BEGIN
+        POPUP "&Paste SQL Statement"
+        BEGIN
+            MENUITEM "&INSERT INTO <tablename>...\tAlt+Shift+I", ID_OBJECT_INSERTSTMT
+            MENUITEM "&UPDATE <tablename> SET...\tAlt+Shift+U", ID_OBJECT_UPDATESTMT
+            MENUITEM "&DELETE FROM <tablename>...\tAlt+Shift+D", ID_OBJECT_DELETESTMT
+            MENUITEM "&SELECT <col-1>...<col-n> FROM...\tAlt+Shift+S", ID_OBJECT_SELECTSTMT
+        END
+        MENUITEM "&Copy Table(s) To Different Host/Database...", ID_OPEN_COPYTABLE
+        MENUITEM SEPARATOR
+        MENUITEM "&Open Table\tF11",            ID_OBJECT_VIEWDATA
+        MENUITEM "Open Table in &New Tab\tCtrl+F11", ID_TABLE_OPENINNEWTAB
+        MENUITEM "Create &Table",               ID_TABLE_MAKER
+        MENUITEM "&Alter Table\tF6",            ID_OBJECT_TABLEEDITOR
+        MENUITEM "&Manage Indexes\tF7",         ID_OBJECT_MANINDEX
+        MENUITEM "Re&lationships/Foreign Keys\tF10", IDM_TABLE_RELATION
+        POPUP "Mo&re Table Operations"
+        BEGIN
+            MENUITEM "&Rename Table\tF2",           ID_OBJECT_RENAMETABLE
+            MENUITEM "Tru&ncate Table...\tShift+Del", ID_OBJECT_CLEARTABLE
+            MENUITEM "&Drop Table From Database...\tDel", ID_OBJECT_DROPTABLE
+            MENUITEM "Re&order Column(s)\tCtrl+Alt+R", ID_OBJECT_REORDER
+            MENUITEM "Duplicate Table &Structure/Data...", ID_OBJECT_COPYTABLE
+            MENUITEM "View &Table Properties",      ID_OBJECT_ADVANCED
+            POPUP "Change Table T&ype To"
+            BEGIN
+                MENUITEM "empty",                       ID_Menu40376
+            END
+        END
+        MENUITEM SEPARATOR
+        POPUP "&Backup/Export"
+        BEGIN
+            MENUITEM "&Scheduled Backups...\tCtrl+Alt+S", ID_POWERTOOLS_SCHEDULEEXPORT2
+            MENUITEM "&Backup Table(s) As SQL Dump...\tCtrl+Alt+E", ID_IMPORTEXPORT_TABLESEXPORTTABLES
+            MENUITEM "&Export Table Data As...\tCtrl+Alt+C", 40377
+        END
+        POPUP "&Import "
+        BEGIN
+            MENUITEM "Import E&xternal Data...\tCtrl+Alt+O", ID_IMPORT_EXTERNAL_DATA
+            MENUITEM "&Import CSV Data Using LOAD LOCAL...\tCtrl+Shift+M", ID_IMPORT_FROMCSV
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Create Tri&gger...",          ID_OBJECT_CREATETRIGGER
+    END
+    POPUP "&Others"
+    BEGIN
+        POPUP "&Columns"
+        BEGIN
+            MENUITEM "Drop &Column...\tDel",        ID_OBJECT_DROPFIELD
+            MENUITEM SEPARATOR
+            MENUITEM "&Manage Columns\tF6",         40381
+        END
+        POPUP "&Indexes"
+        BEGIN
+            MENUITEM "Create &Index",               40382
+            MENUITEM "&Edit Index\tF6",             40383
+            MENUITEM "&Drop Index...\tDel",         40384
+            MENUITEM SEPARATOR
+            MENUITEM "&Manage Indexes\tF7",         ID_OBJECT_MAINMANINDEX
+        END
+        MENUITEM SEPARATOR
+        POPUP "&Views"
+        BEGIN
+            MENUITEM "Create &View...",             ID_OBJECT_CREATEVIEW
+            MENUITEM "&Alter View...\tF6",          ID_OBJECT_ALTERVIEW
+            MENUITEM "&Drop View...\tDel",          ID_OBJECT_DROPVIEW
+            MENUITEM SEPARATOR
+            MENUITEM "&Rename View\tF2",            ID_OBJECTS_RENAMEVIEW
+            MENUITEM "&Export View...",             ID_OBJECT_EXPORTVIEW
+            MENUITEM "Vie&w Data",                  ID_OBJECT_VIEWDATA
+        END
+        POPUP "&Stored Procedures"
+        BEGIN
+            MENUITEM "Create &Stored Procedure...", ID_OBJECT_CREATESTOREDPROCEDURE
+            MENUITEM "&Alter Stored Procedure...\tF6", ID_OBJECT_ALTERSTOREDPROCEDURE
+            MENUITEM "&Drop Stored Procedure...\tDel", ID_OBJECT_DROPSTOREDPROCEDURE
+        END
+        POPUP "&Functions"
+        BEGIN
+            MENUITEM "Create &Function...",         ID_OBJECT_CREATEFUNCTION
+            MENUITEM "&Alter Function...\tF6",      ID_OBJECT_ALTERFUNCTION
+            MENUITEM "&Drop Function...\tDel",      ID_OBJECT_DROPFUNCTION
+        END
+        POPUP "&Triggers"
+        BEGIN
+            MENUITEM "Create &Trigger...",          ID_OBJECT_CREATETRIGGER
+            MENUITEM "&Alter Trigger...\tF6",       ID_OBJECT_ALTERTRIGGER
+            MENUITEM "&Drop Trigger...\tDel",       ID_OBJECT_DROPTRIGGER
+            MENUITEM SEPARATOR
+            MENUITEM "&Rename Trigger\tF2",         ID_OBJECTS_RENAMETRIGGER
+        END
+        POPUP "&Events"
+        BEGIN
+            MENUITEM "Create &Event...",            ID_OBJECT_CREATEEVENT
+            MENUITEM "&Alter Event...\tF6",         ID_OBJECT_ALTEREVENT
+            MENUITEM "&Drop Event...\tDel",         ID_OBJECT_DROPEVENT
+            MENUITEM SEPARATOR
+            MENUITEM "&Rename Event\tF2",           ID_OBJECT_RENAMEEVENT
+        END
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "&Export All Rows Of Table Data/Result As...\tCtrl+Shift+E", IDM_IMEX_EXPORTDATA
+        MENUITEM "&Backup Database As SQL Dump...\tCtrl+Alt+E", ID_IMPORTEXPORT_DBEXPORTTABLES2
+        MENUITEM "Execute &SQL Script...\tCtrl+Shift+Q", ID_IMEX_TEXTFILE2
+        MENUITEM SEPARATOR
+        MENUITEM "&Flush...\tCtrl+Alt+F",       ID_TOOLS_FLUSH
+        MENUITEM "&Table Diagnostics...\tCtrl+Alt+T", IDM_TOOLS_TABLEDIAG
+        MENUITEM "&History\tCtrl+Shift+H",      ID_HISTORY
+        MENUITEM "&Info\tCtrl+Shift+I",         ID_INFOTAB
+        MENUITEM SEPARATOR
+        MENUITEM "&User Manager\tCtrl+U",       ID_TOOLS_USERMANAGER
+        POPUP "Sho&w"
+        BEGIN
+            MENUITEM "&Variables...",               ID_SHOW_VARIABLES
+            MENUITEM "&Processlist...",             ID_SHOW_PROCESSLIST
+            MENUITEM "&Status...",                  ID_SHOW_STATUS
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "Change &Language\tAlt+Shift+L", ID_TOOLS_CHANGELANGUAGE
+        POPUP "Export/I&mport Connection Details"
+        BEGIN
+            MENUITEM "&Export Connection Details...", ID_EXPORT_EXPORTCONNECTIONDETAILS
+            MENUITEM "&Import Connection Details...", ID_EXPORT_IMPORTCONNECTIONDETAILS
+        END
+        MENUITEM "&Preferences...",             IDC_PREF
+    END
+    POPUP "&Powertools"
+    BEGIN
+        MENUITEM "Database S&ynchronization Wizard...\tCtrl+Alt+W", IDM_DATASYNC
+        MENUITEM "&Visual Data Comparison Wizard...\tCtrl+Alt+Q", ID_VDDTOOL
+        MENUITEM "Schema &Synchronization Tool...\tCtrl+Q", IDC_DIFFTOOL
+        MENUITEM SEPARATOR
+        MENUITEM "Import E&xternal Data...\tCtrl+Alt+O", ID_IMPORT_EXTERNAL_DATA
+        MENUITEM "S&QL Scheduler and Reporting Wizard...\tCtrl+Alt+N", IDC_TOOLS_NOTIFY
+        MENUITEM "S&cheduled Backups...\tCtrl+Alt+S", ID_POWERTOOLS_SCHEDULEEXPORT2
+        MENUITEM SEPARATOR
+        MENUITEM "Scheduled &Jobs...",          IDM_TOOL_JOBMAN
+        MENUITEM SEPARATOR
+        MENUITEM "&Rebuild tags",               ID_REBUILDTAGS
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&Cascade",                    IDM_WINDOW_CASCADE
+        MENUITEM "&Tile Windows",               IDM_WINDOW_TILE
+        MENUITEM "&Icon Arrange",               IDM_WINDOWS_ICONARRANGE
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&Help\tF1",                   IDM_HELP_HELP
+        MENUITEM "&Keyboard Shortcuts...",      IDM_HELP_SHORT
+        MENUITEM "Check For &Updates...",       IDM_HELP_CHKUPGRD
+        MENUITEM "&About...",                   IDM_HELP_ABOUT
+    END
+END
+
+IDR_FIXTABMENU MENU
+BEGIN
+    POPUP "Connection Tab"
+    BEGIN
+        MENUITEM "&Disconnect\tCtrl+F4",        IDM_FILE_CLOSECONNECTION
+        MENUITEM "Change Objec&t Browser Color\t", IDM_OBCOLOR
+    END
+END
+
+IDR_GRIDVIEWMENU MENU
+BEGIN
+    POPUP "View"
+    BEGIN
+        MENUITEM "&Grid View",                  ID_VIEW_GRIDVIEW
+        MENUITEM "&Form View",                  ID_VIEW_FORMVIEW
+        MENUITEM "&Text View",                  IDM_EDIT_RESULT_TEXT
+    END
+END
+
+IDR_TABPLUSMENU MENU
+BEGIN
+    POPUP "Tab Menu"
+    BEGIN
+        MENUITEM "New &Query Editor\tCtrl+T",   ID_NEW_EDITOR
+        MENUITEM "New Query &Builder\tCtrl+K",  ID_QUERYBUILDER
+        MENUITEM "Ne&w Schema Designer\tCtrl+Alt+D", ID_SCHEMADESIGNER
+        MENUITEM "New Data Sea&rch\tCtrl+Shift+D", ID_DATASEARCH
+        MENUITEM SEPARATOR
+        MENUITEM "&History\tCtrl+Shift+H",      ID_HISTORY
+        MENUITEM "&Info\tCtrl+Shift+I",         ID_INFOTAB
+        MENUITEM "&Table Data\tF11",            ID_OBJECT_VIEWDATA
+    END
+    MENUITEM SEPARATOR
+END
+
+IDR_CONNTABPLUSMENU MENU
+BEGIN
+    POPUP "Conn Tab Plus Menu"
+    BEGIN
+        MENUITEM "&New Connection Using Current Settings\tCtrl+N", IDM_FILE_NEWSAMECONN
+        MENUITEM "New &Connection...\tCtrl+M",  IDM_FILE_NEWCONNECTION
+    END
+END
+
+IDR_INFOTABMENU MENU
+BEGIN
+    POPUP "Object"
+    BEGIN
+        MENUITEM "&Copy\tCtrl+C",               ID_OBJECT_COPY, GRAYED
+        MENUITEM "Select &All\tCtrl+A",         ID_OBJECT_SELECTALL
+        MENUITEM SEPARATOR
+        MENUITEM "&Find...\tCtrl+F",            ID_OBJECT_FIND
+        MENUITEM "Find Next\tF3",               ID_OBJECT_FINDNEXT
+    END
+END
+
+IDR_PREVIEWMENU MENU
+BEGIN
+    POPUP "Open"
+    BEGIN
+        MENUITEM "&Copy\tCtrl+C",               ID_OPEN_COPY
+        MENUITEM "Co&py All",                   ID_OPEN_COPYALL
+        MENUITEM "Select &All\tCtrl+A",         ID_OPEN_SELECTALL
+    END
+END
+
+IDR_MESSAGETAB_MENU MENU
+BEGIN
+    POPUP "Menu"
+    BEGIN
+        MENUITEM "Show Only Errors",            ID_MENU_SHOWONLYERRORS
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_CONNECT DIALOGEX 150, 150, 370, 259
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Connect to MySQL Host"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&New...",IDC_NEW,113,9,46,15
+    PUSHBUTTON      "Clone...",IDC_CLONECONN,164,9,46,15,WS_DISABLED
+    PUSHBUTTON      "&Save",IDC_SAVE,215,9,47,15,WS_DISABLED
+    PUSHBUTTON      "&Rename...",IDC_EDITCONN,267,9,46,15,WS_DISABLED
+    PUSHBUTTON      "&Delete",IDC_DELETE,318,9,46,15,WS_DISABLED
+    LTEXT           "Sa&ved Connections",IDC_DESCSTATIC,113,32,69,9,WS_DISABLED
+    CONTROL         "",IDC_DESC,"CustomComboBox1",WS_DISABLED | WS_TABSTOP | 0x10,180,30,184,15
+    CONTROL         "Tab1",IDC_CONNTAB,"SysTabControl32",TCS_HOTTRACK | WS_DISABLED | WS_GROUP | WS_TABSTOP,113,50,251,181
+    LTEXT           "&MySQL Host Address",IDC_MYSQLHOSTST,119,74,70,9,WS_DISABLED
+    EDITTEXT        IDC_DLGCONNECT_HOST,190,72,166,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "&Username",IDC_MYSQLUSERST,119,92,63,9,WS_DISABLED
+    EDITTEXT        IDC_DLGCONNECT_USER,190,90,166,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "&Password",IDC_MYSQLPWDST,119,111,62,9,WS_DISABLED
+    EDITTEXT        IDC_DLGCONNECT_PASSWORD,190,107,100,12,ES_PASSWORD | ES_AUTOHSCROLL | WS_DISABLED
+    CONTROL         "Save Pass&word",IDC_DLGCONNECT_STOREPASSWORD,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,295,108,63,12
+    LTEXT           "P&ort",IDC_MYSQLPORTST,119,128,64,9,WS_DISABLED
+    EDITTEXT        IDC_DLGCONNECT_PORT,190,125,100,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    LTEXT           "Data&base(s)",IDC_MYSQLDBST,119,144,62,9,WS_DISABLED
+    EDITTEXT        IDC_DLGCONNECT_DATABASE,190,142,166,12,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Pr&ivate Key",IDC_SSHPRIVATEKEYTITLE,125,173,52,8,NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "(Use ';' to seperate multiple databases. Leave blank to display all)",IDC_COLONST,119,160,242,18,WS_DISABLED
+    CONTROL         "Use Compress&ed Protocol",IDC_COMPRESS,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,119,175,95,10
+    PUSHBUTTON      "?",IDC_COMPRESSHELP,340,159,16,11
+    GROUPBOX        "Session Idle Timeout",IDC_TIMEOUT,119,188,139,28
+    CONTROL         "De&fault",IDC_TIMEOUTDEF,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP,124,200,38,10
+    CONTROL         "",IDC_TIMEOUTOPT,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,164,200,12,10
+    EDITTEXT        IDC_TIMEOUTEDIT,176,198,40,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    LTEXT           "(seconds)",IDC_TIMESEC,221,200,33,12
+    GROUPBOX        "Keep-Alive Inter&val",IDC_KEEPALIVE,264,188,92,28,WS_DISABLED
+    EDITTEXT        IDC_PINGINTERVAL,270,198,45,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    LTEXT           "(seconds)",IDC_KEEPALIVESEC,320,200,32,8,WS_DISABLED
+    GROUPBOX        "",IDC_TUNNELGRP,117,72,242,154,NOT WS_VISIBLE
+    CONTROL         "Use &HTTP Tunneling",IDC_TUNNEL,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,121,71,83,8
+    PUSHBUTTON      "?",IDC_TUNNELHELP,339,71,16,11,NOT WS_VISIBLE
+    LTEXT           "&URL",IDC_STATICURL,121,88,15,8,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_URL,151,86,203,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "Time&out",IDC_HTTPTIMEST,121,106,29,10,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_HTTPTIME,151,104,30,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "(seconds)",IDC_HTTPTIMEST2,183,106,56,13,NOT WS_VISIBLE | WS_DISABLED
+    PUSHBUTTON      "&Advanced...",IDC_HTTPAUTH,234,104,55,14,NOT WS_VISIBLE | WS_DISABLED
+    GROUPBOX        "",IDC_HTTPSOCKETGRP,121,132,234,30,NOT WS_VISIBLE
+    CONTROL         "Us&e Socket",IDC_HTTPSOCKET,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,125,131,48,10
+    LTEXT           "F&ile Path",IDC_HTTPSOCKETSTATIC,125,145,55,8,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_HTTPSOCKETPATH,157,143,193,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "(SQLyogTunnel.php is available in the installation directory.\r\nYou may rename it if you don't want to expose the SQLyog tunneler)",IDC_TUNNELST,121,178,225,35,NOT WS_VISIBLE | WS_DISABLED
+    GROUPBOX        "",IDC_SSHGRP,117,72,242,154,NOT WS_VISIBLE
+    CONTROL         "Use SSH Tunnelin&g",IDC_SSH,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_GROUP | WS_TABSTOP,121,71,78,8
+    PUSHBUTTON      "?",IDC_SSHHELP,339,71,16,11,NOT WS_VISIBLE
+    LTEXT           "SSH &Host Address",IDC_SSHHOSTST,121,88,60,8,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_SSHHOST,184,86,170,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "&Username",IDC_SSHUSERST,121,106,60,8,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_SSHUSER,184,104,107,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "SSH P&ort",IDC_SSHPORTST,121,124,33,8,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_SSHPORT,184,122,107,12,ES_AUTOHSCROLL | ES_NUMBER | NOT WS_VISIBLE | WS_DISABLED
+    GROUPBOX        "",IDC_SSHPASSGRP,121,140,234,82,NOT WS_VISIBLE
+    CONTROL         "Pass&word",IDC_SSHPASSWORDRADIO,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE | WS_DISABLED | WS_GROUP,141,139,46,10
+    CONTROL         "Public &Key",IDC_SSHPRIVATERADIO,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE | WS_DISABLED,231,139,48,10
+    LTEXT           "P&assword",IDC_SSHPWDST,125,155,38,8,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_SSHPWD,184,153,97,12,ES_PASSWORD | ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    CONTROL         "Sa&ve Password",IDC_SSHSAVEPHRASE,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,286,156,68,8
+    EDITTEXT        IDC_SSHPRIVATEKEY,184,171,107,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    PUSHBUTTON      "...",IDC_SSHPRIVATEKEYFILE,296,173,16,11,NOT WS_VISIBLE | WS_DISABLED
+    GROUPBOX        "",IDC_SSLGRP,117,72,242,154,NOT WS_VISIBLE
+    CONTROL         "Use SSL Encr&yption",IDC_SSL,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,121,71,78,8
+    PUSHBUTTON      "?",IDC_SSLHELP,339,71,16,11,NOT WS_VISIBLE
+    LTEXT           "CA Certificat&e",IDC_SSLCACER,121,88,52,8,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_CACER,184,86,110,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    PUSHBUTTON      "...",IDC_SSLCAFILE,295,88,16,11,NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "C&ipher",IDC_SSLCIPHER,121,106,32,8,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_CIPHER,183,104,110,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    GROUPBOX        "",IDC_SSLAUTHGRP,121,123,234,99,NOT WS_VISIBLE
+    CONTROL         "Use A&uthentication ",IDC_SSLAUTH,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_DISABLED | WS_TABSTOP,125,122,78,8
+    LTEXT           "Cl&ient Key",IDC_SSLCLIENTKEY,125,140,33,8,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_CLIENTKEY,182,137,110,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    PUSHBUTTON      "...",IDC_SSLKEYFILE,295,139,16,11,NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "Client Ce&rtificate",IDC_SSLCLIENTCER,125,158,56,8,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_CLIENTCER,182,155,110,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    PUSHBUTTON      "...",IDC_SSLCERFILE,295,157,16,11,NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "B&ackground Color",IDC_COLORTXT2,119,71,62,8,NOT WS_VISIBLE | WS_DISABLED | NOT WS_GROUP
+    COMBOBOX        IDC_COLORCOMBO,186,68,166,200,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_SORT | NOT WS_VISIBLE | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "F&oreground Color",IDC_COLORTXT3,119,89,62,8,NOT WS_VISIBLE | WS_DISABLED | NOT WS_GROUP
+    COMBOBOX        IDC_COLORCOMBO3,186,86,166,30,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_SORT | NOT WS_VISIBLE | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "(These colors will be used in the Object Browser for this connection only)",IDC_COLORTXT1,119,103,232,17,NOT WS_VISIBLE | WS_DISABLED | NOT WS_GROUP
+    GROUPBOX        "SQL Mode",IDC_MSQLOPTIONSGRP,118,115,238,26,NOT WS_VISIBLE
+    CONTROL         "",IDC_MODEVALUE,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE | WS_DISABLED,126,127,8,10
+    EDITTEXT        IDC_EDITMODE,141,125,135,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    CONTROL         "Use &global value",IDC_MODEGLOBAL,"Button",BS_AUTORADIOBUTTON | NOT WS_VISIBLE | WS_DISABLED,284,127,68,10
+    LTEXT           "Init Command(s)",IDC_INITCOMMAND,119,150,54,8,NOT WS_VISIBLE | WS_DISABLED
+    EDITTEXT        IDC_EDITINITCOMMAND,176,148,160,12,ES_AUTOHSCROLL | NOT WS_VISIBLE | WS_DISABLED
+    PUSHBUTTON      "?",IDC_INITCOMMANDHELP,340,149,16,11,NOT WS_VISIBLE
+    LTEXT           "(Seperate multiple commands with a semicolon ';')",IDC_INITCOMMANDDETAIL,119,162,232,8,NOT WS_VISIBLE | WS_DISABLED | NOT WS_GROUP
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,236,356,1
+    DEFPUSHBUTTON   "&Connect",IDOK,113,241,77,14,WS_DISABLED
+    PUSHBUTTON      "Cance&l",IDCANCEL,200,241,77,14
+    PUSHBUTTON      "&Test Connection",IDC_TESTCONN,287,241,77,14,WS_DISABLED
+    CONTROL         662,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,9,100,220
+END
+
+IDD_EXPORTDATA DIALOGEX 150, 50, 391, 282
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION " SQL Dump"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDI_EXPORTDATA,IDC_ICON_EXP,7,4,20,20
+    LTEXT           "Export as SQL",IDC_TEXT1,87,12,45,10
+    LTEXT           "Database na&me",IDC_TEXT2,6,34,51,8
+    COMBOBOX        IDC_EXPORT_DBCOMBO,6,47,128,137,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "&Object(s)",IDC_TEXT4,6,63,54,8
+    CONTROL         "",IDC_EXPORTTREE,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_CHECKBOXES | WS_BORDER | WS_HSCROLL | WS_GROUP | WS_TABSTOP,6,75,172,150
+    GROUPBOX        "",IDC_GROUP1,142,2,243,26
+    CONTROL         "Str&ucture only",IDC_CHK_STRUCTURE,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,153,12,57,11
+    CONTROL         "&Data only",IDC_CHK_DATAONLY,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,232,12,43,11
+    CONTROL         "S&tructure and data",IDC_CHK_DATA,"Button",BS_AUTORADIOBUTTON,296,12,80,11
+    LTEXT           "Export to &file",IDC_TEXT3,142,34,45,8
+    EDITTEXT        IDC_EXPORTFILENAME,142,47,224,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_EXPFILESELECT,370,46,15,13
+    GROUPBOX        "Options having effect on source",IDC_GROUP2,186,72,199,54
+    CONTROL         "Loc&k tables for read",IDC_CHK_LOCKFORREAD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,83,97,12
+    CONTROL         "Flush lo&gs before dump",IDC_CHK_FLUSHLOGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,96,87,12
+    CONTROL         "&Single transaction",IDC_SINGLE_TRANSACTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,109,104,12
+    GROUPBOX        "Options written to file",IDC_GROUP3,186,131,199,94
+    CONTROL         "Include ""USE d&atabase"" statement",IDC_CHK_USEDBNAME,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,143,124,12
+    CONTROL         "Include ""&CREATE database"" statement",IDC_CHK_CREATEDB,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,156,138,12
+    CONTROL         "Set FO&REIGN_KEY_CHECKS=0",IDC_SETUNIQUE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,169,119,12
+    CONTROL         "Add lock around &INSERT statement(s)",IDC_CHK_LOCKAROUNDINSERT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,182,135,12
+    CONTROL         "Create &bulk INSERT statement(s)",IDC_BULKINSERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,195,118,12
+    CONTROL         "Include ""DRO&P"" statement(s) ",IDC_CHK_DROPOBJECT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,208,105,12
+    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,6,237,379,14,WS_EX_TRANSPARENT
+    LTEXT           "",IDC_MESSAGE2,6,257,249,18
+    DEFPUSHBUTTON   "&Export",IDOK,280,261,50,15
+    PUSHBUTTON      "C&lose",IDCANCEL,335,261,50,15
+    PUSHBUTTON      "Do&ne",IDDONE,335,261,50,15,NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "Grip",IDC_EXPDAT_GRIP,215,260,14,8
+END
+
+IDD_ABOUTDIALOG DIALOGEX 125, 125, 334, 107
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " About SQLyog "
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,8,62,321,1
+    LTEXT           "",IDC_WARNING,6,68,318,34
+    DEFPUSHBUTTON   "O&K",IDOK,281,7,45,15
+    ICON            IDI_MAIN,IDC_LOGO,21,11,20,20
+    LTEXT           "http://www.webyog.com",IDC_LINK,63,24,213,11,SS_NOTIFY | SS_CENTERIMAGE
+    LTEXT           "This is a TRIAL version of SQLyog.",IDC_REGINFO,8,51,319,9,SS_WORDELLIPSIS
+    LTEXT           "",IDC_APPINFO,63,8,213,16
+END
+
+IDD_KEYSHORT DIALOGEX 175, 125, 324, 194
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION " Keyboard Shortcuts for SQLyog"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,265,172,50,14
+    EDITTEXT        IDC_KEYSHORTS,32,7,283,154,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL,WS_EX_DLGMODALFRAME
+    ICON            IDI_KEYSHORT,IDC_STATIC,5,7,20,20
+    CONTROL         "",IDC_KEYSTATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,6,165,309,1
+END
+
+IDD_TABLEDIAG DIALOGEX 175, 80, 310, 166
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION " Table Diagnostics"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "Select database and table(s)",IDC_STATIC,9,9,119,11
+    COMBOBOX        IDC_DIAG_DATABASE,9,20,115,85,CBS_DROPDOWNLIST | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    CONTROL         "&Select/Deselect all table(s)",IDC_DIAG_CHKUNCHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,134,20,101,12
+    CONTROL         "",IDC_DIAG_TABLES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | LVS_EDITLABELS | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,9,37,147,103,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "O&ptimize...",IDC_DIAG_OPTIMIZE,162,39,50,14
+    CONTROL         "L&ocal",IDC_DIAG_OPTIMIZELOCAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,217,39,80,14
+    PUSHBUTTON      "C&heck...",IDC_DIAG_CHECK,162,59,50,14
+    COMBOBOX        IDC_CHECKOPTION,217,60,83,85,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    PUSHBUTTON      "A&nalyze...",IDC_DIAG_ANALYZE,162,79,50,14
+    CONTROL         "Lo&cal",IDC_DIAG_ANALYZELOCAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,217,81,80,12
+    PUSHBUTTON      "&Repair...",IDC_DIAG_REPAIR,162,99,50,14
+    CONTROL         "&Quick",IDC_DIAG_QUICKREPAIR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,217,101,32,12
+    CONTROL         "&Extended",IDC_DIAG_EXTENDEDREPAIR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,255,101,45,12
+    CONTROL         "&Use_Frm",IDC_DIAG_USEFRMREPAIR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,217,113,45,12
+    CONTROL         "Loc&al",IDC_DIAG_USELOCALREPAIR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,217,125,80,12
+    DEFPUSHBUTTON   "Cance&l",IDOK,253,145,50,14
+    CONTROL         "",IDC_HORZ,"Static",SS_BLACKFRAME | SS_SUNKEN,9,142,294,1,WS_EX_STATICEDGE
+    GROUPBOX        "",IDC_DIAG_GROUP2,159,53,144,23
+    GROUPBOX        "",IDC_DIAG_GROUP1,159,33,144,23
+    GROUPBOX        "",IDC_DIAG_GROUP3,159,73,144,23
+    GROUPBOX        "",IDC_DIAG_GROUP4,159,93,144,47
+    ICON            IDI_TABLEDIAG,IDC_DIAG_ICON,277,11,20,20
+    LTEXT           "Grip",IDC_TABLEDIAG_GRIP,169,153,14,8
+END
+
+IDD_FLUSH DIALOGEX 0, 0, 195, 142
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Flush"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CONTROL         "Lo&gs",IDC_FL_LOGS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,35,10,54,9
+    CONTROL         "&Hosts",IDC_FL_HOSTS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,10,53,9
+    CONTROL         "&Privileges",IDC_FL_PRIV,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,35,23,53,9
+    CONTROL         "&Status",IDC_FL_STATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,23,69,9
+    CONTROL         "&Tables",IDC_FL_TABLES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,35,36,54,9
+    CONTROL         "Tables with &read lock",IDC_FL_TABLESREAD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,36,92,9
+    CONTROL         "&DES_KEY_FILE",IDC_FL_DES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,35,49,65,9
+    CONTROL         "&QUERY CACHE",IDC_FL_CACHE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,103,49,69,8
+    CONTROL         "&USER_RESOURCES",IDC_FL_RESOURCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,35,62,90,8
+    CONTROL         "&All",IDC_FLUSH_ALL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,35,74,69,9
+    CONTROL         "Use &NO_WRITE_TO_BINLOG",IDC_FL_BINLOG,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,35,87,138,9
+    LTEXT           "",IDC_MSG,13,102,172,12,SS_CENTERIMAGE
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,9,117,179,1
+    PUSHBUTTON      "&Flush",IDOK,83,121,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,138,121,50,14
+    ICON            IDI_FLUSH,IDC_STATIC,6,11,20,20
+END
+
+IDD_TEMPLATE DIALOGEX 0, 0, 374, 199
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION " SQL Templates"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LISTBOX         IDC_TEMPLIST,7,21,108,144,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_SAMPLE,119,21,247,144,ES_MULTILINE | ES_AUTOHSCROLL | ES_NOHIDESEL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP,WS_EX_STATICEDGE
+    DEFPUSHBUTTON   "&Insert",IDOK,262,177,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,316,177,50,14
+    LTEXT           "SQL Commands",IDC_STATIC,8,8,107,12,SS_CENTERIMAGE
+    LTEXT           "Preview",IDC_TEMP_STATIC1,119,8,107,12,SS_CENTERIMAGE
+    CONTROL         "",IDC_TEMP_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,172,359,1
+END
+
+IDD_SCHEMA DIALOGEX 0, 0, 219, 196
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Create schema"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    ICON            IDI_SCHEMA,IDC_STATIC,11,8,20,20
+    LTEXT           "Select table(s) for schema generation",IDC_STATIC,40,14,170,8
+    LISTBOX         IDC_TABLENAME,8,34,204,118,LBS_SORT | LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    LTEXT           "",IDC_MESSAGE,8,156,201,10
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,8,170,204,1
+    DEFPUSHBUTTON   "&Create...",IDOK,8,175,48,14
+    PUSHBUTTON      "&Select All",ID_SELECTALL,60,175,48,14
+    PUSHBUTTON      "&Deselect All",ID_UNSELECT,112,175,48,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,164,175,48,14
+END
+
+IDD_COPYTABLE DIALOGEX 0, 0, 251, 227
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Duplicate Table"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    ICON            IDI_COPYTABLE,IDC_STATIC,8,8,20,20
+    LTEXT           "Static",IDC_STATICTITLE,36,8,120,8
+    EDITTEXT        IDC_TABLENAME,35,19,211,12,ES_AUTOHSCROLL
+    CONTROL         "With &all fields",IDC_ALLFIELDS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,37,57,10
+    CONTROL         "With &indexes",IDC_ALLINDEX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,72,37,57,10
+    CONTROL         "With &triggers",IDC_TRIGGERS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,139,37,57,10
+    CONTROL         "&Structure only",IDC_STRUC,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,6,52,63,10
+    CONTROL         "Structure and &data",IDC_STRUCDATA,"Button",BS_AUTORADIOBUTTON,72,52,76,10
+    CONTROL         "List1",IDC_COLLIST,"SysListView32",LVS_REPORT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,6,68,240,131
+    DEFPUSHBUTTON   "&Copy",IDOK,141,208,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,196,208,50,14
+    CONTROL         "",IDC_STAT_HORZ,"Static",SS_BLACKFRAME | SS_SUNKEN,6,203,240,1
+    LTEXT           "Grip",IDC_COPYTABLE_GRIP,94,210,14,8
+END
+
+IDD_DBMAKER DIALOGEX 150, 150, 186, 66
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Create Database"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "Enter new database name",IDC_CAPTION,4,9,112,10
+    EDITTEXT        IDC_DBNAME,3,25,178,13,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&Create",IDOK,73,47,53,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,131,47,50,14
+END
+
+IDD_INSERTUPDATEBLOB DIALOGEX 0, 0, 427, 366
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION " Insert/Update Blob Field"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CONTROL         "Tab2",IDC_MAINTAB,"SysTabControl32",TCS_BUTTONS,7,7,176,97
+    PUSHBUTTON      "&Save To File...",IDC_SAVETOFILE,285,7,64,14
+    PUSHBUTTON      "&Import From File...",IDC_IMPORT,216,7,64,14
+    CONTROL         "Set &Null",IDC_SETNULL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,165,7,46,14
+    CONTROL         "scintilla",IDC_TEXT,"scintilla",WS_TABSTOP,7,23,413,313,WS_EX_STATICEDGE
+    CONTROL         "",IDC_TOPLINE,"Static",SS_BLACKFRAME | SS_SUNKEN,7,341,413,1
+    DEFPUSHBUTTON   "&OK",IDOK,315,345,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,370,345,50,14
+    CONTROL         "",IDC_IMAGE,"Static",SS_BLACKFRAME | WS_BORDER,7,24,413,314,WS_EX_CLIENTEDGE
+    COMBOBOX        IDC_COMBO,355,7,65,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Size:",IDC_SIZETEXT,8,347,17,11
+    LTEXT           "",IDC_BLOBSIZE,29,347,115,11
+END
+
+IDD_IMPORTBATCH DIALOGEX 0, 0, 241, 150
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Execute Query(s) From A File"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    LTEXT           "",IDC_MESSAGE,7,76,228,17
+    ICON            IDI_EXECBATCH,IDC_STATIC,9,10,21,20
+    LTEXT           "Execute query(s) stored in a SQL batch file.\t\nThis option is useful when you want to execute batch scripts without loading it into the SQL editor.",IDC_STATIC,37,10,198,25
+    LTEXT           "Current database : ",IDC_STATIC,37,37,74,8
+    LTEXT           "",IDC_CURDATABASE,110,36,122,13,SS_WORDELLIPSIS
+    LTEXT           "&File to execute",IDC_STATIC,7,49,56,8
+    EDITTEXT        IDC_EXPORTFILENAME,7,60,207,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_EXPFILESELECT,219,60,16,13
+    CONTROL         "Abort on error",IDC_CHECKBOX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,131,70,10
+    DEFPUSHBUTTON   "&Execute",IDOK,130,130,50,14
+    PUSHBUTTON      "C&lose",IDCANCEL,184,130,50,14
+    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,7,96,227,14
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME,7,124,227,1,WS_EX_STATICEDGE
+    RTEXT           "",IDC_SIZESTATIC,114,113,120,11
+    PUSHBUTTON      "&Done",IDDONE,184,130,50,14,NOT WS_VISIBLE | WS_DISABLED
+END
+
+IDD_ESCAPECHAR DIALOGEX 0, 0, 208, 184
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Specify The Escape Characters"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    CONTROL         "E&scaped by",IDC_ESCAPED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,8,52,8
+    EDITTEXT        IDC_ESCAPECHAR,92,7,18,12,ES_AUTOHSCROLL
+    CONTROL         "Li&nes terminated by",IDC_LINESTERM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,27,79,8
+    EDITTEXT        IDC_LESCAPE,92,25,18,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,43,192,1
+    GROUPBOX        "Fields",IDC_STATIC,7,46,192,78
+    CONTROL         "&Fixed length",IDC_FIXEDLENGTH,"Button",BS_AUTORADIOBUTTON | WS_GROUP,14,56,85,9
+    CONTROL         "&Variable length",IDC_VARIABLE,"Button",BS_AUTORADIOBUTTON,14,67,85,9
+    CONTROL         "Fields &terminated by",IDC_FIELDSTERMINATED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,31,79,79,8
+    EDITTEXT        IDC_FESCAPE,129,77,18,12,ES_AUTOHSCROLL
+    CONTROL         "Fields &enclosed by",IDC_FIELDSENCLOSED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,31,94,79,8
+    EDITTEXT        IDC_FENCLOSED,129,92,18,12,ES_AUTOHSCROLL
+    CONTROL         "O&ptionally",IDC_OPTIONAL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,152,93,44,11
+    CONTROL         "N&ULL value replaced by",IDC_NULLREPLACEBY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,31,109,89,8
+    EDITTEXT        IDC_NULLCHAR,129,108,18,12,ES_AUTOHSCROLL
+    CONTROL         "&Include column names",IDC_COLUMNS,"Button",BS_AUTOCHECKBOX | NOT WS_VISIBLE | WS_TABSTOP,7,129,89,8
+    PUSHBUTTON      "Fill E&xcel Friendly Values",IDC_EXCELDEFAULT,7,140,192,14
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,159,192,1
+    DEFPUSHBUTTON   "&OK",IDOK,95,163,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,149,163,50,14
+END
+
+IDD_IMPORTCSV DIALOGEX 0, 0, 375, 241
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Import CSV Data Using LOAD LOCAL"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    ICON            IDI_CSV,IDC_STATIC,13,8,20,20
+    LTEXT           "Select Table and Columns To Import In CSV",IDC_STATIC,41,12,148,10
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,5,32,365,1
+    GROUPBOX        "Tables",IDC_STATIC,5,36,111,126
+    LISTBOX         IDC_TABLELIST,11,47,99,112,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    GROUPBOX        "Columns",IDC_STATIC,121,36,115,126
+    LISTBOX         IDC_FIELDLIST,127,47,103,95,LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Select All",IDC_SELECTALL,127,144,48,15
+    PUSHBUTTON      "&Deselect All",IDC_UNSELECTALL,180,144,50,15
+    GROUPBOX        "Delimiters",IDC_STATIC,242,36,128,100
+    GROUPBOX        "Fields",IDC_STATIC,246,46,119,47
+    LTEXT           "Terminated by :",IDC_FIELDSTITLE,251,56,50,10
+    LTEXT           "\\t",IDC_FIELDSCHAR,333,56,29,10
+    LTEXT           "Enclosed by :",IDC_ENCLOSEDTITLE,251,68,78,8
+    LTEXT           "<NONE>",IDC_ENCLOSEDCHAR,333,68,28,8
+    LTEXT           "Escaped by :",IDC_ESCAPETITLE,251,80,42,10
+    LTEXT           "\\\\",IDC_ESCAPECHAR,333,82,30,8
+    GROUPBOX        "Lines",IDC_STATIC,246,94,119,23
+    LTEXT           "Terminated by :",IDC_LINESTITLE,252,105,60,8
+    LTEXT           "\\n",IDC_LINESCHAR,332,106,30,8
+    PUSHBUTTON      "&Change...",IDC_CHANGE,318,120,47,15
+    GROUPBOX        "Charset",IDC_STATIC,242,137,128,26
+    COMBOBOX        IDC_CHARSETCOMBO,248,147,116,13,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Other Options",IDC_STATIC,5,164,365,28
+    CONTROL         "Low priority",IDC_LOWPRIORITY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,174,52,11
+    CONTROL         "Concurrent",IDC_CONCURRENT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,67,174,47,11
+    CONTROL         "Replace",IDC_REPLACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,123,174,40,11
+    CONTROL         "Ignore",IDC_IGNORE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,172,174,36,11
+    CONTROL         "Ignore",IDC_IGNORELINES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,214,174,35,11
+    EDITTEXT        IDC_IGNORENUM,250,174,24,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    LTEXT           "lines",IDC_STATIC,276,177,31,11
+    LTEXT           "Import from file",IDC_STATIC,7,199,56,8
+    EDITTEXT        IDC_EXPORTFILENAME,67,198,280,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_EXPFILESELECT,354,198,16,12
+    DEFPUSHBUTTON   "&Import...",IDOK,266,222,50,14
+    PUSHBUTTON      "C&lose",IDCANCEL,320,222,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,216,363,1
+END
+
+IDD_BACKUP DIALOGEX 0, 0, 252, 254
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Backup Database"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDI_BACKUP,IDC_STATIC,11,9,20,20
+    LTEXT           "Backup Database",IDC_STATIC,39,14,114,10
+    LTEXT           "Select A Directory",IDC_STATIC,7,34,62,8
+    EDITTEXT        IDC_EXPORTDIRNAME,7,46,215,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_EXPFILESELECT,229,47,16,12
+    LTEXT           "Select The Tables You Want To Backup",IDC_STATIC,7,65,131,8
+    LISTBOX         IDC_TABLELIST,7,80,238,107,LBS_SORT | LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "S&elect All",IDC_SELALL2,143,63,50,14
+    PUSHBUTTON      "&Deselect All",IDC_UNSELALL2,195,63,50,14
+    LTEXT           "Note: This option uses the MySQL BACKUP TABLE option. Backup will be taken for MyISAM tables only. For other table types use DB -> Export Database As SQL Dump option.",IDC_STATIC,7,194,238,26
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,189,238,1
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,221,238,1
+    DEFPUSHBUTTON   "&Backup",IDOK,143,233,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,195,233,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,31,238,1
+END
+
+IDD_RESTORE DIALOGEX 0, 0, 252, 230
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Restore Database"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    ICON            IDI_RESTORE,IDC_STATIC,11,9,20,20
+    LTEXT           "Restore A Database",IDC_STATIC,39,14,114,10
+    LTEXT           "Select A Directory",IDC_STATIC,7,34,62,8
+    EDITTEXT        IDC_EXPORTDIRNAME,7,46,220,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_EXPFILESELECT,229,46,16,12
+    LTEXT           "Select The Tables You Want To Restore",IDC_STATIC,7,66,132,8
+    LISTBOX         IDC_TABLELIST,7,81,235,105,LBS_SORT | LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,189,237,1
+    LTEXT           "Note: This option uses the MySQL RESTORE TABLE option.",IDC_STATIC,7,194,205,8
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,205,238,1
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,31,238,1
+    DEFPUSHBUTTON   "&Restore",IDOK,140,209,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,195,209,50,14
+    PUSHBUTTON      "S&elect All",IDC_SELALL2,142,63,50,14
+    PUSHBUTTON      "&Deselect All",IDC_UNSELALL2,194,63,50,14
+END
+
+IDD_SHOWINFO DIALOGEX 0, 0, 362, 182
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,304,161,50,14
+    EDITTEXT        IDC_INFO,7,7,347,145,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+END
+
+IDD_EXPORTRESULTSET DIALOGEX 0, 0, 396, 254
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION " Export As "
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDI_XMLHTML,IDC_STATIC,15,8,20,20
+    LTEXT           "Choose a format in which you want to export your data",IDC_STATIC1,47,14,272,8
+    CONTROL         "",IDC_HORZBAR1,"Static",SS_BLACKFRAME | SS_SUNKEN,7,31,382,1
+    CONTROL         "&CSV",IDC_CSV,"Button",BS_AUTORADIOBUTTON | WS_GROUP,34,36,39,12
+    CONTROL         "&HTML",IDC_HTML,"Button",BS_AUTORADIOBUTTON,110,36,39,12
+    CONTROL         "&XML",IDC_XML,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,186,36,39,12
+    CONTROL         "Excel  X&ML",IDC_EXCEL,"Button",BS_AUTORADIOBUTTON,259,36,59,12
+    CONTROL         "S&QL",IDC_SQL,"Button",BS_AUTORADIOBUTTON,348,36,39,12
+    GROUPBOX        "CSV Options",IDC_CSVOPTIONS,7,53,129,139
+    GROUPBOX        "Fields",IDC_CSVFIELDS,13,65,117,52
+    LTEXT           "Terminated by :",IDC_FIELDSTITLE,18,75,52,10
+    LTEXT           "\\t",IDC_FIELDSCHAR,90,75,30,10
+    LTEXT           "Enclosed by :",IDC_ENCLOSEDTITLE,18,88,76,10
+    LTEXT           "<none>",IDC_ENCLOSEDCHAR,90,88,28,8
+    LTEXT           "Escaped by :",IDC_ESCAPETITLE,18,101,42,10
+    LTEXT           "\\\\",IDC_ESCAPECHAR,90,101,29,10
+    GROUPBOX        "Lines",IDC_CSVLINES,13,119,117,22
+    LTEXT           "Terminated by :",IDC_LINESTITLE,18,128,51,10,SS_ENDELLIPSIS
+    LTEXT           "\\n",IDC_LINESCHAR,90,128,31,10
+    LTEXT           "NULL replaced by :",IDC_NULLCHARTITLE,18,143,61,10
+    LTEXT           "\\N",IDC_NULLCHARDISPLAY,90,143,43,10
+    CONTROL         "&Add column names on top",IDC_ADDCOLUMNS,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,13,157,101,10
+    PUSHBUTTON      "Chan&ge...",IDC_CHANGE,13,173,50,14,WS_DISABLED
+    GROUPBOX        "Excel Options",IDC_EXCELOPTIONS,141,53,121,68
+    LTEXT           "Text column si&ze limit",IDC_BLOBTEXT,149,78,69,12
+    EDITTEXT        IDC_BLOB,220,78,33,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Decimal &places",IDC_DECIMALTEXT,149,93,50,11
+    EDITTEXT        IDC_DECIMAL,220,93,33,12,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "SQL Options",IDC_SQLGROUP,141,128,121,64
+    CONTROL         "Str&ucture only",IDC_STRUCTUREONLY,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,149,145,57,11
+    CONTROL         "Data &only",IDC_DATAONLY,"Button",BS_AUTORADIOBUTTON,149,160,58,11
+    CONTROL         "S&tructure and data",IDC_BOTH,"Button",BS_AUTORADIOBUTTON,149,175,76,11
+    GROUPBOX        "Select Field(s) To Export",IDC_SELFLDS,268,53,121,139
+    LISTBOX         IDC_COLUMNLIST,277,67,104,99,LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Select All",IDC_SELECTALL,276,173,50,14
+    PUSHBUTTON      "&Deselect All",IDC_DESELECTALL,331,173,50,14
+    LTEXT           "Save to &file",IDC_TEXT1,7,211,44,8
+    EDITTEXT        IDC_EXPORTFILENAME,54,210,306,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_EXPFILESELECT,373,210,16,12
+    DEFPUSHBUTTON   "&Export",IDOK,284,233,50,14
+    PUSHBUTTON      "C&lose",IDCANCEL,339,233,50,14
+    CONTROL         "",IDC_HORZBAR2,"Static",SS_BLACKFRAME | SS_SUNKEN,7,201,382,1
+    CONTROL         "",IDC_HORZBAR3,"Static",SS_BLACKFRAME | SS_SUNKEN,7,227,382,1
+    LTEXT           "",IDC_MESSAGE,7,239,144,8
+    LTEXT           "Static",IDC__EXPORTAS_GRIP,213,232,19,8
+END
+
+IDD_COPYDATABASE DIALOGEX 0, 0, 388, 246
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Copy Database"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDI_EXPORTDATA,IDC_COPYTABLE_GRIP,9,9,21,20
+    LTEXT           "This option copies object(s) between database/hosts.",IDC_STATIC,39,13,198,9
+    GROUPBOX        "Source {Connection - Database}",IDC_GROUP1,6,31,183,187
+    LTEXT           "Name:",IDC_STATICTITLE2,11,42,23,8
+    LTEXT           "",IDC_TARGETDB,36,42,142,8,SS_WORDELLIPSIS
+    LTEXT           "&Object(s)",IDC_STATICTITLE3,11,56,29,8
+    CONTROL         "",IDC_TREE,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_CHECKBOXES | WS_BORDER | WS_HSCROLL | WS_TABSTOP,12,68,170,144
+    GROUPBOX        "Target {Connection - Database}",IDC_GROUP2,193,31,190,76
+    LTEXT           "Note: If you want to copy to different host(s), connect to multiple host(s) using  File -> New Connection. The target database dropdown would then list all databases for all connections.",IDC_STATIC_NOTE,201,43,176,31
+    COMBOBOX        IDC_SOURCEDB,200,84,178,85,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_SORT | CBS_HASSTRINGS | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    GROUPBOX        "",IDC_GROUP3,193,116,190,46
+    CONTROL         "S&tructure and data",IDC_STRUCDATA,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,200,130,78,9
+    CONTROL         "Str&ucture only",IDC_STRUC,"Button",BS_AUTORADIOBUTTON,200,145,64,8
+    GROUPBOX        "",IDC_GROUP4,193,171,190,47
+    CONTROL         "&Drop if exists in target",IDC_DROP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,200,185,86,10
+    CONTROL         "Use &bulk INSERT",IDC_CPY_BULKINSERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,200,200,73,10
+    PUSHBUTTON      "&Show Summary...",IDC_SUMMARY,209,227,66,14
+    PUSHBUTTON      "&Copy",IDOK,279,227,50,14
+    PUSHBUTTON      "C&lose",IDCANCEL,333,227,50,14
+    PUSHBUTTON      "Do&ne",IDDONE,333,227,50,14,NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "",IDC_MESSAGE,8,227,196,8,SS_WORDELLIPSIS
+    LTEXT           "Grip",IDC_COPYDATA_GRIP,339,196,14,8
+END
+
+IDD_SQLWHERE DIALOGEX 0, 0, 264, 161
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "SQL WHERE"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "You can specify a valid SQL WHERE clause for the table to sync only those rows that fulfill the WHERE clause.\r\n( Note: Don't include WHERE in the clause )",IDC_WHERETITLE,7,9,250,24
+    EDITTEXT        IDC_EDIT,7,38,250,92,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,135,250,1
+    PUSHBUTTON      "&Parse",IDC_PARSE,7,140,77,14,NOT WS_VISIBLE | WS_DISABLED
+    DEFPUSHBUTTON   "&OK",IDOK,153,140,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,207,140,50,14
+END
+
+IDD_CONNECTIONNAME DIALOGEX 150, 150, 186, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " New Connection"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Name",IDC_STATIC,7,8,130,10
+    EDITTEXT        IDC_DBNAME,7,22,172,13,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDOK,73,41,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,129,41,50,14
+END
+
+IDD_NEWFOREIGN DIALOGEX 0, 0, 275, 249
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION " Create Relationship"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Current table (foreign key table)",IDC_STATIC,7,8,117,10
+    GROUPBOX        "",IDC_STATIC,7,16,128,21
+    LTEXT           "",IDC_TABLENAME,11,24,80,8
+    LTEXT           "Referenced table (primary key table)",IDC_STATIC,137,8,127,10
+    GROUPBOX        "",IDC_GRPBASIC,138,16,130,21
+    PUSHBUTTON      "Indexes...",IDC_REFINDEX,227,22,38,12
+    COMBOBOX        IDC_TABLELIST,140,22,84,85,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    LTEXT           "Constraint name",IDC_STATIC,8,41,123,8
+    EDITTEXT        IDC_FKNAME,148,39,127,13,ES_AUTOHSCROLL
+    CONTROL         "",IDC_TOPLINE,"Static",SS_BLACKFRAME | SS_SUNKEN,15,54,260,1
+    CONTROL         "",IDC_BOTLINE,"Static",SS_BLACKFRAME | SS_SUNKEN,15,168,260,1
+    GROUPBOX        "",IDC_GRP41,15,172,260,23
+    CONTROL         "On &Delete",IDC_ONDELETE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,171,56,11
+    CONTROL         "Cascade",IDC_ONDELCASCADE,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP | WS_TABSTOP,27,182,42,11
+    CONTROL         "Set null",IDC_ONDELNULL,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP | WS_TABSTOP,75,182,42,11
+    CONTROL         "No action",IDC_ONDELNOACTION,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP | WS_TABSTOP,123,182,50,11
+    CONTROL         "Restrict",IDC_ONDELRESTRICT,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP | WS_TABSTOP,175,182,42,11
+    GROUPBOX        "",IDC_GRP51,15,196,260,25
+    CONTROL         "On &Update",IDC_ONUPDATE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,196,50,11
+    CONTROL         "Cascade",IDC_ONUPDATECASECADE,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP | WS_TABSTOP,27,208,42,11
+    CONTROL         "Set null",IDC_ONUPDATENULL,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP | WS_TABSTOP,75,208,42,11
+    CONTROL         "No action",IDC_ONUPDATENOACTION,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP | WS_TABSTOP,123,208,50,11
+    CONTROL         "Restrict",IDC_ONUPDATERESTRICT,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP | WS_TABSTOP,175,208,42,11
+    CONTROL         "",IDC_BOTTOMLINE,"Static",SS_BLACKFRAME | SS_SUNKEN,15,225,260,1
+    DEFPUSHBUTTON   "&Create",IDOK,163,228,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,225,228,50,14
+    PUSHBUTTON      "Indexes...",IDC_KEYINDEX,95,22,38,12
+END
+
+IDD_EXPORTXMLHTML DIALOGEX 0, 0, 290, 196
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Export Data as CSV"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    ICON            IDI_CSV,-1,9,8,20,20
+    LTEXT           "Select Table and Columns To Export In CSV",IDC_STATICTITLE,37,12,246,10
+    CONTROL         "",-1,"Static",SS_BLACKFRAME | SS_SUNKEN,7,29,276,1
+    LTEXT           "Colum&ns",-1,7,34,105,8
+    LISTBOX         IDC_FIELDLIST,7,44,224,92,LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    PUSHBUTTON      "&Select All",IDC_SELECTALL,236,74,47,15
+    PUSHBUTTON      "&Deselect All",IDC_UNSELECTALL,236,94,47,15
+    CONTROL         "",-1,"Static",SS_BLACKFRAME | SS_SUNKEN,7,139,276,1
+    LTEXT           "Export to file ",-1,7,141,56,8
+    EDITTEXT        IDC_EXPORTFILENAME,8,153,256,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_EXPFILESELECT,267,153,16,12
+    DEFPUSHBUTTON   "&Export...",IDOK,180,175,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,233,175,50,14
+    CONTROL         "",-1,"Static",SS_BLACKFRAME | SS_SUNKEN,7,170,276,1
+    LTEXT           "",IDC_MESSAGE,8,176,165,13
+END
+
+IDD_SHOWVALUE DIALOGEX 0, 0, 360, 198
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION " Advanced Properties"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,302,177,50,14
+    PUSHBUTTON      "&Refresh",IDC_REFRESH,7,177,48,14
+    PUSHBUTTON      "&Kill Process",IDC_KILL,225,177,72,14,NOT WS_VISIBLE
+END
+
+IDD_JOBMAN DIALOGEX 0, 0, 226, 172
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_THICKFRAME
+CAPTION "Scheduled Jobs"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    ICON            IDI_JOBMANAGER,IDC_STATIC,7,7,20,20
+    LTEXT           "Manage Jobs created with SQLyog.\nNote: To create a job use the respective job wizards",IDC_JOB_STATIC,34,8,169,18
+    LISTBOX         IDC_JOBS,7,33,213,112,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "E&xecute",IDC_EXECUTE,7,152,50,14
+    PUSHBUTTON      "&Edit...",IDOK,62,152,50,14
+    PUSHBUTTON      "&Delete...",IDC_DELETE,116,152,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,170,152,50,14
+    CONTROL         "",IDC_JOB_HORZ2,"Static",SS_BLACKFRAME | SS_SUNKEN,7,148,213,1
+    CONTROL         "",IDC_JOB_HORZ,"Static",SS_BLACKFRAME | SS_SUNKEN,7,30,213,1
+END
+
+IDD_JOBINTERIOR5 DIALOGEX 0, 0, 326, 153
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_CHILD | WS_DISABLED | WS_CAPTION
+CAPTION "SQL Scheduler and Reporting Wizard"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Query(s)",IDC_STATIC2,12,5,32,10
+    LTEXT           "( Note: Separate multiple queries by ; )",IDC_STATIC1,11,136,174,11
+    PUSHBUTTON      "&Parse...",IDC_PARSE,257,135,57,15
+END
+
+IDD_PROXY DIALOGEX 0, 0, 221, 201
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "HTTP Tunneling Settings"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "",IDC_STATIC,7,10,207,63
+    CONTROL         "Use &Proxy Server",IDC_USEPROXY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,7,68,15
+    LTEXT           "&Server",IDC_PROXYSTATIC,15,25,34,9
+    EDITTEXT        IDC_PROXY,62,24,94,13,ES_AUTOHSCROLL
+    LTEXT           "P&ort",IDC_PROXYPORTSTATIC,159,26,17,9
+    EDITTEXT        IDC_PROXYPORT,180,24,27,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "&Username",IDC_PROXYUSERSTATIC,15,40,35,9
+    EDITTEXT        IDC_PROXYUSERNAME,62,39,145,13,ES_AUTOHSCROLL
+    LTEXT           "Pass&word",IDC_PROXYPWDSTATIC,15,55,34,9
+    EDITTEXT        IDC_PROXYPWD,62,53,145,13,ES_PASSWORD | ES_AUTOHSCROLL
+    GROUPBOX        "",IDC_STATIC,7,76,207,46
+    CONTROL         "Use &Credentials",IDC_USECHALLENGE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,76,63,11
+    LTEXT           "User&name",IDC_CHALLENGEUSERSTATIC,14,91,35,9
+    EDITTEXT        IDC_CHALLENGEUSER,62,89,145,13,ES_AUTOHSCROLL
+    LTEXT           "Passwor&d",IDC_CHALLENGEPWDSTATIC,14,105,34,9
+    EDITTEXT        IDC_CHALLENGEPWD,62,104,145,13,ES_PASSWORD | ES_AUTOHSCROLL
+    GROUPBOX        "HTTP Header",IDC_STATIC,7,125,207,30
+    LTEXT           "Content-&type",IDC_STATIC,14,137,46,11
+    COMBOBOX        IDC_CONTENTTYPE,62,136,145,50,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "&Always Use Base64 Encoding For Data Stream",IDC_HTTPENCODEOPTION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,160,181,11
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME,7,175,207,1,WS_EX_STATICEDGE
+    DEFPUSHBUTTON   "&OK",IDOK,110,181,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,164,181,50,14
+END
+
+IDD_SHOWWARNING DIALOGEX 0, 0, 249, 58
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,176,37,66,14
+    PUSHBUTTON      "&Show Warnings...",IDC_SHOWWARNINGS,106,37,66,14
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,33,235,1
+    LTEXT           "",IDC_MESSAGE,38,12,202,11,SS_WORDELLIPSIS
+    ICON            "",IDC_STATICIMG,7,8,21,20
+END
+
+IDD_SHOWIMPORTERR DIALOGEX 0, 0, 249, 83
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "SQLyog - SQL Dump Import Error"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,139,62,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,192,62,50,14
+    PUSHBUTTON      "Open &Error File...",IDC_OPENFILE,72,61,64,15
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,7,58,235,1
+    ICON            "",IDC_STATICIMG,7,8,20,20
+    EDITTEXT        IDC_MESSAGE,35,7,204,48,ES_MULTILINE | ES_READONLY | NOT WS_BORDER | WS_HSCROLL
+END
+
+IDD_PREF2 DIALOGEX 0, 0, 255, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "Editor"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "Fonts ",IDC_STATIC,4,3,247,81
+    LTEXT           "SQL &editor",IDC_EDITOR,8,15,60,9
+    LTEXT           " ",IDC_SQLFONT,76,15,120,10,SS_WORDELLIPSIS
+    PUSHBUTTON      "Change...",IDC_SQLCHANGE,205,12,41,12
+    LTEXT           "&History/Info",IDC_EDITOR2,8,28,60,9
+    LTEXT           " ",IDC_HISTORYFONT,76,28,120,10,SS_WORDELLIPSIS
+    PUSHBUTTON      "Change...",IDC_HISTORYCHANGE,205,26,41,12
+    LTEXT           "&Blob viewer",IDC_EDITOR3,8,41,60,9
+    LTEXT           " ",IDC_BLOBFONT,76,41,120,10,SS_WORDELLIPSIS
+    PUSHBUTTON      "Change...",IDC_BLOBCHANGE,205,40,41,12
+    LTEXT           "Ob&ject Browser",IDC_EDITOR5,8,54,60,10
+    LTEXT           " ",IDC_OBFONT,76,54,120,10,SS_WORDELLIPSIS
+    PUSHBUTTON      "Change...",IDC_OBCHANGE,205,54,41,12
+    LTEXT           "&Others",IDC_EDITOR4,8,68,60,10
+    LTEXT           " ",IDC_DATAFONT,76,68,120,10,SS_WORDELLIPSIS
+    PUSHBUTTON      "Change...",IDC_DATACHANGE,205,68,41,12
+    GROUPBOX        "Color ",IDC_STATIC,4,88,247,99
+    CONTROL         "",IDC_TREE2,"SysTreeView32",TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWSELALWAYS | TVS_TRACKSELECT | WS_BORDER | WS_HSCROLL | WS_TABSTOP,9,98,151,84
+    PUSHBUTTON      "Foreground Color",IDC_BUTTONFOREGROUNDPREF,165,122,81,14
+    PUSHBUTTON      "Background Color",IDC_BUTTONBACKGROUNDPREF2,165,139,81,14
+    CTEXT           "Preview",IDC_STATIC_TEST,165,157,81,25,SS_CENTERIMAGE,WS_EX_CLIENTEDGE
+    GROUPBOX        "Case ",IDC_STATIC,4,190,247,28
+    LTEXT           "&Keywords",IDC_STATIC,8,201,32,8
+    COMBOBOX        IDC_KEYWORDCASE,47,200,70,59,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Functions",IDC_STATIC,138,201,34,11
+    COMBOBOX        IDC_FUNCTIONCASE,176,200,70,54,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Tabs ",IDC_STATIC,4,222,247,32
+    LTEXT           "Tab &size",IDC_NORMAL2,8,234,29,9
+    EDITTEXT        IDC_TAB,45,232,33,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "&Insert spaces",IDC_INSERTSPACES,"Button",BS_AUTORADIOBUTTON | WS_GROUP,91,230,77,8
+    CONTROL         "Kee&p tabs",IDC_KEEPTABS,"Button",BS_AUTORADIOBUTTON,91,242,48,8
+    PUSHBUTTON      "Restore &All Defaults",IDC_EDITORRESTOREALL,97,262,75,15
+    PUSHBUTTON      "Restore &Tab Defaults",IDC_EDITORRESTORETAB,176,262,75,15
+END
+
+IDD_ADDFAVORITES DIALOGEX 0, 0, 310, 231
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Add Favorite"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    ICON            IDI_ADDTOFAV,IDC_STATIC,17,9,21,20
+    LTEXT           "SQLyog can add the current SQL statements to your Favorite list. Alternatively, you can add a link to an existing SQL file.",IDC_STATIC,46,11,248,19
+    LTEXT           "Name",IDC_STATIC,10,44,26,11
+    EDITTEXT        IDC_FAVORITENAME,53,42,188,13,ES_AUTOHSCROLL
+    LTEXT           "Create in",IDC_STATIC,10,60,35,9
+    CONTROL         "",IDC_ADDFAVORTREE,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | WS_BORDER | WS_HSCROLL | WS_TABSTOP,53,59,188,100,WS_EX_CLIENTEDGE
+    CONTROL         "&Use query(s) from current SQL editor. A new file will be created in SQLyog Favorites folder.",IDC_CURRENTSQL,
+                    "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE | WS_GROUP,54,164,184,17
+    CONTROL         "&Create a link to an existing SQL file. The file will not be copied to SQLyog Favorites folder.",IDC_SQLFROMFILE,
+                    "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,54,185,188,18
+    EDITTEXT        IDC_SQLFILE,65,208,151,13,ES_AUTOHSCROLL | WS_DISABLED
+    PUSHBUTTON      "...",IDC_OPEN,222,208,19,13,WS_DISABLED
+    DEFPUSHBUTTON   "&OK",IDOK,245,42,54,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,245,59,54,14
+    PUSHBUTTON      "&New Folder...",IDC_NEWFOLDER,245,76,54,14
+    CONTROL         "",IDC_STAT_HORZ,"Static",SS_ETCHEDHORZ,10,35,290,1
+    LTEXT           "Grip",IDC_ADDFAV_GRIP,254,106,14,8
+END
+
+IDD_GETFOLDERNAME DIALOGEX 0, 0, 271, 79
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Create New Folder"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "SQLyog will create the following folder for you. You can use this folder to Organize Shortcuts in your Favorite menu.",IDC_STATIC,9,9,252,18
+    LTEXT           "Folder name",IDC_STATIC,9,37,42,8
+    EDITTEXT        IDC_FOLDERNAME,53,34,211,15,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDOK,158,58,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,214,58,50,14
+END
+
+IDD_ORGFAVORITES DIALOGEX 0, 0, 312, 218
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Organize Favorites"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    ICON            IDI_FAVORITES,IDC_STATIC,12,10,21,20
+    LTEXT           "To create a new folder to organize your favorite query(s), click on the Create Folder button. To rename or delete an item, select an item and click Rename or Delete.",IDC_ORG_TEXT1,41,8,256,24
+    CONTROL         "",IDC_ORG_HORZ,"Static",SS_BLACKFRAME | SS_SUNKEN,9,37,294,1
+    PUSHBUTTON      "&Create Folder ",IDC_CREATE,9,41,70,13
+    PUSHBUTTON      "&Rename",IDC_RENAME,84,41,70,13
+    PUSHBUTTON      "&Move to Folder...",IDC_MOVETO,9,58,70,13
+    PUSHBUTTON      "&Delete ",IDC_DELETE,84,58,70,13
+    CONTROL         "",IDC_ORGTREE,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_EDITLABELS | TVS_SHOWSELALWAYS | WS_BORDER | WS_HSCROLL | WS_TABSTOP,159,41,143,147,WS_EX_CLIENTEDGE
+    PUSHBUTTON      "C&lose",IDCANCEL,239,196,63,13
+    CONTROL         "",IDC_ORG_HORZ2,"Static",SS_BLACKFRAME | SS_SUNKEN,9,192,294,1
+    CONTROL         "Custom1",IDC_PREVIEW,"Scintilla",0x0,11,74,141,114
+    LTEXT           "Grip",IDC_ORGFAV_GRIP,153,203,14,8
+END
+
+IDD_MOVETOFOLDER DIALOGEX 0, 0, 150, 190
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Browse for Folder"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Select the folder that you want to move the selected files to:",IDC_STATIC,7,9,131,18
+    CONTROL         "",IDC_MOVETREE,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS | TVS_INFOTIP | WS_BORDER | WS_TABSTOP,7,27,132,137,WS_EX_CLIENTEDGE
+    DEFPUSHBUTTON   "&OK",IDOK,34,169,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,90,169,49,14
+    CONTROL         "",IDC_STATIC,"Static",SS_ETCHEDHORZ,8,165,131,1
+END
+
+IDD_TEXTENTRYDIALOG DIALOGEX 150, 150, 185, 70
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_DBNAME,6,25,172,13,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDOK,73,49,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,128,49,50,14
+    LTEXT           "",IDC_CAPTION,6,9,130,10
+END
+
+IDD_STARTDLG DIALOGEX 0, 0, 392, 345
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_BORDER | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY | WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         918,IDC_COMLINK,"Static",SS_BITMAP | SS_NOTIFY | WS_GROUP | WS_TABSTOP,0,0,391,324
+    PUSHBUTTON      "&Continue...",IDCONTINUE,263,328,61,14
+    PUSHBUTTON      "&Buy",IDC_BUY_LINK,328,328,60,14
+END
+
+IDD_CREATEDB DIALOGEX 0, 0, 265, 121
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Create Database"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Database name",IDC_STATIC,11,16,51,8
+    EDITTEXT        IDC_DBEDIT,83,13,175,14,ES_AUTOHSCROLL
+    LTEXT           "Data&base charset",IDC_STATIC,11,36,58,8
+    COMBOBOX        IDC_CHARSETCOMBO,83,35,145,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Database c&ollation",IDC_STATIC,11,56,60,8
+    COMBOBOX        IDC_COLLATECOMBO,83,54,144,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "&Create",IDOK,154,101,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,208,101,50,14
+    LTEXT           "The settings for this connection specify a filter on specific database name(s). You may not be able to see the new database you create.",IDC_TEXTFILTERDB,11,74,246,20,NOT WS_VISIBLE
+END
+
+IDD_MYSQL_ERROR DIALOGEX 0, 0, 289, 206
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "MySQL Error"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    ICON            IDI_STOP,IDC_MYSQL_ERROR,8,8,21,20
+    LTEXT           "MySQL Error",IDC_STATIC_MYSQLERROR,39,14,78,8
+    LTEXT           "Executed  SQL statement",IDC_STATIC_QUERY,8,31,102,11
+    CONTROL         "Custom1",IDC_QUERY,"Scintilla",WS_BORDER | WS_TABSTOP,7,45,274,48
+    LTEXT           "Error number:",IDC_STATIC_ERRNO,7,97,46,9
+    LTEXT           "Custom1",IDC_ERROR_NUMBER,60,97,48,8,NOT WS_GROUP | WS_TABSTOP
+    LTEXT           "Error message",IDC_STATIC_ERRMSG,7,113,90,8
+    CONTROL         "Custom1",IDC_ERROR_MESSAGE,"Scintilla",WS_BORDER | WS_TABSTOP,7,125,274,52
+    PUSHBUTTON      "&Save To Text File...",IDC_SAVE_BUTTON,145,183,80,16
+    DEFPUSHBUTTON   "&OK",ID_OK,231,183,50,16
+END
+
+IDD_GETSQLYOGENTERPRISE DIALOGEX 0, 0, 328, 74
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Get SQLyog ENTERPRISE/ULTIMATE"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Not Now",IDC_NOTNOW,219,54,50,14
+    LTEXT           "This feature is available in ENTERPRISE/ULTIMATE version of SQLyog.",IDC_ENTFEATURE,34,13,291,8
+    LTEXT           "Get SQLyog ENTERPRISE/ULTIMATE today to enable this and dozens of other great features.",IDC_GETENTTEXT,34,31,290,17
+    ICON            IDI_MAIN,IDC_LOGO,5,10,21,20
+    DEFPUSHBUTTON   "&Buy Now",IDC_BUYNOW,273,54,50,14
+END
+
+IDD_UPGRADECHK DIALOGEX 0, 0, 267, 58
+STYLE DS_ABSALIGN | DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Check for updates"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,213,43,50,12
+    LTEXT           "Caption",IDC_STATICTITLE,32,8,226,15
+    LTEXT           "http://www.webyog.com",IDC_LINK,32,28,129,10,SS_NOTIFY | SS_CENTERIMAGE
+    CONTROL         "&Skip this version",IDC_UPGRDCHK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,32,43,133,9
+    ICON            IDI_MYSQL,IDC_LOGO,4,5,20,20
+END
+
+IDD_PREFOTHERS DIALOGEX 0, 0, 255, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "Others"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Miscellaneous ",IDC_STATIC,4,3,247,73
+    CONTROL         "Retain user modified column &width",IDC_RETAINCOLUMNWIDTH,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,14,202,10
+    CONTROL         "Truncate &column headers to maximum data size",IDC_COLUMNWIDTH,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,26,202,10
+    CONTROL         """smart"" &KEYWORDS/FUNCTIONS/DEFAULTS handling",IDC_GETINFOKW,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,38,216,10
+    CONTROL         "&Switch F5 and F9 functionalities",IDC_SWITCHSHORTCUT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,50,197,10
+    CONTROL         "&Open ""Tables"" folder in Object Browser as default",IDC_OPENTABLES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,62,216,9
+    GROUPBOX        "Data Display/Editing ",IDC_STATIC,4,80,247,36
+    CONTROL         "Automatically &refresh Table Data tab on focus",IDC_REFRESHTABLEDATA,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,91,212,10
+    CONTROL         "&Prompt if multiple rows are getting updated",IDC_UPDATEPROMPT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,103,211,10
+    GROUPBOX        "Paging in Table Data/Result Tab",IDC_STATIC,4,120,247,51
+    CONTROL         "Ena&ble Autopaging in Result tab",IDC_RESUTTABPAGE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,146,116,10
+    LTEXT           "&Default number of rows",IDC_STATIC,9,131,79,9
+    EDITTEXT        IDC_HIGHLIMIT,95,130,49,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Remember setting for each &query",IDC_RESUTTABPAGERETAIN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,158,127,10
+    GROUPBOX        "Toolbar Size ",IDC_STATIC,4,174,80,29
+    COMBOBOX        IDC_ICONSIZE,8,184,71,44,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Theme ",IDC_STATIC,88,174,163,29
+    COMBOBOX        IDC_THEMECOMBO,93,184,153,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Restore &All Defaults",IDC_OTHERSRESTOREALL,97,262,75,15
+    PUSHBUTTON      "Restore &Tab Defaults",IDC_OTHERSRESTORETAB,176,262,75,15
+END
+
+IDD_PREFGENERAL DIALOGEX 0, 0, 255, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "General"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Generate &queries using backquote(`)",IDC_BACKQUOTES,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,4,3,202,10
+    CONTROL         "Keep &focus on SQL editor after query execution",IDC_FOCUSAFTERQUERY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,16,205,10
+    CONTROL         "P&rompt if a tab with unsaved changes is closed",IDC_CONFIRMONTABCLOSE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,29,202,10
+    CONTROL         "Paste object name in &editor on double-click",IDC_GETTEXTONDBCLICK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,42,202,10
+    CONTROL         "Enable &word wrap in SQL editor and BLOB viewer",IDC_WORDWRAP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,55,202,10
+    CONTROL         "Enable transaction support for &batch process",IDC_TRANSACTIONENABLE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,68,202,10
+    CONTROL         "Force disable F&K check throughout HTTP import batch process",IDC_FKCHKIMPORT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,81,225,10
+    CONTROL         "&Show Warning(s) in Messages tab",IDC_SHOWWARNING,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,94,124,10
+    GROUPBOX        "Export Options ",IDC_STATIC,4,106,247,99
+    GROUPBOX        "Max. size (in KB) for BULK INSERT statement(s)",IDC_STATIC,9,116,237,40
+    CONTROL         "&Get server default",IDC_DEF_BULK_SIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,127,112,8
+    LTEXT           "Custom si&ze",IDC_STATIC,14,141,39,10
+    EDITTEXT        IDC_BULKINSERT,58,139,37,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    GROUPBOX        "Chunk size (in rows) during batch exports ",IDC_STATIC,9,160,237,41
+    CONTROL         "&Don't break into chunks",IDC_SETMAXROW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,170,115,9
+    LTEXT           "&Chunk size",IDC_STATIC,14,186,36,9
+    EDITTEXT        IDC_ROW_LIMIT,58,184,37,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    LTEXT           "rows",IDC_STATIC,100,187,31,9
+    PUSHBUTTON      "Restore &All Defaults",IDC_GENRESTOREALL,97,262,75,15
+    PUSHBUTTON      "Restore &Tab Defaults",IDC_GENRESTORETAB,176,262,75,15
+    GROUPBOX        "Table Data/Info/History Tab positioning",IDC_STATIC,4,208,247,49
+    CONTROL         "Tab&le Data under Query tabs",IDC_TABLEDATAPOSITION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,219,109,10
+    CONTROL         "&Info under Query tabs",IDC_INFOPOSITION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,231,88,10
+    CONTROL         "&History under Query tabs",IDC_HISTORYPOSITION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,243,97,10
+END
+
+IDD_PREF3 DIALOGEX 0, 0, 255, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "Power Tools"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "",IDC_ACGROUP,4,3,247,78
+    CONTROL         "&Enable Autocomplete",IDC_AUTOCOMPLETE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,2,82,10
+    CONTROL         "&Show Autocomplete help in SQL editor",IDC_AUTOCOMPLETEHELP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,14,190,8
+    CONTROL         "Always &rebuild tag files on startup",IDC_AUTOCOMPLETEREBUILD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,26,181,8
+    CONTROL         "S&how suggestion as you type in SQL editor",IDC_AUTOCOMPLETESHOWTOOLTIP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,37,197,8
+    GROUPBOX        "Tags Directory ",IDC_TAGDIRGROUP,12,48,231,29
+    EDITTEXT        IDC_AUTOCOMPLETETAGSDIR,17,60,197,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_DIRSEL,218,60,20,13
+    GROUPBOX        "",IDC_PQAGROUP,4,85,247,60
+    CONTROL         "Enable &Query Profiler",IDC_PQA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,84,82,10
+    CONTROL         "Sh&ow Profile",IDC_PQAPROF,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,136,10
+    CONTROL         "Status &Variables",IDC_PQASTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,120,122,10
+    CONTROL         "E&XPLAIN Result",IDC_PQAEXPLAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,136,10
+    CONTROL         "EXPLAIN EXTENDED &info",IDC_PQAEXPLAINEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,132,136,10
+    PUSHBUTTON      "Restore &All Defaults",IDC_POWERTOOLSRESTOREALL,97,262,75,15
+    PUSHBUTTON      "Restore &Tab Defaults",IDC_POWERTOOLSRESTORETAB,176,262,75,15
+END
+
+IDD_PREFFORMATTER DIALOGEX 0, 0, 255, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "SQL Formatter"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "&Not stacked",IDC_NOTSTACKED,"Button",BS_AUTORADIOBUTTON | WS_GROUP,8,14,70,11
+    CONTROL         "&Stacked",IDC_STACKED,"Button",BS_AUTORADIOBUTTON,8,28,57,10
+    CONTROL         "&Before comma",IDC_BEFORECOMMA,"Button",BS_AUTORADIOBUTTON | WS_GROUP,8,55,71,14
+    CONTROL         "A&fter comma",IDC_AFTERCOMMA,"Button",BS_AUTORADIOBUTTON,8,70,57,12
+    LTEXT           "&Indentation",IDC_INDENT,4,90,43,8
+    EDITTEXT        IDC_INDENTATION,52,88,23,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "spaces",IDC_SPACES,79,90,26,10
+    GROUPBOX        "Preview ",IDC_PRWGROUP,4,105,247,88
+    CONTROL         "Custom2",IDC_FORMATTERPREVIEW,"Scintilla",0x0,8,115,239,73
+    PUSHBUTTON      "Restore &All Defaults",IDC_FORMATTERRESTOREALL,97,262,75,15
+    PUSHBUTTON      "Restore &Tab Defaults",IDC_FORMATTERRESTORETAB,176,262,75,15
+    GROUPBOX        "Table and Column List Style ",IDC_STATIC,4,3,247,39
+    GROUPBOX        "Linebreaks ",IDC_STATIC,4,45,247,40
+END
+
+IDD_EMPTYDB DIALOGEX 0, 0, 217, 148
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Empty Database"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    ICON            IDI_EMPTYDB,IDC_STATIC,4,4,20,20
+    LTEXT           "'db1'",IDC_STATICEMPTYDB,32,16,178,10,SS_ENDELLIPSIS
+    CONTROL         "&Select/Deselect all",IDC_EMPTYDBSELECTALL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,28,99,9
+    CONTROL         "",IDC_OBJECTSLIST,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,6,43,204,77
+    DEFPUSHBUTTON   "&OK",IDOK,106,127,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,160,127,50,14
+    LTEXT           "Select the object(s) you want to delete from database",IDC_STATIC,32,6,175,8
+END
+
+IDD_QUERYPREVIEW DIALOGEX 0, 0, 306, 140
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "SQL Preview"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    CONTROL         "",IDC_QUERYPREVIEW,"Scintilla",WS_BORDER | WS_TABSTOP,5,5,297,114
+    PUSHBUTTON      "C&lose",IDCANCEL,241,122,45,14
+END
+
+IDD_ENUMSETVALUES DIALOGEX 0, 0, 221, 215
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Enum/Set"
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    LTEXT           "Value&s",IDC_STATIC,10,3,41,8
+    LISTBOX         IDC_VALUELIST,10,13,204,108,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Change value order",IDC_STATIC,35,128,67,8
+    PUSHBUTTON      "&Up",IDC_UP,110,126,50,14
+    PUSHBUTTON      "&Down",IDC_DOWN,164,126,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,10,145,204,1
+    LTEXT           "Enter &value",IDC_STATIC,10,153,42,8
+    EDITTEXT        IDC_VALUE,54,151,159,13,ES_AUTOHSCROLL
+    PUSHBUTTON      "&Add",IDC_ADD,56,169,50,14
+    PUSHBUTTON      "&Replace",IDC_REPLACE,110,169,50,14
+    PUSHBUTTON      "Re&move",IDC_REMOVE,164,169,50,14
+    DEFPUSHBUTTON   "&OK",IDOK,110,194,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,164,194,50,14
+    CONTROL         "",IDC_STATIC,"Static",SS_BLACKFRAME | SS_SUNKEN,10,188,204,1
+END
+
+IDD_GETSQLYOGULTIMATE DIALOGEX 0, 0, 236, 78
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Get SQLyog ULTIMATE"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Not Now",IDC_NOTNOW,128,60,50,14
+    LTEXT           "This feature is available in ULTIMATE version of SQLyog.",IDC_STATIC,37,12,196,14
+    LTEXT           "Get SQLyog ULTIMATE today to enable this and dozens of other great features.",IDC_GETULT,37,31,192,17
+    ICON            IDI_MAIN,IDC_LOGO,7,10,21,20
+    DEFPUSHBUTTON   "&Buy Now",IDC_BUYNOW,182,60,50,14
+END
+
+IDD_OBCOLOR DIALOGEX 0, 0, 196, 106
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Object Browser Color"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Background &Color",IDC_STATIC,7,16,59,9
+    COMBOBOX        IDC_COLORCOMBO1,71,14,118,200,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Foreground Color",IDC_STATIC,7,37,57,8
+    COMBOBOX        IDC_COLORCOMBO2,71,34,118,30,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "(These colors will be used in the Object Browser for this connection only)",IDC_COLORSTATIC3,5,58,183,16
+    DEFPUSHBUTTON   "&OK",IDOK,85,85,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,139,85,50,14
+END
+
+IDD_USERMANAGER DIALOGEX 0, 0, 460, 240
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "User Manager"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Size Griper",IDC_GRIP,390,140,40,10
+    LTEXT           "Use&r",IDC_UM_USER,7,9,16,8
+    COMBOBOX        IDC_USERCOMBO,25,7,112,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_OBTREE,"SysTreeView32",TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWSELALWAYS | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,29,130,107
+    CONTROL         "",IDC_PRIVOBTREE,"SysTreeView32",TVS_HASBUTTONS | TVS_LINESATROOT | TVS_SHOWSELALWAYS | WS_BORDER | WS_HSCROLL | WS_TABSTOP,7,140,130,68
+    CONTROL         "Show only pr&ivileged objects",IDC_PRIVILEGEDCHECK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,223,107,10
+    PUSHBUTTON      "&Delete User",IDC_DELUSER,145,7,65,14
+    PUSHBUTTON      "Add &New User",IDC_NEWUSER,215,7,65,14
+    PUSHBUTTON      "Hel&p",IDC_UM_HELP,388,7,65,14
+    ICON            "",IDC_CONTEXTICON,145,31,20,20
+    LTEXT           "Context help",IDC_CONTEXTHELP,175,37,271,9
+    LTEXT           "&Username",IDC_USERNAME_PROMPT,145,64,33,8
+    EDITTEXT        IDC_USERNAME,180,62,99,14,ES_AUTOHSCROLL
+    LTEXT           "&Host",IDC_HOST_PROMPT,294,64,16,8
+    COMBOBOX        IDC_HOSTNAME,354,64,99,30,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Pass&word",IDC_PASSWORD_PROMPT,145,88,32,8
+    EDITTEXT        IDC_PASSWORD,180,86,99,14,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "Retype Passw&ord",IDC_PASSWORD2_PROMPT,294,89,57,8
+    EDITTEXT        IDC_PASSWORD_CONFIRM,354,86,99,14,ES_PASSWORD | ES_AUTOHSCROLL
+    LTEXT           "Maximum number of &queries per hour",IDC_MAXQUERY_PROMPT,145,119,120,8
+    EDITTEXT        IDC_MAXQUERIES,282,117,60,14,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    CONTROL         "",IDC_MAXQUERY_SPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,350,117,10,14
+    LTEXT           "Ma&ximum number of updates per hour",IDC_MAXUPDATE_PROMPT,145,138,122,8
+    EDITTEXT        IDC_MAXUPDATE,282,135,60,14,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    CONTROL         "",IDC_MAXUPDATE_SPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,350,135,10,14
+    LTEXT           "Maxi&mum number of connections per hour",IDC_MAXCONN_PROMPT,145,157,134,8
+    EDITTEXT        IDC_MAXCONN,282,153,60,14,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    CONTROL         "",IDC_MAXCONN_SPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,350,153,10,14
+    LTEXT           "Maximum number of user connec&tions",IDC_MAXCONNSIM_PROMPT,145,175,121,8
+    EDITTEXT        IDC_MAXSIMCONN,282,171,60,14,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    CONTROL         "",IDC_MAXSIMCONN_SPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ALIGNRIGHT | UDS_AUTOBUDDY | UDS_ARROWKEYS | UDS_NOTHOUSANDS,350,171,10,14
+    LTEXT           "Note - Please select an object to GRANT/REVOKE privileges",IDC_PRIV_NOTE,196,104,190,8
+    LTEXT           "(Note - 0 means no limitations)",IDC_HELPZERO,145,200,132,8
+    CONTROL         "Select/Deselect &All",IDC_SELECTALLCHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,145,186,75,10
+    CONTROL         "",IDC_PRIVLIST,"SysListView32",LVS_LIST | LVS_SINGLESEL | LVS_SORTASCENDING | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,145,200,308,8
+    PUSHBUTTON      "&Save Changes",IDC_SAVE_CHANGES,248,219,65,14,WS_DISABLED
+    PUSHBUTTON      "&Cancel Changes",IDC_CANCEL_CHANGES,318,219,65,14,WS_DISABLED
+    PUSHBUTTON      "C&lose",IDCANCEL,388,219,65,14
+END
+
+IDD_CUSTOMFILTER DIALOGEX 0, 0, 241, 51
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Custom Filter"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Field Name",IDC_STATIC,6,4,36,8
+    COMBOBOX        IDC_FILTER_COLUMN,6,15,84,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Condition",IDC_STATIC,96,4,31,8
+    COMBOBOX        IDC_FILTER_COND,96,15,50,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "&Value",IDC_STATIC,153,4,18,8
+    EDITTEXT        IDC_FILTER_VALUE,152,15,83,13,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDOK,131,33,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,185,33,50,14
+END
+
+IDD_LANGUAGE DIALOGEX 0, 0, 212, 59
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select UI Language"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Languag&e",IDC_STATIC,7,15,32,8
+    COMBOBOX        IDC_LANGCOMBO,46,13,159,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,101,38,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,155,38,50,14
+END
+
+IDD_FKDIALOG DIALOGEX 0, 0, 308, 150
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_WINDOWEDGE
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Limit Ro&ws",IDC_LIMITROWS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,11,45,10
+    LTEXT           "&First Row:",IDC_FIRSTROW,58,12,34,8
+    PUSHBUTTON      "&<",IDC_PREV,93,10,12,12
+    EDITTEXT        IDC_ROWSTART,108,10,40,12,ES_AUTOHSCROLL | ES_NUMBER
+    PUSHBUTTON      "&>",IDC_NEXT,151,10,12,12
+    LTEXT           "# of &rows:",IDC_ROWS,167,12,35,8
+    EDITTEXT        IDC_ROWCOUNT,203,10,40,12,ES_AUTOHSCROLL | ES_NUMBER
+    DEFPUSHBUTTON   "Refre&sh",IDC_REFRESHFK,250,9,50,14
+    LTEXT           "Fil&ter",IDC_FILTERPROMPT,7,129,17,8
+    EDITTEXT        IDC_SEARCHTEXT,26,127,136,13,ES_AUTOHSCROLL
+    CONTROL         "&^",IDC_COLUMN_FILTER,"ButtonDropDown",WS_TABSTOP,163,126,10,14
+    PUSHBUTTON      "S&elect",IDOK,197,126,50,14,WS_DISABLED
+    PUSHBUTTON      "Cance&l",IDCANCEL,250,126,50,14
+    GROUPBOX        "",IDC_NAVGROUP,55,3,191,22
+    LTEXT           "",IDC_SIZEGRIP,300,142,8,8
+END
+
+IDD_DATETIME DIALOGEX 0, 0, 116, 103
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_CHILD | WS_BORDER
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_MONTHCALENDAR1,"SysMonthCal32",MCS_NOTODAY | WS_TABSTOP,0,0,116,88
+    DEFPUSHBUTTON   "OK",IDOK,54,88,30,15
+    PUSHBUTTON      "Cancel",IDCANCEL,83,88,30,15
+    CONTROL         "",IDC_DATETIMEPICKER1,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,0,88,54,15
+END
+
+IDD_SEARCHFILTER DIALOGEX 0, 0, 270, 241
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Search Filter"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Data Types",IDC_DATATYPE_GB,6,160,258,56
+    GROUPBOX        "Databases",IDC_ITEM_SEL,6,6,258,151
+    CONTROL         "Select &All",IDC_SELALL_ITEM,"Button",BS_3STATE | BS_NOTIFY | WS_TABSTOP,12,16,45,10
+    CONTROL         "",IDC_LISTITEM,"SysListView32",LVS_LIST | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,12,27,246,123
+    CONTROL         "&Numeric - int/decimal/double/float",IDC_NUMERIC_SD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,172,123,10
+    CONTROL         "&String - (var)char/set/enum",IDC_SHORTSTR_SD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,186,104,10
+    CONTROL         "Binar&y - (var)binary/bit",IDC_BINARY_SD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,200,89,10
+    CONTROL         "&Date/Time",IDC_DATETIME_SD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,135,172,49,10
+    CONTROL         "&TEXT",IDC_LONGSTR_SD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,135,186,32,10
+    CONTROL         "&BLOB",IDC_BLOB_SD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,135,200,33,10
+    LTEXT           "Grip",IDC_GRIP_SD,246,202,18,8
+    DEFPUSHBUTTON   "&OK",IDOK,161,221,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,215,221,50,14
+END
+
+IDD_CREATEALTER DIALOGEX 0, 0, 598, 281
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+END
+
+IDD_INDEXCOLUMNS DIALOGEX 0, 0, 236, 130
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_WINDOWEDGE
+CAPTION "Columns"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_BOTLINE,"Static",SS_BLACKFRAME | SS_SUNKEN,8,108,220,1
+    PUSHBUTTON      "&Up",IDC_MOVEUP,8,112,32,14,WS_DISABLED
+    PUSHBUTTON      "&Down",IDC_MOVEDOWN,44,112,32,14,WS_DISABLED
+    DEFPUSHBUTTON   "&OK",IDOK,135,112,44,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,184,112,44,14
+    CONTROL         "",IDC_TOPLINE,"Static",SS_BLACKFRAME | SS_SUNKEN,8,15,220,1
+    LTEXT           "Select the required column(s). Use the up/down buttons to reorder.",IDC_HEADING,8,4,220,8
+    LTEXT           "Grip",IDC_INDEXGRIP,214,108,14,8
+END
+
+IDD_CONNECTION_DETAILS_MANAGER DIALOGEX 150, 150, 393, 188
+STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_CLIENTEDGE
+CAPTION "Export Connection Details"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_CONNECTION_FILE,51,145,300,14,0,WS_EX_CLIENTEDGE | WS_EX_STATICEDGE
+    PUSHBUTTON      "...",IDC_BUTTON_CONNECTION,355,144,24,14
+    DEFPUSHBUTTON   "&Export",IDOK,274,165,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,329,165,50,14
+    CONTROL         "&Select/Deselect All",IDC_CHKUNCHK,"Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,14,8,75,13,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_CONNECTION_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,14,23,365,115,WS_EX_CLIENTEDGE
+    LTEXT           "File name",IDC_STATIC_FILE,14,147,31,8
+    LTEXT           "",IDC_STATUS,14,168,242,8,SS_ENDELLIPSIS
+END
+
+IDD_CONNECTION_IMPORT_MANAGER DIALOGEX 0, 0, 393, 172
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Import Connection Details"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Open File...",IDC_LOAD_FILE,330,8,50,14
+    CONTROL         "&Select/Deselect All",IDC_CHKUNCHK,"Button",BS_AUTOCHECKBOX | BS_NOTIFY | WS_TABSTOP,14,11,75,13,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_CONNECTION_LIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_AUTOARRANGE | LVS_ALIGNLEFT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,14,25,366,122,WS_EX_CLIENTEDGE
+    DEFPUSHBUTTON   "&Import",IDOK,276,150,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,330,150,50,14
+    LTEXT           "",IDC_STATUS,14,153,242,8,SS_ENDELLIPSIS
+END
+
+IDD_CONNECTION_IMPORT_CONFLICT DIALOGEX 150, 150, 234, 75
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Connection name conflict"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "&Do this for remaining conflicts",IDC_CHECKALL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,37,110,10
+    PUSHBUTTON      "&Keep Both",IDC_BUTTON_KEEPBOTH,9,51,50,14
+    PUSHBUTTON      "&Replace",IDC_BUTTON_REPLACE,64,51,50,14
+    PUSHBUTTON      "&Skip",IDC_BUTTON_SKIP,119,51,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,174,51,50,14
+    LTEXT           "Connection \t already exists. What do you want to do?",IDC_MESSAGE,11,11,209,24
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_MAIN                ICON                    "..\\include\\bitmaps\\mysql.ICO"
+IDI_SCHEMA              ICON                    "..\\include\\bitmaps\\schema.ICO"
+IDI_SORTDSC             ICON                    "..\\include\\bitmaps\\sortdsc.ico"
+IDI_INSERT              ICON                    "..\\include\\bitmaps\\insertupdate.ICO"
+IDI_XMLHTML             ICON                    "..\\include\\bitmaps\\exportxmlhtml.ico"
+IDI_NEWQUERY            ICON                    "..\\include\\bitmaps\\first.ico"
+IDI_SAVE                ICON                    "..\\include\\bitmaps\\save.ico"
+IDI_CUT                 ICON                    "..\\include\\bitmaps\\cut.ico"
+IDI_COPY                ICON                    "..\\include\\bitmaps\\Copy.ico"
+IDI_PASTE               ICON                    "..\\include\\bitmaps\\paste.ico"
+IDI_OPEN                ICON                    "..\\include\\bitmaps\\open.ico"
+IDI_EXECUTE             ICON                    "..\\include\\bitmaps\\execute.ico"
+IDI_REFRESH             ICON                    "..\\include\\bitmaps\\refresh.ico"
+IDI_ODBC                ICON                    "..\\include\\bitmaps\\odbc.ico"
+IDI_DIFFTOOL            ICON                    "..\\include\\bitmaps\\Sync.ico"
+IDI_USERS               ICON                    "..\\include\\bitmaps\\users.ICO"
+IDI_FLUSH               ICON                    "..\\include\\bitmaps\\flush.ico"
+IDI_TABLEDIAG           ICON                    "..\\include\\bitmaps\\tablediag.ico"
+IDI_PROCESS             ICON                    "..\\include\\bitmaps\\process.ico"
+IDI_CHECK               ICON                    "..\\include\\bitmaps\\check.ICO"
+IDI_EXECUTEFORUPD       ICON                    "..\\include\\bitmaps\\execforupd.ico"
+IDI_EXECUTEALL          ICON                    "..\\include\\bitmaps\\execall.ico"
+IDI_SMALL               ICON                    "..\\include\\bitmaps\\smallico.ICO"
+IDI_COLUMN              ICON                    "..\\include\\bitmaps\\column.ico"
+IDI_DROPTABLE           ICON                    "..\\include\\bitmaps\\drop_table.ico"
+IDI_DROPCOLUMN          ICON                    "..\\include\\bitmaps\\dropcolumn.ico"
+IDI_INDEX               ICON                    "..\\include\\bitmaps\\index.ico"
+IDI_MANINDEX            ICON                    "..\\include\\bitmaps\\manage_index.ico"
+IDI_QUERYRECORD         ICON                    "..\\include\\bitmaps\\result_set.ico"
+IDI_TABLE               ICON                    "..\\include\\bitmaps\\table.ico"
+IDI_TILE                ICON                    "..\\include\\bitmaps\\tile.ico"
+IDI_ALTERTABLE          ICON                    "..\\include\\bitmaps\\altertable.ico"
+IDI_COPYDATABASE        ICON                    "..\\include\\bitmaps\\copy_data.ico"
+IDI_EXPORTDATA          ICON                    "..\\include\\bitmaps\\export_data.ico"
+IDI_HELP                ICON                    "..\\include\\bitmaps\\help.ICO"
+IDI_IMPORTDATA          ICON                    "..\\include\\bitmaps\\import_data.ico"
+IDI_HISTORY             ICON                    "..\\include\\bitmaps\\history.ico"
+IDI_DATABASE            ICON                    "..\\include\\bitmaps\\database.ico"
+IDI_KEYSHORT            ICON                    "..\\include\\bitmaps\\keyboard.ICO"
+IDI_NEWDATABASE         ICON                    "..\\include\\bitmaps\\new_data.ico"
+IDI_TABLEINDEX          ICON                    "..\\include\\bitmaps\\object.ico"
+IDI_REDOSM              ICON                    "..\\include\\bitmaps\\redo.ico"
+IDI_UNDOSM              ICON                    "..\\include\\bitmaps\\undo.ico"
+IDI_SERVER              ICON                    "..\\include\\bitmaps\\serv.ico"
+IDI_REPLACE             ICON                    "..\\include\\bitmaps\\replace.ico"
+IDI_FIND                ICON                    "..\\include\\bitmaps\\search.ico"
+IDI_EXECBATCH           ICON                    "..\\include\\bitmaps\\execbatch.ico"
+IDI_COPYTABLE           ICON                    "..\\include\\bitmaps\\copytable.ICO"
+IDI_REORDER             ICON                    "..\\include\\bitmaps\\reordercolumns.ico"
+IDI_MANREL              ICON                    "..\\include\\bitmaps\\manrel.ico"
+IDI_QUERYMESSAGE        ICON                    "..\\include\\bitmaps\\ico00002.ico"
+IDI_RESTORE             ICON                    "..\\include\\bitmaps\\restore_data.ico"
+IDI_BACKUP              ICON                    "..\\include\\bitmaps\\backup.ico"
+IDI_CREATETABLE         ICON                    "..\\include\\bitmaps\\createtableindata.ico"
+IDI_TEMPLATE            ICON                    "..\\include\\bitmaps\\templatesm.ico"
+IDI_DISCON              ICON                    "..\\include\\bitmaps\\discon.ICO"
+IDI_DISCONALL           ICON                    "..\\include\\bitmaps\\disconall.ICO"
+IDI_CONNECT             ICON                    "..\\include\\bitmaps\\connect.ico"
+IDI_CASCADE             ICON                    "..\\include\\bitmaps\\cascade.ico"
+IDI_JOBMANAGER          ICON                    "..\\include\\bitmaps\\jobmanager.ico"
+IDI_NOTIFICATION        ICON                    "..\\include\\bitmaps\\notification.ico"
+IDI_EDITUSER            ICON                    "..\\include\\bitmaps\\editusers.ico"
+IDI_ADDUSER             ICON                    "..\\include\\bitmaps\\addusers.ico"
+IDI_CSV                 ICON                    "..\\include\\bitmaps\\csv.ico"
+IDI_EMPTYDB             ICON                    "..\\include\\bitmaps\\emptydata.ico"
+IDI_RENAME              ICON                    "..\\include\\bitmaps\\rename.ico"
+IDI_TABLEPROP           ICON                    "..\\include\\bitmaps\\tableprop.ico"
+IDI_TRUNCDB             ICON                    "..\\include\\bitmaps\\truncatedata.ico"
+IDI_VIEWDATA            ICON                    "..\\include\\bitmaps\\viewdata.ico"
+IDI_SORTASC             ICON                    "..\\include\\bitmaps\\sortasc.ico"
+IDI_DBSYNC              ICON                    "..\\include\\bitmaps\\dbsync.ico"
+IDI_PREF                ICON                    "..\\include\\bitmaps\\preferences.ico"
+IDI_REORDERCOL          ICON                    "..\\include\\bitmaps\\reordercol.ico"
+IDI_EMPTYTABLE          ICON                    "..\\include\\bitmaps\\emptytable.ico"
+IDI_DROPDB              ICON                    "..\\include\\bitmaps\\dropdatabase.ico"
+IDI_MYSQL               ICON                    "..\\include\\bitmaps\\MySQL.ico"
+IDI_TUNNEL              ICON                    "..\\include\\bitmaps\\tunnel.ico"
+IDI_SERVERGROUP         ICON                    "..\\include\\bitmaps\\GroupofServers.ico"
+IDI_STOP                ICON                    "bitmaps\\Stop.ico"
+IDI_EXPORTRESULTCSV     ICON                    "bitmaps\\export_csv.ico"
+IDI_EXPORTSELCSV        ICON                    "bitmaps\\export_sel_csv.ico"
+IDI_EXPORTSELCELLCSV    ICON                    "bitmaps\\export_sel_cell_csv.ico"
+IDI_RESULTCANCEL        ICON                    "bitmaps\\result_cancel.ico"
+IDI_RESULTDELETE        ICON                    "bitmaps\\result_delete.ico"
+IDI_RESULTINSERT        ICON                    "bitmaps\\result_insert.ico"
+IDI_RESULTSAVE          ICON                    "bitmaps\\result_save.ico"
+IDI_SCHDEXPORT          ICON                    "bitmaps\\schdexport.ico"
+IDI_EMAILMANAGER        ICON                    "bitmaps\\emailmanager.ico"
+IDI_VIEW                ICON                    "..\\include\\bitmaps\\view.ico"
+IDI_CREATEVIEW          ICON                    "..\\include\\bitmaps\\viewnew.ico"
+IDI_ALTERVIEW           ICON                    "..\\include\\bitmaps\\alterview.ico"
+IDI_DROPVIEW            ICON                    "..\\include\\bitmaps\\deleteview.ico"
+IDI_PROCEDURE           ICON                    "..\\include\\bitmaps\\sp.ico"
+IDI_CREATEPROCEDURE     ICON                    "..\\include\\bitmaps\\addsp.ico"
+IDI_ALTERPROCEDURE      ICON                    "..\\include\\bitmaps\\altersp.ico"
+IDI_DROPPROCEDURE       ICON                    "..\\include\\bitmaps\\deletesp.ico"
+IDI_CREATETRIGGER       ICON                    "..\\include\\bitmaps\\addtrigger.ico"
+IDI_ALTERTRIGGER        ICON                    "..\\include\\bitmaps\\altertrigger.ico"
+IDI_DROPTRIGGER         ICON                    "..\\include\\bitmaps\\deletetrigger.ico"
+IDI_CREATEFUNCTION      ICON                    "..\\include\\bitmaps\\addfunction.ico"
+IDI_ALTERFUNCTION       ICON                    "..\\include\\bitmaps\\alterfunction.ico"
+IDI_DROPFUNCTION        ICON                    "..\\include\\bitmaps\\deletefunction.ico"
+IDI_QUERY               ICON                    "bitmaps\\query.ico"
+IDI_FAVORITES           ICON                    "bitmaps\\favorites.ico"
+IDI_ORGANIZEFAV         ICON                    "bitmaps\\organize_favorites.ico"
+IDI_ADDTOFAV            ICON                    "bitmaps\\addtofavorite.ico"
+IDI_SQL                 ICON                    "bitmaps\\sql_file.ico"
+IDI_QUERYBUILDER        ICON                    "bitmaps\\querybuilder.ico"
+IDI_SCHEMADESIGNER      ICON                    "bitmaps\\schemadesigner.ico"
+IDI_PKEY                ICON                    "bitmaps\\pkey.ico"
+IDI_NEXT                ICON                    "bitmaps\\nextbutton.ico"
+IDI_PREVIOUS            ICON                    "bitmaps\\previousbutton.ico"
+IDI_CLOSETABLE          ICON                    "bitmaps\\closetable.ICO"
+IDI_SDTABLEVIEW         ICON                    "bitmaps\\tableviews.ico"
+IDI_EXPORTASIMG         ICON                    "bitmaps\\Exportasimg.ico"
+IDI_SDPRINT             ICON                    "bitmaps\\Print.ico"
+IDI_SDZOOMIN            ICON                    "bitmaps\\zoomin.ico"
+IDI_SDZOOMOUT           ICON                    "bitmaps\\zoomout.ico"
+IDI_ALTEREVENT          ICON                    "bitmaps\\alterevent.ico"
+IDI_DROPEVENT           ICON                    "bitmaps\\dropevent.ico"
+IDI_RENAMEEVENT         ICON                    "bitmaps\\renameevent.ico"
+IDI_EVENT               ICON                    "bitmaps\\event.ico"
+IDI_ADDTABLES           ICON                    "bitmaps\\Addtables.ico"
+IDI_ALTERDB             ICON                    "bitmaps\\alterdb.ico"
+IDI_CHECKICON           ICON                    "bitmaps\\check16.ico"
+IDI_UNCHECKICON         ICON                    "bitmaps\\uncheck16.ico"
+IDI_LINEICON            ICON                    "bitmaps\\line16.ico"
+IDI_ENTMENU             ICON                    "bitmaps\\entmenu.ico"
+IDI_RESETFILTER         ICON                    "bitmaps\\resetfilter.ico"
+IDI_QADONTALERT         ICON                    "bitmaps\\qa_noalert.ico"
+IDI_QAALERT             ICON                    "bitmaps\\qa_alert.ico"
+IDI_FORMATQUERY         ICON                    "bitmaps\\formatall.ico"
+IDI_ABOUTICO            ICON                    "bitmaps\\about.ico"
+IDI_EXITICO             ICON                    "bitmaps\\exit.ico"
+IDI_REFRESHCANVAS       ICON                    "bitmaps\\refreshcanvas.ico"
+IDI_CLOSETAB            ICON                    "bitmaps\\closetab.ico"
+IDI_FAVREFRESH          ICON                    "bitmaps\\refreshfav.ico"
+IDI_INDEXDROP           ICON                    "bitmaps\\indexdelete.ico"
+IDI_INDEXCREATE         ICON                    "bitmaps\\indexcreate.ico"
+IDI_INDEXEDIT           ICON                    "bitmaps\\indexedit.ico"
+IDI_RENAMETRIGGER       ICON                    "bitmaps\\renametrigger.ico"
+IDI_RENAMEVIEW          ICON                    "bitmaps\\renameview.ico"
+IDI_EXPORTVIEW          ICON                    "bitmaps\\expotview.ico"
+IDI_COPYQUERYTOCLIP     ICON                    "bitmaps\\copyquerytoclip.ico"
+IDI_COPYQUERYTOCURTAB   ICON                    "bitmaps\\copyquerytocurrenttab.ico"
+IDI_COPYQUERYTONEWTAB   ICON                    "bitmaps\\copyquerytonewtab.ico"
+IDI_FOLDER              ICON                    "bitmaps\\foldericon.ico"
+IDI_CREATEEVENT         ICON                    "bitmaps\\eventnew.ico"
+IDI_TRIGGER             ICON                    "bitmaps\\trigger.ico"
+IDI_FUNCTION            ICON                    "bitmaps\\function.ico"
+IDI_CONNECT_16          ICON                    "bitmaps\\connect_16.ico"
+IDI_COPYDATABASE_16     ICON                    "bitmaps\\copy_data_16.ico"
+IDI_DBSYNC_16           ICON                    "bitmaps\\dbsync_16.ico"
+IDI_EXECUTEALL_16       ICON                    "bitmaps\\execall_16.ico"
+IDI_EXECUTE_16          ICON                    "bitmaps\\execute_16.ico"
+IDI_EXECUTEFORUPD_16    ICON                    "bitmaps\\execforupd_16.ico"
+IDI_EXPORTDATA_16       ICON                    "bitmaps\\export_data_16.ico"
+IDI_QUERYBUILDER_16     ICON                    "bitmaps\\querybuilder_16.ico"
+IDI_QUERY_16            ICON                    "bitmaps\\query_16.ico"
+IDI_SCHEMADESIGNER_16   ICON                    "bitmaps\\schemadesigner_16.ico"
+IDI_SCHDEXPORT_16       ICON                    "bitmaps\\schdexport_16.ico"
+IDI_NOTIFICATION_16     ICON                    "bitmaps\\notification_16.ico"
+IDI_REFRESH_16          ICON                    "bitmaps\\refresh_16.ico"
+IDI_MANREL_16           ICON                    "bitmaps\\manrel_16.ico"
+IDI_MANINDEX_16         ICON                    "bitmaps\\manage_index_16.ico"
+IDI_EXECBATCH_16        ICON                    "bitmaps\\execbatch_16.ico"
+IDI_XMLHTML_16          ICON                    "bitmaps\\exportxmlhtml_16.ico"
+IDI_ODBC_16             ICON                    "..\\include\\bitmaps\\icon9.ico"
+IDI_DIFFTOOL_16         ICON                    "bitmaps\\Sync_16.ico"
+IDI_PRIMARYKEY          ICON                    "bitmaps\\primary_key_16.ico"
+IDI_OPENINNEWTAB        ICON                    "bitmaps\\open_in_new_tab.ico"
+IDI_USERMANAGER         ICON                    "bitmaps\\usermanager.ICO"
+IDI_SAVEAS              ICON                    "bitmaps\\saveas.ico"
+IDI_CONNCOLOR           ICON                    "bitmaps\\colorpicker.ico"
+IDI_RENAMEUSER          ICON                    "bitmaps\\renameuser.ico"
+IDI_USER_16             ICON                    "bitmaps\\user16.ico"
+IDI_USER_GLOBALPRIV     ICON                    "bitmaps\\user-globe.ico"
+IDI_USER_OBJECTPRIV     ICON                    "bitmaps\\user-objects.ico"
+IDI_USER_ADD            ICON                    "bitmaps\\user_add.ico"
+IDI_USER_WRITE          ICON                    "bitmaps\\user_write.ico"
+IDI_DATAVIEWTYPE        ICON                    "bitmaps\\dataview.ico"
+IDI_DATASEARCH          ICON                    "bitmaps\\datasearch.ico"
+IDI_MOVEDOWN            ICON                    "bitmaps\\Down.ico"
+IDI_MOVEUP              ICON                    "bitmaps\\Up.ico"
+IDI_ADDROW              ICON                    "bitmaps\\add.ico"
+IDI_DELETEROW           ICON                    "bitmaps\\delete.ico"
+IDI_TABLEOPTIONS        ICON                    "bitmaps\\TableOptions.ico"
+IDI_TABPREVIEW          ICON                    "bitmaps\\TabPreview.ico"
+IDI_CIRCLE8             ICON                    "bitmaps\\circle8.ico"
+IDI_CIRCLE1             ICON                    "bitmaps\\circle1.ico"
+IDI_CIRCLE2             ICON                    "bitmaps\\circle2.ico"
+IDI_CIRCLE3             ICON                    "bitmaps\\circle3.ico"
+IDI_CIRCLE4             ICON                    "bitmaps\\circle4.ico"
+IDI_CIRCLE5             ICON                    "bitmaps\\circle5.ico"
+IDI_CIRCLE6             ICON                    "bitmaps\\circle6.ico"
+IDI_CIRCLE7             ICON                    "bitmaps\\circle7.ico"
+IDI_TABLEREFRESH        ICON                    "bitmaps\\tablerefresh.ico"
+IDI_DATAGRID            ICON                    "bitmaps\\grid_view.ico"
+IDI_FORMICON            ICON                    "bitmaps\\form_view.ico"
+IDI_TEXTVIEW            ICON                    "bitmaps\\text_view.ico"
+IDI_DUPLICATEROW        ICON                    "bitmaps\\duplicaterow.ico"
+IDI_FILTER              ICON                    "bitmaps\\filter.ico"
+IDI_REMOVE_DB_FILTER    ICON                    "bitmaps\\remove_db_filter.ico"
+IDI_TABLEEXPORT         ICON                    "bitmaps\\result_export.ico"
+IDI_REMOVE_FILTER       ICON                    "bitmaps\\remove_filter.ico"
+IDI_OVERLAYFILTER       ICON                    "bitmaps\\overlay_filter.ico"
+IDI_VDD                 ICON                    "bitmaps\\compare-data.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_CONNECT, DIALOG
+    BEGIN
+        RIGHTMARGIN, 369
+        BOTTOMMARGIN, 258
+    END
+
+    IDD_EXPORTDATA, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 280
+    END
+
+    IDD_ABOUTDIALOG, DIALOG
+    BEGIN
+        RIGHTMARGIN, 333
+    END
+
+    IDD_KEYSHORT, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 193
+    END
+
+    IDD_TABLEDIAG, DIALOG
+    BEGIN
+    END
+
+    IDD_FLUSH, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 122
+    END
+
+    IDD_TEMPLATE, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 198
+    END
+
+    IDD_SCHEMA, DIALOG
+    BEGIN
+    END
+
+    IDD_COPYTABLE, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 226
+    END
+
+    IDD_DBMAKER, DIALOG
+    BEGIN
+    END
+
+    IDD_INSERTUPDATEBLOB, DIALOG
+    BEGIN
+    END
+
+    IDD_IMPORTBATCH, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 145
+    END
+
+    IDD_ESCAPECHAR, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 170
+    END
+
+    IDD_IMPORTCSV, DIALOG
+    BEGIN
+        RIGHTMARGIN, 373
+    END
+
+    IDD_BACKUP, DIALOG
+    BEGIN
+    END
+
+    IDD_RESTORE, DIALOG
+    BEGIN
+    END
+
+    IDD_SHOWINFO, DIALOG
+    BEGIN
+        RIGHTMARGIN, 361
+    END
+
+    IDD_EXPORTRESULTSET, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 247
+    END
+
+    IDD_COPYDATABASE, DIALOG
+    BEGIN
+    END
+
+    IDD_SQLWHERE, DIALOG
+    BEGIN
+    END
+
+    IDD_CONNECTIONNAME, DIALOG
+    BEGIN
+    END
+
+    IDD_NEWFOREIGN, DIALOG
+    BEGIN
+        RIGHTMARGIN, 274
+    END
+
+    IDD_EXPORTXMLHTML, DIALOG
+    BEGIN
+    END
+
+    IDD_SHOWVALUE, DIALOG
+    BEGIN
+    END
+
+    IDD_JOBMAN, DIALOG
+    BEGIN
+        RIGHTMARGIN, 225
+    END
+
+    IDD_JOBINTERIOR5, DIALOG
+    BEGIN
+    END
+
+    IDD_PROXY, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 186
+    END
+
+    IDD_SHOWWARNING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 242
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 51
+    END
+
+    IDD_SHOWIMPORTERR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 242
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 76
+    END
+
+    IDD_PREF2, DIALOG
+    BEGIN
+    END
+
+    IDD_ADDFAVORITES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 303
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 224
+    END
+
+    IDD_GETFOLDERNAME, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 264
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 72
+    END
+
+    IDD_ORGFAVORITES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 305
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 211
+    END
+
+    IDD_MOVETOFOLDER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 141
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 183
+    END
+
+    IDD_TEXTENTRYDIALOG, DIALOG
+    BEGIN
+    END
+
+    IDD_STARTDLG, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 343
+    END
+
+    IDD_CREATEDB, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 262
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 114
+    END
+
+    IDD_MYSQL_ERROR, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 199
+    END
+
+    IDD_GETSQLYOGENTERPRISE, DIALOG
+    BEGIN
+        LEFTMARGIN, 1
+        RIGHTMARGIN, 324
+        TOPMARGIN, 3
+    END
+
+    IDD_UPGRADECHK, DIALOG
+    BEGIN
+        RIGHTMARGIN, 263
+        BOTTOMMARGIN, 54
+    END
+
+    IDD_PREFOTHERS, DIALOG
+    BEGIN
+    END
+
+    IDD_PREFGENERAL, DIALOG
+    BEGIN
+    END
+
+    IDD_PREF3, DIALOG
+    BEGIN
+    END
+
+    IDD_PREFFORMATTER, DIALOG
+    BEGIN
+    END
+
+    IDD_EMPTYDB, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 210
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 141
+    END
+
+    IDD_QUERYPREVIEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 2
+        RIGHTMARGIN, 303
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 139
+    END
+
+    IDD_ENUMSETVALUES, DIALOG
+    BEGIN
+        RIGHTMARGIN, 218
+        BOTTOMMARGIN, 212
+    END
+
+    IDD_GETSQLYOGULTIMATE, DIALOG
+    BEGIN
+        LEFTMARGIN, 1
+        RIGHTMARGIN, 234
+        TOPMARGIN, 3
+    END
+
+    IDD_OBCOLOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 189
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 99
+    END
+
+    IDD_USERMANAGER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 453
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 233
+    END
+
+    IDD_CUSTOMFILTER, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 235
+        TOPMARGIN, 4
+    END
+
+    IDD_LANGUAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 205
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 52
+    END
+
+    IDD_FKDIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        TOPMARGIN, 7
+    END
+
+    IDD_DATETIME, DIALOG
+    BEGIN
+        RIGHTMARGIN, 115
+    END
+
+    IDD_SEARCHFILTER, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 264
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 235
+    END
+
+    IDD_CREATEALTER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 591
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 274
+    END
+
+    IDD_INDEXCOLUMNS, DIALOG
+    BEGIN
+        RIGHTMARGIN, 228
+        VERTGUIDE, 8
+    END
+
+    IDD_CONNECTION_DETAILS_MANAGER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 386
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 181
+    END
+
+    IDD_CONNECTION_IMPORT_MANAGER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 386
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 165
+    END
+
+    IDD_CONNECTION_IMPORT_CONFLICT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 227
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 68
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// PNG
+//
+
+PK                      PNG                     "bitmaps\\primary_key_16.png"
+SERVER                  PNG                     "bitmaps\\serv.png"
+TABLE                   PNG                     "bitmaps\\table.png"
+DATABASE                PNG                     "bitmaps\\database.png"
+INDEX                   PNG                     "bitmaps\\index.png"
+SP                      PNG                     "bitmaps\\sp.png"
+VIEW                    PNG                     "bitmaps\\view.png"
+FUNCTION                PNG                     "bitmaps\\function.png"
+TRIGGER                 PNG                     "bitmaps\\trigger.png"
+EVENT                   PNG                     "bitmaps\\event.png"
+CALENDAR                PNG                     "bitmaps\\calendar.png"
+DOWNARROW               PNG                     "bitmaps\\downarrow.png"
+REVERTSELECTED          PNG                     "bitmaps\\revert_selected.png"
+APPLY                   PNG                     "bitmaps\\apply.png"
+APPLYALL                PNG                     "bitmaps\\apply_all.png"
+REVERTALL               PNG                     "bitmaps\\revert_all.png"
+STOP                    PNG                     "bitmaps\\stop.png"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// README
+//
+
+IDR_README              README                  "readme.txt"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// THEME
+//
+
+IDR_THEME_TWILIGHT      THEME                   "twilight_theme.xml"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// GIF
+//
+
+PROGRESS                GIF                     "bitmaps\\progress.gif"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDM_FILE_CONNECT        "Template"
+    IDS_NAGENT              "\nUpgrade to the ""Fully Loaded"" SQLyog that includes Advanced Connectivity Tools, Synchronization Tools, Smart Autocomplete, Migration Toolkit, Scheduled Backups, Notification Services and much more. Click here to learn more about SQLyog"
+    IDM_FILE_NEWCONNECTION  " Create a new connection"
+    IDM_FILE_CLOSECONNECTION " Close the current MDI and connection"
+    IDM_FILE_CLOASEALL      " Close all MDI window and connections"
+    IDM_FILE_SAVESQL        " Save the current SQL statement(s)"
+    IDM_FILE_OPENSQL        " Open a SQL file in the current connection"
+    IDM_FILE_EXIT           " Exit from the application"
+    IDM_FILE_SAVEAS         " Specify and save the current SQL into a file"
+    IDM_EDIT_CUT            " Cut and move the selection to the clipboard"
+    IDM_EDIT_COPY           " Copy the current selection into clipboard"
+    IDM_EDIT_PASTE          " Insert the clipboard content at the current insertion point"
+    IDM_EDIT_UNDO           " Undo the last action"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_REFRESHOBJECT       " Refresh the object browser"
+    ID_OBJECT_DROPDATABASE  " Drop the currently selected database"
+    ID_OBJECT_DROPTABLE     " Drop the currently selected table"
+    ID_OBJECT_INSERTSTMT    " Create a valid SQL INSERT statement for the table"
+    IDM_EDIT_MANPF          " Manage personal folder"
+    ID_POWERTOOLS_SCHEDULEEXPORT " Scheduled backup"
+    ACCEL_EXECUTE           " Execute query"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_EDIT_TEMP_USER1     "/*\r\nUSE Statement\r\nSource : MySQL documentation\r\n*/\r\nUSE db_name"
+    IDM_EDIT_TEMP_USER2     "/*\r\nDESCRIBE Statement\r\nSource : MySQL documentation\r\n*/\r\n{ DESCRIBE | DESC } tbl_name {col_name | wild}"
+    IDM_EDIT_TEMP_BEGIN     "/*\r\nBEGIN/COMMMIT/ROLLBACK Statement\r\nSource : MySQL documentation\r\n*/\r\nBEGIN;\r\nSELECT @A:=SUM(salary) FROM table1 WHERE type=1;\r\nUPDATE table2 SET summmary=@A WHERE type=1;\r\nCOMMIT;\r\nROLLBACK"
+    IDM_EDIT_TEMP_COMMIT    "/*\r\nBEGIN/COMMMIT/ROLLBACK Statement\r\nSource : MySQL documentation\r\n*/\r\nBEGIN;\r\nSELECT @A:=SUM(salary) FROM table1 WHERE type=1;\r\nUPDATE table2 SET summmary=@A WHERE type=1;\r\nCOMMIT;\r\nROLLBACK"
+    IDM_EDIT_TEMP_ROLLBACK  "/*\r\nBEGIN/COMMMIT/ROLLBACK Statement\r\nSource : MySQL documentation\r\n*/\r\nBEGIN;\r\nSELECT @A:=SUM(salary) FROM table1 WHERE type=1;\r\nUPDATE table2 SET summmary=@A WHERE type=1;\r\nCOMMIT;\r\nROLLBACK"
+    IDM_EDIT_TEMP_LOCK      "/*\r\nLOCK/UNLOCK Statement\r\nSource : MySQL documentation\r\n*/\r\nLOCK TABLES tbl_name [ AS alias ] { READ | [ READ LOCAL ] | \r\n\t[ LOW_PRIORITY ] WRITE }\r\n\t[ , tbl_name { READ | [ LOW_PRIORITY ] WRITE } ... ]\r\n...\r\nUNLOCK TABLES"
+    IDM_EDIT_TEMP_UNLOCK    "/*\r\nLOCK/UNLOCK Statement\r\nSource : MySQL documentation\r\n*/\r\nLOCK TABLES tbl_name [ AS alias ] {READ | [ READ LOCAL ] | \r\n\t[ LOW_PRIORITY ] WRITE}\r\n\t\t[ , tbl_name {READ | [ LOW_PRIORITY ] WRITE} ... ]\r\n...\r\nUNLOCK TABLES"
+    IDM_EDIT_TEMP_TRANSACTION 
+                            "/*\r\nTransaction Statement\r\nSource : MySQL documentation\r\n*/\r\nSET [ GLOBAL | SESSION ] TRANSACTION ISOLATION LEVEL\r\n[ READ UNCOMMITTED | READ COMMITTED | \r\n  REPEATABLE READ | SERIALIZABLE ]"
+    IDM_EDIT_TEMP_CREATE3   "/*\r\nCreate Index Statement\r\nSource : MySQL documentation\r\n*/\r\nCREATE [ UNIQUE| FULLTEXT ] INDEX index_name \r\n\tON tbl_name (col_name[ (length) ],... ]"
+    IDM_EDIT_REDO           " Redo the previously undone action"
+    IDM_EXECUTE             " Execute query"
+    IDM_EDIT_SELECTALL      " Select all text in the current window"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_EDIT_FIND           " Find the specified text"
+    IDM_EDIT_REPLACE        " Find the specified text and replace it with different text"
+    IDC_EDIT_SHOWOBJECT     " Show or hide the object browser"
+    ID_TOOLS_FLUSH          " Flush logs, privileges, hosts etc."
+    ID_EDIT_INSERTTEMPLATES " Show templates for SQL commands"
+    IDM_IMEX_EXPORTDATA     " Export as... (Ctrl+Shift+E)"
+    IDM_EDIT_TEMP_BACKUP_RESTORE 
+                            "/*\r\nBackup/Restore Statement\r\nSource : MySQL documentation\r\n*/\r\nBACKUP TABLE tbl_name[,tbl_name...] TO '/path/to/backup/directory'\r\n\r\nRESTORE TABLE tbl_name[,tbl_name...] FROM '/path/to/backup/directory'"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_TOOLS_TABLEDIAG     " CHECK/REPAIR/ANALYZE/OPTIMIZE your table"
+    IDM_EDIT_RESULT_TEXT    " Show results in text mode"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_EDIT_ADVANCED_UPPER " Change selected text to uppercase"
+    IDM_EDIT_ADVANCED_LOWER " Change selected text to lowercase"
+    IDM_EDIT_ADVANCED_COMMENT " Comment the current line"
+    IDM_EDIT_ADVANCED_REMOVE " Remove comment from the current line"
+    IDM_EDIT_ADDSQL         " Adds the current SQL to the personal folder"
+    IDM_WINDOW_CASCADE      " Arrange the windows as overlapped window"
+    IDM_WINDOW_TILE         " Tile the window"
+    IDM_WINDOWS_ICONARRANGE " Arrange the minimized MDI windows"
+    IDM_HELP_ABOUT          " Display the program information and copyright"
+    IDM_HELP_SHORT          " List of keyboard shortcuts in SQLyog"
+END
+
+STRINGTABLE
+BEGIN
+    ID_IMPORTEXPORT_EXPORTTABLES " Export table data and structure in SQL"
+    ID_IMEX_TEXTFILE        " Execute a batch file of SQL commands"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_HELP_HELP           " Show the HELP file for SQLyog"
+    ACCEL_EXECUTESEL        " Execute selected query(s)"
+    ACCEL_EXECUTEALL        " Execute all queries"
+    ID_TABLE_MAKER          " Create a new table in the selected database"
+    IDM_TMAKER_SAVE         " Create Table"
+    IDM_DATATOCLIPBOARD     " Copy all rows to clipboard"
+    IDM_SELDATATOCLIPBOARD  " Copy selected row(s) data to clipboard"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_EDIT_TEMP_SELECTSTMT 
+                            "/*\r\nSelect Statement\r\nSource : MySQL documentation\r\n*/\r\nSELECT [ STRAIGHT_JOIN ]  [ SQL_SMALL_RESULT ]  \r\n\t[ SQL_BIG_RESULT ]  [ SQL_BUFFER_RESULT ] \r\t\t[ HIGH_PRIORITY ]  \n\t\t[ DISTINCT | DISTINCT ROW | ALL ] \r\n\tselect_expression,... \r\n\t[ INTO {OUTFILE | DUMPFILE} \\'file_name\\' export_options ] \r\n\t[ FROM table_references[ WHERE where_definition ]\r\n\t[ GROUP BY {unsigned_integer | col_name | formula} [ ASC | DESC ], ... ]\r\n\t[ HAVING where_definition ]\r\n\t[ ORDER BY {unsigned_integer | col_name | formula} [ ASC | DESC ] ,... ]\r\n\t[ LIMIT [ offset, ] rows ]\r\n\t[ PROCEDURE procedure_name ]\r\n\tFOR UPDATE | LOCK IN SHARE MODE ] ]"
+    IDM_EDIT_TEMP_JOINSTMT  "/*\r\nJoin Statement\r\nSource : MySQL documentation\r\n*/\r\ntable_reference, table_reference\r\ntable_reference [ CROSS ] JOIN table_reference\r\ntable_reference INNER JOIN table_reference join_condition\r\ntable_reference STRAIGHT_JOIN table_reference\r\n\r\ntable_reference LEFT [ OUTER ] JOIN table_reference join_condition\r\ntable_reference LEFT [ OUTER ] JOIN table_reference\r\ntable_reference NATURAL [ LEFT [ OUTER ] ] JOIN table_reference\r\n{ oj table_reference LEFT OUTER JOIN table_reference ON conditional_expr }\r\ntable_reference RIGHT [ OUTER ] JOIN table_reference join_condition\r\ntable_reference RIGHT [ OUTER ] JOIN table_reference\r\ntable_reference NATURAL [ RIGHT [ OUTER ] ] JOIN table_reference"
+    IDM_EDIT_TEMP_INSERT1   "/*\r\nInsert Statement\r\nSource : MySQL documentation\r\n*/\r\nINSERT [ LOW_PRIORITY | DELAYED ] [ IGNORE ]\r\n\t[ INTO ] tbl_name [ (col_name,...) ]\r\n\tVALUES (expression,...),(...),...\r\n\r\nINSERT [ LOW_PRIORITY | DELAYED ] [ IGNORE ]\r\n\t[ INTO ] tbl_name [ (col_name,...) ]\r\n\tSELECT ...\r\n\r\nINSERT [ LOW_PRIORITY | DELAYED ] [ IGNORE ]\r\n\t[ INTO ] tbl_name\r\n\tSET col_name=expression, col_name=expression, ..."
+    IDM_EDIT_TEMP_INSERT2   "/*\r\nInsert_Select Statement\r\nSource : MySQL documentation\r\n*/\r\nINSERT [ LOW_PRIORITY ] [ IGNORE ] [ INTO ] tbl_name \r\n\t[ (column list) ] SELECT ..."
+    IDM_EDIT_TEMP_UPDATE    "/*\r\nUpdate Statement\r\nSource : MySQL documentation\r\n*/\r\nUPDATE [ LOW_PRIORITY ] [ IGNORE ] tbl_name\r\n\tSET col_name1=expr1, [ col_name2=expr2, ... ]\r\n\t[ WHERE where_definition ]\r\n\t[ LIMIT # ]"
+    IDM_EDIT_TEMP_DELETE    "/*\r\nDelete Statement\r\nSource : MySQL documentation\r\n*/\r\nDELETE [ LOW_PRIORITY ] FROM tbl_name\r\n\t[ WHERE where_definition ]\r\n\t[ LIMIT rows ]"
+    IDM_EDIT_TEMP_TRUNCATE  "/*\r\nTruncate Statement\r\nSource : MySQL documentation\r\n*/\r\nTRUNCATE TABLE table_name"
+    IDM_EDIT_TEMP_REPLACE   "/*\r\nReplace Statement\r\nSource : MySQL documentation\r\n*/\r\nREPLACE [ LOW_PRIORITY | DELAYED ]\r\n\t[ INTO ] tbl_name [ (col_name,...) ]\r\n\tVALUES (expression,...),(...),...\r\n\r\nREPLACE [ LOW_PRIORITY | DELAYED ]\r\n\t[ INTO ] tbl_name [ (col_name,...) ]\r\n\tSELECT ...\r\n\tREPLACE [ LOW_PRIORITY | DELAYED ]\r\n\t[ INTO ] tbl_name\r\n\tSET col_name=expression, col_name=expression,..."
+    IDM_EDIT_TEMP_LOADDATA  "/*\r\nLoaddata Statement\r\nSource : MySQL documentation\r\n*/\r\nLOAD DATA [ LOW_PRIORITY | CONCURRENT ] [ LOCAL ] \r\n\tINFILE 'file_name.txt'\r\n\t[ REPLACE | IGNORE ]\r\n\tINTO TABLE tbl_name\r\n\t[ FIELDS\r\n\t\t[ TERMINATED BY '' ]\r\n\t\t[ [ OPTIONALLY ] ENCLOSED BY '' ]\r\n\t\t\r\n\t\t[ ESCAPED BY '\\'  ]\r\n\t ]\r\n\t[ LINES TERMINATED BY '' ]\r\n\t[ IGNORE number LINES ]\r\n\t[ (col_name,...) ]"
+    IDM_EDIT_TEMP_CREATE1   "/*\r\nCreate Table Statement\r\nSource : MySQL documentation\r\n*/\r\nCREATE [ TEMPORARY ] TABLE [ IF NOT EXISTS ] \r\n\ttbl_name [ (create_definition,...) ]\r\n\t[ table_options ] [ select_statement ]"
+    IDM_EDIT_TEMP_CREATE2   "/*\r\nCreate Database Statement\r\nSource : MySQL documentation\r\n*/\r\nCREATE DATABASE [ IF NOT EXISTS ] db_name\r\n   [DEFAULT] CHARACTER SET charset_name\r\n | [DEFAULT] COLLATE collation_name"
+    IDM_EDIT_TEMP_DROP1     "/*\r\nDrop database Statement\r\nSource : MySQL documentation\r\n*/\r\nDROP DATABASE [ IF EXISTS ] db_name "
+    IDM_EDIT_TEMP_DROP2     "/*\r\nDrop table Statement\r\nSource : MySQL documentation\r\n*/\r\nDROP TABLE [ IF EXISTS ] tbl_name [ , tbl_name,... ] \r\n\t[ RESTRICT | CASCADE ]"
+    IDM_EDIT_TEMP_ALTER     "/*\r\nAlter Table Statement\r\nSource : MySQL documentation\r\n*/\r\nALTER [ IGNORE ] TABLE tbl_name alter_spec \r\n\t[ , alter_spec ... ]"
+    IDM_EDIT_TEMP_RENAME    "/*\r\nRename Table Statement\r\nSource : MySQL documentation\r\n*/\r\nRENAME TABLE tbl_name TO new_table_name[ , tbl_name2 TO \r\n\tnew_table_name2,... ]"
+END
+
+STRINGTABLE
+BEGIN
+    ID_OBJECT_RENAMETABLE   " Rename the table"
+    ID_OBJECT_VIEWDATA      " View table data"
+    ID_OBJECT_CLEARTABLE    " Truncate data of the selected table"
+    ID_OBJECT_ADVANCED      " View advanced properties of the selected table"
+    ID_OBJECT_DROPFIELD     " Drop the selected column"
+    ID_OBJECT_CREATESCHEMA  " Create schema for the database in HTML"
+    IDM_FILE_NEWSAMECONN    " Create a new window with the current connection"
+END
+
+STRINGTABLE
+BEGIN
+    ID_LF_1                 " No recent files"
+    ID_LF_2                 " Open this document"
+    ID_LF_3                 " Open this document"
+    ID_LF_4                 " Open this document"
+END
+
+STRINGTABLE
+BEGIN
+    ID_LF_5                 " Open this document"
+    ID_LF_6                 " Open this document"
+    ID_LF_7                 " Open this document"
+    ID_LF_8                 " Open this document"
+    ID_LF_9                 " Open this document"
+    ID_LF_10                " Open this document"
+END
+
+STRINGTABLE
+BEGIN
+    ID_TOOLS_MANPERM        " Give Database, Table and Column level privileges to a user"
+    ID_EXPORT_AS            " Export data of the selected table as Comma Separated Values"
+    ID_IMPORT_FROMCSV       " Import data into the table from a CSV file"
+    ID_OBJECT_BACKUPDATABASE 
+                            " Backup the selected database using BACKUP command"
+    ID_OBJECT_RESTOREDATABASE " Restore a database using RESTORE command"
+    IDC_EDIT_SHOWRESULT     " Show or hide the result window"
+    ID_PF_1                 " Open the Personal SQL in the current connection"
+    ID_PF_2                 " Open the Personal SQL in the current connection"
+    ID_PF_3                 " Open the Personal SQL in the current connection"
+    ID_PF_4                 " Open the Personal SQL in the current connection"
+    ID_PF_5                 " Open the Personal SQL in the current connection"
+    ID_COLUMNS_DROPINDEX    " Drop the currently selected Index"
+END
+
+STRINGTABLE
+BEGIN
+    ID_OBJECT_COPYTABLE     " Make a copy of the selected table in the database"
+    ID_OBJECT_TABLEEDITOR   " Alter table structure of the selected table"
+    IDM_TOOL_ADDUSER        " Add a user and set its Global Privileges"
+    IDM_TOOL_EDITUSER       " Edit a existing users Global Privileges"
+    ID_OBJECT_INSERTUPDATE  " Insert and Update table data"
+END
+
+STRINGTABLE
+BEGIN
+    ID_IMPORTEXPORT_DBEXPORTTABLES 
+                            " Export data of the selected database as SQL query(s)"
+    ID_IMPORTEXPORT_TABLESEXPORTTABLES 
+                            " Export data of the selected table as SQL query(s)"
+    ID_OBJECT_MAINMANINDEX  " Create and edit indexes for the table"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_DATASYNC            " Synchronize data of two databases"
+    IDC_DIFFTOOL            " Compare and synchronize MySQL database schemas"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_CREATEDATABASE      " Create a new database"
+    ID_OBJECT_CHANGETABLETYPE_ISAM " Change the table handler to ISAM"
+    ID_OBJECT_CHANGETABLETYPE_MYISAM " Change the table handler to MyISAM"
+    ID_OBJECT_CHANGETABLETYPE_HEAP " Change the table handler to HEAP"
+    ID_OBJECT_CHANGETABLETYPE_MERGE " Change the table handler to MERGE"
+    ID_OBJECT_CHANGETABLETYPE_INNODB " Change the table handler to InnoDB"
+    ID_OBJECT_CHANGETABLETYPE_BDB " Change the table handler to BDB"
+    ID_OBJECT_CHANGETABLETYPE_GEMINI " Change the table handler to GEMINI"
+    ID_OBJECT_MANINDEX      " Create and edit indexes for the table"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TITLE1              "Choose a MySQL data source"
+    IDS_SUBTITLE1           "From where do you want to copy data ?"
+    IDS_TITLE2              "Choose A Data Source"
+    IDS_SUBTITLE2           "From where do you want to copy data ?"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_TITLE3              "Specify Table Copy or Query"
+    IDS_SUBTITLE3           "Specify whether to copy one or more table(s) or the result of the query from the data source."
+    IDS_TITLE4              "Type SQL Statement"
+    IDS_SUBTITLE4           "Type the query which will get the data."
+    IDS_TITLE5              "Select table(s)"
+    IDS_SUBTITLE5           "You can choose one or more tables to copy. You can copy the schema or data as it appears on the table or click (...) to transform the structure."
+END
+
+STRINGTABLE
+BEGIN
+    ID_OBJECT_REORDER       " Reorder columns of the selected table"
+    IDM_TOOL_ADDUSERTIP     " Manage User Permissions"
+    ID_TOOLS_FLUSHTIP       " Flush"
+    IDM_TOOLS_TABLEDIAGTIP  " Table diagnostics"
+    ID_OPEN_COPYDATABASE    " Copy database objects to another host/database"
+    ID_OBJECT_EMPTYDATABASE " Drop all table(s) of the selected database"
+    IDC_EDIT_SHOWEDIT       " Show or hide the SQL editor"
+    ACCEL_QUERYUPDATE       " Execute and edit the resultset"
+    ID_SHOW_VARIABLES       " Show values"
+END
+
+STRINGTABLE
+BEGIN
+    ID_TOOLS_ODBCIMPORT     " Import data from an ODBC datasource to MySQL"
+    IDC_TOOLS_NOTIFY        " Send personalized mails with results returned from a query"
+    ID_POWERTOOLS_SCHEDULEEXPORT2 
+                            " Export database or tables as SQL statements"
+    IDM_TOOL_JOBMAN         " Manage jobs for SQLyog Job Agent"
+    ID_REBUILDTAGS          " Rebuild Tag File"
+    ID_EDIT_LISTALLTAGS     " List all keywords and objects"
+    ID_EDIT_LISTMATCHINGTAGS 
+                            " List all keyword and objects matching to the current word"
+END
+
+STRINGTABLE
+BEGIN
+    ID_IMPORTEXPORT_DBEXPORTTABLESTIP " Export Data As Batch Scripts"
+    ID_IMEX_TEXTFILETIP     " Execute Batch File"
+    ID_OBJECT_CREATESCHEMATIP 
+                            " Manage FK Relationships for the selected table"
+    ID_OBJECT_INSERTUPDATETIP " Insert/Update Data For The Table"
+    ID_OBJECT_TABLEEDITORTIP " Alter Table Structure"
+    ID_OBJECT_MAINMANINDEXTIP 
+                            " Truncate data for ALL table(s) in the selected database"
+    IDM_TABLE_RELATIONTIP   " Manage Relationships For the Selected Table"
+    ID_EXPORT_ASHTML        " Export data of the selected table in HTML"
+    ID_EXPORT_ASXML         " Export data of selected table in XML"
+END
+
+STRINGTABLE
+BEGIN
+    ID_SHOW_PROCESSLIST     " Show processlist"
+    ID_SHOW_STATUS          " Show status"
+    IDS_DSYNCTITLE1         "Provide details about SOURCE and TARGET MySQL Servers"
+    IDS_DSYNCSUBTITLE1      " "
+    IDS_DSYNCTITLE2         " Advanced options for data synchronization"
+    IDS_DSYNCSUBTITLE2      "Choose an option that you want to perform"
+    IDS_DSYNCTITLE3         "Select table(s) that you want to synchronize"
+    IDS_DSYNCSUBTITLE3      "Selecting [ALL] to sync all tables in the source database. You can select all columns or specific columns to be used for comparing data. You can also specify a where clause to filter rows that are being compared."
+    IDC_PREF                " Set your preferences for the application"
+    IDS_DSYNCTITLE4         " Send results from Query at scheduled intervals"
+    IDS_DSYNCSUBTITLE4      "Choose an option that you want to perform"
+    IDS_NOTIFYTITLE1        "What do you want to do?"
+    ID_OPEN_COPYTABLE       "Copy table(s) to another host/database"
+    IDS_NOTIFYTITLE2        "Provide details about your MySQL server"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_NOTIFYSUBTITLE2     " "
+    IDS_NOTIFYTITLE3        "Email Options..."
+    IDS_NOTIFYSUBTITLE3     "Specify your Email and outgoing server information"
+    IDS_NOTIFYTITLE4        "Email Options....(continued)"
+    IDS_NOTIFYSUBTITLE4     "Specify a subject for Email or select YYYY-MM-DD or YYYY-MM-DD HH:MM:SS to autogenerate subject from current Date/Time value."
+    IDS_NOTIFYTITLE5        "Query(s)"
+    IDS_NOTIFYSUBTITLE5     "Specify an external file or enter query(s) which you want to execute"
+    IDS_SCHDSERVERTITLE     "asas"
+    IDS_SCHDSERVERSUBTITLE  "asdasd"
+    IDS_SCHDSELTABLESTITLE  "Select databases that you want to export"
+    IDS_SCHDSELTABLESSUBTITLE 
+                            "You can export ALL databases or SELECTED database."
+    IDS_SCHDSELSCRIPTTITLE  "How do you want to generate the script?"
+    IDS_SCHDSELSCRIPTSUBTITLE 
+                            "Specify whether you want to generate dump in one single file or across multiple files in a directory"
+    IDS_SCHDOPT1TITLE       "What do you want to generate?"
+    IDS_SCHDOPT1SUBTITLE    "asdasdsda"
+    IDS_SCHDOPT2TITLE       "What do you want to generate?"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SCHDOPT2SUBTITLE    " "
+    IDS_SCHDMAILTITLE       "asdas"
+    IDS_SCHDMAILSUBTITLE    "asddsd"
+    IDS_SCHDABORTTITLE      "What you want to do on error?"
+    IDS_SCHDABORTSUBTITLE   "Send report over Email when an error occurs"
+    IDS_SCHDMAILSUBJTITLE   "sdasd"
+    ID_STOPQUERY            " Stop execution"
+    IDM_IMEX_EXPORTCELL     " Copy selected cell data to clipboard"
+    ID_RESULT_INSERT        " Insert new row"
+    ID_RESULT_DELETE        " Delete selected row(s)"
+END
+
+STRINGTABLE
+BEGIN
+    ID_RESULT_CANCEL        " Cancel changes"
+    ID_RESULT_SAVE          " Save changes"
+    IDS_SCHDODBCTITLEDSN    "Choose Data Source"
+    IDS_SCHDODBCSUBTITLEDSN "From where do you want to import data?"
+    IDS_SCHDODBCTITLETYPE   "Specify Table Copy or Query"
+    IDS_SCHDODBCSUBTITLETYPE 
+                            "Specify whether to IMPORT one or more TABLE(s) or the result of the\n QUERY from the data source"
+    ID_IMPORTEXPORT_DBEXPORTTABLES2 
+                            " Export database or tables as SQL statements"
+    ID_IMEX_TEXTFILE2       " Import from SQL statements"
+    IDS_SCHDODBCSUBTITLECREATEQUERY "Type the query which will get the data"
+    IDS_SCHDODBCTITLEDB     "Select Database"
+    IDS_SCHDODBCSUBTITLEDB  "Select database where you want to import to"
+    IDS_SCHDODBCTITLEONERROR "What do you want to do on error?"
+    IDS_SCHDODBCSUBTITLEONERROR "Send report over Email when an error occurs"
+END
+
+STRINGTABLE
+BEGIN
+    ID_OBJECT_ALTERSTOREDPROCEDURE 
+                            " Alter the currently selected stored procedure"
+    ID_OBJECT_DROPSTOREDPROCEDURE 
+                            " Drop the currently selected stored procedure"
+    IDS_SCHDODBCTITLESUBMAIL "Email Options...(Continued)"
+    ID_OBJECT_ALTERFUNCTION " Alter the currently selected function"
+    ID_OBJECT_DROPFUNCTION  " Drop the currently selected function"
+    ID_OBJECT_DROPTRIGGER   " Drop the currently selected trigger"
+    ID_OBJECT_ALTERVIEW     " Alter view structure of the currently selected view"
+    ID_OBJECT_DROPVIEW      " Drop the currently selected view "
+    ID_OBJECT_CREATEVIEW    " Create a new view in the selected database"
+    ID_OBJECT_CREATESTOREDPROCEDURE 
+                            " Create a new stored procedure in the selected database"
+    ID_OBJECT_CREATEFUNCTION " Create a new function in the selected database"
+    ID_OBJECT_CREATETRIGGER " Create a new trigger on the currently selected table"
+END
+
+STRINGTABLE
+BEGIN
+    ID_OBJECT_ALTERTRIGGER  " Alter the currently selected trigger"
+    IDS_SCHDODBCTITLECONCLUDE "Completing the Database Import Wizard"
+    ID_NEW_EDITOR           " Add a new SQL editor"
+    IDS_NOTIFICATIONCONCLUDE "Completing the SQLyog Notification Wizard"
+    ID_OBJECTS_RENAMEVIEW   " Rename the currently selected view"
+    ID_OBJECTS_RENAMETRIGGER " Rename the currently selected trigger"
+    IDM_EDIT_GOTO           " Place the cursor on a specific line"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SCHDODBCTITLEMAILINFO "Email Options..."
+    IDS_SCHDODBCSUBTITLEMAILINFO 
+                            "Specify your Email and outgoing server information"
+    IDS_SCHDODBCSUBTITLESUBMAIL 
+                            "Specify a subject for Email or select YYYY-MM-DD OR YY-MM-DD HH:MM:SS to autogenerate subject from current Data/Time value"
+    IDS_SCHDODBCTITLESCHEDULE "What do you want to do?"
+    IDM_EDIT_TEMP_CREATEPROCEDURE 
+                            "/*\r\nCreate Procedure Statement\r\nSource : MySQL documentation\r\n*/\r\nCREATE\r\n[DEFINER = { user | CURRENT_USER }] \r\n PROCEDURE sp_name ([[ IN | OUT | INOUT ] param_name type[,...]])\r\n    [characteristic ...] routine_body\r\n    LANGUAGE SQL\r\n  | [NOT] DETERMINISTIC\r\n  | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }\r\n  | SQL SECURITY { DEFINER | INVOKER }\r\n  | COMMENT 'string'"
+    IDM_EDIT_TEMP_CREATEFUNCTION 
+                            "/*\r\nCreate Function Statement\r\nSource : MySQL documentation\r\n*/\r\nCREATE\r\n[DEFINER = { user | CURRENT_USER }] \r\n FUNCTION sp_name ([[ IN | OUT | INOUT ] param_name type[,...]])\r\n    RETURNS type\r\n    [characteristic ...] routine_body\r\n LANGUAGE SQL\r\n  | [NOT] DETERMINISTIC\r\n  | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }\r\n  | SQL SECURITY { DEFINER | INVOKER }\r\n  | COMMENT 'string'"
+    IDM_EDIT_TEMP_ALTERPROCEDURE 
+                            "/*\r\nAlter Procedure Statement\r\nSource : MySQL documentation\r\n*/\r\nALTER PROCEDURE sp_name \r\n[{ CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }\r\n  | SQL SECURITY { DEFINER | INVOKER }\r\n  | COMMENT 'string']"
+    IDM_EDIT_TEMP_ALTERFUNCTION 
+                            "/*\r\nAlter Function Statement\r\nSource : MySQL documentation\r\n*/\r\nALTER FUNCTION function_name \r\n[{ CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }\r\n  | SQL SECURITY { DEFINER | INVOKER }\r\n  | COMMENT 'string']"
+    IDM_EDIT_TEMP_DROPPROCEDURE 
+                            "/*\r\nDrop Procedure Statement\r\nSource : MySQL documentation\r\n*/\r\nDROP PROCEDURE  [IF EXISTS] sp_name"
+    IDM_EDIT_TEMP_DROPFUNCTION 
+                            "/*\r\nDrop Function Statement\r\nSource : MySQL documentation\r\n*/\r\nDROP FUNCTION  [IF EXISTS] function_name"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_EDIT_TEMP_CREATEVIEW 
+                            "/*\r\nCreate View Statement\r\nSource : MySQL documentation\r\n*/\r\nCREATE [OR REPLACE]\r\n[ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]\r\n[DEFINER = { user | CURRENT_USER }] \r\n[SQL SECURITY { DEFINER | INVOKER }]\r\n    VIEW view_name [(column_list)]\r\n    AS select_statement\r\n    [WITH [CASCADED | LOCAL] CHECK OPTION]\r\n"
+    IDM_EDIT_TEMP_ALTERVIEW "/*\r\nAlter View Statement\r\nSource : MySQL documentation\r\n*/\r\nALTER  [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]  \r\n    [DEFINER = { user | CURRENT_USER }]\r\n [SQL SECURITY { DEFINER | INVOKER }]\r\n  VIEW view_name [(column_list)]\r\n    AS select_statement\r\n    [WITH [CASCADED | LOCAL] CHECK OPTION]\r\n"
+    IDM_EDIT_TEMP_DROPVIEW  "/*\r\nDrop View Statement\r\nSource : MySQL documentation\r\n*/\r\nDROP VIEW [IF EXISTS]\r\n    view_name [, view_name] ...\r\n    [RESTRICT | CASCADE]\r\n"
+    IDM_EDIT_TEMP_CREATETRIGGER 
+                            "/*\r\nCreate Trigger Statement\r\nSource : MySQL documentation\r\n*/\r\nCREATE \r\n[DEFINER = { user | CURRENT_USER }] \r\nTRIGGER trigger_name trigger_time trigger_event\r\n    ON tbl_name FOR EACH ROW trigger_stmt\r\n"
+    IDM_EDIT_TEMP_DROPTRIGGER 
+                            "/*\r\nDrop Trigger Statement\r\nSource : MySQL documentation\r\n*/\r\nDROP TRIGGER [schema_name.]trigger_name\r\n"
+    IDM_EDIT_TEMP_CREATEEVENT 
+                            "/*\r\nCreate Event Statement\r\nSource : MySQL documentation\r\n*/\r\nCREATE\r\n[DEFINER = { user | CURRENT_USER }]\r\nEVENT [IF NOT EXISTS]\r\nevent_name ON SCHEDULE\r\nAT timestamp [+ INTERVAL interval]\r\n| EVERY interval\r\n[STARTS timestamp [+ INTERVAL interval]]\r\n[ENDS timestamp [+ INTERVAL interval]]\r\n[ON COMPLETION [NOT]PRESERVE]\r\n[ENABLE | DISABLE | DISABLE ON SLAVE]\r\n[COMMENT 'comment']\r\nDO sql_statement;\r\n\r\nInterval:\r\nquantity {YEAR | QUARTER | MONTH | DAY | HOUR | MINUTE |\r\nWEEK | SECOND | YEAR_MONTH | DAY_HOUR | DAY_MINUTE |\r\nDAY_SECOND | HOUR_MINUTE | HOUR_SECOND | MINUTE_SECOND}   "
+    IDS_SCHDEXPORTCONCLUDETITLE 
+                            " Completing the Scheduled Export As Batch Script Option"
+    IDS_DATABASESYNCCONCLUDE 
+                            " Completing the SQLyog Database Synchronization Wizard"
+END
+
+STRINGTABLE
+BEGIN
+    ID_OBJECT_SELECTSTMT    " Create a valid SQL SELECT Statement for the Table"
+    ID_ADDTOFAVORITES       " Add current query(s) to favorites list"
+    ID_ORGANIZEFAVORITES    " Organize your favorite folder"
+END
+
+STRINGTABLE
+BEGIN
+    ID_TABDELETE            " Close the current SQL editor"
+    ID_REFRESHFAVORITES     " Refresh favorites"
+    ID_EXPORT_EXPORTTABLEDATA 
+                            " Export table data as CSV/HTML/XML/SQL statements"
+    ID_OBJECT_EXPORTVIEW    " Export view data as..."
+    ID_COLUMNS_MANAGECOLUMNS " Manage columns"
+    ID_INDEXES_CREATEINDEX  " Create indexes for the table"
+    ID_INDEXES_EDITINDEX    " Edit indexes for the table"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_SCHDODBCTITLESELECTTABLE "Select Table(s)"
+    IDS_SCHDODBCSUBTITLESELECTTABLE 
+                            "You can choose one or more table(s) to copy. You can copy the\nschema or data as it appears on the table or click(...) to transform the structure."
+    IDS_SCHDODBCTITLECREATEQUERY "Type SQL Statement"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_NOTIFYSUBTITLE1     " "
+END
+
+STRINGTABLE
+BEGIN
+    ACCEL_EXECUTE_MENU      " Execute query"
+    IDM_ALTERDATABASE       " Alter database"
+    ID_OBJECT_CREATEEVENT   " Create a new event"
+    IDM_EDIT_TEMP_ALTEREVENT 
+                            "/*\r\nAlter Event Statement\r\nSource : MySQL documentation\r\n*/\r\nALTER\r\n[DEFINER = { user | CURRENT_USER }]\r\nEVENT event_name\r\n[ON SCHEDULE schedule]\r\n[ON COMPLETION [NOT] PRESERVE]\r\n[RENAME TO new_event_name]\r\n[ENABLE | DISABLE | DISABLE ON SLAVE]\r\n[COMMENT 'comment']"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_EDIT_TEMP_DROPEVENT "/*\r\nDrop Event Statement\r\nSource : MySQL documentation\r\n*/\r\nDROP EVENT [IF EXISTS] event_name"
+    ID_OBJECT_ALTEREVENT    " Alter the currently selected event"
+    ID_OBJECT_DROPEVENT     " Drop the currently selected event"
+    ID_OBJECT_RENAMEEVENT   " Rename the currently selected event"
+END
+
+STRINGTABLE
+BEGIN
+    ID_OBJECT_UPDATESTMT    " Create a valid SQL UPDATE statement for the table"
+    ID_OBJECT_DELETESTMT    " Create a valid SQL DELETE statement for the table"
+    IDS_DSYNCTYPETITLE      " How do you want to perform synchronization?"
+    IDS_DSYNCTYPESUBTITLE   " Why upgrade to Professional/Enterprise/Ultimate? Scheduled Jobs allows you to schedule important jobs like backups, data sync, etc"
+    IDM_EDIT_TEMP_ALTERDB   "/*\r\nAlter Database Statement\r\nSource : MySQL documentation\r\n*/\r\nALTER DATABASE db_name\r\n   [DEFAULT] CHARACTER SET charset_name\r\n | [DEFAULT] COLLATE collation_name"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_COMMUNITY_AD_1      "No nag screens on startup and shutdown"
+    IDS_COMMUNITY_AD_2      "No ads showcasing SQLyog features"
+    IDS_COMMUNITY_AD_3      "Dozens of Power Tools for Smart MySQL Management included"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_COMMUNITY_AD_4      "Get one year of unlimited premier email support"
+    IDS_COMMUNITY_AD_5      "Create schema visually using Visual Schema Designer"
+    IDS_COMMUNITY_AD_6      "Create relationships using simple drag-n-drop interface"
+    IDS_COMMUNITY_AD_7      "Reverse Engineer your database schema using Visual Schema Designer"
+    IDS_COMMUNITY_AD_8      "Use Visual Schema designer to share schema design within a team"
+    IDS_COMMUNITY_AD_9      "Print your database schema using Visual Schema Designer"
+    IDS_COMMUNITY_AD_10     "Construct your queries visually using Visual Query Builder"
+    IDS_COMMUNITY_AD_11     "Create SQL faster by using Visual Query Builder"
+    IDS_COMMUNITY_AD_12     "Visually create SQL statements without the need to remember column names"
+    IDS_COMMUNITY_AD_13     "Build complex queries using drag-n-drop interface"
+    IDS_COMMUNITY_AD_14     "Write queries 10x faster using Smart Autocomplete"
+    IDS_COMMUNITY_AD_15     "Smart Autocomplete has complete support for table and column aliases"
+    IDS_COMMUNITY_AD_16     "Provides intelligent code completion for fast, accurate SQL"
+    IDS_COMMUNITY_AD_17     "Smart Autocomplete provides keyword formatting and column picker"
+    IDS_COMMUNITY_AD_18     "Smart Autocomplete dramatically reduce your time at the keyboard"
+    IDS_COMMUNITY_AD_19     "Compare and synchronize MySQL database schemas"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_COMMUNITY_AD_20     "Automate database comparisons"
+    IDS_COMMUNITY_AD_21     "Save hours of tedious work and eliminate manual scripting errors"
+    IDS_COMMUNITY_AD_22     "Generate schema synchronization scripts"
+    IDS_COMMUNITY_AD_23     "Take database snapshots and compare them – useful for audit trails"
+    IDS_COMMUNITY_AD_24     "Generate schema change histories, ideal for database versioning"
+    IDS_COMMUNITY_AD_25     "Apply schema changes from development MySQL to test MySQL to production MySQL"
+    IDS_COMMUNITY_AD_26     "Schema Sync tool brings two or more schemas in complete sync"
+    IDS_COMMUNITY_AD_27     "Compare the contents of two databases using Data Sync Tool"
+    IDS_COMMUNITY_AD_28     "Automatically synchronize your data using Data Sync Tool"
+    IDS_COMMUNITY_AD_29     "Data Sync can be scheduled"
+    IDS_COMMUNITY_AD_30     "Data Sync allows you to take instant backups of your hosted MySQL data"
+    IDS_COMMUNITY_AD_31     "Data Sync tool uses intelligent checksum based algorithm to detect changes"
+    IDS_COMMUNITY_AD_32     "Data Sync tool helps you verify the success of your data migration"
+    IDS_COMMUNITY_AD_33     "Data Sync tool helps you create an audit trail by comparing backups"
+    IDS_COMMUNITY_AD_34     "Data Sync tool helps restore missing or damaged data at table, row or column level "
+    IDS_COMMUNITY_AD_35     "Data Sync tool helps troubleshoot your replication issues"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_COMMUNITY_AD_36     "Use HTTP/SSH Tunneling to connect to MySQL even if direct connection is disallowed"
+    IDS_COMMUNITY_AD_37     "HTTP/SSH Tunneling allows you to get rid of the annoying phpMyAdmin page refreshes"
+    IDS_COMMUNITY_AD_38     "Import data directly from Excel, Access and CSV files"
+    IDS_COMMUNITY_AD_39     "Import schema and data from any ODBC compliant data source"
+    IDS_COMMUNITY_AD_40     "Import external data at scheduled intervals"
+    IDS_COMMUNITY_AD_41     "Receive status updates over email for scheduled import of external data"
+    IDS_COMMUNITY_AD_42     "Import external data containing hundreds of columns and millions of rows"
+    IDS_COMMUNITY_AD_43     "Scheduled Backups presents a wizard driven interface to take backups"
+    IDS_COMMUNITY_AD_44     "No need to learn cryptic command line tools for backups"
+    IDS_COMMUNITY_AD_45     "Scheduled Backups gives you peace of mind"
+    IDS_COMMUNITY_AD_46     "Get the resultset of scheduled queries delivered right into your Inbox"
+    IDS_COMMUNITY_AD_47     "Run maintenance queries at scheduled intervals using Notification Services"
+    IDS_COMMUNITY_AD_48     "Scheduled Jobs allows you to schedule important jobs like backups, data sync, etc."
+    IDS_COMMUNITY_AD_49     "SQL Formatter formats SQL for better readability and maintenance"
+    IDS_COMMUNITY_AD_50     "SQL Formatter beautifies your SQL code instantly"
+    IDS_COMMUNITY_AD_51     "SQL Formatter 'pretty prints' your SQL code"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_COMMUNITY_AD_52     "Query Profiler helps you identify problem SQL"
+    IDS_COMMUNITY_AD_53     "Query Profiler helps you fine-tune SQL"
+    IDS_COMMUNITY_AD_54     "Query Profiler helps you create the right indexes"
+    IDS_COMMUNITY_AD_55     "Query Profiler analyzes queries and helps you optimize them"
+    IDS_COMMUNITY_AD_56     "Query Profiler reports the exact time spent in each step of query execution"
+    IDS_COMMUNITY_AD_57     "Query Profiler helps you write better SQL"
+    IDS_COMMUNITY_AD_58     "Query Profiler identifies whether indexes are being used effectively"
+    IDS_COMMUNITY_AD_59     "Query Profiler helps you improve overall response time of your application"
+    IDS_COMMUNITY_AD_60     "Format selected query"
+    IDS_COMMUNITY_AD_61     "Format all queries"
+    IDS_COMMUNITY_AD_62     "Format current query"
+    IDS_COMMUNITY_AD_63     "Create compressed backups and save disk space"
+    IDS_COMMUNITY_AD_64     "Schema Optimizer helps you determine the optimal column types"
+    IDS_COMMUNITY_AD_65     "Schema Optimizer helps you save memory and disk space"
+    IDS_COMMUNITY_AD_66     "Schema Optimizer helps fit more data into memory thereby improving response times"
+    IDS_COMMUNITY_AD_67     "Find Redundant Indexes"
+END
+
+STRINGTABLE
+BEGIN
+    ID_DB_CREATETRIGGER     " Create a trigger"
+    ID_DB_CREATEEVENT       " Create an event"
+    IDM_TOOL_RENAMEUSER     " Rename an existing user"
+    ID_EDIT_INSERTFILE      " Select a file containing SQL statements"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_FILE_OPENSQLNEW     "Open a SQL file in new tab"
+END
+
+STRINGTABLE
+BEGIN
+    ID_SCHEMADESIGNER       "Add a new Schema Designer"
+    ID_QUERYBUILDER         "Add a new Query Builder"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_EDIT_FINDNEXT       " Find the next occurrence"
+    ID_EDIT_SWITCHTABSTOLEF " Switch to Previous Tab"
+    ID_TOOLS_USERMANAGER    " Manage MySQL users"
+    ID_TOOLS_CHANGELANGUAGE " Change language"
+END
+
+STRINGTABLE
+BEGIN
+    ACCEL_FORMATSELECTEDQUERY " Format selected query(s)"
+    ACCEL_FORMATALLQUERIES  " Format all queries"
+    ACCEL_FORMATCURRENTQUERY " Format current query"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_CLOSETAB        " Close the current tab"
+    ID_EDIT_SWITCHTABSTOLEFT " Switch to previous tab"
+    ID_EDIT_SWITCHTABSTORIGHT " Switch to next tab"
+END
+
+STRINGTABLE
+BEGIN
+    FAVORITE_MENU_ID        "Open the favorite file"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_COMMUNITY_AD_68     "Data Search - easiest way to search across all databases"
+    IDS_COMMUNITY_AD_69     "Data Search - become more productive with your searches"
+    IDS_COMMUNITY_AD_70     "Search across all databases without writing any queries"
+    IDS_COMMUNITY_AD_71     "Search across all databases without worrying about the underlying structure"
+    IDS_COMMUNITY_AD_72     "Data Search - search and navigate to the respective record in a single click"
+    IDS_COMMUNITY_AD_73     "Data Search - match any text pattern with regular expression support"
+    IDS_COMMUNITY_AD_74     "Form View - the most convenient way to manually enter data"
+    IDS_COMMUNITY_AD_75     "Form View - conveniently browse through your data, one row at a time"
+END
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// English (India) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENN)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_INDIA
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_CONNECTIONLIST DIALOGEX 0, 0, 205, 158
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_THICKFRAME
+CAPTION "Previously Opened Connections"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "&Open",IDOK,6,137,55,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,143,137,55,14
+    PUSHBUTTON      "&New Connection...",IDC_OPENCONNDLG,66,137,72,14
+    CONTROL         "",IDC_CONNECTIONLIST,"SysListView32",LVS_LIST | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,17,191,116
+    CONTROL         "Select &All",IDC_SELCHECK,"Button",BS_AUTO3STATE | WS_TABSTOP,7,7,45,10
+    LTEXT           "grip",IDC_GRIP,185,133,13,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_CONNECTIONLIST, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 198
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 151
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (India) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

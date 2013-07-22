@@ -1,0 +1,270 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1720">请指定主题</string>
+	<string name="1721">无效的日志文件名称</string>
+	<string name="1722">该文件不包含任何可执行的查询</string>
+	<string name="1723">启用查询探查器（仅支持旗舰版）</string>
+	<string name="1724">选择您要保存标记文件的文件夹</string>
+	<string name="1725">解释结果</string>
+	<string name="1726">EXPLAIN EXTENDED 信息</string>
+	<string name="1727">显示 PROFILE 结果（按时长排序）</string>
+	<string name="1728">正常运行时间</string>
+	<string name="1729">Uptime_since_flush_status</string>
+	<string name="1730">&lt;UL>&lt;LI>当您在‘偏好设置’中启用此选项，并执行 SELECT 语句时，查询分析信息将显示在此处。 &lt;LI>请注意只有 SELECT 语句支持查询分析器 &lt;/UL></string>
+	<string name="1731">注意：下方显示的分析结果为当选择&lt;a href=&quot;pref_others &quot; target=&quot;_blank&quot;>在“结果”选项卡中启用自动分页&lt;/a>时，由 SQLyog 添加的 LIMIT 子句的查询</string>
+	<string name="1732">没有选择查询分析器选项。前往 工具 -> 偏好设置 并选择至少一项。</string>
+	<string name="1733">查询分析器不支持 HTTP 隧道</string>
+	<string name="1734">* 执行查询后的实际值（由于查询，不改变）</string>
+	<string name="1735"># 全局数值（受所有已连接客户端操作的影响）</string>
+	<string name="1736">此版本的 MySQL 不支持会话变量。所有下列的状态变量为全局变量（受所有已连接客户端操作的影响）</string>
+	<string name="1737">执行查询时发生重连接。没有可用的信息</string>
+	<string name="1738">未找到分析信息，尝试再次执行查询</string>
+	<string name="1739">此 MySQL 服务器版本不支持 EXPLAIN EXTENDED 信息。</string>
+	<string name="1740">此 MySQL 服务器版本不支持 SHOW PROFILE</string>
+	<string name="1741">要执行查询的状态变量的变化</string>
+	<string name="1742">此分析需要 MySQL 5.0 或更高版本</string>
+	<string name="1743">此表格未定义索引</string>
+	<string name="1744">此数据库中未找到表格</string>
+	<string name="1745">内存不足，无法继续操作</string>
+	<string name="1746">感谢您注册 SQLyog %s-MySQL GUI。</string>
+	<string name="1747">感谢您注册 SQLyog %s-MySQL GUI。
+请重新启动 SQLyog，使所有的设置生效</string>
+	<string name="1748">试用期已过。</string>
+	<string name="1749">这是一个“完全加载”的SQLyog版本</string>
+	<string name="1750">要获得您的证书key，你需要购买SQLyog从：</string>
+	<string name="1751">请输入证书key</string>
+	<string name="1752">空表. 无数据时无法对该表的数据类型进行优化.</string>
+	<string name="1753">内存不足，无法完成操作</string>
+	<string name="1754">表</string>
+	<string name="1755">请至少选择一个%s。</string>
+	<string name="1756">请选择一种数据类型</string>
+	<string name="1757">列</string>
+	<string name="1758">全部列</string>
+	<string name="1759">SQLyog 数据库同步向导</string>
+	<string name="1760">欢迎使用SQLyog的数据库同步向导！</string>
+	<string name="1761">本向导将指导您完成两个数据库之间的数据同步步骤，也将帮助您排程数据库同步过程。
+
+工作文件存储了此任务的配置。您可以在今后使用工作文件来运行此任务。</string>
+	<string name="1762">错误 No. 2003
+无法连接到 &apos;localhost&apos; 上的 MySQL 服务器</string>
+	<string name="1763">您已选择[全部]表</string>
+	<string name="1764">显示全部‘%s’字段</string>
+	<string name="1765">选择表格 [%s] 的至少一列</string>
+	<string name="1766">表格 [%s] 中包含不正确的 WHERE 子句
+
+%s</string>
+	<string name="1767">无法创建临时工作文件。</string>
+	<string name="1768">创建文件映射中的错误</string>
+	<string name="1769">源服务器信息不完整</string>
+	<string name="1770">目标服务器信息不完整</string>
+	<string name="1771">您必须指定至少一个表格。</string>
+	<string name="1772">表格名称未指定</string>
+	<string name="1773">请为‘%s’表格指定至少一列</string>
+	<string name="1774">请提供 HTTP 隧道的 URL。</string>
+	<string name="1775">请提供 SSH 主机信息。</string>
+	<string name="1776">您确定要终止同步过程吗？</string>
+	<string name="1777">请选择源数据库</string>
+	<string name="1778">请选择目标数据库</string>
+	<string name="1779">与此 SQLyog 版本的数据同步可与 4.1.1 或更新版本的 MySQL 服务器正常工作。您指定的一台或多台服务器版本较低。请联系 Webyog 获得解决方案</string>
+	<string name="1780">与此 SQLyog 版本的数据同步可与 4.1.1 或更新版本的 MySQL 服务器正常工作。您指定的一台或多台服务器版本较低。请联系 Webyog 获得解决方案。</string>
+	<string name="1781">警告！！！无法打开文件映射对象 (%d)。</string>
+	<string name="1782">您必须在最后 3 个复选框中至少留出一个不勾选。
+3 个复选框全不勾选将不包含任何同步内容。</string>
+	<string name="1783">这将更改目标的架构。您要继续吗？</string>
+	<string name="1784">比较表格</string>
+	<string name="1785">比较视图</string>
+	<string name="1786">正在比较存储过程</string>
+	<string name="1787">正在比较事件</string>
+	<string name="1788">正在比较函数</string>
+	<string name="1789">正在比较触发器</string>
+	<string name="1790">无法阅读密钥文件。</string>
+	<string name="1791">没有可保存的内容！</string>
+	<string name="1792">比较不成功</string>
+	<string name="1793">比较成功</string>
+	<string name="1794">/* 外键已删除现在要重新建立*/</string>
+	<string name="1795">/* 外键已删除现在要重新建立*/</string>
+	<string name="1796">从对象浏览器拖表或右击->添加表</string>
+	<string name="1797">从对象浏览器拖表/视图或-右击> 添加表/视图</string>
+	<string name="1798">选择列，双击列名或拖动并放到表格中</string>
+	<string name="1799">当前查询生成器只支持单一数据库的表/视图</string>
+	<string name="1800">您不可能为星号指定标准(*)</string>
+	<string name="1801">重复表别名/人名字</string>
+	<string name="1802">无法打开查询创建器文件.</string>
+	<string name="1803">未找到数据库</string>
+	<string name="1804">%s文件的内容已改变。
+
+你要保存查询设计吗？</string>
+	<string name="1805">此标签页的内容已改变。
+
+你要保存查询设计吗？</string>
+	<string name="1806">确定关闭查询创建器吗？</string>
+	<string name="1807">无效的查询创建器文件。</string>
+	<string name="1808">从对象浏览器拖拽表或点击右键 -＞ 添加表或使用画布工具条</string>
+	<string name="1809">仅有来自同一数据库的表格可用于一个架构设计器标签</string>
+	<string name="1810">选中表已呈现在画布上</string>
+	<string name="1811">您确定删除该外键吗</string>
+	<string name="1812">无法打开结构设计文件。</string>
+	<string name="1813">未选择表格</string>
+	<string name="1814">表格不匹配。请刷新画布</string>
+	<string name="1815">没有可打印的内容！</string>
+	<string name="1816">百分比必须介于 10 到 600</string>
+	<string name="1817">刷新 F5(R)</string>
+	<string name="1818">刷新 F9(R)</string>
+	<string name="1819">没有足够的内存来创建位图。请关闭部分程序并重试。</string>
+	<string name="1820">打印时发生错误</string>
+	<string name="1821">无法创建位图</string>
+	<string name="1822">无法创建位图。内存不足！</string>
+	<string name="1823">无效的架构文件。</string>
+	<string name="1824">无效的结构文件设计。</string>
+	<string name="1825">未提供数据库名称。</string>
+	<string name="1826">无效的架构文件</string>
+	<string name="1827">CREATE Table 语句中的错误</string>
+	<string name="1828">未选择数据库！</string>
+	<string name="1829">选择一列来删除</string>
+	<string name="1830">表格 (%s) 不支持外键。
+表格引擎必须为 InnoDB、PBXT 或 SolidDB。</string>
+	<string name="1831">%s 文件的内容已更改。
+
+您要保存架构文件设计吗？</string>
+	<string name="1832">此选项卡内容已更改。
+
+您要保存架构设计吗？</string>
+	<string name="1833">未找到默认打印机</string>
+	<string name="1834">选择默认打印机时发生错误</string>
+	<string name="1835">请提供代理服务器地址</string>
+	<string name="1836">请提供代理服务器端口号码</string>
+	<string name="1837">隧道建立失败。HTTP 响应可能为无效，PHP 设置可能未允许隧道建立。您可以发送 HTTP 响应到 support@webyog.com。您也可以尝试更改‘高级’设置来解决问题。</string>
+	<string name="1838">连接到 HTTP 服务器发生错误。</string>
+	<string name="1839">SQLyog 隧道文件版本不匹配或 PHP 错误。
+请从 SQLyog 安装文件夹上传最新的 SQLyogTunnel.php。</string>
+	<string name="1840">用户停止查询。</string>
+	<string name="1841">从 tunnelpage 获取响应时发生错误。</string>
+	<string name="1842">PHP 版本低于 4.3.0。您需要升级至 v4.3.0 或更高版本来使用 HTTP 隧道。</string>
+	<string name="1843">HTTP 错误。需要认证！</string>
+	<string name="1844">HTTP 错误。无法连接到隧道 URL。</string>
+	<string name="1845">未知的 HTTP 服务器错误</string>
+	<string name="1846">由于语法无效，该请求无法被服务器处理。</string>
+	<string name="1847">请求的资源需要用户验证。</string>
+	<string name="1848">在 HTTP 协议中未实现。</string>
+	<string name="1849">服务器理解该请求，但无法满足它。</string>
+	<string name="1850">服务器没有找到任何匹配请求的 URI。</string>
+	<string name="1851">不允许使用HTTP verb</string>
+	<string name="1852">没有发现接受到客户端的响应。</string>
+	<string name="1853">需要代理授权</string>
+	<string name="1854">服务器等待请求超时</string>
+	<string name="1855">由于处在资源冲突的状态，请求可能未完成。</string>
+	<string name="1856">请求的资源不再可用在服务器上，并没有转到已知的地址。</string>
+	<string name="1857">服务器将不接受没有定义的内容长度的请求。</string>
+	<string name="1858">在一个或多个请求头字段值为false.的前提。</string>
+	<string name="1859">服务器不会处理请求，因为请求的实体是攻关。</string>
+	<string name="1860">服务器不将服务请求，因为请求的 URI，服务器可以解释比长。</string>
+	<string name="1861">服务器不将服务请求，因为请求的实体是不支持的格式。</string>
+	<string name="1862">执行适当的操作后，请求应该被重试。</string>
+	<string name="1863">服务器遇到了一个意外的情况，阻止它执行请求。</string>
+	<string name="1864">服务器不支持完成请求所需的功能。</string>
+	<string name="1865">在服务器上，同时作为网关或代理，从上游服务器收到无效的响应。</string>
+	<string name="1866">此服务临时过载。</string>
+	<string name="1867">此服务器不支持请求消息中使用的 HTTP 协议版本。</string>
+	<string name="1868">您已选择使用 HTTP 隧道连接到您的 MySQL 服务器。请确保您的 MySQL 主机地址包含可从隧道 URL 访问的主机名。
+
+如需了解更多关于如何设置 HTTP 隧道的信息，请单击“帮助”按钮。</string>
+	<string name="1869">您已选择使用 SSH 隧道连接到您的 MySQL 服务器。请确保您的 MySQL 主机地址包含可从 SSH 主机访问的主机名。
+
+如需了解更多关于如何设置 SSH 端口转换的信息，请单击“帮助”按钮。</string>
+	<string name="1870">您已选择使用 SSL 加密连接到您的 MySQL 服务器。
+请确保此服务器支持 SSL 加密连接，并配置用户为使用 SSL 连接。
+
+如需了解更多关于如何设置 SSL 加密连接的信息，请单击“帮助”按钮。</string>
+	<string name="1871">无法建立 SSH 连接。
+请确保 SSH 服务器正在运行，并且您输入了建立 SSH 隧道的正确参数值。</string>
+	<string name="1872">创建架构文件</string>
+	<string name="1873">选择表格来生成架构文件</string>
+	<string name="1874">创建(C)...</string>
+	<string name="1875">并选择全部</string>
+	<string name="1876">并取消选择全部</string>
+	<string name="1877">取消(L)</string>
+	<string name="1878">还原数据库</string>
+	<string name="1879">还原数据库</string>
+	<string name="1880">选择目录</string>
+	<string name="1881">选择您要还原的表格</string>
+	<string name="1882">选择全部(E)</string>
+	<string name="1883">注意：该选项使用 MySQL 还原表格选项。</string>
+	<string name="1884">确定</string>
+	<string name="1885">取消</string>
+	<string name="1886">架构同步工具</string>
+	<string name="1887">隐藏并忽略对象</string>
+	<string name="1888">相同(I)</string>
+	<string name="1889">要更改目标</string>
+	<string name="1890">要重复目标</string>
+	<string name="1891">要删除目标</string>
+	<string name="1892">比较</string>
+	<string name="1893">切换选项</string>
+	<string name="1894">删除所有</string>
+	<string name="1895">执行所有</string>
+	<string name="1896">另存为(S)</string>
+	<string name="1897">关闭</string>
+	<string name="1898">选择来源{连接 - 数据库}</string>
+	<string name="1899">选择目标 {连接 - 数据库} 改变将会应用于目标</string>
+	<string name="1900">注意： 要同步数据库位于不同的主机，将连接到多个主机使用-> 新连接文件。数据库下拉列表中会列出所有连接的所有数据库。</string>
+	<string name="1901">选择对象</string>
+	<string name="1902">将在目标修改的对象</string>
+	<string name="1903">将在目标创建对象</string>
+	<string name="1904">比较</string>
+	<string name="1905">将在目标删除的对象</string>
+	<string name="1906">相同的对象</string>
+	<string name="1907">状态</string>
+	<string name="1908">仅表格</string>
+	<string name="1909">全部对象</string>
+	<string name="1910">重新排序列</string>
+	<string name="1911">要重新排序的一种改变使用向上 / 向下按钮，列的顺序，按重新排序</string>
+	<string name="1912">更改列顺序</string>
+	<string name="1913">向上(U)</string>
+	<string name="1914">向下(D)</string>
+	<string name="1915">重新排序...</string>
+	<string name="1916">欢迎来到 SQLyog 数据库同步向导！</string>
+	<string name="1917">本向导将指引您完成两个数据库之间的数据同步步骤。
+
+本向导也将帮助您安排数据库同步。</string>
+	<string name="1918">开始新工作(S)</string>
+	<string name="1919">编辑已保存的工作(E)</string>
+	<string name="1920">源</string>
+	<string name="1921">复制连接自</string>
+	<string name="1922">主机地址</string>
+	<string name="1923">使用 HTTP 隧道</string>
+	<string name="1924">URL</string>
+	<string name="1925">（秒）</string>
+	<string name="1926">高级...</string>
+	<string name="1927">使用 Socket(E)</string>
+	<string name="1928">文件路径(I)</string>
+	<string name="1929">用户名</string>
+	<string name="1930">密码</string>
+	<string name="1931">端口</string>
+	<string name="1932">使用压缩的协议(C)</string>
+	<string name="1933">会话空闲超时</string>
+	<string name="1934">默认(D)</string>
+	<string name="1935">使用 SSH 隧道(S)</string>
+	<string name="1936">SSH 主机(H)</string>
+	<string name="1937">SSH 端口(P)</string>
+	<string name="1938">公钥</string>
+	<string name="1939">私钥(K)</string>
+	<string name="1940">使用 SSL 加密(L)</string>
+	<string name="1941">CA 证书(A)</string>
+	<string name="1942">暗号</string>
+	<string name="1943">使用认证(A)</string>
+	<string name="1944">客户端密钥(C)</string>
+	<string name="1945">客户端验证</string>
+	<string name="1946">目标</string>
+	<string name="1947">使用压缩协议</string>
+	<string name="1948">默认</string>
+	<string name="1949">您何时想要运行任务？</string>
+	<string name="1950">立刻运行</string>
+	<string name="1951">保存选项</string>
+	<string name="1952">保存工作文件</string>
+	<string name="1953">保存计划；它使用了Windows计划程序</string>
+	<string name="1954">日志文件</string>
+	<string name="1955">日志文件记录了所有在任务运行期间发生的错误。</string>
+	<string name="1956">列映射和转换</string>
+	<string name="1957">源：</string>
+	<string name="1958">目的地：</string>
+	<string name="1959">编辑SQL</string>
+</resources>

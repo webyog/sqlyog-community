@@ -1,0 +1,279 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1000">텍스트</string>
+	<string name="1001">이미지</string>
+	<string name="1002">NULL 값을 쓸 수 없습니다!</string>
+	<string name="1003">파일을 생성할 수 없습니다</string>
+	<string name="1004">파일을 열 수 없습니다 !</string>
+	<string name="1005">파일을 열 수 없습니다. 데이터가 변경되지 않았습니다</string>
+	<string name="1006">모든 변경 사항이 사라집니다. 정말 나가시겠습니까?</string>
+	<string name="1007">정보를 검색할 수 없습니다. 권한을 확인하십시오.</string>
+	<string name="1008">이 트리거를 위한 테이블을 검색할 수 없습니다</string>
+	<string name="1009">열린 포트를 찾는 도중 오류 발생</string>
+	<string name="1010">치명적인 오류: 네트워크 오류: 접속 시간 초과</string>
+	<string name="1011">HTTP 터널링 (프로페셔널/엔터프라이지/얼티메이트 전용)</string>
+	<string name="1012">SSH 터널링 (프로페셔널/엔터프라이즈/얼티메이트 전용)</string>
+	<string name="1013">SSL 암호화 (프로페셔널/엔터프라이즈/얼티메이트 전용)</string>
+	<string name="1014">SQLyog 프로페셔널/엔터프라이즈/얼티메이트를 다운로드하여 이 기능 및 다양한 기능을 활성화하세요.</string>
+	<string name="1015">경고: 이 컴퓨터 프로그램은 저작권법에 의해 보호됩니다. 이 프로그램 혹은 일부의 허가받지 않은 복제나 유통은 심각한 민형사적 처벌을 받거나 법률에 의거, 최대한의 범위 내에서 기소됩니다.</string>
+	<string name="1016">SQLyog에 대하여</string>
+	<string name="1017">SQLyog 커뮤니티에 대하여</string>
+	<string name="1018">새로운 접속으로 접속하려고 합니다.
+접속은 저장됩니다.</string>
+	<string name="1019">접속에 대한 상세사항을 변경하였습니다.
+변경사항을 저장하시겠습니까?</string>
+	<string name="1020">새로운 접속</string>
+	<string name="1021">접속 이름 바꾸기</string>
+	<string name="1022">유효한 이름을 입력하세요</string>
+	<string name="1023">접속이 이미 존재합니다. 고유한 이름을 입력하십시오</string>
+	<string name="1024">쿼리 포맷</string>
+	<string name="1025">예정된 백업 마법사 (Ctrl+Alt+S)</string>
+	<string name="1026">외부 데이터 불러오기 마법사(Ctrl+Alt+O)</string>
+	<string name="1027">스키마 동기화 도구 (Ctrl+Q)</string>
+	<string name="1028">데이터베이스 동기화 마법사 (Ctrl+Alt+W)</string>
+	<string name="1029">SQL 스케쥴러와 보고 도구 (Ctrl+Alt+N)</string>
+	<string name="1030">새로운 쿼리 빌더 (Ctrl+K)</string>
+	<string name="1031">새로운 스키마 디자이너 (Ctrl+Alt+D)</string>
+	<string name="1032">SQLyog 프로페셔널/엔터프라이즈/얼티메이트 얻기</string>
+	<string name="1033">이 기능은 SQLyog 프로페셔널/엔터프라이즈/얼티메이트 버전에서 작동됩니다.</string>
+	<string name="1034">이 소프트웨어는 가장 잘 알려진 오픈 소스 라이센스인 GNU General Public Licence(GPL)하에 발매되었습니다. GPL 라이센스의 정식 조건은 http://www.fsf.org/licence/에서 찾을 수 있습니다.</string>
+	<string name="1035">SQLyog 프로페셔널/엔터프라이즈/얼티메이트로 업그레이드하기</string>
+	<string name="1036">이 접속 상세를 정말 삭제하시겠습니까?</string>
+	<string name="1037">접속 성공!
+MySQL 버전: %s</string>
+	<string name="1038">접속 정보</string>
+	<string name="1039">새로운 창을 초기화하지 못했습니다</string>
+	<string name="1040">이 기능은 HTTP 터널을 이용하여 접속할 경우에만 가능합니다.</string>
+	<string name="1041">&amp;복구</string>
+	<string name="1042">HTTP 오류 번호 %d
+%s</string>
+	<string name="1043">오류 번호 %d
+%s</string>
+	<string name="1044">접속: %d</string>
+	<string name="1045">태그 파일 빌드하기</string>
+	<string name="1046">태그 파일 리빌드하기</string>
+	<string name="1047">준비</string>
+	<string name="1048">테이블 종류 변경하기</string>
+	<string name="1049">최근 파일 없음</string>
+	<string name="1050">파일을 열 수 없습니다.</string>
+	<string name="1051">MySQL 서버에 접속하세요</string>
+	<string name="1052">새로운 보기 이름 입력하기</string>
+	<string name="1053">새로운 프로시저 이름 입력하기</string>
+	<string name="1054">새로운 함수 이름 입력하기</string>
+	<string name="1055">새로운 이벤트 이름 입력하기</string>
+	<string name="1056">새로운 트리거 이름 입력하기</string>
+	<string name="1057">라인 수 입력</string>
+	<string name="1058">&amp; 이동</string>
+	<string name="1059">데이터베이스 변경</string>
+	<string name="1060">&amp;변경</string>
+	<string name="1061">유효한 데이터베이스 이름을 입력하십시오.</string>
+	<string name="1062">데이터베이스가 성공적으로 변경되었습니다</string>
+	<string name="1063">유효한 보기 이름을 입력하십시오</string>
+	<string name="1064">&apos;%s&apos; 보기를 생성할 수 없습니다; 해당 이름을 가진 테이블이나 보기가 이미 존재합니다</string>
+	<string name="1065">유효한 이벤트 이름을 입력하십시오</string>
+	<string name="1066">&apos;%s&apos; 이벤트를 생성할 수 없습니다; 이벤트가 존재합니다</string>
+	<string name="1067">유요한 프로시저 이름을 입력하십시오</string>
+	<string name="1068">&apos;%s&apos; 프로시저를 생성할 수 없습니다; 프로시저가 존재합니다</string>
+	<string name="1069">유효한 함수 이름을 입력하십시오</string>
+	<string name="1070">%s&apos; 함수를 생성할 수 없습니다; 함수가 존재합니다</string>
+	<string name="1071">유효한 트리거 이름을 입력하십시오</string>
+	<string name="1072">%s&apos; 트리거는 생성할 수 없습니다; 이미 존재합니다</string>
+	<string name="1073">라인 번호 범위 초과!</string>
+	<string name="1074">참조된 쿼리 파일을 열 수 없습니다.
+쿼리 파일이 존재하는 지 확인하십시오.</string>
+	<string name="1075">선택된 즐겨찾기 항목은 비어있습니다. 선택할 것이 없습니다.</string>
+	<string name="1076">즐겨찾기 파일을 읽는 도중 오류 발생</string>
+	<string name="1077">&apos;%s&apos;를 찾을 수 없습니다
+참조된 파일이 존재하는 지 확인하십시오.</string>
+	<string name="1078">즐겨찾기 파일을 열 수 없습니다.</string>
+	<string name="1079">파일이 비었습니다</string>
+	<string name="1080">참조된 파일을 열 수 없습니다.</string>
+	<string name="1081">참조된 파일에 쓸 수 없습니다.</string>
+	<string name="1082">&amp;SQl 선언 붙여넣기</string>
+	<string name="1083">%s를 찾지 못하거나  오류가 생겼습니다.
+%s를 다시 설치하십시오.</string>
+	<string name="1084">(값에 대한 필터는 이미 입력되었습니다)</string>
+	<string name="1085">1개 이상의 저장된 프로그램이나 보기가 복사되었습니다.
+SQL 참조하는 &lt;source> 데이터베이스 이름을 포함하거나 수동 조절을 필요로 할 것입니다.</string>
+	<string name="1086">최소 하나의 객체를 선택하십시오.</string>
+	<string name="1087">소스 서버로 접속하는 중</string>
+	<string name="1088">목표 서버로 접속 중</string>
+	<string name="1089">성공적으로 복사됨</string>
+	<string name="1090">복사될 것이 없습니다</string>
+	<string name="1091">복사 중 오류 발생</string>
+	<string name="1092">복사 중지 중...</string>
+	<string name="1093">데이터베이스 요약 복사하기</string>
+	<string name="1094">%s에 대한 테이블 구조 생성하기</string>
+	<string name="1095">%s에 대한 데이터 복사 중 (%ld 열 완료)</string>
+	<string name="1096">%s에 대한 데이터 복사 중</string>
+	<string name="1097">%s 복사 중 ...</string>
+	<string name="1098">%s의 리스트를 서버로부터 가져오는 중...</string>
+	<string name="1099">(%lu 열))</string>
+	<string name="1100">복사됨</string>
+	<string name="1101">복사된 &apos;%s&apos; 보기</string>
+	<string name="1102">함수 &apos;%s&apos;가 복사됨</string>
+	<string name="1103">프로시저 &apos;%s&apos;가 복사됨</string>
+	<string name="1104">트리거 &apos;%s&apos; 복사됨</string>
+	<string name="1105">이벤트 &apos;%s&apos; 복사됨</string>
+	<string name="1106">%d %s 복사됨</string>
+	<string name="1107">&amp;복사</string>
+	<string name="1108">&amp;정지</string>
+	<string name="1109">스키마 파일을 열 수 없습니다.</string>
+	<string name="1110">파일이 에디터로 열기에 너무 큽니다. 대신 도구-> SQL 덤프로부터 복구를 사용해보십시오.</string>
+	<string name="1111">쿼리</string>
+	<string name="1112">- %s@%s -%s에 접속하기 위해 SSH 터널 사용</string>
+	<string name="1113">- %s@%s - %s에서 HTTP 터널 사용</string>
+	<string name="1114">서버 접속 성공...</string>
+	<string name="1115">접속을 종료할 수 없습니다. 쿼리가 실행 중입니다.</string>
+	<string name="1116">객체 브라우저 새로 고쳐짐...</string>
+	<string name="1117">이 탭의 내용이 변경되었습니다.
+
+변경사항을 저장하시겠습니까?</string>
+	<string name="1118">%s 파일의 내용이 변경되었습니다.
+
+변경사항을 저장하시겠습니까?</string>
+	<string name="1119">파일이 저장되지 않았습니다. 닫기  액션은 취소되었습니다.</string>
+	<string name="1120">파일을 생성할 수 없습니다.</string>
+	<string name="1121">파일에 쓸 수 없습니다.</string>
+	<string name="1122">작동 중 오류</string>
+	<string name="1123">작업 성공</string>
+	<string name="1124">이 옵션을 사용하기 위해서는 쿼리 창이 보일 수 있도록 해야 합니다.</string>
+	<string name="1125">삽입할 템플릿 선택</string>
+	<string name="1126">데이터베이스: %s</string>
+	<string name="1127">스키마 디자이너</string>
+	<string name="1128">쿼리 빌더</string>
+	<string name="1129">%s, 오류 번호 : %d</string>
+	<string name="1130">이 작업은 %d 열이  %s가 되는 것입니다. 계속하시겠습니까?
+
+알아두기: 경고를 끄려면 도구 -> 설정 -> 기타 -> 다중 열이 업데이트되는 경우 즉시 알리기의 체크를 해제합니다.</string>
+	<string name="1131">업데이트 됨</string>
+	<string name="1132">삭제됨</string>
+	<string name="1133">선택된 열을 지우시겠습니까?</string>
+	<string name="1134">현재 선택된 열을 삭제하시겠습니까?</string>
+	<string name="1135">클립보드에 데이터를 복사하지 못했습니다.</string>
+	<string name="1136">공간 데이터 타입의 삽입 혹은 업데이트를 지원하지 않습니다.</string>
+	<string name="1137">초기화 필터</string>
+	<string name="1138">우연적인 손상으로부터 데이터를 보호하려면 SQLyog는 업데이트가 끝난 지점에서 데이터베이스 컨텍스를 확인할 것입니다. 
+이 결과 세트의 데이터는 현재 선택된 데이터베이스로부터 생성된 것이 아닙니다.
+
+업데이트를 수행하기 위해서 먼저 이 결과를 생성할 곳으로부터 데이터를 선택해야 합니다. 그 후 SQLyog는 이 결과 세트로부터 업데이트 가능한 데이터베이스에서 테이블을 보여줄 것입니다.</string>
+	<string name="1139">이 결과 세트는 이 객체 브라우저에서 현재 선택된 데이터베이스로부터 생성된 것이 아닙니다. 이 결과를 수정하는 것은 데이터 컨텍스트가 잘못 되었을 경우 데이터 오류를 불러올 수 있습니다. 작업을 수행하고자하는 곳에서 데이터베이스를 선택하였는지 확인하십시오. 
+계속하시겠습니까?</string>
+	<string name="1140">열 제한하기</string>
+	<string name="1141">첫째 열:</string>
+	<string name="1142">열 갯수:</string>
+	<string name="1143">새로고침</string>
+	<string name="1144">다른 이름으로 내보내기... (Ctrl+Shift+E)</string>
+	<string name="1145">데이터 복사하기</string>
+	<string name="1146">선택된 열의 데이터를 클립보드에 복사하기</string>
+	<string name="1147">새로운 열 삽입하기</string>
+	<string name="1148">변경 사항 저장하기</string>
+	<string name="1149">선택된 열 삭제하기</string>
+	<string name="1150">변경 취소</string>
+	<string name="1151">이 결과를 수정할 수 없습니다.
+드롭다운 윈도에서 유효한 테이블을 선택하세요.</string>
+	<string name="1152">[BLOB(더블클릭하여 보기)](%u 바이트)</string>
+	<string name="1153">...[BLOB(더블클릭하여 보기)]</string>
+	<string name="1154">변경 사항을 저장하시겠습니까?</string>
+	<string name="1155">(읽기 전용)</string>
+	<string name="1156">삭제할 행을 선택하십시오!</string>
+	<string name="1157">정지</string>
+	<string name="1158">양식</string>
+	<string name="1159">그리드</string>
+	<string name="1160">데이터가 수정되었지만 저장 안 됨</string>
+	<string name="1161">데이터 세트 업데이트/삭제를 위한 검색을 중지하십시오.</string>
+	<string name="1162">데이터베이스: %s 테이블: %s</string>
+	<string name="1163">오류 코드: %d
+%s
+(%lu ms 소요)</string>
+	<string name="1164">(%lu 열이 적용됨)
+(%lu ms 소요)</string>
+	<string name="1165">(%lu 열이 반환됨)
+(%d ms 소요)</string>
+	<string name="1166">쿼리가 실행되지 않았습니다. SQL 창에서 쿼리를 입력하시거나 쿼리 안에 커서를 놓으십시오.</string>
+	<string name="1167">쿼리를 실행하는 중...</string>
+	<string name="1168">오류 번호 : %d</string>
+	<string name="1169">사용자에 의해 중지됨</string>
+	<string name="1170">구조 내보내기 성공</string>
+	<string name="1171">%d 열 내보냄</string>
+	<string name="1172">내보낸 파일을 여는 도중 오류 발생. 스키마 파일의 상세 사항을 확인하십시오.</string>
+	<string name="1173">파일에 쓰기 오류</string>
+	<string name="1174">데이터베이스가 선택되지 않았습니다. 드롭다운 메뉴에서 데이터베이스를 선택하십시오.</string>
+	<string name="1175">다른이름으로 저장</string>
+	<string name="1176">S&amp;맨 위</string>
+	<string name="1177">내보내기 성공</string>
+	<string name="1178">덤프 파일을 생성할 수 없습니다.
+덤프 파일을 확인하십시오 -
+1. 읽기 전용이 아닌지
+2. 다른 프로세스에서 열린 것은 아닌지
+3. 파일 경로가 존재하는 것은 아닌지</string>
+	<string name="1179">오류 번호.: %d
+%s</string>
+	<string name="1180">내보내기가 성공하지 못함</string>
+	<string name="1181">&amp;내보내기</string>
+	<string name="1182">오직 테이블만 데이터를 가질 수 있습니다. 덤핑을 위해 하나의 테이블만 선택하십시오 - 데이터 전용.</string>
+	<string name="1183">오직 테이블만 데이터를 갖습니다. 덤핑을 위해 최소 1개 이상의 테이블을 선택하십시오 - 데이터 전용</string>
+	<string name="1184">최소 1개의 객체를 선택하십시오</string>
+	<string name="1185">내보낼 것이 없습니다</string>
+	<string name="1186">테이블 내보내기: %s</string>
+	<string name="1187">보기 내보내기: %s</string>
+	<string name="1188">프로시저 내보내기: %s</string>
+	<string name="1189">함수 내보내기: %s</string>
+	<string name="1190">이벤트 내보내기: %s</string>
+	<string name="1191">트리거 내보내기: %s</string>
+	<string name="1192">테이블 내보내는 중: %s 
+내보낸 열: %d</string>
+	<string name="1193">SQL 선언의 가장 간결한 형식으로 데이터를 저장합니다.
+추가적인 테이블 정보 (인덱스, 캐릭터세트, 코멘트 등)은 저장되지 않습니다.
+
+데이터를 백업하고자한다면 &apos;SQL 덤프로 테이블 백업&apos;을 사용하십시오.</string>
+	<string name="1194">폴더를 지정하십시오</string>
+	<string name="1195">최소 하나의 테이블을 선택하십시오</string>
+	<string name="1196">데이터베이스를 백업하고자하는 폴더를 선택하기</string>
+	<string name="1197">데이터베이스 백업하는 중...</string>
+	<string name="1198">테이블 정보 백업하기</string>
+	<string name="1199">열 가져오기:</string>
+	<string name="1200">파일 이름을 지정하십시오.</string>
+	<string name="1201">최소 하나의 칼럼을 선택하십시오</string>
+	<string name="1202">다음으로 둘러싸여 있음(옵션):</string>
+	<string name="1203">다음으로 둘러싸여 있음:</string>
+	<string name="1204">...로 내보내기</string>
+	<string name="1205">파일을 생성할 수 없습니다</string>
+	<string name="1206">데이터가 성공적으로 내보내졌습니다</string>
+	<string name="1207">내보내기 도중 오류</string>
+	<string name="1208">파일에 쓸 수 없습니다 !</string>
+	<string name="1209">메뉴 추가 오류</string>
+	<string name="1210">즐겨찾기</string>
+	<string name="1211">즐겨찾기 오류</string>
+	<string name="1212">입력한 바로가기가 이미 즐겨찾기 메뉴에 존재합니다.
+덮어쓰시겠습니까?</string>
+	<string name="1213">즐겨찾기 추가</string>
+	<string name="1214">즐겨찾기 파일에 쓸 수 없습니다</string>
+	<string name="1215">즐겨찾기 폴더를 생성할 수 없습니다</string>
+	<string name="1216">쿼리를 위한 참조 이름을 입력하십시오</string>
+	<string name="1217">SQL 파일 이름을 입력하십시오</string>
+	<string name="1218">쿼리 에디터가 비어있습니다!
+에디터에 쿼리를 입력해보십시오.</string>
+	<string name="1219">폴더 이름을 지정하십시오</string>
+	<string name="1220">즐겨찾기 폴더 생성 도중 오류 발생</string>
+	<string name="1221">이름 바꾸기 오류</string>
+	<string name="1222">&apos;%s&apos;를 자기 자리로 이동할 수 없습니다.</string>
+	<string name="1223">&apos;%s&apos;를 정말 지우시겠습니까?</string>
+	<string name="1224">즐겨찾기 항목 삭제 중 오류 발생</string>
+	<string name="1225">참조된 쿼리 파일을 열 수 없습니다.
+쿼리 파일이 존재하는 지 확인하십시오.</string>
+	<string name="1226">파일 열기</string>
+	<string name="1227">해당 문서에 대한 검색을 마쳤습니다. &quot;%s&quot;를 찾을 수 없습니다</string>
+	<string name="1228">%d 인스턴스 교체됨</string>
+	<string name="1229">교체하기</string>
+	<string name="1230">모두 교체하기</string>
+	<string name="1231">찾기</string>
+	<string name="1232">필터 텍스트를 여기 입력하십시오...</string>
+	<string name="1233">새로고침</string>
+	<string name="1234">부모 테이블 열을 검색하기 위한 검색을 중지하십시오</string>
+	<string name="1235">&amp;컬럼</string>
+	<string name="1236">테이블</string>
+	<string name="1237">&amp; 데이터베이스</string>
+	<string name="1238">SQLyog 재접속됨</string>
+	<string name="1239">SQLyog 재접속 실패</string>
+</resources>

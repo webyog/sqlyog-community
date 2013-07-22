@@ -1,0 +1,142 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3361">기능 및 일상적인 파라미터 목록	Ctrl+Shift+Space</string>
+	<string name="3362">모두의 Ye&amp;s</string>
+	<string name="3363">N&amp;o 모두에게</string>
+	<string name="3364">&amp; 복귀</string>
+	<string name="3365">&amp;4 고급</string>
+	<string name="3366">엔진</string>
+	<string name="3367">Co&amp;py 모두</string>
+	<string name="3368">행 이름</string>
+	<string name="3370">PK?</string>
+	<string name="3371">무효가 아님?</string>
+	<string name="3372">바이너리?</string>
+	<string name="3373">서명없이?</string>
+	<string name="3374">자동 증가?</string>
+	<string name="3375">Zerofill?</string>
+	<string name="3376">인덱스 이름</string>
+	<string name="3377">인덱스 종류</string>
+	<string name="3378">제한된 이름</string>
+	<string name="3379">열 참조</string>
+	<string name="3380">참조된 데이터 베이스</string>
+	<string name="3381">참조된 테이블</string>
+	<string name="3382">참조된 열</string>
+	<string name="3383">업데이트</string>
+	<string name="3384">삭제</string>
+	<string name="3385">지정되지 않은 테이블 이름</string>
+	<string name="3386">열 이름과 데이터 종류는 비어 있을 수 없습니다.</string>
+	<string name="3387">지정되지 않은 데이터 종류</string>
+	<string name="3388">기본값인 비어있는 스트링(&quot;)은 %s 데이터 종류에서는 지원되지 않습니다.</string>
+	<string name="3389">길이가 %s 데이터 종류를 위해서는 정해져야 합니다.</string>
+	<string name="3390">이 테이블에는 열이 없습니다. 적어도 하나의 열을 정의 하십시오.</string>
+	<string name="3391">테이블이 성공적으로 생성되었습니다.</string>
+	<string name="3392">정의된 열이 없습니다.</string>
+	<string name="3393">선택된 열이 없습니다.</string>
+	<string name="3394">외부키를 위해 선탣된 참조중인 열이 없습니다.</string>
+	<string name="3395">참조된 테이터 베이스가 선택되지 않았습니다.</string>
+	<string name="3396">참조된 테이블이 선택되지 않았습니다.</string>
+	<string name="3397">외부키를 위해 선택된 참조된 열이 없습니다.</string>
+	<string name="3398">참조 중인 그리고 참조된 열의 갯수가 같지 않습니다.</string>
+	<string name="3399">데이터 종류</string>
+	<string name="3400">길이</string>
+	<string name="3401">필수 열들을 선택하십시오. 재정열 하시려면 Up/Down 키를 사용하십시오.</string>
+	<string name="3402">실행을 기디라고 있는 쿼리가 없습니다.</string>
+	<string name="3403">테이블이 성공적으로 생성되었습니다.
+
+다른 테이블을 생성하시겠습니까?</string>
+	<string name="3404">선택한 열은 한개 이상의 인덱스에서 참조되었습니다. 열을 버리시면 관련된 인덱스들도 수정됩니다.
+
+계속하시겠습니까?</string>
+	<string name="3405">선택된 열은 한개 이상의 외부키에 의해 참조되었습니다. 열을 버리면 관련된 외부키도 수정됩니다.
+
+계속하시겠습니까?</string>
+	<string name="3406">선택된 열은 한개 이상의 인덱스와 외부키에 의해 참조되었습니다. 열을 버리면 관련된 인텍스와 외부키도 수정됩니다.
+
+계속하시겠습니까?</string>
+	<string name="3407">선택된 열은 한개 이상의 인덱스에 의해 참조되었습니다. 열을 버리면 관련된 인텍스도 수정됩니다.
+
+계속하시겠습니까?</string>
+	<string name="3408">선택된 열은 한개 이상의 외부키에 의해 참조되었습니다. 열을 버리면 관련된 외부키도 수정됩니다.
+
+계속하시겠습니까?</string>
+	<string name="3409">선택된 열은 한개 이상의 인덱스와 외부키에 의해 참조되었습니다. 열을 버리면 관련된 인텍스와 외부키도 수정됩니다.
+
+계속하시겠습니까?</string>
+	<string name="3410">주요한 키들은 한꺼번에 정의되지 않습니다.</string>
+	<string name="3411">이 인덱스를 버리시겠습니까?</string>
+	<string name="3412">선택된 인덱스를 버리시겠습니까?</string>
+	<string name="3413">이 외부키를 버리시겠습니까?</string>
+	<string name="3414">선택된 외부키를 버리시겠습니까?</string>
+	<string name="3415">MySQL에서 외부키에 경고를 할 수 있는 직접적인 방법은 없습니다.
+SQLyog이 존재하고 있는 것을 버리고 이미 존재하는 키의 이름을 사용하여 새 것을 생성할 것입니다.
+만약 이미 설정한 조건들이 맞지 않으면(데이터 종류, 적절한 인덱스 등등), 생성 과정은 실패할 것입니다. 그 결과 기존의 외부키는 지워지고 새로운 키는 생성되지 않습니다.
+키에 새로운 이름을 부여함으로서 그것을 피할 수 있습니다.
+
+계속 하시겠습니까?</string>
+	<string name="3416">이 열을 버리시겠습니까?</string>
+	<string name="3417">선택된 열을 버리시겠습니까?</string>
+	<string name="3418">변환 테이블</string>
+	<string name="3419">데이터 베이스 이름 사용</string>
+	<string name="3420">새로운 행 추가 (Alt+Ins)</string>
+	<string name="3421">선택된 행 지우기(Alt+Del)</string>
+	<string name="3422">위로 이동(Alt+Up)</string>
+	<string name="3423">아래로 이동(Alt+Down)</string>
+	<string name="3424">전송 시간</string>
+	<string name="3425">다른 텝으로 전환할 수 없습니다. 새로운 연결을 생성하십시오. (Ctrl+N)</string>
+	<string name="3426">쿼리 실행 중입니다!</string>
+	<string name="3427">에러 종료</string>
+	<string name="3428">정규 표현</string>
+	<string name="3429">데이터베이스 콜레이션</string>
+	<string name="3430">쿼리를 클립보드에 복사</string>
+	<string name="3431">쿼리를 새 쿼리탭에 복사</string>
+	<string name="3432">쿼리를 동일 쿼리탭에 복사</string>
+	<string name="3434">캔버스에 테이블을 추가</string>
+	<string name="3435">테이블 생성</string>
+	<string name="3436">스키마 디자인 가져오기 (Ctrl+O)</string>
+	<string name="3437">캔버스 새로 고침 (F5)</string>
+	<string name="3438">캔버스를 이미지로 내보내기</string>
+	<string name="3439">인쇄</string>
+	<string name="3440">확대</string>
+	<string name="3441">축소</string>
+	<string name="3443">뷰 생성</string>
+	<string name="3444">프로시저 생성</string>
+	<string name="3445">트리거 생성</string>
+	<string name="3446">함수 생성</string>
+	<string name="3447">이벤트 생성</string>
+	<string name="3448">명령어 초기 설정(&amp;i)</string>
+	<string name="3449">(여러 개의 명령어를 사용할 때에는 세미콜론  &apos;;&apos;으로 구분하십시오)</string>
+	<string name="3450">글꼴 &amp;&amp; 편집기 설정</string>
+	<string name="3451">객체 브라우저(&amp;j)</string>
+	<string name="3452">&amp;foreign_key_checks = 0 설정</string>
+	
+	<string name="3453">&amp;새 탭에서 테이블 열기</string>
+	<string name="3458">&amp;테이블 데이터</string>
+<!--string name="3459" is in file2.xml -->
+	<string name="3460">&amp;새 탭에서 테이블 열기	Ctrl+F11</string>
+	<string name="3461">초기 명령</string>
+	
+	<string name="3463">&amp;테이블 데이터	F11</string>
+	<string name="3466">테이블 선택/객체 브라우저에서 보기</string>
+	<string name="3467">새로운 칼럼 삽입(Alt+Ins)</string>
+	<string name="3468">선택된 칼럼 삭제(Alt+Del)</string>
+	<string name="3469">선택된 인덱스 삭제(Alt+Del)</string>
+	<string name="3470">새로운 인덱스 삽입(Alt+Ins)</string>
+	<string name="3471">선택된 FK 삭제(Alt+Del)</string>
+	<string name="3472">새로운 FK 삽입(Alt+Ins)</string>
+	<string name="3477">테이블 데이터/결과 탭 페이징</string>
+	<string name="3478">&amp;기본 열 개수</string>
+	<string name="3479">툴바 크기</string>
+	<string name="3480">테마</string>
+	<string name="3481">작음</string>
+	<string name="3482">보통</string>
+	<string name="3483">큼</string>
+	<string name="3484">모두 실행</string>
+	<string name="3486">( 주의:여러 개의 쿼리는 ;로 구분)</string>
+	<string name="3487">테이블/보기 추가</string>
+	<string name="3488">&amp;새로고침	F9</string>
+	<string name="3489">%s 쿼리 생성 실패</string>
+	<string name="3490">SQLyog가 선택한 테이블에 대한 데이터베이스를 확인하지 못했습니다.
+
+활성 데이터베이스 컨텍스트를 사용하시겠습니까?</string>
+	<string name="3491">데이터베이스가 선택되지 않았습니다. 데이터베이스를 선택하고 다시 시도하십시오</string>
+</resources>

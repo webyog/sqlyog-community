@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="100">연결</string>
+	<string name="101">새 연결 구성하기</string>
+	<string name="102">최근 연결 속성으로 새 연결 구성하기</string>
+	<string name="103">현재 연결 끊기</string>
+	<string name="104">다음 연결로 전환</string>
+	<string name="105">이전 연결로 전환</string>
+	<string name="106">연결 선택하기 (1에서 8)</string>
+	<string name="107">마지막 연결 선택</string>
+	<string name="109">객체 브라우저</string>
+	<string name="110">객체 브라우저 초기화 (디폴트)</string>
+	<string name="111">객체 브라우저에 포커스 유지</string>
+	<string name="112">SQL 창</string>
+	<string name="113">새 쿼리 편집기</string>
+	<string name="114">SQL 창에 포커스 유지</string>
+	<string name="115">재실행</string>
+	<string name="116">실행취소</string>
+	<string name="117">잘라내기</string>
+	<string name="118">복사</string>
+	<string name="120">이동</string>
+	<string name="122">선택 항목을 대문자로 출력</string>
+	<string name="123">선택 항목을 소문자로 출력</string>
+	<string name="124">SQL 창의 선택항목에 코멘트</string>
+	<string name="125">선택항목에서 코멘트 제거</string>
+	<string name="126">템플릿 삽입</string>
+	<string name="127">모든 태그 표시</string>
+	<string name="128">매칭되는 태그 표시</string>
+	<string name="224">함수와 루틴 파라미터 표시</string>
+	<string name="129">히스토리탭 열기</string>
+	<string name="130">정보 탭 열기</string>
+	<string name="131">쿼리 실행</string>
+	<string name="132">현재 쿼리 실행하고 결과 편집</string>
+	<string name="133">쿼리 실행 (디폴트)</string>
+	<string name="135">모든 쿼리(들) 실행 (디폴트)</string>
+	<string name="137">현재 쿼리 초기화</string>
+	<string name="138">선택한 쿼리 초기화</string>
+	<string name="140">SQL 스테이트먼트 붙여넣기</string>
+	<string name="141">스테이트먼트 삽입</string>
+	<string name="142">스테이트먼트 업데이트</string>
+	<string name="143">스테이트먼트 삭제</string>
+	<string name="144">스테이트먼트 선택</string>
+	<string name="146">대화 삽입 업데이트</string>
+	<string name="147">결과 창의 활성화된 탭에 포커스 유지</string>
+	<string name="148">결과 창/그리드 사이의 테이블 데이터/문자열 모드 전환</string>
+	<string name="149">테이블 데이터를 CSV, Excel, SQL 등으로 내보내기</string>
+	<string name="150">SQL 덤프로 백업</string>
+	<string name="151">CSV 에서 가져온 데이터</string>
+	<string name="152">결과셋 내보내기</string>
+	<string name="153">외국어 키보드 보기</string>
+	<string name="154">결과 창에서 탭 선택 (1에서 8)</string>
+	<string name="155">결과 창에서 가장 마지막 탭 선택</string>
+	<string name="156">표시/숨기기</string>
+	<string name="157">대상 브라우저 표시/숨기기</string>
+	<string name="158">결과 창 보기/숨기기</string>
+	<string name="159">쿼리 창 보기/숨기기</string>
+	<string name="160">데이터베이스/테이블</string>
+	<string name="161">데이터베이스 정의하기</string>
+	<string name="162">데이터베이스/테이블 구조/인덱스/보기/Proc 저장/함수/트리거/이벤트 변경</string>
+	<string name="163">테이블/보기/트리거/이벤트 이름 변경</string>
+	<string name="164">데이터베이스/테이블 저장공간삭제</string>
+	<string name="165">인덱스 창 관리하기</string>
+	<string name="166">관계형/외래 키</string>
+	<string name="167">컬럼 재배치</string>
+	<string name="168">테이블 진단</string>
+	<string name="169">대화 동기화</string>
+	<string name="170">HTML 형식 데이터베이스를 위한 스키마 정의하기</string>
+	<string name="171">SQL 스크립트 실행</string>
+	<string name="172">PowerTools</string>
+	<string name="174">스키마 동기화 도구</string>
+	<string name="176">알림 서비스 마법사</string>		
+	<string name="177">예약된 백업 마법사</string>
+	<string name="182">사용자 관리자 열기</string>
+	<string name="184">현재 SQL을 즐겨찾기에 추가</string>
+	<string name="185">기타</string>
+	<string name="186">도움말</string>
+	<string name="187">복사</string>
+	<string name="188">전체 선택</string>
+	<string name="189">(SQL창/결과 창과 문자열 모드의 테이블 데이터/BLOB 뷰어) 찾기</string>
+	<string name="190">다음 (SQL창/결과 창과 문자열 모드의 테이블 데이터) 찾기</string>
+	<string name="192">이전 탭으로 전환</string>
+	<string name="193">다음 탭으로 이동</string>
+	<string name="194">선택한 항목 삭제</string>
+	<string name="225">언어 변경</string>
+	<string name="195">탭 닫기</string>
+	<string name="196">종료</string>
+	<string name="197">객체 브라우저 필터에 포커스 맞추기</string>
+	<string name="198">비주얼 데이터 비교</string>
+	
+	<string name="199">选择一个表格</string>
+	
+	<string name="200">下一处差别</string>
+	
+	<string name="201">上一处差别</string>
+	
+	<string name="202">타겟으로 통합</string>
+	
+	<string name="203">소스로 통합</string>
+	
+	<string name="204">편집 내용 적용</string>
+	
+	<string name="205">편집 취소</string>
+	
+	<string name="206">선택한 변경 내용 되돌림</string>
+</resources>

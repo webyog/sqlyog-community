@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3361">List Function and Routine Parameters	Ctrl+Shift+Space</string>
+	<string name="3362">Ye&amp;s to All</string>
+	<string name="3363">N&amp;o to All</string>
+	
+	<!-- Following strings are added in version 9.5 -->
+	
+	<string name="3364">&amp;Revert</string>
+	<string name="3365">&amp;4 Advanced</string>
+	<string name="3366">Engine</string>
+	<string name="3367">Co&amp;py All</string>
+	<string name="3368">Column Name</string>
+	<string name="3370">PK?</string>
+	<string name="3371">Not Null?</string>
+	<string name="3372">Binary?</string>
+	<string name="3373">Unsigned?</string>
+	<string name="3374">Auto Incr?</string>
+	<string name="3375">Zerofill?</string>
+	<string name="3376">Index Name</string>
+	<string name="3377">Index Type</string>
+	<string name="3378">Constraint Name</string>
+	<string name="3379">Referencing Columns</string>
+	<string name="3380">Referenced Database</string>
+	<string name="3381">Referenced Table</string>
+	<string name="3382">Referenced Columns</string>
+	<string name="3383">On Update</string>
+	<string name="3384">On Delete</string>
+	<string name="3385">Table name not specified</string>
+	<string name="3386">Column name and data type can not be empty</string>
+	<string name="3387">Data type not specified</string>
+	<string name="3388">Default empty string ('') is not supported for %s data type</string>
+	<string name="3389">Length must be specified for %s data type</string>
+	<string name="3390">There are no columns in this table. Define at least one column</string>
+	<string name="3391">Table created successfully</string>
+	<string name="3392">No columns defined</string>
+	<string name="3393">No columns selected</string>
+	<string name="3394">No referencing columns selected for the foreign key</string>
+	<string name="3395">Referenced database not selected</string>
+	<string name="3396">Referenced table not selected</string>
+	<string name="3397">No referenced columns selected for the foreign key</string>
+	<string name="3398">The number of referencing and referenced columns do not match</string>
+	<string name="3399">Data Type</string>
+	<string name="3400">Length</string>
+	<string name="3401">Select the required column(s). Use the up/down buttons to reorder.</string>
+	<string name="3402">No pending queries to be executed</string>
+	<string name="3403">Table created successfully.
+
+Do you want to create more tables?</string>
+	<string name="3404">The selected column is referenced by one or more indexes. Dropping these columns will also modify the corresponding indexes.
+
+Do you want to continue?</string>
+	<string name="3405">The selected column is referenced by one or more foreign keys. Dropping these columns will also modify the corresponding foreign keys.
+
+Do you want to continue?</string>
+	<string name="3406">The selected column is referenced by one or more indexes and foreign keys. Dropping these columns will also modify the corresponding indexes and foreign keys.
+
+Do you want to continue?</string>
+	<string name="3407">The selected columns are referenced by one or more indexes. Dropping these columns will also modify the corresponding indexes.
+
+Do you want to continue?</string>
+	<string name="3408">The selected columns are referenced by one or more foreign keys. Dropping these columns will also modify the corresponding foreign keys.
+
+Do you want to continue?</string>
+	<string name="3409">The selected columns are referenced by one or more indexes and foreign keys. Dropping these columns will also modify the corresponding indexes and foreign keys.
+
+Do you want to continue?</string>
+	<string name="3410">Multiple primary keys cannot be defined.</string>
+	<string name="3411">Do you want to drop this index?</string>
+	<string name="3412">Do you want to drop the selected index(es)?</string>
+	<string name="3413">Do you want to drop this foreign key?</string>
+	<string name="3414">Do you want to drop the selected Foreign Key(s)?</string>
+	<string name="3415">There in no direct way to ALTER a Foreign Key in MySQL.
+SQLyog will drop the existing one and create a new one using the existing name for the key.
+If necessary preconditions for a Foreign Key (matching data types, appropriate indexes etc.) are not met, the create process will fail. The result will be that existing FK is dropped and no new one is created.
+You can avoid this by specifying a new name for the key.
+
+Do you want to continue?</string>
+
+	<string name="3416">Do you want to drop this column?</string>
+	<string name="3417">Do you want to drop the selected column(s)?</string>
+	<string name="3418">Alter Table</string>
+	<string name="3419">Use database name</string>
+	<string name="3420">Insert new row (Alt+Ins)</string>
+	<string name="3421">Delete selected row(s) (Alt+Del)</string>
+	<string name="3422">Move up (Alt+Up)</string>
+	<string name="3423">Move down (Alt+Down)</string>
+	<string name="3424">Transfer Time</string>
+	<string name="3425">You cannot switch to another tab. Please create another connection (Ctrl+N)</string>
+	<string name="3426">Query execution in progress!</string>
+	<string name="3427">Abort on error</string>
+	
+	<string name="3428">as regular expression</string>
+	<string name="3429">Database collation</string>
+	<string name="3430">Copy Query To Clipboard</string>
+	<string name="3431">Copy Query To New Query Tab</string>
+	<string name="3432">Copy Query To Same Query Tab</string>
+	<string name="3434">Add Table(s) To Canvas</string>
+	<string name="3435">Create Table</string>
+	<string name="3436">Load Schema Design (Ctrl+O)</string>
+	<string name="3437">Refresh Canvas (F5)</string>
+	<string name="3438">Export Canvas As Image</string>
+	<string name="3439">Print</string>
+	<string name="3440">Zoom In</string>
+	<string name="3441">Zoom Out</string>
+	<string name="3443">Create View</string>
+	<string name="3444">Create Procedure</string>
+	<string name="3445">Create Trigger</string>
+	<string name="3446">Create Function</string>
+	<string name="3447">Create Event</string>
+	<string name="3448">In&amp;it Command(s)</string>
+	<string name="3449">(Seperate multiple commands with a semicolon ';')</string>
+	<string name="3450">Fonts &amp;&amp; Editor Settings</string>
+	<string name="3451">Ob&amp;ject Browser</string>
+	<string name="3452">Set &amp;foreign_key_checks = 0</string>
+	<string name="3453">Open Table in &amp;New Tab</string>
+	<string name="3458">&amp;Table Data</string>
+<!--string name="3459" is in file2.xml -->
+	<string name="3460">Open Table in &amp;New Tab	Ctrl+F11</string>
+	<string name="3461">Init Command(s)</string>
+	
+	<string name="3463">&amp;Table Data	F11</string>
+	<string name="3464">Background Color</string>
+	<string name="3465">Foreground Color</string>
+	<string name="3466">Select a Table/View from the Object Browser</string>
+	<string name="3467">Insert new column (Alt+Ins)</string>
+	<string name="3468">Delete selected columns(s) (Alt+Del)</string>
+	<string name="3469">Delete selected indexes(s) (Alt+Del)</string>
+	<string name="3470">Insert new index (Alt+Ins)</string>
+	<string name="3471">Delete selected FK(s) (Alt+Del)</string>
+	<string name="3472">Insert new FK (Alt+Ins)</string>
+	<string name="3477">Paging in Table Data/Result Tab</string>
+	<string name="3478">&amp;Default number of rows</string>
+	<string name="3479">Toolbar Size</string>
+	<string name="3480">Theme</string>
+	<string name="3481">Small</string>
+	<string name="3482">Normal</string>
+	<string name="3483">Large</string>
+	<string name="3484">E&amp;xecute All</string>
+	<string name="3486">( Note:Separate multiple queries by ; )</string>
+	<string name="3487">Add Tables/Views</string>
+	<string name="3488">&amp;Refresh	F9</string>
+	<string name="3489">Failed to generate %s query</string>
+	<string name="3490">SQLyog could not identify the database for the selected table. 
+
+Do you want to use the active database context?</string>
+	<string name="3491">No database selected. Please select a database and try again</string>
+</resources>

@@ -1,0 +1,102 @@
+<sqlyogtheme name="Twilight">
+	<framewindow>
+		<background color1="14339524" />
+		<!-- text active="16777215" inactive="16777215" / -->
+	</framewindow>
+	
+	<mdiclient>
+		<background color1="5585193" image="984" />
+	</mdiclient>
+	
+	<mdichild>
+		<background color1="5585193" />
+		<hyperlink color1="0xFFFFFF" />
+		<text 	active = "0xFFFFFF"/>
+	</mdichild>
+	
+	<menu>
+		<background color1="15658217" />
+		<foreground color2="10938623" color1="0xFFFFFF" />
+		<text active="0" inactive="8421504"/>
+		<seltext active="0" inactive="8421504"/>
+		<selected color1="0xE5C365" color2="0xE5C365" />
+	</menu>
+	
+	<menubar>
+		<background color1="0xB6C1D2" />
+		<foreground color2="10938623" color1="0xFFFFFF" />
+		<text active="0" inactive="8421504"/>
+		<seltext active="0" inactive="8421504"/>
+		<selected color1="0xE5C365" color2="0xE5C365" />
+	</menubar>
+	
+	<toolbar>
+		<background color1="14866898" />
+		<foreground color2="0xFFE8A6" color1="0xFFFFFF" />
+		<selected color1="0xE5C365" color2="0xE5C365" />
+		<!-- text active="16777215" inactive="16777215" / -->
+	</toolbar>
+	
+	<maintoolbar>
+		<background color1="14339524" />
+		<foreground color2="10938623" color1="0xFFFFFF" />
+		<selected color1="0xE5C365" color2="0xE5C365" />
+	</maintoolbar>
+	
+	<hsplitter>
+		<line color1="5585193" />
+		<background color1="7885370" />
+	</hsplitter>
+	
+	<vsplitter>
+		<line color1="5585193" />
+		<background color1="5585193" />
+	</vsplitter>
+	
+	<conntab tabbottomline="true">
+		<background color1="14339524" color2="14339524" />
+		<foreground color1="13218213" />
+		<selectedtab color2="13218213" />
+		<plusbutton color1="6770753" />
+		<closebutton color1="0xA1AEC7" />
+		<seperator highlight="0x303030" />
+	</conntab>
+	
+	<querytab tabbottomline="true">
+		<background color1="5585193" color2="5585193" />
+		<foreground color1="5585193" color2="0x5E6A7F" color3="0x5E6A7F"/>
+		<selectedtab color1="0xFFFFFF" color2="0xFCE198" />
+		<seperator active="8217172" inactive="0xFCE198" highlight="0xE3E7EB" />
+		<tabtext color1="16777215" />
+		<seltabtext color1="0" />
+		<plusbutton color1="16777215" />
+		<dragarrow color1="4210943" />
+		<closebutton color1="0xA1AEC7" />
+		<hyperlink color1="0xFFFF80" />
+	</querytab>
+	
+	<restab tabbottomline="true">
+		<background color1="0x465A7D" color2="0x465A7D" />
+		<foreground color1="0x465A7D" color2="0x5E6A7F" color3="0x5E6A7F"/>
+		<selectedtab color1="0xFFFFFF" color2="0xFCE198" />
+		<seperator active="8217172" inactive="0xFCE198" highlight="0xE3E7EB" />
+		<tabtext color1="16777215" />
+		<seltabtext color1="0" />
+		<plusbutton color1="16777215" />
+		<dragarrow color1="4210943" />
+		<closebutton color1="0xA1AEC7" />
+		<hyperlink color1="0xFFFF80" />
+	</restab>
+	
+	<tabletab tabbottomline="true" border="true">
+		<background color1="0x465A7D" color2="0x465A7D" />
+		<foreground color1="0x465A7D" color2="0x5E6A7F" color3="0x5E6A7F"/>
+		<selectedtab color1="0xFFFFFF" color2="0xFCE198" />
+		<seperator active="8217172" inactive="0xFCE198" highlight="16777215" />
+		<tabtext color1="16777215" />
+		<seltabtext color1="0" />
+		<plusbutton color1="16777215" />
+		<dragarrow color1="4210943" />
+		<hyperlink color1="0xFFFF80" />
+	</tabletab>
+</sqlyogtheme>

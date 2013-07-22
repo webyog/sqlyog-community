@@ -1,0 +1,266 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1480">읽기 전용 결과</string>
+	<string name="1481">목록을 갱신하려면 여기를 클릭하세요</string>
+	<string name="1482">계산 중지</string>
+	<string name="1483">최적 데이터형 숨기기</string>
+	<string name="1484">중복 인덱스 찾기</string>
+	<string name="1485">중복 인덱스 정보 숨기기</string>
+	<string name="1486">파워 툴 옵션 (Professional/Enterprise/Ultimate만 가능)</string>
+	<string name="1487">SQL 포멧터 옵션 (Enterprise/Ultimate만 가능]</string>
+	<string name="1488">쿼리 프로파일러는 SQLyog의 Ultimate 버전에서만 사용할 수 있습니다.&lt;br>&amp;nbsp;&lt;br>SQLyog Ultimate를 구입하려면 &lt;a href=&quot;http://www.webyog.com/en/buy.php?ref=community.queryprofiler &quot; target=&quot;_blank&quot;>여기를 클릭&lt;/a> &lt;br>&amp;nbsp;&lt;br>  쿼리 프로파일러 특징:&lt;UL>  &lt;LI>SQL 문제 식별을 도와줍니다  &lt;LI>SQL 튜닝을 도와줍니다 &lt;LI>올바른 인덱스 생성을 도와줍니다 &lt;LI>쿼리를 분석하고 최적화합니다 &lt;LI>쿼리 실행 각 단계별로 정확한 소요 시간을 보고합니다  &lt;LI>보다 좋은 SQL작성을 도와줍니다  &lt;LI>인덱스가 효과적으로 사용되고 있는지 알려줍니다  &lt;LI>응용 프로그램의 전체 응답 시간을 향상시킬 수 있도록 합니다&lt;/UL></string>
+	<string name="1489">컬럼 이름 중복</string>
+	<string name="1490">Varchar 데이터형은 길이를 반드시 명시해야 합니다</string>
+	<string name="1491">Varbinary 데이터형은 길이를 반드시 명시해야 합니다</string>
+	<string name="1492">이 테이블에 컬렴이 존재하지 않습니다, 적어도 한 개의 컬럼을 정의하십시오</string>
+	<string name="1493">ALTER TABLE로 모든 컬럼을 삭제할 수 없습니다. 대신 DROP TABLE을 사용하십시오</string>
+	<string name="1494">컬럼명이 명시되지 않았습니다</string>
+	<string name="1495">컬럼명 (%s)의 데이터형이 명시되지 않았습니다</string>
+	<string name="1496">/* 오류 */</string>
+	<string name="1497">필드 이름 중복</string>
+	<string name="1498">테이블에 필드가 존재하지 않습니다, 적어도 한 개의 필드를 정의하세요</string>
+	<string name="1499">필드명이 명시되지 않았습니다</string>
+	<string name="1500">경고 보기</string>
+	<string name="1501">업데이트 정보를 찾을 수 없습니다.</string>
+	<string name="1502">SQLyog의 새로운 업데이트가 있습니다.
+최신 버전을 다운로드 받아 설치하십시오</string>
+	<string name="1503">SQLyog Professional의 새로운 업데이트가 있습니다.
+최신 버전을 다운로드 받아 설치하십시오</string>
+	<string name="1504">SQLyog Enterprise의 새로운 업데이트가 있습니다.
+최신 버전을 다운로드 받아 설치하십시오</string>
+	<string name="1505">SQLyog Ultimate의 새로운 업데이트가 있습니다.
+최신 버전을 다운로드 받아 설치하십시오</string>
+	<string name="1506">SQLyog 최신 버전을 사용하고 있습니다</string>
+	<string name="1507">SQLyog Professional 최신 버전을 사용하고 있습니다</string>
+	<string name="1508">SQLyog Enterprise 최신 버전을 사용하고 있습니다</string>
+	<string name="1509">SQLyog Ultimate 최신 버전을 사용하고 있습니다</string>
+	<string name="1510">업데이트 확인...</string>
+	<string name="1511">(삽입하려면 탭키를 누르세요)</string>
+	<string name="1512">태그 파일 재생성 완료</string>
+	<string name="1513">태그 파일 생성 완료</string>
+	<string name="1514">태그 파일 재생성 중</string>
+	<string name="1515">태그 파일 생성 중</string>
+	<string name="1516">프라이빗 키 경로를 입력하세요.</string>
+	<string name="1517">%s 테스트 메시지</string>
+	<string name="1518">이것은 SMTP 계정 설정을 테스트하기 위해, %s의 계정 관리자가 자동으로 보내는 이메일 메시지 입니다.</string>
+	<string name="1519">테스트 메일 전송 중 오류.
+%s</string>
+	<string name="1520">테스트 메일 전송 성공</string>
+	<string name="1521">HTTP 터널링을 선택했습니다. 정확한 URL을 입력하세요.</string>
+	<string name="1522">데이터베이스 이름을 입력하세요.</string>
+	<string name="1523">데이터베이스를 선택하세요.</string>
+	<string name="1524">작업 파일명을 입력하세요.</string>
+	<string name="1525">작업 파일을 생성할 수 없습니다.</string>
+	<string name="1526">이름을 입력하세요.</string>
+	<string name="1527">수신자 이메일 주소를 입력하세요.</string>
+	<string name="1528">발신자 이메일 주소를 입력하세요.</string>
+	<string name="1529">SMTP 서버 주소를 입력하세요.</string>
+	<string name="1530">SMTP 서버 포트 번호를 입력하세요</string>
+	<string name="1531">계정 이름을 입력하세요</string>
+	<string name="1532">비밀번호를 입력하세요.</string>
+	<string name="1533">%s
+파일을 찾을 수 없거나/오류가 있습니다!. %s 를 다시 설치해야 합니다.</string>
+	<string name="1534">평가기간 동안 고객지원 받기!</string>
+	<string name="1535">포매팅 완료 성공</string>
+	<string name="1536">포매팅을 완료했으나 오류 발생</string>
+	<string name="1537">등록 : %s</string>
+	<string name="1538">등록 :</string>
+	<string name="1539">이 SQLyog 제품 %s는 %s에 등록되어 있습니다.</string>
+	<string name="1540">등록된 SQLyog 버전입니다</string>
+	<string name="1541">호스트 주소를 입력하세요.</string>
+	<string name="1542">포트 번호를 입력하세요.</string>
+	<string name="1543">PHP 터널러 URL을 입력하세요.</string>
+	<string name="1544">HTTP 타임아웃 값을 입력하세요.</string>
+	<string name="1545">ConnectToMySQL 실패</string>
+	<string name="1546">ConnectToMySQL 실행</string>
+	<string name="1547">ConnectToMySQL 종료</string>
+	<string name="1548">SSL 설정 되어 있지 않은 서버에 SSL를 통해 접속을 시도하고 있습니다.
+SQLyog는 일반모드로 계속 접속 하게 됩니다.</string>
+	<string name="1549">비밀번호&amp;</string>
+	<string name="1550">비밀번호 저장&amp;</string>
+	<string name="1551">패스프레이즈&amp;</string>
+	<string name="1552">패스프레이즈 저장&amp;</string>
+	<string name="1553">태그 재생성 중지&amp;</string>
+	<string name="1554">태그 생성 중지&amp;</string>
+	<string name="1555">태그 재생성&amp;</string>
+	<string name="1556">태그 생성&amp;</string>
+	<string name="1557"> 자동완성: [Tab]->다음 태그. [Ctrl+Space]->모든 태그 목록. [Ctrl+Enter]->태그와 일치하는 목록.</string>
+	<string name="1558">Plink를 시작할 수 없습니다</string>
+	<string name="1559">SSH 서버의 사용자 이름을 입력하십시오</string>
+	<string name="1560">SSH 서버의 비밀번호를 입력하십시오</string>
+	<string name="1561">SSH 서버의 호스트 주소를 입력하십시오</string>
+	<string name="1562">SSH 서버의 포트 번호를 입력하십시오</string>
+	<string name="1563">SQLyog.dll 로딩 오류</string>
+	<string name="1564">검색조건에 맞는 데이터가 없습니다</string>
+	<string name="1565">선택한 레벨에서는 검색이 지원되지 않습니다</string>
+	<string name="1566">전체 데이터베이스 %s에서 검색</string>
+	<string name="1567">&apos;%s&apos; 데이터베이스 모든 테이블 %s에서 검색</string>
+	<string name="1568">&apos;%s&apos; 테이블 모든 컬럼 %s에서 검색</string>
+	<string name="1569">컬럼 &apos;%s&apos;.&apos;%s&apos;.&apos;%s&apos;에서 검색</string>
+	<string name="1570">변경하려면 클릭</string>
+	<string name="1571">검색</string>
+	<string name="1572">앞서 인덱스된 페이지를 조회할 수 없습니다. 첫 페이지 또는 새로운 검색을 시도하십시오</string>
+	<string name="1573">첫 페이지를 조회할 수 없습니다. 다시 검색해 주십시오</string>
+	<string name="1574">데이터 검색</string>
+	<string name="1575">검색 중지...</string>
+	<string name="1576">검색 초기화...</string>
+	<string name="1577">처음</string>
+	<string name="1578">이전</string>
+	<string name="1579">다음</string>
+	<string name="1580">데이터 세트를 채우기 위한 정보 조회에 실패했습니다.</string>
+	<string name="1581">오류</string>
+	<string name="1582">정규식에 오류가 있습니다</string>
+	<string name="1583">`%s`.`%s`.`%s`(으)로 검색</string>
+	<string name="1584">테이블 %d 검색</string>
+	<string name="1585">선택한 데이터형의 컬럼이 없습니다</string>
+	<string name="1586">선택한 레벨에 해당하는 테이블이 없습니다</string>
+	<string name="1587">클라이언트 오류로 %d 테이블 이후 검색이 중단되었습니다</string>
+	<string name="1588">%d 테이블 이후 검색이 중단되었습니다</string>
+	<string name="1589">`%s`.`%s`.`%s` 에서 검색 중</string>
+	<string name="1590">`%s`.`%s`에서 검색 중</string>
+	<string name="1591">이 서버에는 데이터베이스가 존재하지 않습니다</string>
+	<string name="1592">데이터베이스</string>
+	<string name="1593">%s %s 에서 검색</string>
+	<string name="1594">%s와 1개의 다른 데이터베이스 %s에서 검색</string>
+	<string name="1595">%s와 다른 데이터베이스 %s에서 검색</string>
+	<string name="1596">%s와 %d개 다른 데이베이스 %s에서 검색</string>
+	<string name="1597">%s, 와 %d개의 다른 데이터베이스 %s에서 검색</string>
+	<string name="1598">이 데이터베이스에 테이블이 존재하지 않습니다</string>
+	<string name="1599">테이블</string>
+	<string name="1600">`%s` 데이터베이스 %s %s에서 검색</string>
+	<string name="1601">`%s` 데이터베이스 %s 와 1개의 다른 테이블 %s에서 검색</string>
+	<string name="1602">`%s` 데이터베이스 %s에서 검색</string>
+	<string name="1603">`%s` 데이터베이스 %s 와 1개의 다른 테이블 %s에서 검색</string>
+	<string name="1604">`%s` 데이터베이스 %s 와 %d개의 다른 테이블 %s에서 검색</string>
+	<string name="1605">`%s` 데이터베이스 %s 와 %d개의 다른 테이블 %s에서 검색</string>
+	<string name="1606">`%s` 데이터베이스 %s 와 %d개의 다른 테이블 %s에서 검색</string>
+	<string name="1607">`%s` 데이터베이스 %s 와 %d개의 다른 테이블 %s에서 검색</string>
+	<string name="1608">이 테이블에 컬럼이 존재하지 않습니다.</string>
+	<string name="1609">컬럼</string>
+	<string name="1610">`%s` 테이블 모든 컬럼에서 검색</string>
+	<string name="1611">`%s` 테이블 %s에서 검색</string>
+	<string name="1612">`%s` 데이터베이스 %s 와 1개의 다른 컬럼에서 검색</string>
+	<string name="1613">`%s` 테이블 %s 와 1개의 다른 컬럼에서 검색</string>
+	<string name="1614">`%s` 테이블 %s 와 2개의 다른 컬럼에서 검색</string>
+	<string name="1615">`%s` 테이블 %s 와 %d개의 다른 컬럼에서 검색</string>
+	<string name="1616">`%s` 에 테이블 %s에 검색, 그리고 %d 개의 다른 열</string>
+	<string name="1617">(모든 데이터형)</string>
+	<string name="1618">(numeric</string>
+	<string name="1619">, short string</string>
+	<string name="1620">(short string</string>
+	<string name="1621">, 날짜/시간</string>
+	<string name="1622">(date/time</string>
+	<string name="1623">, 이진</string>
+	<string name="1624">(binary</string>
+	<string name="1625">와 &apos;%s&apos;</string>
+	<string name="1626">잘못된 작업 파일.</string>
+	<string name="1627">작업 파일을 열 수 없습니다.</string>
+	<string name="1628">소스 서버의 세부사항이 제공되지 않았습니다.</string>
+	<string name="1629">배치 스크립트 마법사로 데이터 내보내기</string>
+	<string name="1630">모든 데이터베이스용 단일 파일</string>
+	<string name="1631">각 데이터베이스에 대한 별도 파일</string>
+	<string name="1632">[주의: 이 옵션은 SQL 파일에 여러 테이블의 데이터를 백업할 수 있습니다. SQLyog은 각각의 데이터베이스별로 db_{databasename}.sql 파일을 생성합니다.]</string>
+	<string name="1633">모든 객체용 단일 파일</string>
+	<string name="1634">객체별 별도 파일</string>
+	<string name="1635">[주의: 이 옵션은 SQL파일에 여러 테이블의 데이터를 백업할 수 있습니다. SQLyog은 각 테이블별로 tbl_{tablename}.sql 파일을 생성합니다.]</string>
+	<string name="1636">[전체 - mysql 시스템 데이터베이스 포함]</string>
+	<string name="1637">[전체 - mysql 시스템 데이터베이스 제외]</string>
+	<string name="1638">SQLyog의 백업 스케줄 마법사에 오신것을 환영합니다!</string>
+	<string name="1639">이 마법사는 SQL 덤프로 각 단계별 데이터의 스케줄 내보내기를 설명하고 있습니다. 이 마법사를 사용하여 단일 SQL 파일 또는 여러 개의 파일로 데이터를 내보낼 수 있습니다.
+
+작업 파일은 작업 설정 항목을 저장하고 있습니다. 작업 파일은 나중에 같은 작업을 다시 실행할 때 사용할 수 있습니다.</string>
+	<string name="1640">*컬럼</string>
+	<string name="1641">컬럼</string>
+	<string name="1642">스케줄러를 초기화할 수 없습니다!</string>
+	<string name="1643">작업이 이미 존재합니다. 기존 작업을 교체하시겠습니까?</string>
+	<string name="1644">오류 발생! 작업 생성 실패</string>
+	<string name="1645">스케줄 이름을 입력하세요</string>
+	<string name="1646">작업 파일 저장 성공</string>
+	<string name="1647">MMF 생성하는 동안 오류 발생</string>
+	<string name="1648">MapViewOfFile 오류</string>
+	<string name="1649">SSH 오류:</string>
+	<string name="1650">이것은 SQLyog 시험판 버전입니다.
+한번에 2개의 객체만 선택할 수 있습니다.
+계속하려면 폴더를 확장해서 2개의 객체를 선택하세요.</string>
+	<string name="1651">이것은 SQLyog 시험판 버전입니다.
+한 번에 두 개의 테이블만 선택할 수 있습니다.</string>
+	<string name="1652">이것은 SQLyog 시험판 버전입니다.
+한 번에 하나의 데이터베이스만 내보낼 수 있습니다.</string>
+	<string name="1653">SQLyog 외부 데이터 가져오기 마법사</string>
+	<string name="1654">SQLyog의 외부 데이터 가져오기 마법사에 오신 것을 환영합니다!</string>
+	<string name="1655">이 마법사는 외부 데이터 가져오기 각 단계를 안내하고 데이터 가져오기 스케줄링 과정에 도움을 줄 것입니다.
+
+작업 파일은 작업 설정 항목을 저장하고 있습니다. 작업 파일은 나중에 같은 작업을 다시 실행할 때 사용할 수 있습니다.</string>
+	<string name="1656">테이블에 대한 올바른 SQL WHERE 절을 기술할 수 있습니다. WHERE 절을 만족하는 열만 가져올 수 있습니다.
+(주의: 구문에 WHERE를 포함하지 마십시오)</string>
+	<string name="1657">Access 데이터베이스의 외부 참조키와 같은 메타 데이터를 올바르게 가져오려면, Access 시스템 테이블에 권한이 있어야 합니다.
+(사용자 레벨 보안 기능은 새로운 파일 형식 .accdb, .accde, .accdc, .accdr에서 지원하지 않으니, 데이터베이스를 .mdb 파일 형식으로 저장했는지 확인하십시오).</string>
+	<string name="1658">기본적으로 데이터베이스는 텍스트 파일 드라이버로 가져오기를 실행합니다. 드라이버의 제한 사항은 다음과 같습니다 :
+
+1) 테이블은 최대 255개의 필드만을 가질 수 있습니다.
+2) 필드명은 64 글자로 제한되고, 필드 폭은 32,766 글자 수로 제한됩니다.
+3) 레코드는 65,000 바이트로 제한됩니다.</string>
+	<string name="1659">컬럼이 없는 테이블을 가져올 수 없습니다.</string>
+	<string name="1660">작업 파일 이름을 입력하세요</string>
+	<string name="1661">작업 파일 오류</string>
+	<string name="1662">SQL 환경 설정 오류</string>
+	<string name="1663">ODBC 드라이버가 3.0과 호환 되지 않습니다. ODBC 3.0 호환 드라이버를 설치하세요.</string>
+	<string name="1664">HDBC 접속을 초기화할 수 없습니다.</string>
+	<string name="1665">폴더명을 입력하세요.</string>
+	<string name="1666">파일명을 입력하세요.</string>
+	<string name="1667">ODBC 소스에 대한 세부사항을 입력하세요.</string>
+	<string name="1668">초기화 중 오류</string>
+	<string name="1669">ODBC 환경 초기화 오류</string>
+	<string name="1670">쿼리에 오류가 있습니다.</string>
+	<string name="1671">쿼리에 대한 결과가 없습니다.</string>
+	<string name="1672">SQL 구문이 잘못되었습니다.</string>
+	<string name="1673">SELECT한 테이블에서 어떤 Row 결과도 ODBC 소스가 받지 못했습니다.</string>
+	<string name="1674">작업명을 입력하세요.</string>
+	<string name="1675">임시 작업 파일을 생성할 수 없습니다.</string>
+	<string name="1676">가져오기 프로세스틑 정말 종료하시겠습니까?</string>
+	<string name="1677">SQL 구문이 정상입니다!</string>
+	<string name="1678">SQL 구문이 정상입니다!</string>
+	<string name="1679">이 기능은 현재 OS에서 지원하지 않습니다.</string>
+	<string name="1680">- 지금까지 실행되지 않음</string>
+	<string name="1681">- 가장 최근 실행 시간: %u/%u/%u:%u:%02u</string>
+	<string name="1682">이 작업을 정말 삭제하시겠습니까?</string>
+	<string name="1683">작업 삭제 성공</string>
+	<string name="1684">작업 초기화 성공</string>
+	<string name="1685">SMTP 서버에 접속할 수 없습니다.</string>
+	<string name="1686">전송 실패!</string>
+	<string name="1687">WinSock을 초기화 할 수 없습니다</string>
+	<string name="1688">WinSock용 버전 1.1 인스턴스를 생성할 수 없습니다</string>
+	<string name="1689">호스트를 알 수 없습니다</string>
+	<string name="1690">소켓을 생성할 수 없습니다</string>
+	<string name="1691">입력한 서버와 포트로 접속할 수 없습니다</string>
+	<string name="1692">서버에 접속할 수 없습니다.</string>
+	<string name="1693">시간 초과 오류</string>
+	<string name="1694">서버로 데이터를 전송할 수 없습니다</string>
+	<string name="1695">잘못된 수신자</string>
+	<string name="1696">일반 인증은 SJA에서 지원하지 않습니다</string>
+	<string name="1697">CRAM-MD5 인증은 SJA에서 지원하지 않습니다</string>
+	<string name="1698">SMTP 인증 실패</string>
+	<string name="1699">사용자 인증을 위한 사용자 이름 또는 비밀번호가 입력되지 않았습니다</string>
+	<string name="1700">SMTP 계정 이름과 비밀번호가 일치하지 않습니다.</string>
+	<string name="1701">SQL 스케줄러와 리포팅 도구</string>
+	<string name="1702">SQL 스케줄러 및 리포팅 도구에 오신 것을 환영합니다!</string>
+	<string name="1703">이 마법사는 쿼리 실행 스케줄러의 각 단계를 설명하고 있습니다. 결과값은 여러 명의 수신자에게 이메일로 보낼 수 있습니다. 또한, 이 기능은 ANALYZE, REPAIR와 같은 유지보수 쿼리를 실행하기 위해 사용할 수 있습니다.
+
+작업 파일은 작업 설정 항목을 저장하고 있습니다. 작업 파일은 나중에 같은 작업을 다시 실행할 때 사용할 수 있습니다.</string>
+	<string name="1704">정확한 쿼리를 입력하였습니다</string>
+	<string name="1705">알림 프로세스를 정말 종료하시겠습니까?</string>
+	<string name="1706">작업 파일 오류 : %s 번째 줄 %d</string>
+	<string name="1707">소스 서버 정보가 완전하지 않습니다</string>
+	<string name="1708">적어도 한 개의 쿼리를 기술해야 합니다</string>
+	<string name="1709">SMTP 호스트 주소를 입력하세요.</string>
+	<string name="1710">이메일 &quot;발신자명&quot;을 입력하세요.</string>
+	<string name="1711">수신자 이메일 주소를 제공해야 합니다.</string>
+	<string name="1712">경고 : 이메일에 제목이 없습니다.</string>
+	<string name="1713">사용자 인증을 위해 &quot;로그인 명&quot;을 입력하세요.</string>
+	<string name="1714">사용자 인증을 위해 &quot;비밀번호&quot;를 입력하세요.</string>
+	<string name="1715">HTTP 터널링 URL을 입력하세요.</string>
+	<string name="1716">SSH 서버 호스트를 입력하세요.</string>
+	<string name="1717">적어도 한 개의 쿼리를 입력하세요.</string>
+	<string name="1718">파일에 쿼리가 없습니다.</string>
+	<string name="1719">파이프 프로세스를 생성할 수 없습니다.</string>
+</resources>

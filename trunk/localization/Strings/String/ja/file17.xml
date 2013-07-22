@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3595">Microsoft Office用の64bitドライバが見つかりません。ダウンロード</string>
+	<string name="3596">最初のバッチの差異%.*sを確認しています</string>
+	<string name="3597">次のバッチの差異%.*sを確認しています</string>
+	<string name="3598">以前のバッチの差異%.*sを確認しています</string>
+	<string name="3599">表が存在していません</string>
+	<string name="3600">Schemaが合っていません! それを直すにはSchema Synchronization Toolを利用して下さい。</string>
+	<string name="3601">プライマリキー/ユニークキーのない表の比較はサポートされていません。</string>
+	<string name="3602">現在のテーブルには、保存されていない変更があります。</string>
+	<string name="3603">１個以上の開いた%sインスタンスがあります。SQLyogを閉じるために、インスタンスを閉じてください。</string>
+	<string name="3604">継続しますか？</string>
+	<string name="3605">プロファイラー</string>
+</resources>

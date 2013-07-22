@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  
+    	<language>
+		<ja langname="日本語" />
+		<zh-cn langname="简体中文" />
+		<ko langname="한국어" />
+    	</language>
+	
+	<pattern>%([-+]?(0| |#)?)?(\*|[0-9]+)?(\.(\*|[0-9]+))?(h|l|ll|I|I32|I64)?(c|C|d|i|o|u|x|X|e|E|f|g|G|a|A|n|p|s|S)</pattern>
+	
+	<version>2</version>
+	
+</config>

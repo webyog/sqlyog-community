@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3595">Microsoft Office용 64비트 드라이버를 찾을 수 없습니다. 다운로드 하려면</string>
+	<string name="3596">차집합%.*s 첫 번째 배치 검색 중</string>
+	<string name="3597">차집합%.*s 다음 배치 검색 중</string>
+	<string name="3598">차집합%.*s 이전 배치 검색 중</string>
+	<string name="3599">테ㅇ</string>
+	<string name="3600">스키마 불일치! 수정하려면 스키마 동기화 도구를 이용하세요.</string>
+	<string name="3601">기본 키/유일 키가 없는 테이블 비교는 지원하지 않습니다.</string>
+	<string name="3602">현재 테이블에 저장되지 않은 변경사항이 있습니다.</string>
+	<string name="3603">%s의 한 개 이상의 인스턴스가 열려 있습니다. SQLyog를 종료하려면, 이들을 닫아 주시기 바랍니다.</string>
+	<string name="3604">계속하시겠습니까?</string>
+	<string name="3605">프로파일러</string>
+</resources>

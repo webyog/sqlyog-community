@@ -1,0 +1,272 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="1720">제목을 입력하십시오</string>
+	<string name="1721">올바르지 않은 로그파일명</string>
+	<string name="1722">실행할 쿼리가 파일에 존재하지 않습니다</string>
+	<string name="1723">쿼리 프로파일러 활성화하기 (Ultimate만 가능)</string>
+	<string name="1724">태그파일을 저장할 폴더 선택</string>
+	<string name="1725">EXPLAIN 결과</string>
+	<string name="1726">EXPLAIN EXTENDED 정보</string>
+	<string name="1727">SHOW PROFILE 결과 (기간으로 정렬)</string>
+	<string name="1728">가동 시간</string>
+	<string name="1729">플러쉬_이후_가동시간_상태</string>
+	<string name="1730">&lt;UL>&lt;LI>&apos;환경설정&apos;에서 이 옵션을 활성화 했기 때문에, SELECT 문 실행 시 쿼리 프로파일 정보는 여기에 표시됩니다 &lt;LI>SELECT 문만 쿼리 프로파일러에서 지원합니다 &lt;LI></string>
+	<string name="1731">주의: &lt;a href=&quot;pref_others &quot; target=&quot;_blank&quot;>결과 탭에서 자동페이징&lt;/a>이 선택되었기 때문에 SQLyog이 추가한 LIMIT 구문이 있는 쿼리 결과가 아래와 같이  표시됩니다</string>
+	<string name="1732">쿼리 프로파일러 옵션을 선택하지 않았습니다. 도구->선택 에서 옵션을 하나 이상 선택하십시오.</string>
+	<string name="1733">쿼리 프로파일러는 HTTP-터널을 사용할 수 없습니다</string>
+	<string name="1734">* 쿼리 실행 후 실제 값 (쿼리로 인해 변경되지 않음)</string>
+	<string name="1735"># 전역 변수 (연결된 모든 클라이언트의 작업에 영향 받음)</string>
+	<string name="1736">이 버전의 MySQL은 세션 변수를 지원하지 않습니다. 목록에 있는 모든 상태 변수는 전역변수입니다(연결된 모든 클라이언트의 작업에 영향받음)</string>
+	<string name="1737">쿼리를 실행하는 동안 재접속이 발생했습니다. 해당하는 정보가 없습니다.</string>
+	<string name="1738">프로필 정보를 찾을 수 없습니다, 다시 한 번 쿼리를 실행해 주십시오.</string>
+	<string name="1739">이 MySQL 서버 버전은 EXPLAIN EXTENDED 정보를 지원하지 않습니다.</string>
+	<string name="1740">이 MySQL 버전은 SHOW PROFILE을 지원하지 않습니다.</string>
+	<string name="1741">쿼리 실행으로 상태 변수 변경</string>
+	<string name="1742">이 분석은 MySQL 5.0 이상에서 가능합니다.</string>
+	<string name="1743">이 테이블을 위한 인덱스가 정의되지 않음</string>
+	<string name="1744">데이터베이스에서 테이블을 찾을 수 없습니다</string>
+	<string name="1745">메모리 부족, 작업을 계속할 수 없습니다</string>
+	<string name="1746">SQLyog %s - MySQL GUI를 등록해 주셔서 감사합니다.</string>
+	<string name="1747">SQLyog %s - MySQL GUI를 등록해 주셔서 감사합니다.
+모든 설정을 적용하려면 SQLyog를 다시 실행해 주십시오</string>
+	<string name="1748">평가판 사용기간이 만료되었습니다.</string>
+	<string name="1749">SQLyog의 &quot;모든 기능이 포함된&quot; 버전입니다</string>
+	<string name="1750">라이선스 키를 얻을 수 있는 SQLyog 구매처:</string>
+	<string name="1751">라이선스 키를 입력하십시오</string>
+	<string name="1752">테이블이 비어있습니다. 데이터가 없으면 이 테이블의 데이터형을 최적화 할 수 없습니다.</string>
+	<string name="1753">메모리가 부족하여 작업을 완료할 수 없습니다</string>
+	<string name="1754">테이블</string>
+	<string name="1755">하나 이상의 %s을 선택하십시오.</string>
+	<string name="1756">하나 이상의 데이터형을 선택하십시오.</string>
+	<string name="1757">컬럼</string>
+	<string name="1758">모든 컬럼</string>
+	<string name="1759">SQLyog 데이터베이스 동기화 마법사</string>
+	<string name="1760">SQLyog 데이터베이스 동기화 마법사에 오신 것을 환영합니다!</string>
+	<string name="1761">이 마법사는 두 데이터베이스 간의 동기화 과정을 안내하고 동기화 스케줄링 과정에 도움을 줄 것입니다.
+
+작업 파일은 이 작업 구성을 저장합니다. 나중에 같은 작업을 다시 할 경우 이 작업 파일을 사용할 수 있습니다.</string>
+	<string name="1762">오류 번호 2003
+
+&apos;localhost&apos;에서 MySQL 서버에 접속할 수 없습니다</string>
+	<string name="1763">이미 [모든] 테이블을 선택했습니다</string>
+	<string name="1764">`%s` 의 모든 필드 보기</string>
+	<string name="1765">[%s] 테이블에서 하나 이상의 컬럼을 선택하십시오</string>
+	<string name="1766">[%s] 테이블의 잘못된 WHERE 구문
+
+%s</string>
+	<string name="1767">임시 작업 파일을 생성할 수 없습니다.</string>
+	<string name="1768">파일 매핑 생성 오류</string>
+	<string name="1769">소스 서버 정보가 완전하지 않습니다</string>
+	<string name="1770">목적지 서버 정보가 완전하지 않습니다</string>
+	<string name="1771">하나 이상 테이블을 지정해야 합니다.</string>
+	<string name="1772">테이블 이름이 지정되지 않았습니다</string>
+	<string name="1773">&apos;%s&apos; 테이블에 하나 이상의 컬럼을 정의해 주십시오</string>
+	<string name="1774">HTTP 터널 URL을 지정해 주십시오</string>
+	<string name="1775">SSH 호스트 정보를 제공해 주십시오.</string>
+	<string name="1776">정말로 동기화 과정을 종료하시겠습니까?</string>
+	<string name="1777">소스 데이터베이스를 선택해주십시오</string>
+	<string name="1778">타겟 데이터베이스를 선택해 주십시오</string>
+	<string name="1779">이 SQLyog 버전의 데이터 싱크는 MySQL 서버 버전 4.1.1. 이상과 작업이 가능합니다. 정의된 서버에 하나 이상의 낮은 버전이 존재합니다. 문제 해결을 위해 Webyog에 연락해 주십시오</string>
+	<string name="1780">이 SQLyog 버전의 데이터 싱크는 MySQL 서버 버전 4.1.1. 이상과 작업이 가능합니다. 정의된 서버에 하나 이상의 낮은 버전이 존재합니다. 문제 해결을 위해 Webyog에 연락해 주십시오</string>
+	<string name="1781">경고 !!! 파일 매핑 객체 (%d)를 열 수 없습니다.</string>
+	<string name="1782">마지막 세 개의 체크박스 중 적어도 한 개의 선택을 해제하여 주십시오.
+체크한 3개 모두 동기화할 내용이 없습니다.</string>
+	<string name="1783">타겟의 스키마가 변경됩니다. 계속하시겠습니까?</string>
+	<string name="1784">테이블 비교</string>
+	<string name="1785">뷰 비교</string>
+	<string name="1786">저장 프로시저 비교</string>
+	<string name="1787">이벤트 비교</string>
+	<string name="1788">함수 비교</string>
+	<string name="1789">트리거 비교</string>
+	<string name="1790">키 파일을 읽을 수 없습니다.</string>
+	<string name="1791">저장할 것이 없습니다!</string>
+	<string name="1792">비교 실패</string>
+	<string name="1793">비교 완료</string>
+	<string name="1794">/* 삭제된 외부키가 다시 생성되었습니다*/</string>
+	<string name="1795">/* 변경 사항이 확실하게 반영되려면 외부키는 대상에서 삭제되어야 합니다*/</string>
+	<string name="1796">객체 브라우저에서 테이블을 드래그하거나 오른쪽 버튼 클릭 -> 테이블 추가</string>
+	<string name="1797">객체 브라우저에서 테이블/뷰를 드래그 하거나 오른쪽 버튼 클릭 -> 테이블/뷰 추가</string>
+	<string name="1798">컬럼을 선택하려면, 컬럼 이름을 더블클릭하거나 컬럼을 격자 안으로 끌어다 놓으십시오.</string>
+	<string name="1799">현재 쿼리 빌더는 단일 데이터베이스의 테이블/뷰만 지원합니다</string>
+	<string name="1800">애스터리스크(*)에 대한 조건을 지정할 수 없습니다</string>
+	<string name="1801">중복된 별명/테이블명</string>
+	<string name="1802">쿼리 빌더 파일을 열 수 없습니다.</string>
+	<string name="1803">데이터 베이스를 찾을 수 없음</string>
+	<string name="1804">%s 파일의 내용이 변경되었습니다.
+
+쿼리 디자인을 저장하시겠습니까?</string>
+	<string name="1805">현재 탭의 내용이 변경되었습니다.
+
+쿼리 디자인을 저장하시겠습니까?</string>
+	<string name="1806">쿼리 빌더를 종료하시겠습니까?</string>
+	<string name="1807">잘못된 쿼리 빌더 파일.</string>
+	<string name="1808">객체 브라우저에서 테이블을 드래그하거나 오른쪽 클릭 -> 테이블 추가 또는 캔버스 툴바 사용</string>
+	<string name="1809">하나의 스키마 디자이너 탭에는 같은 데이터베이스에 속한 테이블만 사용할 수 있습니다</string>
+	<string name="1810">선택한 테이블이 이미 캔버스에 존재합니다</string>
+	<string name="1811">정말로 이 외래키를 삭제하시겠습니까</string>
+	<string name="1812">스키마 설계 파일을 열 수 없습니다.</string>
+	<string name="1813">선택된 테이블이 없습니다</string>
+	<string name="1814">테이블이 일치하지 않습니다. 캔버스를 갱신하십시오.</string>
+	<string name="1815">출력할 것이 없습니다!</string>
+	<string name="1816">퍼센티지는 10에서 600까지만 가능합니다</string>
+	<string name="1817">새로 고침	F5&amp;</string>
+	<string name="1818">새로 고침	F9&amp;</string>
+	<string name="1819">메모리가 부족하여 비트맵을 생성할 수 없습니다. 실행 중인 다른 프로그램을 종료한 후 다시 시도해 주십시오.</string>
+	<string name="1820">인쇄 중 오류 발생</string>
+	<string name="1821">비트맵을 생성할 수 없습니다</string>
+	<string name="1822">비트맵을 생성할 수 없습니다. 메모리가 부족합니다!</string>
+	<string name="1823">잘못된 스키마 파일.</string>
+	<string name="1824">잘못된 스키마 디자인</string>
+	<string name="1825">데이터베이스 이름이 제공되지 않습니다.</string>
+	<string name="1826">잘못된 스키마 파일</string>
+	<string name="1827">CREATE Table 구문 오류</string>
+	<string name="1828">데이터베이스를 선택하지 않았습니다!</string>
+	<string name="1829">삭제할 컬럼 선택</string>
+	<string name="1830">테이블(%s)이 외국어 키를 지원하지 않습니다.
+테이블 엔진은 InnoDB, PBXT 나 SolidDB만 가능합니다.</string>
+	<string name="1831">%s 파일의 내용이 변경되었습니다.
+
+스키마 디자인을 저장하시겠습니까?</string>
+	<string name="1832">이 탭의 내용이 변경되었습니다.
+
+스키마 디자인을 저장하시겠습니까?</string>
+	<string name="1833">기본 프린터를 찾을 수 없음</string>
+	<string name="1834">기본 프린터 선택 중 오류 발생</string>
+	<string name="1835">프록시 서버 주소를 제공해 주십시오</string>
+	<string name="1836">프록시 서버 포트 번호를 지정해 주십시오</string>
+	<string name="1837">터널링 오류. HTTP 응답이 올바르지 않습니다, PHP 설정이 터널링 또는 이와 유사한 것을 허용하지 않을 수 있습니다. support@webyog.com로 HTTP 응답을 보낼 수 있습니다. &apos;고급&apos; 버튼 뒤에 있는 설정을 변경해 문제를 해결할 수도 있습니다.</string>
+	<string name="1838">HTTP 서버 접속 오류.</string>
+	<string name="1839">SQLyog 터널링 파일 버전 불일치 또는 PHP 오류.
+
+SQLyog설치 폴더에서 최신 버전 SQLyogTunnel.php를 업로드해 주십시오.</string>
+	<string name="1840">사용자가 쿼리를 중단했습니다.</string>
+	<string name="1841">터널페이지 응답 수신 오류.</string>
+	<string name="1842">PHP버전이 4.3.0보다 낮습니다. HTTP 터널링을 사용하려면 v4.3.0이상으로 업그레이드 해야 합니다.</string>
+	<string name="1843">HTTP 에러. 인증이 필요합니다!</string>
+	<string name="1844">HTTP 오류. 터널링 URL에 접속할 수 없습니다.</string>
+	<string name="1845">알 수 없는 HTTP 서버 오류</string>
+	<string name="1846">잘못된 구문으로 인해 서버가 요청을 처리할 수 없습니다.</string>
+	<string name="1847">요청한 리소스는 사용자 인증이 필요합니다.</string>
+	<string name="1848">HTTP 프로토콜에 구현되어 있지 않습니다.</string>
+	<string name="1849">서버가 요청을 이해했지만, 요청을 실행할 수 없습니다.</string>
+	<string name="1850">서버는 요청한 URI와 일치하는 것을 찾을 수 없습니다.</string>
+	<string name="1851">사용한 HTTP verb는 허용되지 않았습니다.</string>
+	<string name="1852">클라이언트에게 허용되는 응답을 찾을 수 없습니다</string>
+	<string name="1853">프록시 인증이 필요합니다.</string>
+	<string name="1854">서버가 요청을 기다리는 동안 제한 시간을 초과했습니다.</string>
+	<string name="1855">현재 자원 상태와 충돌로 요청을 처리할 수 없습니다.</string>
+	<string name="1856">요청한 자원은 서버에서 더 이상 사용할 수 없고 포워딩 주소를 알 수 없습니다.</string>
+	<string name="1857">서버는 정해진 길이에 맞지 않는 요청을 처리할 수 없습니다.</string>
+	<string name="1858">요청 헤더 필드에 있는 하나 이상의 전제 조건에 오류가 있습니다.</string>
+	<string name="1859">요청한 엔티티가 너무 크기 때문에 서버가 요청을 처리할 수 없습니다.</string>
+	<string name="1860">요청한 URI가 서버의 처리 가능 길이보다 길어서 요청을 처리할 수 없습니다.</string>
+	<string name="1861">개체가 지원되지 않는 형식으로 되어있으므로 서버는 요청을 처리할 수 없습니다.</string>
+	<string name="1862">적절한 조치를 취한 후 다시 시도하십시오.</string>
+	<string name="1863">서버에 예기치 않은 문제가 발생하여 요청을 처리할 수 없습니다.</string>
+	<string name="1864">서버가 요청 사항 수행에 필요한 기능을 지원하지 않습니다.</string>
+	<string name="1865">게이트웨이 혹은 프록시로 동작하는 서버가 업스트림 서버에서 잘못된 응답을 받았습니다.</string>
+	<string name="1866">서비스에 일시적 과부하가 발생했습니다.</string>
+	<string name="1867">요청 메시지에서 사용한 HTTP 프로토콜 버전은 서버에서 지원하지 않습니다.</string>
+	<string name="1868">HTTP 터널링을 사용해 MySQL 서버에 접속하는 것을 선택했습니다. 터널링 URL에서 접근할 수 있는 호스트 이름이 MySQL 호스트 주소에 포함되어 있는지 확인해 주십시오.
+
+HTTP 터널링에 대한 자세한 정보를 보시려면, 도움말 버튼을 눌러주십시오.</string>
+	<string name="1869">SSH 터널링을 사용해 MySQL 서버에 접속하는 것을 선택했습니다. MySQL 호스트 주소에 SSH 호스트로 접근할 수 있는 호스트 이름이 포함되어 있는지 확인해 주십시오.
+
+SSH 포트 포워딩에 대한 자세한 정보를 보시려면, 도움말 버튼을 눌러주십시오.</string>
+	<string name="1870">SSL 암호화로 MySQL서버 접속을 선택했습니다.
+서버가 SSL 암호화 접속을 허용하고 사용자가 SSL 접속하도록 구성되었는지 확인하십시오.
+
+SSL 암호화 접속 설정에 대한 자세한 정보를 보려면, Help 버튼을 누르십시오.</string>
+	<string name="1871">SSH 연결을 설정할 수 없습니다.
+SSH 서버가 동작 여부 및 사용자가 올바른 SSH 터널링 값을 입력했는지 확인하십시오.</string>
+	<string name="1872">스키마 생성</string>
+	<string name="1873">스키마를 생성할 테이블 선택</string>
+	<string name="1874">&amp;생성...</string>
+	<string name="1875">&amp;모두 선택</string>
+	<string name="1876">&amp;전체 선택 해제</string>
+	<string name="1877">취소&amp;</string>
+	<string name="1878">데이터베이스 복구</string>
+	<string name="1879">데이터베이스 복구</string>
+	<string name="1880">디렉토리 선택</string>
+	<string name="1881">복원할 테이블을 선택하십시오</string>
+	<string name="1882">전체 선택&amp;</string>
+	<string name="1883">주의: 이 옵션은 MySQL RESTORE TABLE 옵션을 사용합니다.</string>
+	<string name="1884">예</string>
+	<string name="1885">취소</string>
+	<string name="1886">스키마 동기화 도구</string>
+	<string name="1887">객체 숨기기와 무시하기</string>
+	<string name="1888">동일&amp;</string>
+	<string name="1889">타켓에서 변경&amp;</string>
+	<string name="1890">타겟에서 생성&amp;</string>
+	<string name="1891">타겟에서 지우기&amp;</string>
+	<string name="1892">비교&amp;</string>
+	<string name="1893">선택 전환&amp;</string>
+	<string name="1894">전체 삭제&amp;</string>
+	<string name="1895">모두 실행&amp;</string>
+	<string name="1896">다른 이름으로 저장&amp;</string>
+	<string name="1897">닫기&amp;</string>
+	<string name="1898">소스 선택 {연결 - 데이터베이스}</string>
+	<string name="1899">타겟 선택 {연결 - 데이터베이스}을 변경하면 타겟에 반영됩니다</string>
+	<string name="1900">주의: 다른 호스트에 있는 데이터베이스를 동기화 하려면, &apos;파일 -> 신규 접속&apos;으로 여러 개의 호스트에 접속하십시오. 연결된 모든 데이터베이스 목록이 드롭다운에 표시될 것입니다.</string>
+	<string name="1901">객체 선택</string>
+	<string name="1902">대상에 변경되는 객체</string>
+	<string name="1903">대상에서 생성되는 객체</string>
+	<string name="1904">비교</string>
+	<string name="1905">대상에서 삭제되는 객체</string>
+	<string name="1906">동일 객체</string>
+	<string name="1907">상태</string>
+	<string name="1908">테이블만</string>
+	<string name="1909">모든 객체</string>
+	<string name="1910">컬럼 순서 변경</string>
+	<string name="1911">컬럼 순서를 변경하려면 위/아래 버튼으로 순서를 변경한 후 순서 변경 버튼을 누르십시오.</string>
+	<string name="1912">컬럼 순서 변경</string>
+	<string name="1913">위로&amp;</string>
+	<string name="1914">아래로&amp;</string>
+	<string name="1915">순서 변경...</string>
+	<string name="1916">SQLyog 데이터베이스 동기화 마법사에 오신 것을 환영합니다!</string>
+	<string name="1917">이 마법사는 두 개의 데이터베이스를 동기화 하는 과정을 안내할 것입니다.
+
+이 마법사는 데이터베이스 동기화 스케쥴링에 대해서도 도움을 줄 것입니다.</string>
+	<string name="1918">새 작업 시작&amp;</string>
+	<string name="1919">저장된 작업 편집&amp;</string>
+	<string name="1920">소스</string>
+	<string name="1921">연결 복사</string>
+	<string name="1922">호스트 주소</string>
+	<string name="1923">HTTP 터널링 사용</string>
+	<string name="1924">URL</string>
+	<string name="1925">(초)</string>
+	<string name="1926">고급...</string>
+	<string name="1927">소켓 사용&amp;</string>
+	<string name="1928">파일 경로&amp;</string>
+	<string name="1929">사용자 이름</string>
+	<string name="1930">비밀번호</string>
+	<string name="1931">포트</string>
+	<string name="1932">압축 프로토콜 사용&amp;</string>
+	<string name="1933">세션 유휴 제한시간</string>
+	<string name="1934">기본값&amp;</string>
+	<string name="1935">SSH 터널링 사용&amp;</string>
+	<string name="1936">SSH 호스트&amp;</string>
+	<string name="1937">SSH 포트&amp;</string>
+	<string name="1938">공개키</string>
+	<string name="1939">개인키&amp;</string>
+	<string name="1940">SSL 암호화 사용&amp;</string>
+	<string name="1941">CA 인증&amp;</string>
+	<string name="1942">암호&amp;</string>
+	<string name="1943">인증 사용&amp;</string>
+	<string name="1944">클라이언트키&amp;</string>
+	<string name="1945">클라이언트 인증&amp;</string>
+	<string name="1946">대상</string>
+	<string name="1947">압축 프로토콜 사용&amp;</string>
+	<string name="1948">기본값&amp;</string>
+	<string name="1949">이 작업을 언제 실행하시겠습니까?</string>
+	<string name="1950">즉시 실행&amp;</string>
+	<string name="1951">옵션 저장&amp;</string>
+	<string name="1952">작업 파일 저장&amp;</string>
+	<string name="1953">윈도우즈 스케쥴러로 저장 &amp; 스케쥴&amp;</string>
+	<string name="1954">로그 파일&amp;</string>
+	<string name="1955">작업 실행 시 발생한 모든 오류를 로그 파일에 기록합니다.</string>
+	<string name="1956">컬럼 매핑 및 변환</string>
+	<string name="1957">소스:</string>
+	<string name="1958">목적지:</string>
+	<string name="1959">SQL 편집&amp;</string>
+</resources>

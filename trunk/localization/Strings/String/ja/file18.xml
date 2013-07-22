@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3606">(複数のデータベースを区切るには\";\"を使用します。すべてを表示する場合は空欄のままにします)</string>
+	<string name="3607">サーバーにPing送信中...</string>
+	<string name="3608">かかった時間</string>
+	<string name="3609">サーバーにPingを送信しました</string>
+	<string name="3610">Clearte&amp;xt プラグインを有効にする</string>
+	<string name="3611">タイムアウト</string>
+	<string name="3612">Keep-Alive 間隔</string>
+</resources>

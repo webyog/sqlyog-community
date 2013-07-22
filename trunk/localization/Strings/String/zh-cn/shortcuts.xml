@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="100">连接</string>
+	<string name="101">创建新连接</string>
+	<string name="102">以当前连接属性创建新连接</string>
+	<string name="103">断开当前连接</string>
+	<string name="104">切换到下一个连接</string>
+	<string name="105">切换到上一个连接</string>
+	<string name="106">选择连接（1到8）</string>
+	<string name="107">选择最后一个连接</string>
+	<string name="109">对象浏览器</string>
+	<string name="110">刷新对象浏览器（默认）</string>
+	<string name="111">切换焦点至对象浏览器</string>
+	<string name="112">SQL窗口</string>
+	<string name="113">新查询窗口</string>
+	<string name="114">切换焦点至SQL窗口</string>
+	<string name="115">重做</string>
+	<string name="116">撤销</string>
+	<string name="117">剪切</string>
+	<string name="118">粘贴</string>
+	<string name="120">转到</string>
+	<string name="122">将选中部分变为大写</string>
+	<string name="123"> 将选中部分变为小写</string>
+	<string name="124"> 在SQL窗口中对选中部分标注</string>
+	<string name="125"> 删除选中部分的注释</string>
+	<string name="126"> 插入模板</string>
+	<string name="127">列出所有标记</string>
+	<string name="128">列出匹配的标签</string>
+	<string name="224">列出函数和路由参数</string>
+	<string name="129">打开历史记录标签</string>
+	<string name="130">打开信息标签页</string>
+	<string name="131">查询执行</string>
+	<string name="132">执行当前查询并编辑结果</string>
+	<string name="133">执行查询（默认）</string>
+	<string name="135">执行全部查询（默认）</string>
+	<string name="137">格式化当前查询</string>
+	<string name="138">格式化选中的查询</string>
+	<string name="139">格式化所有查询</string>
+	<string name="140">粘贴SQL语句</string>
+	<string name="141">插入语句</string>
+	<string name="142">更新语句</string>
+	<string name="143">删除语句</string>
+	<string name="144">查询语句</string>
+	<string name="146">插入更新窗口</string>
+	<string name="147">将焦点切换至结果面板中的当前标签页</string>
+	<string name="148">切换结果窗口/表数据为数据表格/文字模式</string>
+	<string name="149">导出表数据为CSV，Excel，SQL等...</string>
+	<string name="150">备份数据库为SQL转储</string>
+	<string name="151">从CSV导入数据</string>
+	<string name="152">导出结果集</string>
+	<string name="153">打开外键查找</string>
+	<string name="154">选择结果窗口里的标签页（1到8）</string>
+	<string name="155">选择结果窗口里的最后一个标签页</string>
+	<string name="156">显示/隐藏</string>
+	<string name="157">显示/隐藏对象浏览器</string>
+	<string name="158">显示/隐藏结果面板</string>
+	<string name="159">显示/隐藏查询窗口</string>
+	<string name="160">数据库/表</string>
+	<string name="161">创建数据库</string>
+	<string name="162">修改数据库/表结构/索引/视图/存储过程/函数/触发器/事件</string>
+	<string name="163">重命名表/视图/触发器/事件</string>
+	<string name="164">截断数据库/表</string>
+	<string name="165">管理索引窗口</string>
+	<string name="166">关系/外键</string>
+	<string name="167">重新排序列</string>
+	<string name="168">表诊断</string>
+	<string name="169">输出对话框</string>
+	<string name="170">以HTML形式创建数据库结构</string>
+	<string name="171">执行SQL脚本</string>
+	<string name="172">工具</string>
+	<string name="174">架构同步工具</string>
+	<string name="176">通知服务向导</string>
+	<string name="177">计划备份向导</string>
+	<string name="182">打开用户管理器</string>
+	<string name="184">添加当前SQL至收藏</string>
+	<string name="185">其他</string>
+	<string name="186">帮助</string>
+	<string name="187">复制</string>
+	<string name="188">全选</string>
+	<string name="189">查找（SQL窗口/结果窗口和文字模式表数据/Blob查看器）</string>
+	<string name="190">查找下一个（SQL窗口/结果窗口和文字模式表数据/Blob查看器）</string>
+	<string name="192">切换到上一个标签页</string>
+	<string name="193">切换到下一个标签页</string>
+	<string name="194">删除选中部分</string>
+	<string name="225">改变语言</string>
+	<string name="195">关闭标签页</string>
+	<string name="196">退出</string>
+	<string name="197">将焦点放在对象浏览器过滤器上</string>
+	<string name="198">可视化数据对照</string>
+	
+	<string name="199">选择一个表格</string>
+	
+	<string name="200">下一处差别</string>
+	
+	<string name="201">上一处差别</string>
+	
+	<string name="202">合并至目标</string>
+	
+	<string name="203">合并至源头</string>
+	
+	<string name="204">实施更改</string>
+	
+	<string name="205">还原更改</string>
+	
+	<string name="206">还原所选更改</string>
+</resources>

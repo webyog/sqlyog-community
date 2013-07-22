@@ -1,0 +1,790 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Template|Win32">
+      <Configuration>Template</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Template|x64">
+      <Configuration>Template</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{040BE517-FD94-46E0-89F6-07F29CA8750E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Template|x64'">..\bin\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Template|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../include;../include/scintilla;../include/mysql;../include/htmlayout;../include/pcre;../include/tinyxml;../include/vld;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_WIN32_WINNT=0x500;COMMUNITY;UNICODE;_UNICODE;PCRE_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <ProgramDataBaseFileName>$(IntDir)vc70_t.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>shfolder.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT; LIBC;LIBCD;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
+    </Link>
+    <Manifest>
+      <EnableDPIAwareness>true</EnableDPIAwareness>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../include;../include/scintilla;../include/mysql;../include/htmlayout;../include/pcre;../include/tinyxml;../include/vld;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;WIN64;_DEBUG;_WINDOWS;_WIN32_WINNT=0x500;COMMUNITY;UNICODE;_UNICODE;PCRE_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <ProgramDataBaseFileName>$(IntDir)vc70_t.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level1</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>shfolder.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT; LIBC;LIBCD;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
+    </Link>
+    <Manifest>
+      <EnableDPIAwareness>true</EnableDPIAwareness>
+    </Manifest>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN64</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>../include;../include/scintilla;../include/mysql;../include/htmlayout;../include/pcre;../include/tinyxml;../include/vld;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_WIN32_WINNT=0x500;SCI_LEXER;STATIC_BUILD;COMMUNITY;_UNICODE;UNICODE;PCRE_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <ProgramDataBaseFileName>$(IntDir)vc70.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>shfolder.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCD;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
+    </Link>
+    <Manifest>
+      <EnableDPIAwareness>true</EnableDPIAwareness>
+    </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>../include;../include/scintilla;../include/mysql;../include/htmlayout;../include/pcre;../include/tinyxml;../include/vld;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;WIN64;NDEBUG;_WINDOWS;_WIN32_WINNT=0x500;SCI_LEXER;STATIC_BUILD;COMMUNITY;_UNICODE;UNICODE;PCRE_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <ProgramDataBaseFileName>$(IntDir)vc70.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>shfolder.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCD;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(TargetDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <AdditionalLibraryDirectories>..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
+    </Link>
+    <Manifest>
+      <EnableDPIAwareness>true</EnableDPIAwareness>
+    </Manifest>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN64</PreprocessorDefinitions>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../include;../include/scintilla;../include/mysql;../include/htmlayout;../include/pcre;../include/tinyxml;../include/vld;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>shfolder.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT; LIBC;LIBCD;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../include;../include/scintilla;../include/mysql;../include/htmlayout;../include/pcre;../include/tinyxml;../include/vld;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>..\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>shfolder.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT; LIBC;LIBCD;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\AutoCompleteInterface.cpp" />
+    <ClCompile Include="..\src\BlobMgmt.cpp" />
+    <ClCompile Include="..\src\ButtonDropDown.cpp" />
+    <ClCompile Include="..\src\CalendarCtrl.cpp" />
+    <ClCompile Include="..\src\CCustomComboBox.cpp" />
+    <ClCompile Include="..\src\ClientMySQLWrapper.cpp" />
+    <ClCompile Include="..\src\CommonHelper.cpp" />
+    <ClCompile Include="..\src\CommunityRibbon.cpp" />
+    <ClCompile Include="..\src\ConnectionBase.cpp" />
+    <ClCompile Include="..\src\ConnectionCommunity.cpp" />
+    <ClCompile Include="..\src\ConnectionTab.cpp" />
+    <ClCompile Include="..\src\CopyDatabase.cpp" />
+    <ClCompile Include="..\src\CustGrid.cpp" />
+    <ClCompile Include="..\src\CustomSaveDlg.cpp" />
+    <ClCompile Include="..\src\CustTab.cpp" />
+    <ClCompile Include="..\src\DataView.cpp" />
+    <ClCompile Include="..\src\DBListBuilder.cpp" />
+    <ClCompile Include="..\src\DialogPersistence.cpp" />
+    <ClCompile Include="..\src\DoubleBuffer.cpp" />
+    <ClCompile Include="..\src\EditorBase.cpp" />
+    <ClCompile Include="..\src\EditorFont.cpp" />
+    <ClCompile Include="..\src\EditorProcs.cpp" />
+    <ClCompile Include="..\src\EditorQuery.cpp" />
+    <ClCompile Include="..\src\Escapechar.cpp" />
+    <ClCompile Include="..\src\ExportAsSimpleSQL.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\src\ExportAsSQL.cpp" />
+    <ClCompile Include="..\src\ExportBatch.cpp" />
+    <ClCompile Include="..\src\ExportData.cpp" />
+    <ClCompile Include="..\src\ExportImportConnectionDetails.cpp" />
+    <ClCompile Include="..\src\ExportToExcel.cpp" />
+    <ClCompile Include="..\src\Favorite.cpp" />
+    <ClCompile Include="..\src\FavoriteAdd.cpp" />
+    <ClCompile Include="..\src\FavoriteMenu.cpp" />
+    <ClCompile Include="..\src\FavoriteOrganize.cpp" />
+    <ClCompile Include="..\src\FileHelper.cpp" />
+    <ClCompile Include="..\src\FindAndReplace.cpp" />
+    <ClCompile Include="..\src\FKDropDown.cpp" />
+    <ClCompile Include="..\src\FrameWindow.cpp" />
+    <ClCompile Include="..\src\FrameWindowHelper.cpp" />
+    <ClCompile Include="..\src\FrameWindowSplitter.cpp" />
+    <ClCompile Include="..\src\GUIHelper.cpp" />
+    <ClCompile Include="..\src\Htmlrender.cpp" />
+    <ClCompile Include="..\src\Http.cpp" />
+    <ClCompile Include="..\src\ImageList.cpp" />
+    <ClCompile Include="..\src\ImportBatch.cpp" />
+    <ClCompile Include="..\src\ImportData.cpp" />
+    <ClCompile Include="..\src\ImportFromSQL.cpp" />
+    <ClCompile Include="..\src\InputBoxGeneric.cpp" />
+    <ClCompile Include="..\src\KeyShortCuts.cpp" />
+    <ClCompile Include="..\src\L10n.cpp" />
+    <ClCompile Include="..\src\L10nText.cpp" />
+    <ClCompile Include="..\src\LexHelper.cpp" />
+    <ClCompile Include="..\src\List.cpp" />
+    <ClCompile Include="..\src\LogMgmt.cpp" />
+    <ClCompile Include="..\src\MDIWindow.cpp" />
+    <ClCompile Include="..\src\MiniDump.cpp" />
+    <ClCompile Include="..\src\MySQLRowExArray.cpp" />
+    <ClCompile Include="..\src\MySQLVersionHelper.cpp" />
+    <ClCompile Include="..\src\ObjectBrowser.cpp" />
+    <ClCompile Include="..\src\ObjectInfo.cpp" />
+    <ClCompile Include="..\src\OtherDialogs.cpp" />
+    <ClCompile Include="..\src\PreferenceBase.cpp" />
+    <ClCompile Include="..\src\PreferenceCommunity.cpp" />
+    <ClCompile Include="..\src\QueryAnalyzerBase.cpp" />
+    <ClCompile Include="..\src\QueryAnalyzerCommunity.cpp" />
+    <ClCompile Include="..\src\QueryThread.cpp" />
+    <ClCompile Include="..\src\ResultView.cpp" />
+    <ClCompile Include="..\src\SortAndFilter.cpp" />
+    <ClCompile Include="..\src\SQLFormatter.cpp" />
+    <ClCompile Include="..\src\SQLMaker.cpp" />
+    <ClCompile Include="..\src\SQLTokenizer.cpp" />
+    <ClCompile Include="..\src\StatusbarMgmt.cpp" />
+    <ClCompile Include="..\src\TabAdvancedProperties.cpp" />
+    <ClCompile Include="..\src\TabEditor.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\src\TabEditorSplitter.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\src\TabFields.cpp" />
+    <ClCompile Include="..\src\TabForeignKeys.cpp" />
+    <ClCompile Include="..\src\TabHistory.cpp" />
+    <ClCompile Include="..\src\TabIndexes.cpp" />
+    <ClCompile Include="..\src\TableTabInterface.cpp" />
+    <ClCompile Include="..\src\TableTabInterfaceTabMgmt.cpp" />
+    <ClCompile Include="..\src\TableView.cpp" />
+    <ClCompile Include="..\src\TabMessage.cpp" />
+    <ClCompile Include="..\src\TabMgmt.cpp" />
+    <ClCompile Include="..\src\TabModule.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\src\TabObject.cpp" />
+    <ClCompile Include="..\src\TabPreview.cpp" />
+    <ClCompile Include="..\src\TabQueryHistory.cpp" />
+    <ClCompile Include="..\src\TabQueryObject.cpp" />
+    <ClCompile Include="..\src\TabQueryTypes.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\src\TabResult.cpp" />
+    <ClCompile Include="..\src\TabTable.cpp" />
+    <ClCompile Include="..\src\TabTableData.cpp" />
+    <ClCompile Include="..\src\TabTypes.cpp">
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\src\tinyxml\tinystr.cpp" />
+    <ClCompile Include="..\src\tinyxml\tinyxml.cpp" />
+    <ClCompile Include="..\src\tinyxml\tinyxmlerror.cpp" />
+    <ClCompile Include="..\src\tinyxml\tinyxmlparser.cpp" />
+    <ClCompile Include="..\src\TunnelCommunity.cpp" />
+    <ClCompile Include="..\src\UpgradeCheck.cpp" />
+    <ClCompile Include="..\src\UrlEncode.cpp" />
+    <ClCompile Include="..\src\UserManager.cpp" />
+    <ClCompile Include="..\src\WinMain.cpp" />
+    <ClCompile Include="..\src\WyCrc.cpp" />
+    <ClCompile Include="..\src\wyFile.cpp" />
+    <ClCompile Include="..\src\wyIni.cpp" />
+    <ClCompile Include="..\src\wyMySQLError.cpp" />
+    <ClCompile Include="..\src\wySqlite.cpp" />
+    <ClCompile Include="..\src\wyString.cpp" />
+    <ClCompile Include="..\src\wyTheme.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\AppInfo.h" />
+    <ClInclude Include="..\include\AutoCompleteInterface.h" />
+    <ClInclude Include="..\include\BlobMgmt.h" />
+    <ClInclude Include="..\include\ButtonDropDown.h" />
+    <ClInclude Include="..\include\CalendarCtrl.h" />
+    <ClInclude Include="..\include\CCustomComboBox.h" />
+    <ClInclude Include="..\include\ClientMySQLWrapper.h" />
+    <ClInclude Include="..\include\CommonHelper.h" />
+    <ClInclude Include="..\include\CommunityRibbon.h" />
+    <ClInclude Include="..\include\ConnectionBase.h" />
+    <ClInclude Include="..\include\ConnectionCommunity.h" />
+    <ClInclude Include="..\include\ConnectionTab.h" />
+    <ClInclude Include="..\include\CopyDatabase.h" />
+    <ClInclude Include="..\include\CustGrid.h" />
+    <ClInclude Include="..\include\CustomSaveDlg.h" />
+    <ClInclude Include="..\include\CustTab.h" />
+    <ClInclude Include="..\include\Datatype.h" />
+    <ClInclude Include="..\include\DataView.h" />
+    <ClInclude Include="..\include\DBListBuilder.h" />
+    <ClInclude Include="..\include\DialogPersistence.h" />
+    <ClInclude Include="..\include\DoubleBuffer.h" />
+    <ClInclude Include="..\include\EditorBase.h" />
+    <ClInclude Include="..\include\EditorFont.h" />
+    <ClInclude Include="..\include\EditorProcs.h" />
+    <ClInclude Include="..\include\EditorQuery.h" />
+    <ClInclude Include="..\include\EditorTab.h" />
+    <ClInclude Include="..\include\ExportAsSimpleSQL.h" />
+    <ClInclude Include="..\include\ExportAsSQL.h" />
+    <ClInclude Include="..\include\ExportBatch.h" />
+    <ClInclude Include="..\include\ExportImportConnectionDetails.h" />
+    <ClInclude Include="..\include\ExportMultiFormat.h" />
+    <ClInclude Include="..\include\ExportToExcel.h" />
+    <ClInclude Include="..\include\FavoriteAdd.h" />
+    <ClInclude Include="..\include\FavoriteBase.h" />
+    <ClInclude Include="..\include\FavoriteMenu.h" />
+    <ClInclude Include="..\include\FavoriteOrganize.h" />
+    <ClInclude Include="..\include\FileHelper.h" />
+    <ClInclude Include="..\include\FindAndReplace.h" />
+    <ClInclude Include="..\include\FindReplace.h" />
+    <ClInclude Include="..\include\FKDropDown.h" />
+    <ClInclude Include="..\include\FrameWindow.h" />
+    <ClInclude Include="..\include\FrameWindowHelper.h" />
+    <ClInclude Include="..\include\Global.h" />
+    <ClInclude Include="..\include\GUIHelper.h" />
+    <ClInclude Include="..\include\HelpHeader.h" />
+    <ClInclude Include="..\include\Htmlrender.h" />
+    <ClInclude Include="..\include\Http.h" />
+    <ClInclude Include="..\include\ImageList.h" />
+    <ClInclude Include="..\include\ImportBatch.h" />
+    <ClInclude Include="..\include\ImportFromSQL.h" />
+    <ClInclude Include="..\include\Include.h" />
+    <ClInclude Include="..\include\InputBoxGeneric.h" />
+    <ClInclude Include="..\include\L10n.h" />
+    <ClInclude Include="..\include\L10nText.h" />
+    <ClInclude Include="..\include\LexHelper.h" />
+    <ClInclude Include="..\include\LexMySQL.h" />
+    <ClInclude Include="..\include\List.h" />
+    <ClInclude Include="..\include\LogMgmt.h" />
+    <ClInclude Include="..\include\MainWinSplitter.h" />
+    <ClInclude Include="..\include\MDIWindow.h" />
+    <ClInclude Include="..\include\MiniDump.h" />
+    <ClInclude Include="..\include\MySQLRowExArray.h" />
+    <ClInclude Include="..\include\MySQLVersionHelper.h" />
+    <ClInclude Include="..\include\ObjectBrowser.h" />
+    <ClInclude Include="..\include\ObjectInfo.h" />
+    <ClInclude Include="..\include\OtherDialogs.h" />
+    <ClInclude Include="..\include\PreferenceBase.h" />
+    <ClInclude Include="..\include\PreferenceCommunity.h" />
+    <ClInclude Include="..\include\QueryAnalyzerBase.h" />
+    <ClInclude Include="..\include\QueryMessageEdit.h" />
+    <ClInclude Include="..\include\QueryThread.h" />
+    <ClInclude Include="..\include\resource.h" />
+    <ClInclude Include="..\include\ResultView.h" />
+    <ClInclude Include="..\include\SortAndFilter.h" />
+    <ClInclude Include="..\include\SQLFormatter.h" />
+    <ClInclude Include="..\include\sqlite3.h" />
+    <ClInclude Include="..\include\SQLMaker.h" />
+    <ClInclude Include="..\include\SQLTokenizer.h" />
+    <ClInclude Include="..\include\StatusbarMgmt.h" />
+    <ClInclude Include="..\include\Symbols.h" />
+    <ClInclude Include="..\include\TabAdvancedProperties.h" />
+    <ClInclude Include="..\include\TabEditor.h" />
+    <ClInclude Include="..\include\TabEditorSplitter.h" />
+    <ClInclude Include="..\include\TabFields.h" />
+    <ClInclude Include="..\include\TabForeignKeys.h" />
+    <ClInclude Include="..\include\TabHistory.h" />
+    <ClInclude Include="..\include\TabIndexes.h" />
+    <ClInclude Include="..\include\TableTabInterface.h" />
+    <ClInclude Include="..\include\TableTabInterfaceTabMgmt.h" />
+    <ClInclude Include="..\include\TableView.h" />
+    <ClInclude Include="..\include\TabMessage.h" />
+    <ClInclude Include="..\include\TabMgmt.h" />
+    <ClInclude Include="..\include\TabModule.h" />
+    <ClInclude Include="..\include\TabObject.h" />
+    <ClInclude Include="..\include\TabPreview.h" />
+    <ClInclude Include="..\include\TabQueryObject.h" />
+    <ClInclude Include="..\include\TabQueryTypes.h" />
+    <ClInclude Include="..\include\TabResult.h" />
+    <ClInclude Include="..\include\TabTableData.h" />
+    <ClInclude Include="..\include\TabTypes.h" />
+    <ClInclude Include="..\include\tinyxml\tinystr.h" />
+    <ClInclude Include="..\include\tinyxml\tinyxml.h" />
+    <ClInclude Include="..\include\Tunnel.h" />
+    <ClInclude Include="..\include\TunnelCommunity.h" />
+    <ClInclude Include="..\include\UpgradeCheck.h" />
+    <ClInclude Include="..\include\UrlEncode.h" />
+    <ClInclude Include="..\include\UserManager.h" />
+    <ClInclude Include="..\include\Verify.h" />
+    <ClInclude Include="..\include\WyCrc.h" />
+    <ClInclude Include="..\include\wyFile.h" />
+    <ClInclude Include="..\include\wyIni.h" />
+    <ClInclude Include="..\include\wyMySQLError.h" />
+    <ClInclude Include="..\include\wySqlite.h" />
+    <ClInclude Include="..\include\wyString.h" />
+    <ClInclude Include="..\include\wyTheme.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\include\SQLyog.rc" />
+    <ResourceCompile Include="..\include\VersionInfo.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\calendar.png" />
+    <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\circle1.ico" />
+    <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\circle2.ico" />
+    <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\circle3.ico" />
+    <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\circle4.ico" />
+    <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\circle5.ico" />
+    <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\circle6.ico" />
+    <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\circle7.ico" />
+    <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\circle8.ico" />
+    <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\TableOptions.ico" />
+    <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\TabPreview.ico" />
+    <None Include="..\..\..\..\..\Chirantan%27s Data\Main Trunk\SQLyog\SQLyogCommunity\include\bitmaps\icon1.ico" />
+    <None Include="..\include\bitmaps\add.ico" />
+    <None Include="..\include\bitmaps\bg.bmp" />
+    <None Include="..\include\bitmaps\calendar.png" />
+    <None Include="..\include\bitmaps\circle1.ico" />
+    <None Include="..\include\bitmaps\circle2.ico" />
+    <None Include="..\include\bitmaps\circle3.ico" />
+    <None Include="..\include\bitmaps\circle4.ico" />
+    <None Include="..\include\bitmaps\circle5.ico" />
+    <None Include="..\include\bitmaps\circle6.ico" />
+    <None Include="..\include\bitmaps\circle7.ico" />
+    <None Include="..\include\bitmaps\circle8.ico" />
+    <None Include="..\include\bitmaps\datasearch.ico" />
+    <None Include="..\include\bitmaps\dataview.ico" />
+    <None Include="..\include\bitmaps\delete.ico" />
+    <None Include="..\include\bitmaps\Down.ico" />
+    <None Include="..\include\bitmaps\downarrow.png" />
+    <None Include="..\include\bitmaps\duplicaterow.ico" />
+    <None Include="..\include\bitmaps\filter.ico" />
+    <None Include="..\include\bitmaps\form_view.ico" />
+    <None Include="..\include\bitmaps\grid_view.ico" />
+    <None Include="..\include\bitmaps\icon1.ico" />
+    <None Include="..\include\bitmaps\icon7.ico" />
+    <None Include="..\include\bitmaps\icon8.ico" />
+    <None Include="..\include\bitmaps\overlay_filter.ico" />
+    <None Include="..\include\bitmaps\remove_db_filter.ico" />
+    <None Include="..\include\bitmaps\remove_filter.ico" />
+    <None Include="..\include\bitmaps\result_export.ico" />
+    <None Include="..\include\bitmaps\TableOptions.ico" />
+    <None Include="..\include\bitmaps\tablerefresh.ico" />
+    <None Include="..\include\bitmaps\TabPreview.ico" />
+    <None Include="..\include\bitmaps\text_view.ico" />
+    <None Include="..\include\bitmaps\Up.ico" />
+    <None Include="..\include\bitmaps\user-globe.ico" />
+    <None Include="..\include\bitmaps\user-objects.ico" />
+    <None Include="..\include\bitmaps\user16.ico" />
+    <None Include="..\include\bitmaps\user_add.ico" />
+    <None Include="..\include\bitmaps\user_write.ico" />
+    <None Include="..\include\bitmaps\about.ico" />
+    <None Include="..\include\bitmaps\addfunction.ico" />
+    <None Include="..\include\bitmaps\addsp.ico" />
+    <None Include="..\include\bitmaps\Addtables.ico" />
+    <None Include="..\include\bitmaps\addtofavorite.ico" />
+    <None Include="..\include\bitmaps\addtopf.ico" />
+    <None Include="..\include\bitmaps\addtrigger.ico" />
+    <None Include="..\include\bitmaps\addusers.ico" />
+    <None Include="..\include\bitmaps\addview.ico" />
+    <None Include="..\include\bitmaps\alterdb.ico" />
+    <None Include="..\include\bitmaps\alterevent.ico" />
+    <None Include="..\include\bitmaps\alterfunction.ico" />
+    <None Include="..\include\bitmaps\altersp.ico" />
+    <None Include="..\include\bitmaps\altertable.ico" />
+    <None Include="..\include\bitmaps\altertrigger.ico" />
+    <None Include="..\include\bitmaps\alterview.ico" />
+    <None Include="..\include\bitmaps\backup.ico" />
+    <None Include="..\include\bitmaps\bitmap9.bmp" />
+    <None Include="..\include\bitmaps\blueback.bmp" />
+    <None Include="..\include\bitmaps\bmp00001.bmp" />
+    <None Include="..\include\bitmaps\cascade.ico" />
+    <None Include="..\include\bitmaps\check.ICO" />
+    <None Include="..\include\bitmaps\check16.ico" />
+    <None Include="..\include\bitmaps\closetab.ico" />
+    <None Include="..\include\bitmaps\closetable.ICO" />
+    <None Include="..\include\bitmaps\colorpicker.ico" />
+    <None Include="..\include\bitmaps\column.ico" />
+    <None Include="..\include\bitmaps\column_with_primary_key-2.ico" />
+    <None Include="..\include\bitmaps\column_with_primary_key.ico" />
+    <None Include="..\include\bitmaps\comsplash.bmp" />
+    <None Include="..\include\bitmaps\comsplashbmp.bmp" />
+    <None Include="..\include\bitmaps\connect.ico" />
+    <None Include="..\include\bitmaps\connect_16.ico" />
+    <None Include="..\include\bitmaps\connection.bmp" />
+    <None Include="..\include\bitmaps\Copy.ico" />
+    <None Include="..\include\bitmaps\copy_data.ico" />
+    <None Include="..\include\bitmaps\copy_data_16.ico" />
+    <None Include="..\include\bitmaps\copyquerytoclip.ico" />
+    <None Include="..\include\bitmaps\copyquerytocurrenttab.ico" />
+    <None Include="..\include\bitmaps\copyquerytonewtab.ico" />
+    <None Include="..\include\bitmaps\copytable.ICO" />
+    <None Include="..\include\bitmaps\createtableindata.ico" />
+    <None Include="..\include\bitmaps\csv.ico" />
+    <None Include="..\include\bitmaps\cut.ico" />
+    <None Include="..\include\bitmaps\database.ico" />
+    <None Include="..\include\bitmaps\dbsync.ico" />
+    <None Include="..\include\bitmaps\dbsync_16.ico" />
+    <None Include="..\include\bitmaps\deletefunction.ico" />
+    <None Include="..\include\bitmaps\deletesp.ico" />
+    <None Include="..\include\bitmaps\deletetrigger.ico" />
+    <None Include="..\include\bitmaps\deleteview.ico" />
+    <None Include="..\include\bitmaps\discon.ICO" />
+    <None Include="..\include\bitmaps\disconall.ICO" />
+    <None Include="..\include\bitmaps\drop_index.ico" />
+    <None Include="..\include\bitmaps\drop_table.ico" />
+    <None Include="..\include\bitmaps\dropcolumn.ico" />
+    <None Include="..\include\bitmaps\dropdatabase.ico" />
+    <None Include="..\include\bitmaps\dropevent.ico" />
+    <None Include="..\include\bitmaps\dsync1.bmp" />
+    <None Include="..\include\bitmaps\dsync2.bmp" />
+    <None Include="..\include\bitmaps\editusers.ico" />
+    <None Include="..\include\bitmaps\emailmanager.ico" />
+    <None Include="..\include\bitmaps\emptydata.ico" />
+    <None Include="..\include\bitmaps\emptytable.ico" />
+    <None Include="..\include\bitmaps\entmenu.ico" />
+    <None Include="..\include\bitmaps\event.ico" />
+    <None Include="..\include\bitmaps\eventnew.ico" />
+    <None Include="..\include\bitmaps\execall.ico" />
+    <None Include="..\include\bitmaps\execall_16.ico" />
+    <None Include="..\include\bitmaps\execbatch.ico" />
+    <None Include="..\include\bitmaps\execbatch_16.ico" />
+    <None Include="..\include\bitmaps\execforupd.ico" />
+    <None Include="..\include\bitmaps\execforupd_16.ico" />
+    <None Include="..\include\bitmaps\execute.ico" />
+    <None Include="..\include\bitmaps\execute_16.ico" />
+    <None Include="..\include\bitmaps\exit.ico" />
+    <None Include="..\include\bitmaps\export_csv.ico" />
+    <None Include="..\include\bitmaps\export_data.ico" />
+    <None Include="..\include\bitmaps\export_data_16.ico" />
+    <None Include="..\include\bitmaps\export_sel_cell_csv.ico" />
+    <None Include="..\include\bitmaps\export_sel_csv.ico" />
+    <None Include="..\include\bitmaps\Exportasimg.ico" />
+    <None Include="..\include\bitmaps\exportresult.ico" />
+    <None Include="..\include\bitmaps\exportxmlhtml.ico" />
+    <None Include="..\include\bitmaps\exportxmlhtml_16.ico" />
+    <None Include="..\include\bitmaps\expotview.ico" />
+    <None Include="..\include\bitmaps\favorites.ico" />
+    <None Include="..\include\bitmaps\first.ico" />
+    <None Include="..\include\bitmaps\flush.ico" />
+    <None Include="..\include\bitmaps\foldericon.ico" />
+    <None Include="..\include\bitmaps\formatall.ico" />
+    <None Include="..\include\bitmaps\function.ico" />
+    <None Include="..\include\bitmaps\greenback.bmp" />
+    <None Include="..\include\bitmaps\GroupofServers.ico" />
+    <None Include="..\include\bitmaps\Header.bmp" />
+    <None Include="..\include\bitmaps\help.ICO" />
+    <None Include="..\include\bitmaps\history.ico" />
+    <None Include="..\include\bitmaps\ico00001.ico" />
+    <None Include="..\include\bitmaps\ico00002.ico" />
+    <None Include="..\include\bitmaps\icon10.ico" />
+    <None Include="..\include\bitmaps\icon9.ico" />
+    <None Include="..\include\bitmaps\import_data.ico" />
+    <None Include="..\include\bitmaps\index.ico" />
+    <None Include="..\include\bitmaps\indexcreate.ico" />
+    <None Include="..\include\bitmaps\indexdelete.ico" />
+    <None Include="..\include\bitmaps\indexedit.ico" />
+    <None Include="..\include\bitmaps\insertupdate.ICO" />
+    <None Include="..\include\bitmaps\jobbig.bmp" />
+    <None Include="..\include\bitmaps\jobmanager.ico" />
+    <None Include="..\include\bitmaps\jobsmall.bmp" />
+    <None Include="..\include\bitmaps\keyboard.ICO" />
+    <None Include="..\include\bitmaps\line16.ico" />
+    <None Include="..\include\bitmaps\manage_index.ico" />
+    <None Include="..\include\bitmaps\manage_index_16.ico" />
+    <None Include="..\include\bitmaps\manrel.ico" />
+    <None Include="..\include\bitmaps\manrel_16.ico" />
+    <None Include="..\include\bitmaps\MySQL.ico" />
+    <None Include="..\include\bitmaps\new_data.ico" />
+    <None Include="..\include\bitmaps\nextbutton.ico" />
+    <None Include="..\include\bitmaps\notification.ico" />
+    <None Include="..\include\bitmaps\notification_16.ico" />
+    <None Include="..\include\bitmaps\object.ico" />
+    <None Include="..\include\bitmaps\odbc.ico" />
+    <None Include="..\include\bitmaps\odbc_schd.bmp" />
+    <None Include="..\include\bitmaps\open.ico" />
+    <None Include="..\include\bitmaps\open_in_new_tab.ico" />
+    <None Include="..\include\bitmaps\organize_favorites.ico" />
+    <None Include="..\include\bitmaps\paste.ico" />
+    <None Include="..\include\bitmaps\pkey.ico" />
+    <None Include="..\include\bitmaps\preferences.ico" />
+    <None Include="..\include\bitmaps\previousbutton.ico" />
+    <None Include="..\include\bitmaps\primary_key_16.ico" />
+    <None Include="..\include\bitmaps\Print.ico" />
+    <None Include="..\include\bitmaps\process.ico" />
+    <None Include="..\include\bitmaps\qa_alert.ico" />
+    <None Include="..\include\bitmaps\qa_noalert.ico" />
+    <None Include="..\include\bitmaps\query.ico" />
+    <None Include="..\include\bitmaps\query_16.ico" />
+    <None Include="..\include\bitmaps\querybui.ico" />
+    <None Include="..\include\bitmaps\querybuilder.ico" />
+    <None Include="..\include\bitmaps\querybuilder_16.ico" />
+    <None Include="..\include\bitmaps\readme2.bin" />
+    <None Include="..\include\bitmaps\readme3.bin" />
+    <None Include="..\include\bitmaps\redo.ico" />
+    <None Include="..\include\bitmaps\refresh.ico" />
+    <None Include="..\include\bitmaps\refresh_16.ico" />
+    <None Include="..\include\bitmaps\refreshcanvas.ico" />
+    <None Include="..\include\bitmaps\refreshfav.ico" />
+    <None Include="..\include\bitmaps\rename.ico" />
+    <None Include="..\include\bitmaps\renameevent.ico" />
+    <None Include="..\include\bitmaps\renametrigger.ico" />
+    <None Include="..\include\bitmaps\renameuser.ico" />
+    <None Include="..\include\bitmaps\renameview.ico" />
+    <None Include="..\include\bitmaps\reordercol.ico" />
+    <None Include="..\include\bitmaps\reordercolumns.ico" />
+    <None Include="..\include\bitmaps\replace.ico" />
+    <None Include="..\include\bitmaps\resetfilter.ico" />
+    <None Include="..\include\bitmaps\restore_data.ico" />
+    <None Include="..\include\bitmaps\result_cancel.ico" />
+    <None Include="..\include\bitmaps\result_delete.ico" />
+    <None Include="..\include\bitmaps\result_insert.ico" />
+    <None Include="..\include\bitmaps\result_save.ico" />
+    <None Include="..\include\bitmaps\result_set.ico" />
+    <None Include="..\include\bitmaps\save.ico" />
+    <None Include="..\include\bitmaps\saveas.ico" />
+    <None Include="..\include\bitmaps\schdexport.ico" />
+    <None Include="..\include\bitmaps\schdexport_16.ico" />
+    <None Include="..\include\bitmaps\schdexport_small.bmp" />
+    <None Include="..\include\bitmaps\schema.ico" />
+    <None Include="..\include\bitmaps\schemadesigner.ico" />
+    <None Include="..\include\bitmaps\schemadesigner_16.ico" />
+    <None Include="..\include\bitmaps\schexport_big.bmp" />
+    <None Include="..\include\bitmaps\search.ico" />
+    <None Include="..\include\bitmaps\serv.ico" />
+    <None Include="..\include\bitmaps\smallico.ICO" />
+    <None Include="..\include\bitmaps\sortasc.ico" />
+    <None Include="..\include\bitmaps\sortdsc.ico" />
+    <None Include="..\include\bitmaps\sp.ico" />
+    <None Include="..\include\bitmaps\splash.bmp" />
+    <None Include="..\include\bitmaps\splashcomm.bmp" />
+    <None Include="..\include\bitmaps\splashcomm.jpg" />
+    <None Include="..\include\bitmaps\sql_file.ico" />
+    <None Include="..\include\bitmaps\sqlyog2.bmp" />
+    <None Include="..\include\bitmaps\sqlyog3.bmp" />
+    <None Include="..\include\bitmaps\Stop.ico" />
+    <None Include="..\include\bitmaps\Sync.ico" />
+    <None Include="..\include\bitmaps\Sync_16.ico" />
+    <None Include="..\include\bitmaps\table.ico" />
+    <None Include="..\include\bitmaps\tablediag.ico" />
+    <None Include="..\include\bitmaps\tableprop.ico" />
+    <None Include="..\include\bitmaps\tableviews.ico" />
+    <None Include="..\include\bitmaps\templatesm.ico" />
+    <None Include="..\include\bitmaps\tile.ico" />
+    <None Include="..\include\bitmaps\trigger.ico" />
+    <None Include="..\include\bitmaps\truncatedata.ico" />
+    <None Include="..\include\bitmaps\tunnel.ico" />
+    <None Include="..\include\bitmaps\uncheck16.ico" />
+    <None Include="..\include\bitmaps\undo.ico" />
+    <None Include="..\include\bitmaps\user_folder.ico" />
+    <None Include="..\include\bitmaps\usermanager.ICO" />
+    <None Include="..\include\bitmaps\users.ICO" />
+    <None Include="..\include\bitmaps\view.ico" />
+    <None Include="..\include\bitmaps\viewdata.ico" />
+    <None Include="..\include\bitmaps\viewnew.ico" />
+    <None Include="..\include\bitmaps\Watermrk.bmp" />
+    <None Include="..\include\bitmaps\workswithmysql.bmp" />
+    <None Include="..\include\bitmaps\xml.ico" />
+    <None Include="..\include\bitmaps\zoomin.ico" />
+    <None Include="..\include\bitmaps\zoomout.ico" />
+    <None Include="..\include\bitmaps\database.png" />
+    <None Include="..\include\bitmaps\event.png" />
+    <None Include="..\include\bitmaps\function.png" />
+    <None Include="..\include\bitmaps\index.png" />
+    <None Include="..\include\bitmaps\primary_key_16.png" />
+    <None Include="..\include\readme.txt" />
+    <None Include="..\include\bitmaps\serv.png" />
+    <None Include="..\include\bitmaps\sp.png" />
+    <None Include="..\include\bitmaps\table.png" />
+    <None Include="..\include\bitmaps\trigger.png" />
+    <None Include="..\include\bitmaps\view.png" />
+    <None Include="..\include\twilight_theme.xml" />
+    <None Include="bitmaps\OB_filter.ico" />
+    <None Include="bitmaps\overlay_filter.ico" />
+    <None Include="bitmaps\previous.PNG" />
+    <None Include="bitmaps\remove_db_filter_black.ico" />
+    <None Include="bitmaps\TableOptions.ico" />
+    <None Include="bitmaps\TabPreview.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties DevPartner_IsInstrumented="0" RESOURCE_FILE="\6.2\SQLyogCommunity\include\SQLyog.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

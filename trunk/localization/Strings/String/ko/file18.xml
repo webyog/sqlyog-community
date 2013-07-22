@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3606">(여러 개의 데이터베이스로 나누려면 \';\'를 사용하십시오. 모두 표시하려면 빈 칸으로 두십시오)</string>
+	<string name="3607">서버 핑 중...</string>
+	<string name="3608">소요 시간</string>
+	<string name="3609">서버 핑 됨</string>
+	<string name="3610">Clearte&amp;xt 플러그인 활성화</string>
+	<string name="3611">시간초과</string>
+	<string name="3612">Keep-Alive 간격</string>
+</resources>
