@@ -70,6 +70,7 @@ void vio_reset(Vio* vio, enum enum_vio_type type,
  * as read(2) and write(2).
  */
 size_t vio_read(Vio* vio, gptr buf,	size_t size);
+my_bool vio_read_peek(Vio *vio, size_t *bytes);
 size_t vio_write(Vio* vio, const gptr buf, size_t size);
 /*
  * Whenever the socket is set to blocking mode or not.

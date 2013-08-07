@@ -1181,10 +1181,11 @@ CQueryObject::InsertDatabases(Tunnel * tunnel, PMYSQL mysql, HTREEITEM hserver)
 	wyBool				tosearch = wyFalse, ismysql41 = IsMySQL41(tunnel, mysql);
 	HWND				hwnd = m_hwnd;
 	HTREEITEM			hdatabase;
+	MDIWindow			*pcquerywnd;
 
 	MYSQL_RES			*myres=NULL;
 	MYSQL_ROW			myrow;
-
+	
 	// now we get the databases to be filtered before it is added to teh object browser.
 	if(m_filterdb.GetLength())
 		tosearch = wyTrue;
@@ -1198,7 +1199,9 @@ CQueryObject::InsertDatabases(Tunnel * tunnel, PMYSQL mysql, HTREEITEM hserver)
 
 		SetCursor(LoadCursor(NULL, IDC_WAIT));
 
-        myres = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query);
+		VERIFY(pcquerywnd  = (MDIWindow *)GetWindowLongPtr(m_hwndparent, GWLP_USERDATA));
+
+        myres = ExecuteAndGetResult(pcquerywnd, tunnel, mysql, query);
 
 		if(!myres)
 		{

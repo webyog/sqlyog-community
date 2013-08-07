@@ -3900,6 +3900,7 @@ InitConnectionDetails(ConnectionInfo *conn)
 	conn->m_ispassword          = wyTrue;
     conn->m_isssh               = wyFalse;
     conn->m_issshsavepassword   = wyFalse;
+    conn->m_issslchecked        = wyFalse;
     conn->m_issslauthchecked    = wyFalse;
     conn->m_issslchecked        = wyFalse;
 	conn->m_iscompress			= wyTrue;	

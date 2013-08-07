@@ -40,6 +40,8 @@ using namespace std;
 class CommunityRibbon;
 #endif
 
+#define			CONRESTORE_TIMER	1001
+
 class	MDIWindow;
 class	EditorBase;
 class	Favorites;
@@ -1610,5 +1612,9 @@ public:
     wyInt32             m_editorcolumnline;
 };
 
+/// Function to rstore connections
+/**
+*/
+void	ConnectFromList();
 
 #endif

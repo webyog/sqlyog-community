@@ -172,7 +172,7 @@ public:
 	@param conninfo		: IN Connection information
 	@returns non zero on success else zero
 	*/
-    wyInt32 ActivateDialog(ConnectionInfo *conninfo, wyBool checksession = wyFalse);
+    wyInt32 ActivateDialog(ConnectionInfo *conninfo);
 
 	/// Handles menu items
 	/**

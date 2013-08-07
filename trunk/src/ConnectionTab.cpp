@@ -162,6 +162,7 @@ ConnectionTab::InsertConnectionTab(wyString * title, LPARAM lparam)
         return wyFalse;
 	 }
 
+	
 	CustomTab_SetCurSel(hwndtab, count);
 
     count = CustomTab_GetItemCount(hwndtab);

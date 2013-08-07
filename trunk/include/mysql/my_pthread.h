@@ -236,26 +236,7 @@ extern int my_pthread_create_detached;
 #define PTHREAD_SCOPE_SYSTEM  PTHREAD_SCOPE_GLOBAL
 #define PTHREAD_SCOPE_PROCESS PTHREAD_SCOPE_LOCAL
 #define USE_ALARM_THREAD
-#elif defined(HAVE_mit_thread)
-#define USE_ALARM_THREAD
-#undef	HAVE_LOCALTIME_R
-#define HAVE_LOCALTIME_R
-#undef	HAVE_PTHREAD_ATTR_SETSCOPE
-#define HAVE_PTHREAD_ATTR_SETSCOPE
-#undef HAVE_GETHOSTBYNAME_R_GLIBC2_STYLE	/* If we are running linux */
-#undef HAVE_RWLOCK_T
-#undef HAVE_RWLOCK_INIT
-#undef HAVE_PTHREAD_RWLOCK_RDLOCK
-#undef HAVE_SNPRINTF
-
-#define sigset(A,B) pthread_signal((A),(void (*)(int)) (B))
-#define signal(A,B) pthread_signal((A),(void (*)(int)) (B))
-#define my_pthread_attr_setprio(A,B)
 #endif /* defined(PTHREAD_SCOPE_GLOBAL) && !defined(PTHREAD_SCOPE_SYSTEM) */
-
-#if defined(_BSDI_VERSION) && _BSDI_VERSION < 199910
-int sigwait(sigset_t *set, int *sig);
-#endif
 
 #if defined(HAVE_UNIXWARE7_POSIX)
 #undef HAVE_NONPOSIX_SIGWAIT
@@ -286,14 +267,16 @@ extern int my_pthread_cond_init(pthread_cond_t *mp,
 #if !defined(HAVE_SIGWAIT) && !defined(HAVE_mit_thread) && !defined(HAVE_rts_threads) && !defined(sigwait) && !defined(alpha_linux_port) && !defined(HAVE_NONPOSIX_SIGWAIT) && !defined(HAVE_DEC_3_2_THREADS) && !defined(_AIX)
 int sigwait(sigset_t *setp, int *sigp);		/* Use our implemention */
 #endif
-#if !defined(HAVE_SIGSET) && !defined(HAVE_mit_thread) && !defined(sigset)
-#define sigset(A,B) do { struct sigaction s; sigset_t set;              \
+#if !defined(HAVE_SIGSET) && !defined(my_sigset)
+#define my_sigset(A,B) do { struct sigaction s; sigset_t set;           \
                          sigemptyset(&set);                             \
                          s.sa_handler = (B);                            \
                          s.sa_mask    = set;                            \
                          s.sa_flags   = 0;                              \
                          sigaction((A), &s, (struct sigaction *) NULL); \
                        } while (0)
+#elif !defined(my_sigset)
+  #define my_sigset(A,B) signal((A),(B))
 #endif
 
 #ifndef my_pthread_setprio
@@ -390,7 +373,9 @@ struct tm *localtime_r(const time_t *clock, struct tm *res);
 #undef	pthread_detach_this_thread
 #define pthread_detach_this_thread() { pthread_t tmp=pthread_self() ; pthread_detach(&tmp); }
 #else /* HAVE_PTHREAD_ATTR_CREATE && !HAVE_SIGWAIT */
+#if (!defined(HAVE_PTHREAD_KILL))
 #define HAVE_PTHREAD_KILL
+#endif
 #endif
 
 #endif /* defined(_WIN32) */
@@ -566,6 +551,7 @@ struct st_my_thread_var
 };
 
 extern struct st_my_thread_var *_my_thread_var(void) __attribute__ ((const));
+extern void **my_thread_var_dbug();
 #define my_thread_var (_my_thread_var())
 #define my_errno my_thread_var->thr_errno
 

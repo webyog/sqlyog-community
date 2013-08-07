@@ -326,13 +326,6 @@ typedef unsigned short ushort;
 #define DBUG_OFF
 #endif
 
-#include <dbug.h>
-#ifndef DBUG_OFF
-#define dbug_assert(A) assert(A)
-#else
-#define dbug_assert(A)
-#endif
-
 #define MIN_ARRAY_SIZE	0	/* Zero or One. Gcc allows zero*/
 #define ASCII_BITS_USED 8	/* Bit char used */
 #define NEAR_F			/* No near function handling */
@@ -1059,6 +1052,13 @@ do { doubleget_union _tmp; \
 #define SO_EXT ".dylib"
 #else
 #define SO_EXT ".so"
+#endif
+
+#include <dbug.h>
+#ifndef DBUG_OFF
+#define dbug_assert(A) assert(A)
+#else
+#define dbug_assert(A)
 #endif
 
 #ifdef HAVE_DLOPEN

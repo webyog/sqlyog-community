@@ -1664,7 +1664,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "Others"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    GROUPBOX        "Miscellaneous ",IDC_STATIC,4,3,247,73
+    GROUPBOX        "Miscellaneous ",IDC_STATIC,4,3,247,84
     CONTROL         "Retain user modified column &width",IDC_RETAINCOLUMNWIDTH,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,14,202,10
     CONTROL         "Truncate &column headers to maximum data size",IDC_COLUMNWIDTH,
@@ -1675,24 +1675,25 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,50,197,10
     CONTROL         "&Open ""Tables"" folder in Object Browser as default",IDC_OPENTABLES,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,62,216,9
-    GROUPBOX        "Data Display/Editing ",IDC_STATIC,4,80,247,36
+    GROUPBOX        "Data Display/Editing ",IDC_STATIC,4,91,247,36
     CONTROL         "Automatically &refresh Table Data tab on focus",IDC_REFRESHTABLEDATA,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,91,212,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,102,212,10
     CONTROL         "&Prompt if multiple rows are getting updated",IDC_UPDATEPROMPT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,103,211,10
-    GROUPBOX        "Paging in Table Data/Result Tab",IDC_STATIC,4,120,247,51
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,114,211,10
+    GROUPBOX        "Paging in Table Data/Result Tab",IDC_STATIC,4,131,247,51
     CONTROL         "Ena&ble Autopaging in Result tab",IDC_RESUTTABPAGE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,146,116,10
-    LTEXT           "&Default number of rows",IDC_STATIC,9,131,79,9
-    EDITTEXT        IDC_HIGHLIMIT,95,130,49,12,ES_AUTOHSCROLL | ES_NUMBER
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,157,116,10
+    LTEXT           "&Default number of rows",IDC_STATIC,9,142,79,9
+    EDITTEXT        IDC_HIGHLIMIT,95,141,49,12,ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "Remember setting for each &query",IDC_RESUTTABPAGERETAIN,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,158,127,10
-    GROUPBOX        "Toolbar Size ",IDC_STATIC,4,174,80,29
-    COMBOBOX        IDC_ICONSIZE,8,184,71,44,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Theme ",IDC_STATIC,88,174,163,29
-    COMBOBOX        IDC_THEMECOMBO,93,184,153,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,169,127,10
+    GROUPBOX        "Toolbar Size ",IDC_STATIC,4,185,80,29
+    COMBOBOX        IDC_ICONSIZE,8,195,71,44,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Theme ",IDC_STATIC,88,185,163,29
+    COMBOBOX        IDC_THEMECOMBO,93,195,153,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Restore &All Defaults",IDC_OTHERSRESTOREALL,97,262,75,15
     PUSHBUTTON      "Restore &Tab Defaults",IDC_OTHERSRESTORETAB,176,262,75,15
+    CONTROL         "&Enable connection restore",IDC_CONRESTORE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,74,216,9
 END
 
 IDD_PREFGENERAL DIALOGEX 0, 0, 255, 280
@@ -3280,13 +3281,12 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_INDIA
 //
 
 IDD_CONNECTIONLIST DIALOGEX 0, 0, 205, 158
-STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_THICKFRAME
-CAPTION "Previously Opened Connections"
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Restore Connections"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    DEFPUSHBUTTON   "&Open",IDOK,6,137,55,14
+    DEFPUSHBUTTON   "&Open",IDOK,83,137,55,14
     PUSHBUTTON      "Cance&l",IDCANCEL,143,137,55,14
-    PUSHBUTTON      "&New Connection...",IDC_OPENCONNDLG,66,137,72,14
     CONTROL         "",IDC_CONNECTIONLIST,"SysListView32",LVS_LIST | LVS_ALIGNLEFT | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,17,191,116
     CONTROL         "Select &All",IDC_SELCHECK,"Button",BS_AUTO3STATE | WS_TABSTOP,7,7,45,10
     LTEXT           "grip",IDC_GRIP,185,133,13,8

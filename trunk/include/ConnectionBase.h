@@ -450,7 +450,7 @@ public:
 	@param conninfo		: Connection information
 	@returns non zero on success else zero
 	*/
-    virtual wyInt32 ActivateDialog(ConnectionInfo *conninfo, wyBool checksession = wyFalse) = 0;
+    virtual wyInt32 ActivateDialog(ConnectionInfo *conninfo) = 0;
 
 	/// Handles menu items
 	/**

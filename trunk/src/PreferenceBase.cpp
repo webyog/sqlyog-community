@@ -51,6 +51,7 @@ extern PGLOBALS		pGlobals;
 #define		GETINFOKW_DEFAULT			1
 #define		SWITCHSHORTCUT_DEFAULT		0
 #define		OPENTABLES_DEFAULT			0
+#define		CONRESTORE_DEFAULT			0
 #define		ENABLEUPGRADE_DEFAULT		1
 #define		UPDATEPROMPT_DEFAULT		1
 #define		SHOWALLINTABLEDATA_DEFAULT	0
@@ -1445,6 +1446,9 @@ PreferenceBase::InitOthersPrefValues()
 	truncdata	= wyIni::IniGetInt(GENERALPREFA, "OBOpenTablesByDefault", OPENTABLES_DEFAULT, dirstr.GetString());
     SendMessage(GetDlgItem(m_hwnd, IDC_OPENTABLES), BM_SETCHECK,truncdata, 0);
 
+	truncdata	= wyIni::IniGetInt(GENERALPREFA, "ConnectionRestore", CONRESTORE_DEFAULT, dirstr.GetString());
+    SendMessage(GetDlgItem(m_hwnd, IDC_CONRESTORE), BM_SETCHECK, truncdata, 0);
+
 	truncdata   = wyIni::IniGetInt(GENERALPREFA, "UpdateCheck", ENABLEUPGRADE_DEFAULT, dirstr.GetString());
 	SendMessage(GetDlgItem(m_hwnd, IDC_ENABLEUPGRADE), BM_SETCHECK, truncdata, 0);
 	
@@ -1670,6 +1674,9 @@ PreferenceBase::SaveOthersPreferences(HWND hwndbase, wyInt32 page)
 
 	//when we are expanding a database, whether we need to expand Tables folderor not 
 	SetBoolProfileString(hwnd, GENERALPREF, L"OBOpenTablesByDefault", IDC_OPENTABLES);
+	
+	// for enabling connection restore
+	SetBoolProfileString(hwnd, GENERALPREF, L"ConnectionRestore", IDC_CONRESTORE);
 
 	//enable implicity upgrade check if it is checck
 	SetBoolProfileString(hwnd, GENERALPREF, L"UpdateCheck", IDC_ENABLEUPGRADE);
@@ -2132,6 +2139,7 @@ PreferenceBase::SetOthersPrefDefaultValues(HWND hwnd)
 	SendMessage(GetDlgItem(hwnd, IDC_GETINFOKW), BM_SETCHECK, GETINFOKW_DEFAULT, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_SWITCHSHORTCUT), BM_SETCHECK, SWITCHSHORTCUT_DEFAULT, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_OPENTABLES), BM_SETCHECK, OPENTABLES_DEFAULT, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_CONRESTORE), BM_SETCHECK, CONRESTORE_DEFAULT, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_ENABLEUPGRADE), BM_SETCHECK, ENABLEUPGRADE_DEFAULT, 0);
 		
 	SendMessage(GetDlgItem(hwnd, IDC_REFRESHTABLEDATA), BM_SETCHECK, REFRESHTABLEDATA_DEFAULT, 0);
