@@ -150,9 +150,10 @@ CHttp::~CHttp ()
 	if (m_challengename ) delete[] m_challengename;
 	if (m_challengepwd ) delete[] m_challengepwd;
 
-	if (m_InternetSession ) InternetCloseHandle(m_InternetSession );
-	if (m_InternetConnect ) InternetCloseHandle(m_InternetConnect );
+	
 	if (m_HttpOpenRequest ) InternetCloseHandle(m_HttpOpenRequest );
+	if (m_InternetConnect ) InternetCloseHandle(m_InternetConnect );
+	if (m_InternetSession ) InternetCloseHandle(m_InternetSession );
 }
 
 DWORD
@@ -634,7 +635,9 @@ CHttp::yog_HttpSendRequest (	DWORD       *lpdwLastError,
 
 	if (WaitForSingleObject (thread, m_timeout ) == WAIT_TIMEOUT )
 	{
-		TerminateThread (thread, 1 );
+		InternetCloseHandle(m_InternetSession);
+		m_InternetSession = NULL;
+		WaitForSingleObject (thread, INFINITE);
 		VERIFY (CloseHandle (thread ) );
 		SetLastError (ERROR_INTERNET_TIMEOUT );
 		return FALSE;
@@ -798,7 +801,9 @@ CHttp::yog_HttpSendRequestEx(	HINTERNET hRequest, LPINTERNET_BUFFERS lpBuffersIn
 
 	if (WaitForSingleObject (thread, m_timeout ) == WAIT_TIMEOUT )
 	{
-		TerminateThread (thread, 1 );
+		InternetCloseHandle(m_InternetSession);
+		m_InternetSession = NULL;
+		WaitForSingleObject (thread, INFINITE);
 		VERIFY (CloseHandle (thread ) );
 		SetLastError (ERROR_INTERNET_TIMEOUT );
 		return FALSE;
@@ -852,7 +857,9 @@ CHttp::yog_InternetWriteFile (HINTERNET hFile, LPCVOID lpBuffer,
 
 	if (WaitForSingleObject (thread, m_timeout ) == WAIT_TIMEOUT )
 	{
-		TerminateThread (thread, 1 );
+		InternetCloseHandle(m_InternetSession);
+		m_InternetSession = NULL;
+		WaitForSingleObject (thread, INFINITE);
 		VERIFY (CloseHandle (thread ) );
 		SetLastError (ERROR_INTERNET_TIMEOUT );
 		return FALSE;
@@ -944,7 +951,9 @@ CHttp::yog_HttpEndRequest (	HINTERNET hRequest,  LPINTERNET_BUFFERS lpBuffersOut
 
 	if (WaitForSingleObject (thread, m_timeout ) == WAIT_TIMEOUT )
 	{
-		TerminateThread (thread, 1 );
+		InternetCloseHandle(m_InternetSession);
+		m_InternetSession = NULL;
+		WaitForSingleObject (thread, INFINITE);
 		VERIFY (CloseHandle (thread ) );
 		SetLastError (ERROR_INTERNET_TIMEOUT );
 		return FALSE;
@@ -1115,7 +1124,9 @@ CHttp::yog_InternetReadFile (HINTERNET hFile, LPVOID lpBuffer,
 
 	if (WaitForSingleObject (thread, m_timeout ) == WAIT_TIMEOUT )
 	{
-		TerminateThread (thread, 1 );
+		InternetCloseHandle(m_InternetSession);
+		m_InternetSession = NULL;
+		WaitForSingleObject (thread, INFINITE);
 		VERIFY (CloseHandle (thread ) );
 		SetLastError (ERROR_INTERNET_TIMEOUT );
 		return FALSE;

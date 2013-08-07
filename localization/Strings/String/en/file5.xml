@@ -18,8 +18,8 @@
 	<string name="1974">License &amp;Key</string>
 	<string name="1975">&amp;Register...</string>
 	<string name="1976">(Note: License key is case sensitive)</string>
-	<string name="1977">This is a TRIAL version of SQLyog.</string>
-	<string name="1978">Number of days left before it will expire:</string>
+	<string name="1977">This is a trial version of SQLyog.</string>
+	<string name="1978">Number of days left in trial:</string>
 	<string name="1979">To purchase SQLyog visit: </string>
 	<string name="1980">Continue...</string>
 	<string name="1981">&amp;Exit</string>

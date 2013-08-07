@@ -831,6 +831,12 @@ wyBool	IsGetObjectInfoAlways();
 */
 wyBool  IsOpenTablesInOB();
 
+/// Checks if connection restore is enabled
+/**
+@returns wyTrue if always else wyFalse
+*/
+wyBool  IsConnectionRestore();
+
 ///Checks whether Show all is selected in Data Tab or not
 /*
 @returns wyTrue if Show All is Selected otherwise wyFalse

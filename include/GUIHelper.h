@@ -1520,15 +1520,15 @@ LPARAM  TV_GetLParam(HWND hwnd, HTREEITEM hti);
 
 void EscapeHtmlToBuffer(wyString* buffer, const wyChar* text);
 
-wyBool CreateSessionFile(wyBool istemp);
+wyBool CreateSessionFile();
 
-wyBool GetSessionFile(wyWChar *path, wyBool istemp);
+wyBool GetSessionFile(wyWChar *path);
 
 wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo);
 
-wyBool WriteSessionDetails(wyChar* title, ConnectionInfo *conninfo, wyInt32 connectionno, wyBool isfocus);
+//wyBool WriteSessionDetails(wyChar* title, ConnectionInfo *conninfo, wyInt32 connectionno, wyBool isfocus);
 
-
+void WriteFullSectionToFile(FILE *fstream, wyInt32 conno, ConnectionInfo *coninfo, const wyChar *title, wyBool isfocussed);
 
 #endif
 

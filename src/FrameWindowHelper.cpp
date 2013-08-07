@@ -2342,6 +2342,22 @@ IsOpenTablesInOB()
 	return(ret)?(wyTrue):(wyFalse);
 }
 
+wyBool
+IsConnectionRestore()
+{
+	wyWChar		*lpfileport = 0;
+	wyWChar		directory[MAX_PATH+1]= {0};
+    wyInt32     ret;
+	wyString	dirstr;
+	// Get the complete path.
+	SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+	dirstr.SetAs(directory);
+	ret = wyIni::IniGetInt(GENERALPREFA, "ConnectionRestore", 0, dirstr.GetString());
+
+	return(ret)?(wyTrue):(wyFalse);
+}
+
+
 wyBool 
 IsShowAllInTableData()
 {	

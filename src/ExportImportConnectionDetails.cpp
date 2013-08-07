@@ -176,7 +176,7 @@ ExportImportConnection::OnInitConnectionManagerDialog(HWND hwnd,WPARAM wParam,LP
         return;
     
     //Place  SQLyog icon at top of Dialog
-    hicon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(MAKEINTRESOURCE(IDI_MAIN)));
+    hicon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_MAIN));
     SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hicon);
     DestroyIcon(hicon);
 
@@ -895,7 +895,7 @@ ExportImportConnection::OnInitConnectionImportDialog(HWND hwnd,WPARAM wParam,LPA
         return;
     }
 
-    hicon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(MAKEINTRESOURCE(IDI_MAIN)));
+    hicon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_MAIN));
     SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hicon);
     DestroyIcon(hicon);
 

@@ -463,6 +463,8 @@
 #define IDC_IGNORELINES                 1061
 #define IDC_SSHHOST2                    1061
 #define IDC_DIAG_USEFRMREPAIR           1061
+#define IDC_OPENTABLES2                 1061
+#define IDC_CONRESTORE                  1061
 #define IDC_DIAG_USELOCALREPAIR         1062
 #define IDC_TAB                         1062
 #define IDD_PREFFORMATTER               1062

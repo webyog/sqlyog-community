@@ -879,12 +879,16 @@ ConnectionCommunity::ConnectDialogProc(HWND hwnd, UINT message, WPARAM wParam, L
 }
 
 wyInt32 
-ConnectionCommunity::ActivateDialog(ConnectionInfo *conninfo, wyBool checksession)
+ConnectionCommunity::ActivateDialog(ConnectionInfo *conninfo)
 {
     wyInt32 ret = 0;
+	
+
 	// if click on buy or on image of start up dialog will go to website 
 	if(pGlobals->m_pcmainwin->m_connection->m_linkadd.GetLength() == 0)
-        ret =	DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_CONNECT), pGlobals->m_pcmainwin->m_hwndmain, ConnectDialogProc, (LPARAM)conninfo);
+	{
+		ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_CONNECT), pGlobals->m_pcmainwin->m_hwndmain, ConnectDialogProc, (LPARAM)conninfo);
+	}
 	else
 	{
 		ShowWindow(pGlobals->m_pcmainwin->m_hwndmain, SW_NORMAL);
@@ -1543,11 +1547,95 @@ ConnectionCommunity::FormateAllQueries(MDIWindow *wnd, HWND hwndeditor,
 }
 
 void    
-ConnectionCommunity::OnConnect(ConnectionInfo * dbname)
+ConnectionCommunity::OnConnect(ConnectionInfo *dbname)
 {
+	Tunnel		*tunnel;
+    MYSQL		*mysql;
+	HWND		lastfocus = GetFocus();
+	
+    tunnel = CreateTunnel(wyFalse);
+
+	if( ! tunnel )
+	{
+		return;
+	}
+
+	dbname->m_tunnel = tunnel;
+
+    mysql = ConnectToMySQL(dbname);
+
+	if(mysql == NULL)
+    {
+        delete tunnel;
+		tunnel = NULL;
+		SetFocus(lastfocus);
+	}
+    else if(dbname->m_db.GetLength() ==0 || (IsDatabaseValid(dbname->m_db, mysql, tunnel) == wyTrue))
+    {
+		dbname->m_mysql = mysql;
+		dbname->m_tunnel = tunnel;
+		m_rgbobbkcolor = dbname->m_rgbconn;
+		m_rgbobfgcolor = dbname->m_rgbfgconn;
+
+		pGlobals->m_isconnected = wyTrue;
+	}
+	else
+	{
+		ShowMySQLError(NULL, tunnel, &mysql, NULL, wyTrue);
+		return;
+	}
+
 }
+
 MYSQL* 
 ConnectionCommunity::ConnectToMySQL(ConnectionInfo * coninfo)
 {
-	return NULL;
+	Tunnel			*tunnel = coninfo->m_tunnel;
+	wyUInt32		client=0;
+	MYSQL           *mysql, *temp;
+    
+	SetCursor(LoadCursor(NULL, IDC_WAIT));
+
+	// FIRST initialize the object.
+	VERIFY(mysql = tunnel->mysql_init((MYSQL*)0));
+	temp = mysql;
+
+	coninfo->m_hprocess      = INVALID_HANDLE_VALUE;
+	coninfo->m_isssh         = wyFalse;
+	coninfo->m_origmysqlport = 0;
+
+
+	if(!tunnel->IsTunnel())
+    {
+        if(coninfo->m_initcommand.GetLength())
+            ExecuteInitCommands(mysql, tunnel, coninfo->m_initcommand);
+    }
+
+	if(coninfo->m_isdeftimeout == wyTrue) 
+	{	
+		coninfo->m_strwaittimeout.SetAs(WAIT_TIMEOUT_SERVER);
+	}
+	else
+	{
+		if(!coninfo->m_strwaittimeout.GetLength())
+		{
+			coninfo->m_strwaittimeout.SetAs(WAIT_TIMEOUT_SERVER);
+		}
+	}
+
+    SetMySQLOptions(coninfo, tunnel, &mysql);
+
+	mysql	= tunnel->mysql_real_connect(mysql, coninfo->m_host.GetString(), coninfo->m_user.GetString(), coninfo->m_pwd.GetString(), NULL, coninfo->m_port, NULL, client | CLIENT_MULTI_RESULTS | CLIENT_REMEMBER_OPTIONS, coninfo->m_url.GetString());
+
+	if(!mysql)
+    {
+		ShowMySQLError(NULL, tunnel, &temp, NULL, wyTrue);
+		tunnel->mysql_close(temp);
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
+		return NULL;
+	}
+		
+	SetCursor(LoadCursor(NULL, IDC_ARROW));
+
+	return mysql;
 }

@@ -220,7 +220,6 @@ wyIni::IniIsConnectionExists(const wyWChar *path)
     return wyFalse;
 }
 
-
 //transfers complete section from one file to another
 wyBool
 wyIni::IniTransferFullSection(const wyChar* fromSec, const wyChar* toSec, 

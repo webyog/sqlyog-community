@@ -89,6 +89,7 @@ extern	PGLOBALS		pGlobals;
 #define         MNU_REBUILDTAGS     12
 #define			ZERO				0
 
+
 #define			FIRSTTOOLICONCOUNT	6
 
 #define			TABBED_INTERFACE_HEIGHT	25
@@ -1000,6 +1001,7 @@ FrameWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 
 	switch(message)
 	{
+	
 	case WM_NCCREATE:
 		pcmainwin	= (FrameWindow *)(((CREATESTRUCT*)lparam)->lpCreateParams);
 		pcmainwin->SetHwnd(hwnd);
@@ -1116,6 +1118,13 @@ FrameWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
         }
 		break;
 
+	case WM_TIMER : 
+		if(wparam == CONRESTORE_TIMER)
+		{
+			KillTimer(hwnd, CONRESTORE_TIMER);
+			ConnectFromList();
+		}
+		break;
 	case WM_CLOSEALLWINDOW:
 		EnumChildWindows((HWND)pGlobals->m_hwndclient, FrameWindow::CloseEnumProc,(LPARAM)lparam);
 		break;
@@ -6187,17 +6196,10 @@ FrameWindow::OnWmClose(HWND hwnd)
 
 	wyBool retval;
 
-#ifndef COMMUNITY
-	if(pGlobals->m_entlicense.CompareI("Professional"))
-	{
-		if(pGlobals->m_conncount)
-		{
-			retval = SaveConnectionDetails();
-			if(retval == wyFalse)
-				return wyFalse;
-		}
-	}
-#endif
+	retval = SaveConnectionDetails();
+	if(retval == wyFalse)
+		return wyFalse;
+
 	SendMessage(hwnd, WM_CLOSEALLWINDOW, 0,(LPARAM)&ret);
 
     if(m_iscloseallmdi == wyTrue)
@@ -6402,7 +6404,7 @@ FrameWindow::ONWmMainWinNotify(HWND hwnd, LPARAM lparam, WPARAM wparam)
 {
 	LPNMHDR			lpnmhdr =(LPNMHDR)lparam;
 	HWND            hwndwindow, hwndtemp;
-	MDIWindow       *wnd;
+	MDIWindow       *wnd,*tempwnd = NULL;
     HMENU           hmenu, htrackmenu;
     POINT           pnt;
 	
@@ -6475,8 +6477,9 @@ FrameWindow::ONWmMainWinNotify(HWND hwnd, LPARAM lparam, WPARAM wparam)
 				or deleting a connection WM_MDIACTIVATE will be send where wparam is 0*/
 				if(wparam)
 				{
+					tempwnd = GetActiveWin();
 					EnumChildWindows(GetActiveWin()->m_hwndparent, FrameWindow::EnumMDIChildren, (LPARAM)&hwndtemp);
-					SendMessage(GetActiveWin()->m_hwndparent, WM_MDINEXT, (WPARAM)hwndtemp, (LPARAM)0);
+					hwndtemp && SendMessage(GetActiveWin()->m_hwndparent, WM_MDINEXT, (WPARAM)hwndtemp, (LPARAM)0);
 				}
 				else
 				{
@@ -8083,7 +8086,8 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 	MDIWindow		*pcquerywnd = NULL;//, *wnd;
 	wyInt32         ret;
 	ConnectionInfo	conninfo;
-    
+    wyWChar path[MAX_PATH+1] ={0};
+
     InitializeConnectionInfo(conninfo);
 
 	VERIFY(IsWindow(pGlobals->m_hwndclient));
@@ -8101,12 +8105,14 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 	}*/
 
 
-	//check if pref option says do not open connection dlg
-
-	if(readsession)
-		ret = pGlobals->m_pcmainwin->m_connection->ActivateDialog(&conninfo, wyTrue);
+	//check if pref option says do not open restore connection dlg
+	if(readsession && IsConnectionRestore() && GetSessionFile(path))
+	{
+		SetTimer(pGlobals->m_pcmainwin->m_hwndmain, CONRESTORE_TIMER, 500, NULL);
+		ret = 0;
+	}	
 	else
-		ret = pGlobals->m_pcmainwin->m_connection->ActivateDialog(&conninfo, wyFalse);
+		ret = pGlobals->m_pcmainwin->m_connection->ActivateDialog(&conninfo);
     
 	// Now check what was returned from the dialog box.
 	switch(ret)
@@ -8623,38 +8629,132 @@ FrameWindow::SaveConnectionDetails()
 	contabitem.m_mask = CTBIF_LPARAM | CTBIF_COLOR;
 	MDIWindow	*wnd;
  	wyBool isfocussed;
-	wyWChar		directory[MAX_PATH+1]= {0};
-	wyWChar		*lpfileport=0;
+	wyWChar		path[MAX_PATH + 1] = {0};
 	wyString	dirstr;
+	FILE		*out_stream = NULL;
+	wyUInt32	trycount = 0;
 
-	SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
-			dirstr.SetAs(directory);
 	
-	
-		CreateSessionFile(wyTrue);
-		if(m_hwndconntab)
-			tabcount = CustomTab_GetItemCount(m_hwndconntab);
-		else
-			return wyTrue;
 
-		for(i= 0; i< tabcount; i++)
+	if(IsConnectionRestore())
+	{
+		GetSessionFile(path);
+		do
 		{
-			CustomTab_GetItem(m_hwndconntab, i, &contabitem);
-			wnd = (MDIWindow*)contabitem.m_lparam;
-			if(GetActiveWin() == wnd)
-				isfocussed = wyTrue;
+			if((out_stream = _wfopen(path, L"wb")))
+			{
+				break;
+			}
 			else
-				isfocussed = wyFalse;
-			WriteSessionDetails((wyChar*)wnd->m_title.GetString(), &wnd->m_conninfo, i, isfocussed);
+			{
+				if(GetLastError() == ERROR_FILE_NOT_FOUND)
+				{
+					return wyFalse;				
+				}
+
+				Sleep(FILE_LOCK_WAIT);
+				trycount++;	
+			}
+
+		} while(trycount <= FILE_LOCK_WAIT_TRY_COUNT);
+	
+		if(trycount > FILE_LOCK_WAIT_TRY_COUNT)
+		{
+			MessageBox(NULL, _(L"Files are inaccessible"), L"SQLyog", MB_ICONERROR | MB_OKCANCEL); 
+			return wyFalse;
 		}
 
-		/*GetSessionFile(directory, wyTrue);
-		GetSessionFile(dir2, wyFalse);
-
-		CopyFile(directory, dir2, FALSE);
-		DeleteFile(directory);*/
-
+		if(m_hwndconntab)
+		{
+			tabcount = CustomTab_GetItemCount(m_hwndconntab);
+		
+			for(i = 0; i < tabcount; i++)
+			{
+				CustomTab_GetItem(m_hwndconntab, i, &contabitem);
+				wnd = (MDIWindow*)contabitem.m_lparam;
+				if(GetActiveWin() == wnd)
+					isfocussed = wyTrue;
+				else
+					isfocussed = wyFalse;
+				WriteFullSectionToFile(out_stream, i, &wnd->m_conninfo, wnd->m_title.GetString(), isfocussed);
+			}
+		}
+		fclose(out_stream);
+	}
 	
 	return wyTrue;
 }
 
+void
+ConnectFromList()
+{
+	ConnectionInfo	conninfo;
+	MDIWindow		*pcquerywnd = NULL;
+	wyInt32         concount = 0, focussedconn = -1;
+	wyBool			isfocussed = wyFalse;
+    wyWChar			path[MAX_PATH +1];
+	wyString		pathstr, connstr, sectionstring, tmps;
+	wyChar			seps[] = ";";
+	
+	
+
+	if(GetSessionFile(path) == wyTrue)
+	{
+		pathstr.SetAs(path);
+
+		wyIni::IniGetSection(&sectionstring, &pathstr);
+
+		sectionstring.StripToken(seps, &connstr);
+		
+		
+		while(connstr.GetLength())
+		{
+			InitializeConnectionInfo(conninfo);
+
+			isfocussed = GetSessionDetails(connstr.GetAsWideChar(), pathstr.GetAsWideChar(), &conninfo);
+				
+			sectionstring.StripToken(seps, &connstr);
+			
+			pGlobals->m_pcmainwin->m_connection->OnConnect(&conninfo);
+				
+			if( ! conninfo.m_mysql )
+			{
+				tmps.Sprintf(_("Could not connect to %s"), conninfo.m_title.GetString());
+				yog_message(pGlobals->m_pcmainwin->m_hwndmain, tmps.GetAsWideChar(),_(L"Error"), MB_ICONERROR);
+				continue;
+			}
+
+			if(pGlobals->m_pcmainwin->m_hwndconntab == NULL)
+			{
+				//create connection tab
+				pGlobals->m_pcmainwin->m_hwndconntab = pGlobals->m_pcmainwin->m_conntab->CreateConnectionTabControl(pGlobals->m_pcmainwin->GetHwnd());
+			}
+
+			pcquerywnd	= new MDIWindow(pGlobals->m_pcmainwin->GetMDIWindow(), &conninfo, conninfo.m_db, conninfo.m_title);
+			if(pcquerywnd)
+			{
+				pcquerywnd->m_postactivatemsg = wyFalse;
+				
+				pcquerywnd->Create();
+				
+				pGlobals->m_conncount++;
+				
+				pGlobals->m_pcmainwin->SetConnectionNumber();
+				pcquerywnd->m_pcqueryobject->OnSelChanged(TreeView_GetSelection(pcquerywnd->m_pcqueryobject->m_hwnd));
+				pGlobals->m_pcmainwin->OnActiveConn();
+
+				if(isfocussed)
+				{	
+					focussedconn = concount;
+				}
+
+				concount++;
+			}
+		}
+		
+		//if(focussedconn >= 0)
+		//	CustomTab_SetCurSel(pGlobals->m_pcmainwin->m_hwndconntab, focussedconn, 1);
+		
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
+	}
+}
