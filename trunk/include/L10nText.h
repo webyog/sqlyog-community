@@ -57,10 +57,11 @@ struct Language
 @param langcode         : IN language code
 @param dictionary       : IN dictionary file
 @param ismemoryindex    : IN wheather to create the index in the memory or not. With memory index, the library would be faster
-@param islogging        : IN parameter tells to log information whenever a string lookup fails
+@param islogerror       : IN parameter tells to log information whenever a string lookup fails, also activates SQLite logging
+@param islogaccess      : IN parameter tells to log information whenever a string lookup is tried
 @returns 0 on success else non zero
 */
-wyInt32         InitL10n(const wyChar* langcode, const wyChar* dictionary, wyBool ismemoryindex);
+wyInt32         InitL10n(const wyChar* langcode, const wyChar* dictionary, wyBool ismemoryindex, wyBool islogerror = wyFalse, wyBool islogaccess = wyFalse);
 
 ///Function closes the library
 void            CloseL10n();
@@ -187,10 +188,11 @@ class L10nText
         @param langcode         : IN language code
         @param dictionary       : IN dictionary file
         @param ismemoryindex    : IN wheather to create the index in the memory or not. With memory index, the library would be faster
-        @param islogging        : IN parameter tells to log information whenever a string lookup fails
+        @param islogerror       : IN parameter tells to log information whenever a string lookup fails, also activates SQLite logging
+		@param islogaccess      : IN parameter tells to log information whenever a string lookup is tried
         @returns 0 on success else non zero
         */
-        static wyInt32          Init(const wyChar* langcode, const wyChar* dictonary, wyBool ismemoryindex, wyBool islogging);
+        static wyInt32          Init(const wyChar* langcode, const wyChar* dictonary, wyBool ismemoryindex,  wyBool islogerror, wyBool islogaccess);
 
         ///Static function to get the languages available with the dictionary
         /**
@@ -253,10 +255,11 @@ class L10nText
         @param langcode         : IN language code
         @param dictionary       : IN dictionary file
         @param ismemoryindex    : IN wheather to create the index in the memory or not. With memory index, the library would be faster
-        @param islogging        : IN parameter tells to log information whenever a string lookup fails
+        @param islogerror       : IN parameter tells to log information whenever a string lookup fails, also activates SQLite logging
+		@param islogaccess      : IN parameter tells to log information whenever a string lookup is tried
         @returns 0 on success else non zero
         */
-        wyInt32             Initialize(const wyChar* langcode, const wyChar* dictonary, wyBool ismemoryindex, wyBool islogging);
+        wyInt32             Initialize(const wyChar* langcode, const wyChar* dictonary, wyBool ismemoryindex, wyBool islogerror, wyBool islogaccess);
         
         ///Function released the index created
         void                ReleaseStringIndex();
@@ -284,8 +287,11 @@ class L10nText
         //member to hold language code
         wyString            m_langcode;
 
-        //member to indicate the logging
-        wyBool              m_islogging;
+        //member to indicate the error logging
+        wyBool              m_islogerror;
+
+		//member to indicate access logging
+        wyBool              m_islogaccess;
 
         //dictionary file name
         wyString            m_dictionary;

@@ -2643,8 +2643,12 @@ SQLFormatter::GetQueryWtOutComments(wyString *commstr, wyString *uncommstr)
 		m_pcmnts = (Comments**)realloc(m_pcmnts, sizeof(Comments*) *(m_cmntcnt + 1));	
 		
 		if(!m_pcmnts)
+		{
+			//sudhi
+			free(cmntbuf);
+			//sudhi
 			return ;
-		
+		}
 		m_pcmnts[m_cmntcnt] = cmntbuf;
 		m_pcmnts[m_cmntcnt]->m_startpos = 0 ;
 		m_pcmnts[m_cmntcnt]->m_comment  = NULL ;

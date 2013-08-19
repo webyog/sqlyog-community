@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="3300">高级功能</string>
-	<string name="3301">/*数据库：％s*/</string>
+	<string name="3301">/*数据库：%s*/</string>
 	<string name="3302">格式：</string>
 	<string name="3303">文本/详细</string>
 	<string name="3304">选择的颜色</string>
@@ -9,7 +9,7 @@
 	<string name="3306">自动对比度</string>
 	<string name="3308">/*服务器信息 -</string>
 	<string name="3309">/*表信息*/</string>
-	<string name="3310">表（％d）</string>
+	<string name="3310">表（%d）</string>
 	<string name="3311">/*查看信息*/</string>
 	<string name="3312">查看（%d）</string>
 	<string name="3313">/*过程信息*/</string>

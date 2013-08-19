@@ -25,7 +25,7 @@
 #ifndef COMMUNITY
 #include "tinyxml.h"
 #endif
-
+#include "Symbols.h"
 #include "ExportMultiFormat.h"
 #include "FrameWindow.h"
 #include "FrameWindowHelper.h"
@@ -74,6 +74,10 @@
 
 extern	PGLOBALS		pGlobals;
 
+#define			UM_UPDATE_PROGRESS		WM_USER + 100
+#define			UM_CLOSE_RESTORE_STATUS	WM_USER + 101
+#define			UM_UPDATE_CONNECTION	WM_USER + 102
+
 #define			MDISTARTID			60000
 #define			FIND_STR_LEN		256
 #define			DELIMITEROPEN		"DELIMITER $$\r\n\r\n"
@@ -112,6 +116,7 @@ log(const char * buff)
 	fclose ( fp );
 #endif
 }
+
 FrameWindow::FrameWindow(HINSTANCE hinstance)
 {	
     wyWChar     directory[MAX_PATH];
@@ -137,7 +142,11 @@ FrameWindow::FrameWindow(HINSTANCE hinstance)
         dirstr.Add(LANGUAGE_DBFILE);
 
         //Initialize L10nText library
-        InitL10n(section.GetString(), dirstr.GetString(), wyFalse); 
+#ifdef _DEBUG
+		InitL10n(section.GetString(), dirstr.GetString(), wyFalse, wyTrue, wyFalse); 
+#else
+		InitL10n(section.GetString(), dirstr.GetString(), wyFalse, wyFalse, wyFalse); 
+#endif
     }
     
     m_hwndtooltip       = NULL;
@@ -178,6 +187,8 @@ FrameWindow::FrameWindow(HINSTANCE hinstance)
     m_frstruct.lStructSize = sizeof(FINDREPLACE);
     m_findproc = NULL;
     m_languagecount = GetL10nLanguageCount();
+	m_showwindowstyle = SW_NORMAL;
+	m_hwndrestorestatus = NULL;
 
 #ifdef COMMUNITY
 	m_commribbon    =  NULL;
@@ -753,7 +764,7 @@ FrameWindow::CreateMainWindow(HINSTANCE hinstance)
 	//ShowWindow(hwnd, SW_NORMAL);
 	//VERIFY(ret = UpdateWindow(hwnd));
 
-    MoveToInitPos(hwnd);
+    MoveToInitPos(hwnd);	
 
      val = m_connection->CheckRegistration(m_hwndmain, this);
 
@@ -797,7 +808,7 @@ FrameWindow::MoveToInitPos(HWND hwnd)
 
     if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyFalse)
     {
-        ShowWindow(hwnd, SW_NORMAL);
+		m_showwindowstyle = SW_NORMAL;
         return wyFalse;
     }
 	
@@ -807,7 +818,7 @@ FrameWindow::MoveToInitPos(HWND hwnd)
 
     if(lstyle == 1)
     {
-        ShowWindow(hwnd, SW_MAXIMIZE);
+		m_showwindowstyle = SW_MAXIMIZE;
         return wyTrue;
     }
 
@@ -918,7 +929,7 @@ FrameWindow::MoveToInitPos(HWND hwnd)
 	}
 	
 	MoveWindow(hwnd, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, FALSE);        
-    ShowWindow(hwnd, SW_NORMAL);
+    m_showwindowstyle = SW_NORMAL;
 	return wyTrue;
 }
 
@@ -1121,8 +1132,11 @@ FrameWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 	case WM_TIMER : 
 		if(wparam == CONRESTORE_TIMER)
 		{
+            PostMessage(pcmainwin->m_hwndrestorestatus, UM_CLOSE_RESTORE_STATUS, 0, 0);
 			KillTimer(hwnd, CONRESTORE_TIMER);
-			ConnectFromList();
+			ShowWindow(hwnd, pcmainwin->m_showwindowstyle);
+			pcmainwin->m_showwindowstyle = SW_HIDE;
+			SetForegroundWindow(hwnd);
 		}
 		break;
 	case WM_CLOSEALLWINDOW:
@@ -8087,6 +8101,7 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 	wyInt32         ret;
 	ConnectionInfo	conninfo;
     wyWChar path[MAX_PATH+1] ={0};
+	wyString		failedconnections;
 
     InitializeConnectionInfo(conninfo);
 
@@ -8108,11 +8123,27 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 	//check if pref option says do not open restore connection dlg
 	if(readsession && IsConnectionRestore() && GetSessionFile(path))
 	{
+		ConnectFromList(&failedconnections);
 		SetTimer(pGlobals->m_pcmainwin->m_hwndmain, CONRESTORE_TIMER, 500, NULL);
+
+		if(failedconnections.GetLength())
+		{
+			failedconnections.Insert(0, _("Failed to restore following connections\r\n\r\n"));
+			MessageBox(pGlobals->m_pcmainwin->m_hwndmain, failedconnections.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONINFORMATION | MB_OK);
+		}
+
 		ret = 0;
 	}	
 	else
+	{
+		if(m_showwindowstyle != SW_HIDE) 
+		{
+			ShowWindow(m_hwndmain, m_showwindowstyle);
+			m_showwindowstyle = SW_HIDE;
+		}
+
 		ret = pGlobals->m_pcmainwin->m_connection->ActivateDialog(&conninfo);
+	}
     
 	// Now check what was returned from the dialog box.
 	switch(ret)
@@ -8686,16 +8717,17 @@ FrameWindow::SaveConnectionDetails()
 }
 
 void
-ConnectFromList()
+ConnectFromList(wyString* failledconnections)
 {
 	ConnectionInfo	conninfo;
 	MDIWindow		*pcquerywnd = NULL;
-	wyInt32         concount = 0, focussedconn = -1;
+	wyInt32         concount = 0, focussedconn = -1, totalcon = 0, i = 0;
+	wyUInt32		threadid;
 	wyBool			isfocussed = wyFalse;
     wyWChar			path[MAX_PATH +1];
-	wyString		pathstr, connstr, sectionstring, tmps;
+	wyString		pathstr, connstr, sectionstring;
 	wyChar			seps[] = ";";
-	
+	const wyChar*	str = NULL;
 	
 
 	if(GetSessionFile(path) == wyTrue)
@@ -8704,23 +8736,35 @@ ConnectFromList()
 
 		wyIni::IniGetSection(&sectionstring, &pathstr);
 
+		for(i = 0, str = sectionstring.GetString(); str[i]; ++i)
+		{
+			totalcon += str[i] == seps[0] ? 1 : 0;
+		}
+
+		i = 0;
 		sectionstring.StripToken(seps, &connstr);
-		
 		
 		while(connstr.GetLength())
 		{
+			if(i == 0)
+			{
+				_beginthreadex(NULL, 0, FrameWindow::RestoreStatusThreadProc, (void*)totalcon, 0, &threadid);
+			}
+
+			++i;
 			InitializeConnectionInfo(conninfo);
 
 			isfocussed = GetSessionDetails(connstr.GetAsWideChar(), pathstr.GetAsWideChar(), &conninfo);
 				
-			sectionstring.StripToken(seps, &connstr);
+			sectionstring.StripToken(seps, &connstr); 
 			
+			PostMessage(pGlobals->m_pcmainwin->m_hwndrestorestatus, UM_UPDATE_CONNECTION, 0, (LPARAM)strdup(conninfo.m_title.GetString()));
 			pGlobals->m_pcmainwin->m_connection->OnConnect(&conninfo);
+			PostMessage(pGlobals->m_pcmainwin->m_hwndrestorestatus, UM_UPDATE_PROGRESS, 0, 0);
 				
-			if( ! conninfo.m_mysql )
+			if(!conninfo.m_mysql )
 			{
-				tmps.Sprintf(_("Could not connect to %s"), conninfo.m_title.GetString());
-				yog_message(pGlobals->m_pcmainwin->m_hwndmain, tmps.GetAsWideChar(),_(L"Error"), MB_ICONERROR);
+				failledconnections->AddSprintf("%s\r\n", conninfo.m_title.GetString());
 				continue;
 			}
 
@@ -8752,9 +8796,60 @@ ConnectFromList()
 			}
 		}
 		
-		//if(focussedconn >= 0)
-		//	CustomTab_SetCurSel(pGlobals->m_pcmainwin->m_hwndconntab, focussedconn, 1);
+		if(focussedconn >= 0)
+			CustomTab_SetCurSel(pGlobals->m_pcmainwin->m_hwndconntab, focussedconn, 1);
 		
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
 	}
+}
+
+
+unsigned __stdcall  
+FrameWindow::RestoreStatusThreadProc(LPVOID lpparam)
+{
+	DialogBoxParam(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_RESTORE_STATUS), NULL, FrameWindow::RestoreStatusDlgProc, (LPARAM)lpparam);    
+    _endthreadex(0);
+    return 0;
+}
+
+INT_PTR CALLBACK 
+FrameWindow::RestoreStatusDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+{
+    HICON		hicon;
+    HMENU		hmenu;  
+	wyString*	ptemp;
+
+	switch(message) 
+	{
+		case WM_INITDIALOG: 
+            pGlobals->m_pcmainwin->m_hwndrestorestatus = hwnd;
+            hicon = LoadIcon(pGlobals->m_hinstance, MAKEINTRESOURCE(IDI_MAIN));
+            SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hicon);
+            DestroyIcon(hicon);
+            hmenu = GetSystemMenu(hwnd, FALSE);
+            EnableMenuItem(hmenu, SC_CLOSE, MF_BYCOMMAND | MF_DISABLED);
+			SendMessage(GetDlgItem(hwnd, IDC_RESTORE_PROGRESS), PBM_SETRANGE32, 0, lparam);
+			SendMessage(GetDlgItem(hwnd, IDC_RESTORE_PROGRESS), PBM_SETSTEP, 1, 0);
+			SendMessage(GetDlgItem(hwnd, IDC_RESTORE_PROGRESS), PBM_SETPOS, 0, 0);
+            SetWindowText(hwnd, pGlobals->m_appname.GetAsWideChar());
+			break;
+
+		case UM_UPDATE_PROGRESS:
+			SendMessage(GetDlgItem(hwnd, IDC_RESTORE_PROGRESS), PBM_STEPIT, 0, 0);
+			return TRUE;
+
+		case UM_UPDATE_CONNECTION:
+			ptemp = new wyString();
+			ptemp->Sprintf(_("Restoring %s"), (wyChar*)lparam);
+			free((wyChar*)lparam);
+			SetWindowText(GetDlgItem(hwnd, IDC_CONNECTION_NAME), ptemp->GetAsWideChar());
+			delete ptemp;
+			return TRUE;
+
+		case UM_CLOSE_RESTORE_STATUS:
+			EndDialog(hwnd, 0);
+			return TRUE;
+	}
+
+	return FALSE;
 }

@@ -80,6 +80,10 @@ public:
 
     static	LRESULT			CALLBACK	ToolbarWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
 
+	static unsigned __stdcall		RestoreStatusThreadProc(LPVOID lpparam);
+
+	static INT_PTR CALLBACK		RestoreStatusDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
+
     ///Window MainWindow window procedure 
     /**
     @param hwnd                 : IN Window procedure
@@ -1610,11 +1614,15 @@ public:
     HWND                m_hwndtooltip;
 
     wyInt32             m_editorcolumnline;
+
+	wyInt32				m_showwindowstyle;
+
+	HWND				m_hwndrestorestatus;
 };
 
 /// Function to rstore connections
 /**
 */
-void	ConnectFromList();
+void	ConnectFromList(wyString* failledconnections);
 
 #endif

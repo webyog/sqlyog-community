@@ -266,7 +266,7 @@ MySQL バージョン: %s</string>
 	<string name="1225">参照先のクエリファイルを開けませんでした。 
 クエリファイルが存在することを確認してください。</string>
 	<string name="1226">ファイルを開く</string>
-	<string name="1227">文書の検索が終わりました。 &quot;％s&quot; を見つけることができません</string>
+	<string name="1227">文書の検索が終わりました。 &quot;%s&quot; を見つけることができません</string>
 	<string name="1228">%d インスタンスの交換</string>
 	<string name="1229">置き換え</string>
 	<string name="1230">すべてを置き換え</string>

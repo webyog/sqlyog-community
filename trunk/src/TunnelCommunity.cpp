@@ -56,7 +56,21 @@ TunnelCommunity::mysql_real_connect (
 							  const char * httpaddress							
 						   )
 {
-		return ::mysql_real_connect( mysql, host, user, passwd, db, port, unix_socket, client_flag );
+		MYSQL *temp = ::mysql_real_connect( mysql, host, user, passwd, db, port, unix_socket, client_flag );
+
+		if(temp) 
+		{
+			wyUInt32 me = mysql_get_server_version(temp);/* Only available from MySQLv4.1*/
+
+			if(me < 40100) 
+			{
+				mysql->net.last_errno = 2054;
+				strcpy(mysql->net.last_error, "Connecting to 3.22, 3.23 & 4.0 servers is not supported");
+				temp = NULL;
+			}
+		}
+
+		return temp;
 }
 
 int

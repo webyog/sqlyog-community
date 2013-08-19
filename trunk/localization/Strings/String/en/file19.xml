@@ -2,4 +2,9 @@
 <resources>
 	<string name="3613">Previously Opened Connections</string>
 	<string name="3614">&amp;New Connection...</string>
+	<string name="3615">Restoring %s</string>
+	<string name="3616">R&amp;estore connections on startup</string>
+	<string name="3617">Failed to restore following connections
+
+</string>
 </resources>
