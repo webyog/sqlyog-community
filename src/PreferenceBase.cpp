@@ -83,6 +83,7 @@ PreferenceBase::~PreferenceBase()
 void
 PreferenceBase::Create(wyInt32 startpage)
 {
+	wyInt32 pagecount = 0;
 	m_startpage = startpage;
 
 	// we have to create a propertysheet.
@@ -100,7 +101,7 @@ PreferenceBase::Create(wyInt32 startpage)
     psp.pszTemplate =   MAKEINTRESOURCE(IDD_PREFGENERAL);
     psp.pszTitle    =   _(L"General");
 
-    ahpsp[0] =          CreatePropertySheetPage(&psp);
+    ahpsp[pagecount++] =          CreatePropertySheetPage(&psp);
 
 	psp.dwSize		=	sizeof(psp);
     psp.dwFlags		=	PSP_DEFAULT | PSH_NOAPPLYNOW | PSP_USETITLE;
@@ -110,7 +111,7 @@ PreferenceBase::Create(wyInt32 startpage)
     psp.pszTemplate =   MAKEINTRESOURCE(IDD_PREF3);
     psp.pszTitle    =   _(L"Power Tools");
     
-    ahpsp[1] =          CreatePropertySheetPage(&psp);
+    ahpsp[pagecount++] =          CreatePropertySheetPage(&psp);
     
 	psp.dwSize		=	sizeof(psp);
     psp.dwFlags		=	PSP_DEFAULT | PSH_NOAPPLYNOW | PSP_USETITLE | PSP_PREMATURE;
@@ -120,17 +121,20 @@ PreferenceBase::Create(wyInt32 startpage)
     psp.pszTemplate =   MAKEINTRESOURCE(IDD_PREF2);
     psp.pszTitle    =   _(L"Fonts && Editor Settings");
 
-    ahpsp[2] =          CreatePropertySheetPage(&psp);
+    ahpsp[pagecount++] =          CreatePropertySheetPage(&psp);
 
-	psp.dwSize		=	sizeof(psp);
-    psp.dwFlags		=	PSP_DEFAULT | PSH_NOAPPLYNOW | PSP_USETITLE;
-    psp.hInstance	=	pGlobals->m_hinstance;
-    psp.lParam		=   (LPARAM)this; //The shared data structure
-    psp.pfnDlgProc	=   FormatterPrefDlgProc;
-    psp.pszTemplate =   MAKEINTRESOURCE(IDD_PREFFORMATTER);
-    psp.pszTitle    =   _(L"SQL Formatter");
+	if(pGlobals->m_entlicense.CompareI("Professional"))
+	{
+		psp.dwSize		=	sizeof(psp);
+		psp.dwFlags		=	PSP_DEFAULT | PSH_NOAPPLYNOW | PSP_USETITLE;
+		psp.hInstance	=	pGlobals->m_hinstance;
+		psp.lParam		=   (LPARAM)this; //The shared data structure
+		psp.pfnDlgProc	=   FormatterPrefDlgProc;
+		psp.pszTemplate =   MAKEINTRESOURCE(IDD_PREFFORMATTER);
+		psp.pszTitle    =   _(L"SQL Formatter");
 
-    ahpsp[3] =          CreatePropertySheetPage(&psp);
+		ahpsp[pagecount++] =          CreatePropertySheetPage(&psp);
+	}
 	
 	psp.dwSize		=	sizeof(psp);
     psp.dwFlags		=	PSP_DEFAULT | PSH_NOAPPLYNOW | PSP_USETITLE;
@@ -140,7 +144,7 @@ PreferenceBase::Create(wyInt32 startpage)
     psp.pszTemplate =   MAKEINTRESOURCE(IDD_PREFOTHERS);
     psp.pszTitle    =   _(L"Others");
 
-    ahpsp[4] =          CreatePropertySheetPage(&psp);
+    ahpsp[pagecount++] =          CreatePropertySheetPage(&psp);
 
 	//////////////////////////////////////////////////////////////////
 	// Display the page using additional code
@@ -152,7 +156,7 @@ PreferenceBase::Create(wyInt32 startpage)
 	psh.phpage		= ahpsp;
 	psh.hwndParent  = pGlobals->m_pcmainwin->m_hwndmain;
 	psh.pszCaption	= _(L"Preferences");
-	psh.nPages		= 5;
+	psh.nPages		= pagecount;
 	psh.nStartPage  = startpage;
 	
 	PropertySheet(&psh);

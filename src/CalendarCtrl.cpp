@@ -16,7 +16,6 @@
 
 */
 
-
 #include "CalendarCtrl.h"
 #include "FrameWindowHelper.h"
 #ifndef COMMUNITY

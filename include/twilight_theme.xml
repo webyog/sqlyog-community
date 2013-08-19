@@ -55,11 +55,11 @@
 	
 	<conntab tabbottomline="true">
 		<background color1="14339524" color2="14339524" />
-		<foreground color1="13218213" />
+		<foreground color1="13218213" color2="13218213" />
 		<selectedtab color2="13218213" />
 		<plusbutton color1="6770753" />
 		<closebutton color1="0xA1AEC7" />
-		<seperator highlight="0x303030" />
+		<seperator highlight="7895160" inactive="7895160" />
 	</conntab>
 	
 	<querytab tabbottomline="true">

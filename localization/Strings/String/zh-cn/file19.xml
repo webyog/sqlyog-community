@@ -2,4 +2,10 @@
 <resources>
 	<string name="3613">之前打开的连接</string>
 	<string name="3614">新的连接...</string>
+	<string name="3615">恢复 %s</string>
+	<string name="3616">恢&amp;复连接启动</string>
+	<string name="3617">以下连接无法恢复
+
+</string>
+	
 </resources>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="3300">진전된</string>
-	<string name="3301">데이터베이스</string>
+	<string name="3301">/*데이터베이스: %s*/</string>
 	<string name="3302">포맷</string>
 	<string name="3303">문자 / 상세한</string>
 	<string name="3304">선택된 색깔</string>
@@ -15,16 +15,16 @@
 	<string name="3313">과정 정보</string>
 	<string name="3314">과정 (%d)</string>
 	<string name="3315">기능 정보</string>
-	<string name="3316">기능</string>
+	<string name="3316">기능 (%d)</string>
 	<string name="3317">트리거 정보</string>
 	<string name="3318">트리거 (%d)</string>
 	<string name="3319">%s*/ 를 위한 DDL 정보</string>
-	<string name="3320">종열</string>
+	<string name="3320">종열 (%d)</string>
 	<string name="3321">&amp;nbsp;테이블; %s</string>
 	<string name="3322">기존 데이터를 읽어서 이 테이블에 맞는 데이터형식을 찾으시오.옵티마이저_도움&apos; 목표= 빈칸 > 더 읽으시오</string>
-	<string name="3323">목록(색인)</string>
+	<string name="3323">목록(색인) (%d)</string>
 	<string name="3324">DDL정보</string>
-	<string name="3325">저장된 과정</string>
+	<string name="3325">/*저장된 과정 %s*/</string>
 	<string name="3326">&amp;nbsp; 저장된 과정 %s</string>
 	<string name="3327">전망 정보</string>
 	<string name="3328">&amp;nbsp; 전망  %s</string>
@@ -48,7 +48,7 @@
 	<string name="3349">기능</string>
 	<string name="3350">트리거</string>
 	<string name="3351">색인</string>
-	<string name="3352">이벤트</string>
+	<string name="3352">이벤트 (%d)</string>
 	<string name="3353">검사 실행 (F9)</string>
 	<string name="3354">모든 검색의 실행 ( Shift+F9)</string>
 	<string name="3355">전문가/사업/최고 으로 업그래드하려는 이유들</string>

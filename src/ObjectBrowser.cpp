@@ -2829,7 +2829,9 @@ CQueryObject::GetPrimaryKeyInfo(MDIWindow * wnd, wyString &primary, wyBool isbac
 			}
 		}
 	}
-
+	//sudhi
+	wnd->m_tunnel->mysql_free_result(keyres);
+	//sudhi
 	if(flag)
 		primary.Strip(4);
 	

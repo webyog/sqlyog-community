@@ -1359,7 +1359,12 @@ CSchema::WriteFK(HWND hwndmessag, wyChar *table)
         return wyFalse;
 
     if(retval == 1)
+	{
+	//sudhi
+		m_tunnel->mysql_free_result(myres);
+	//sudhi
         return wyTrue;
+	}
 
 	/* now write the titles for the table */
 	for(i=0; i <(sizeof(fktitles)/sizeof(fktitles[0])); i++)

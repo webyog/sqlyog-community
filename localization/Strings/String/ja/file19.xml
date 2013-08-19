@@ -2,4 +2,10 @@
 <resources>
 	<string name="3613">事前にオープンされている接続</string>
 	<string name="3614">新規接続...</string>
+	<string name="3615">復元する %s</string>
+	<string name="3616">起&amp;動時に接続を復元</string>
+	<string name="3617">次の接続の復元に失敗しました
+
+</string>
+	
 </resources>

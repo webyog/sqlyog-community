@@ -131,9 +131,9 @@ SQLyogは通常モードで接続を続けます。</string>
 	<string name="1601">%s内のデータベース`%s`および1つのテーブル%sを検索する</string>
 	<string name="1602">%sのデータベース`%s`を検索する</string>
 	<string name="1603">%sのデータベース`%s`およびもう1つのテーブル%sを検索する</string>
-	<string name="1604">%sのデータベース`%s`および%d、他のテーブルを検索する</string>
-	<string name="1605">%sのデータベース`%s`および%d、他のテーブルを検索する</string>
-	<string name="1606">%sのデータベース`%s`および%d、他のテーブルを検索する</string>
+	<string name="1604">%sのデータベース`%s`および%d、他のテーブルを検索する%s</string>
+	<string name="1605">%sのデータベース`%s`および%d、他のテーブルを検索する%s</string>
+	<string name="1606">%sのデータベース`%s`および%d、他のテーブルを検索する%s</string>
 	<string name="1607">%sのデータベース`%s`および%d、他のテーブル%sを検索する</string>
 	<string name="1608">このテーブルには列がありません</string>
 	<string name="1609">列</string>
@@ -222,7 +222,7 @@ SQLyogは通常モードで接続を続けます。</string>
 	<string name="1678">SQLステートメントは有効です!</string>
 	<string name="1679">この機能はお使いのOSではサポートされていません!</string>
 	<string name="1680">- 現在まで実行されていません　</string>
-	<string name="1681">- 一番最新の実行先: %u/%u/%u:%u:u</string>
+	<string name="1681">- 一番最新の実行先: %u/%u/%u:%u:%02u</string>
 	<string name="1682">ジョブを削除します。よろしいですか?</string>
 	<string name="1683">ジョブの削除に成功しました</string>
 	<string name="1684">ジョブが正常に初期化されました</string>

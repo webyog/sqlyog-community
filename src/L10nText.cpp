@@ -35,20 +35,14 @@ wyInt32     L10nText::m_sourceline = 0;
 
 //--------------------------------- L10n APIs
 wyInt32 
-InitL10n(const wyChar* langcode, const wyChar* dictionary, wyBool ismemoryindex)
+InitL10n(const wyChar* langcode, const wyChar* dictionary, wyBool ismemoryindex, wyBool islogerror, wyBool islogaccess)
 {    
-    wyBool islogging = wyFalse;
-
-#ifdef _DEBUG
-    islogging = wyTrue;
-#endif
-
     if(L10nText::Allocate() == wyFalse)
     {
         return 1;
     }
 
-    return L10nText::Init(langcode, dictionary, ismemoryindex, islogging);
+    return L10nText::Init(langcode, dictionary, ismemoryindex, islogerror, islogaccess);
 }
 
 void 
@@ -166,7 +160,8 @@ L10nText::L10nText()
 #endif
     m_index = NULL;
     m_indexcount = 0;
-    m_islogging = wyFalse;
+    m_islogerror = wyFalse;
+	m_islogaccess = wyFalse;
     m_pindexsqlite = NULL;
     m_ismemoryindex = wyFalse;
     m_isen = wyFalse;
@@ -219,7 +214,7 @@ L10nText::Release()
 }
 
 wyInt32
-L10nText::Init(const wyChar* langcode, const wyChar* dictionary, wyBool ismemoryindex, wyBool islogging)
+L10nText::Init(const wyChar* langcode, const wyChar* dictionary, wyBool ismemoryindex, wyBool islogerror, wyBool islogaccess)
 {
     wyInt32 ret;
     
@@ -231,7 +226,7 @@ L10nText::Init(const wyChar* langcode, const wyChar* dictionary, wyBool ismemory
         m_l10nt->m_isen = wyTrue;
     }
 
-    ret = m_l10nt->Initialize(langcode, dictionary, ismemoryindex, islogging);
+    ret = m_l10nt->Initialize(langcode, dictionary, ismemoryindex, islogerror, islogaccess);
 #ifdef WIN32
     LeaveCriticalSection(&m_l10nt->m_cs);
 #endif
@@ -273,7 +268,7 @@ L10nText::GetLastSQliteMsg()
 }
 
 wyInt32
-L10nText::Initialize(const wyChar* langcode, const wyChar* dictionary, wyBool ismemoryindex, wyBool islogging)
+L10nText::Initialize(const wyChar* langcode, const wyChar* dictionary, wyBool ismemoryindex, wyBool islogerror, wyBool islogaccess)
 {
     wyString        query, size;
     wyInt32         i = 0;
@@ -285,7 +280,7 @@ L10nText::Initialize(const wyChar* langcode, const wyChar* dictionary, wyBool is
     HDC             hdc;
 #endif
 
-    m_sqlite.SetLogging(islogging);
+    m_sqlite.SetLogging(islogerror);
 
     if(m_sqlite.Open(dictionary, wyTrue) == wyFalse)
     {
@@ -294,7 +289,8 @@ L10nText::Initialize(const wyChar* langcode, const wyChar* dictionary, wyBool is
     
     m_langcode.SetAs(langcode);
     m_dictionary.SetAs(dictionary);
-    m_islogging = islogging;
+    m_islogerror = islogerror;
+	m_islogaccess = islogaccess;
     m_ismemoryindex = ismemoryindex;
     query.Sprintf("select fontname, fontsize from langindex where langcode = '%s'", m_langcode.GetString());
     m_sqlite.Prepare(NULL, query.GetString());
@@ -443,7 +439,6 @@ L10nText::GetText(const wyChar* str)
     LangString**    presult;
     LangString*     pls = &ls;
     wyString        tempstring, temp;
-    wyBool          islogging;
 
     if(!m_l10nt)
     {
@@ -468,6 +463,18 @@ L10nText::GetText(const wyChar* str)
     EnterCriticalSection(&m_l10nt->m_cs);
 #endif
 
+	if(m_l10nt->m_islogaccess == wyTrue)
+    {
+        if(L10nText::m_sourcefile)
+        {
+            YogDebugLog(L10NT_SEARCH_FAILED, tempstring.GetString(), L10nText::m_sourcefile, L10nText::m_sourceline);
+        }
+        else
+        {
+            YOGLOG(L10NT_SEARCH_FAILED, tempstring.GetString());
+        }
+    }
+
     if((ls.m_id = m_l10nt->GetStringId(tempstring.GetString())) == -1)
     {
 #ifdef WIN32
@@ -476,16 +483,11 @@ L10nText::GetText(const wyChar* str)
         return str;
     }
 
-    islogging = m_l10nt->m_islogging;    
     presult = (LangString**)bsearch(&pls, m_l10nt->m_index, m_l10nt->m_indexcount, sizeof(LangString*), L10nText::CompareFunct);
-
-#ifdef WIN32
-    LeaveCriticalSection(&m_l10nt->m_cs);
-#endif
 
     if(presult == NULL)
     {
-        if(islogging == wyTrue)
+        if(m_l10nt->m_islogerror == wyTrue)
         {
             temp.Sprintf("%d - %s", ls.m_id, tempstring.GetString());
 
@@ -498,21 +500,22 @@ L10nText::GetText(const wyChar* str)
                 YOGLOG(L10NT_SEARCH_FAILED, temp.GetString());
             }
         }
-
-        return str;
     }
 
-    return (*presult)->m_string->GetString();
+#ifdef WIN32
+    LeaveCriticalSection(&m_l10nt->m_cs);
+#endif
+
+    return presult ? (*presult)->m_string->GetString() : str;
 }
 
 const wyWChar* 
 L10nText::GetText(const wyWChar* str)
 {
-    LangString      ls(0, "");
+	LangString      ls(0, "");
     LangString**    presult;
     LangString*     pls = &ls;
     wyString        tempstring, temp;
-    wyBool          islogging;
 
     if(!m_l10nt)
     {
@@ -537,6 +540,18 @@ L10nText::GetText(const wyWChar* str)
     EnterCriticalSection(&m_l10nt->m_cs);
 #endif
 
+	if(m_l10nt->m_islogaccess == wyTrue)
+    {
+        if(L10nText::m_sourcefile)
+        {
+            YogDebugLog(L10NT_SEARCH_FAILED, tempstring.GetString(), L10nText::m_sourcefile, L10nText::m_sourceline);
+        }
+        else
+        {
+            YOGLOG(L10NT_SEARCH_FAILED, tempstring.GetString());
+        }
+    }
+
     if((ls.m_id = m_l10nt->GetStringId(tempstring.GetString())) == -1)
     {
 #ifdef WIN32
@@ -545,16 +560,11 @@ L10nText::GetText(const wyWChar* str)
         return str;
     }
 
-    islogging = m_l10nt->m_islogging;
     presult = (LangString**)bsearch(&pls, m_l10nt->m_index, m_l10nt->m_indexcount, sizeof(LangString*), L10nText::CompareFunct);
-
-#ifdef WIN32
-    LeaveCriticalSection(&m_l10nt->m_cs);
-#endif
 
     if(presult == NULL)
     {
-        if(islogging == wyTrue)
+        if(m_l10nt->m_islogerror == wyTrue)
         {
             temp.Sprintf("%d - %s", ls.m_id, tempstring.GetString());
 
@@ -567,11 +577,13 @@ L10nText::GetText(const wyWChar* str)
                 YOGLOG(L10NT_SEARCH_FAILED, temp.GetString());
             }
         }
-
-        return str;
     }
 
-    return (*presult)->m_string->GetAsWideChar(NULL, wyTrue);
+#ifdef WIN32
+    LeaveCriticalSection(&m_l10nt->m_cs);
+#endif
+
+    return presult ? (*presult)->m_string->GetAsWideChar(NULL, wyTrue) : str;
 }
 
 wyInt32
@@ -596,7 +608,7 @@ L10nText::GetStringId(const wyChar* str)
 
     if(id == -1)
     {
-        if(m_l10nt->m_islogging == wyTrue)
+        if(m_l10nt->m_islogerror == wyTrue)
         { 
             if(L10nText::m_sourcefile)
             {

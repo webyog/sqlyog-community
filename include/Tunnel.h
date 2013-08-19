@@ -151,6 +151,8 @@ protected:
 	bool			m_IsTunnel;
 
 	bool			m_istunnelexecuting;
+
+	bool			m_isnotsupportedserver;
 };
 
 #endif

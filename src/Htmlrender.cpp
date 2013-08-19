@@ -51,7 +51,15 @@ HandleClickEventOnLink(HWND hwndLayout, HELEMENT helem, const wchar_t *url)
 			
             if(pref)
 			{
-				pref->Create(4);
+				if(pGlobals->m_entlicense.CompareI("Professional"))
+				{
+					pref->Create(4);
+				}
+				else
+				{
+					pref->Create(3);
+				}
+
 				delete pref;
 			}
 		}
