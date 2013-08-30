@@ -5877,7 +5877,8 @@ CCustGrid::CopyDataFromClipboard()
             // window. 
             PGVCOLNODE fieldcolnode = GetColNodeStruct(m_curselcol);
 
-            if(fieldcolnode->pColumn.mask != GVIF_TEXT || fieldcolnode->pColumn.uIsReadOnly)
+			//fixed : http://forums.webyog.com/index.php?showtopic=7232
+            if(!(fieldcolnode->pColumn.mask & GVIF_TEXT) || fieldcolnode->pColumn.uIsReadOnly)
             {
                 CloseClipboard(); 
                 return wyTrue;

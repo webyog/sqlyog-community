@@ -402,11 +402,7 @@ typedef SOCKET_SIZE_TYPE size_socket;
 #define IO_SIZE			4096
 /* How much overhead does malloc have. The code often allocates
    something like 1024-MALLOC_OVERHEAD bytes */
-#ifdef SAFEMALLOC
-#define MALLOC_OVERHEAD (8+24+4)
-#else
 #define MALLOC_OVERHEAD 8
-#endif
 	/* get memory in huncs */
 #define ONCE_ALLOC_INIT		(uint) (4096-MALLOC_OVERHEAD)
 	/* Typical record cash */

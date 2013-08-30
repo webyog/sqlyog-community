@@ -76,7 +76,10 @@ ExecuteAndGetResult(MDIWindow *wnd, Tunnel *tunnel, PMYSQL mysql, wyString &quer
 {
     wyInt32     retcode;
     MYSQL_RES   *myres = NULL;
-	wnd->SetThreadBusy(wyTrue);
+
+	if(wnd)
+		wnd->SetThreadBusy(wyTrue);
+
     //if(isprofile == wyTrue)
     //{
         retcode = my_query(wnd, tunnel, mysql, query.GetString(), query.GetLength(), isbatch, 
@@ -91,12 +94,14 @@ ExecuteAndGetResult(MDIWindow *wnd, Tunnel *tunnel, PMYSQL mysql, wyString &quer
 
     if(retcode)
 	{
+		if(wnd)
 			wnd->SetThreadBusy(wyFalse);
-            return myres;
+        return myres;
 	}
             
     myres = tunnel->mysql_store_result(*mysql, (isprofile == wyTrue)?false:true, isforce, wnd);
-	wnd->SetThreadBusy(wyFalse);
+	if(wnd)
+		wnd->SetThreadBusy(wyFalse);
     return myres;
 }
 

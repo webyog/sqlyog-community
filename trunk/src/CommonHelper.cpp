@@ -3655,6 +3655,7 @@ DumpViewStruct(wyString * buffer, Tunnel * tunnel, const wyChar *view, MYSQL_RES
     MYSQL_ROW   row;
     wyInt32     fieldval, typeval;
 	wyBool      isfirst = wyTrue;
+    wyString    value;
 
 	buffer->AddSprintf("\n/*!50001 CREATE TABLE  `%s`(\n", view);
 
@@ -3667,7 +3668,11 @@ DumpViewStruct(wyString * buffer, Tunnel * tunnel, const wyChar *view, MYSQL_RES
 			buffer->Add(",\n");
 		
 		if(row[fieldval])
-			buffer->AddSprintf(" `%s` ", row[fieldval]);
+		{
+            value.SetAs(row[fieldval]);
+            value.FindAndReplace("`", "``");
+            buffer->AddSprintf(" `%s` ", value.GetString());
+        }
 		
         if(row[typeval])
 			buffer->AddSprintf("%s ", row[typeval]);

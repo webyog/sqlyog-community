@@ -163,7 +163,7 @@
 # define HAVE_CHAR 1
 #endif
 
-#define SIZEOF_CHARP 8
+#define SIZEOF_CHARP 4
 #if SIZEOF_CHARP
 # define HAVE_CHARP 1
 #endif
@@ -198,7 +198,7 @@
 # define HAVE_SIGSET_T 1
 #endif
 
-#define SIZEOF_SIZE_T 8
+#define SIZEOF_SIZE_T 4
 #if SIZEOF_SIZE_T
 # define HAVE_SIZE_T 1
 #endif
@@ -273,5 +273,5 @@
  */
 #define HAVE_THREADS 1
 #define SHAREDIR "share"
-#define DEFAULT_CHARSET_HOME "C:/Program Files/mariadb-client"
-#define PLUGINDIR "C:/Program Files/mariadb-client/lib/plugin"
+#define DEFAULT_CHARSET_HOME "C:/Program Files (x86)/mariadb-client"
+#define PLUGINDIR "C:/Program Files (x86)/mariadb-client/lib/plugin"

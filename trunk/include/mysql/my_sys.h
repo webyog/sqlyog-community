@@ -114,22 +114,6 @@ extern int NEAR my_errno;		/* Last error in mysys */
 
 	/* defines when allocating data */
 
-#ifdef SAFEMALLOC
-#define my_malloc(SZ,FLAG) _mymalloc( SZ, __FILE__, __LINE__, FLAG )
-#define my_malloc_ci(SZ,FLAG) _mymalloc( SZ, sFile, uLine, FLAG )
-#define my_realloc(PTR,SZ,FLAG) _myrealloc( PTR, SZ, __FILE__, __LINE__, FLAG )
-#define my_checkmalloc() _sanity( __FILE__, __LINE__ )
-#define my_free(PTR,FLAG) _myfree( PTR, __FILE__, __LINE__,FLAG)
-#define my_memdup(A,B,C) _my_memdup(A,B,__FILE__,__LINE__,C)
-#define my_strdup(A,C) _my_strdup(A,__FILE__,__LINE__,C)
-#define QUICK_SAFEMALLOC sf_malloc_quick=1
-#define NORMAL_SAFEMALLOC sf_malloc_quick=0
-extern uint sf_malloc_prehunc,sf_malloc_endhunc,sf_malloc_quick;
-extern ulonglong safemalloc_mem_limit;
-#define CALLER_INFO_PROTO   , const char *sFile, uint uLine
-#define CALLER_INFO         , __FILE__, __LINE__
-#define ORIG_CALLER_INFO    , sFile, uLine
-#else
 #define my_checkmalloc() (0)
 #undef TERMINATE
 #define TERMINATE(A) {}
@@ -146,7 +130,6 @@ extern my_string my_strndup(const char *from, size_t length, myf MyFlags);
 #define CALLER_INFO_PROTO   /* nothing */
 #define CALLER_INFO         /* nothing */
 #define ORIG_CALLER_INFO    /* nothing */
-#endif
 
 #ifdef HAVE_ALLOCA
 #if defined(_AIX) && !defined(__GNUC__)
