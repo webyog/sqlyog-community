@@ -186,8 +186,11 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query)
 		SetPQABeforeExecutionOptions(param, param->wnd, query);
 
 		if(IsQueryStopped(param) == wyTrue)
+		{			
 			return 0;
+		}
 	}
+
 #endif
     	
 	querytemp.SetAs(query);

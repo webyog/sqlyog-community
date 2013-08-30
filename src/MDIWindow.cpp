@@ -1673,10 +1673,7 @@ MDIWindow::StopQuery()
 
 	/* close the current connection and change the pointer to the new one */
 	//DEBUG_LOG("StopQuery::mysql_close");
-	//sudhi
-	if(m_mysql)
-		mysql_close(m_mysql);
-	//sudhi
+	
 	m_mysql = mysql;
 
 	//set the SQl_MODE = ''

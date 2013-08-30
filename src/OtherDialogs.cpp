@@ -1359,10 +1359,7 @@ CSchema::WriteFK(HWND hwndmessag, wyChar *table)
         return wyFalse;
 
     if(retval == 1)
-	{
-	//sudhi
-		m_tunnel->mysql_free_result(myres);
-	//sudhi
+	{	
         return wyTrue;
 	}
 
@@ -1420,6 +1417,7 @@ CSchema::WriteFKTableInfo(wyString &query, MYSQL_ROW *myrow, MYSQL_RES **myres,
 	if(FkInfoPresent(create) == wyFalse)
     {
         *retval = 1;
+		m_tunnel->mysql_free_result(*myres);
 		return wyTrue;
     }
 
