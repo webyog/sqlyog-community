@@ -330,6 +330,14 @@ typedef unsigned short ushort;
 #define ASCII_BITS_USED 8	/* Bit char used */
 #define NEAR_F			/* No near function handling */
 
+struct st_mysql_lex_string
+{
+  char *str;
+  size_t length;
+};
+typedef struct st_mysql_lex_string LEX_STRING;
+typedef struct st_mysql_lex_string MYSQL_LEX_STRING;
+
 /* Some types that is different between systems */
 
 typedef int	File;		/* File descriptor */
@@ -499,6 +507,14 @@ extern double		my_atof(const char*);
 /* #define sigset(A,B) signal((A),(B)) */
 #endif
 
+#if defined(_lint) || defined(FORCE_INIT_OF_VARS) || \
+    defined(__cplusplus) || !defined(__GNUC__)
+#define UNINIT_VAR(x) x= 0
+#else
+/* GCC specific self-initialization which inhibits the warning. */
+#define UNINIT_VAR(x) x= x
+#endif
+
 /* Remove some things that mit_thread break or doesn't support */
 #if defined(HAVE_mit_thread) && defined(THREAD)
 #undef HAVE_PREAD
@@ -521,25 +537,20 @@ extern double		my_atof(const char*);
 #define LONGLONG_MAX	((long long) 0x7FFFFFFFFFFFFFFFLL)
 #endif
 
-#if SIZEOF_LONG == 4
-#define INT_MIN32	(long) 0x80000000L
-#define INT_MAX32	(long) 0x7FFFFFFFL
+#define INT_MIN64       (~0x7FFFFFFFFFFFFFFFLL)
+#define INT_MAX64       0x7FFFFFFFFFFFFFFFLL
+#define INT_MIN32       (~0x7FFFFFFFL)
+#define INT_MAX32       0x7FFFFFFFL
 #define UINT_MAX32      0xFFFFFFFFL
-#define INT_MIN24	((long) 0xff800000L)
-#define INT_MAX24	0x007fffffL
-#define INT_MIN16	((short int) 0x8000)
-#define INT_MAX16	0x7FFF
-#define UINT_MAX16 0xFFFF
-#define INT_MIN8	((char) 0x80)
-#define INT_MAX8	((char) 0x7F)
-#else  /* Probably Alpha */
-#define INT_MIN32	((long) (int) 0x80000000)
-#define INT_MAX32	((long) (int) 0x7FFFFFFF)
-#define INT_MIN24	((long) (int) 0xff800000)
-#define INT_MAX24	((long) (int) 0x007fffff)
-#define INT_MIN16	((short int) 0xffff8000)
-#define INT_MAX16	((short int) 0x00007FFF)
-#endif
+#define INT_MIN24       (~0x007FFFFF)
+#define INT_MAX24       0x007FFFFF
+#define UINT_MAX24      0x00FFFFFF
+#define INT_MIN16       (~0x7FFF)
+#define INT_MAX16       0x7FFF
+#define UINT_MAX16      0xFFFF
+#define INT_MIN8        (~0x7F)
+#define INT_MAX8        0x7F
+#define UINT_MAX8       0xFF
 
 #ifndef ULL
 #ifdef HAVE_LONG_LONG
@@ -548,6 +559,15 @@ extern double		my_atof(const char*);
 #define ULL(A) A ## UL
 #endif
 #endif
+
+#if defined(HAVE_LONG_LONG) && !defined(ULONGLONG_MAX)
+/* First check for ANSI C99 definition: */
+#ifdef ULLONG_MAX
+#define ULONGLONG_MAX  ULLONG_MAX
+#else
+#define ULONGLONG_MAX ((unsigned long long)(~0ULL))
+#endif
+#endif /* defined (HAVE_LONG_LONG) && !defined(ULONGLONG_MAX)*/
 
 /* From limits.h instead */
 #ifndef DBL_MIN
@@ -638,7 +658,7 @@ typedef long		longlong;
 #ifndef MAX
 #define MAX(a,b) (((a) > (b)) ? (a) : (b))
 #endif
-
+#define CMP_NUM(a,b)    (((a) < (b)) ? -1 : ((a) == (b)) ? 0 : 1)
 #ifdef USE_RAID
 /*
   The following is done with a if to not get problems with pre-processors

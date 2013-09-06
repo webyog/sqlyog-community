@@ -576,7 +576,7 @@ extern my_bool dynstr_append(DYNAMIC_STRING *str, const char *append);
 my_bool dynstr_append_mem(DYNAMIC_STRING *str, const char *append,
 			  size_t length);
 extern my_bool dynstr_set(DYNAMIC_STRING *str, const char *init_str);
-extern my_bool dynstr_realloc(DYNAMIC_STRING *str, ulong additional_size);
+extern my_bool dynstr_realloc(DYNAMIC_STRING *str, size_t additional_size);
 extern void dynstr_free(DYNAMIC_STRING *str);
 void set_all_changeable_vars(CHANGEABLE_VAR *vars);
 my_bool set_changeable_var(my_string str,CHANGEABLE_VAR *vars);

@@ -258,10 +258,12 @@ CopyDatabase::OnUmCopydatabase(HWND hwnd)
 	m_ispromtstorepgrmmessage = wyFalse;
 	m_isstoredpgrms = wyFalse;
 
-    EnableDlgWindows(wyFalse);
+    SetFocus(GetDlgItem(m_hwnddlg, IDC_CHECK1));
+
+    EnableDlgWindows(wyFalse);  
 	EnableWindow(GetDlgItem(hwnd, IDDONE ), false);
 	EnableWindow(GetDlgItem(m_hwnddlg, IDC_SUMMARY), wyFalse);
-
+    
 	m_summary.Clear();
     
 	VERIFY(hwndtree = GetDlgItem(m_hwnddlg, IDC_TREE));	
@@ -401,7 +403,7 @@ CopyDatabase::ExecuteCopyThread(LPVOID lpparam)
     ret = copydb->m_copydb->ExportData(CopyDatabase::UpdateGui, (void*)copydb->m_lpParam);
 	
 	//For working 'cancel'
-	SetFocus(copydb->m_copydb->m_hwnddlg);
+	//SetFocus(copydb->m_copydb->m_hwnddlg);
 
 	//if enable Transaction support (preference option)is selected then execute commit query
 	if(flag == wyTrue)
@@ -442,7 +444,7 @@ CopyDatabase::ExecuteCopyThread(LPVOID lpparam)
 		msg.Sprintf(_("Error occured while copying "));
 		SendMessage(copydb->m_lpParam->m_hwndmsg, WM_SETTEXT, 0, (LPARAM)msg.GetAsWideChar());
 
-		SetFocus(copydb->m_copydb->m_hwnddlg);		
+		//SetFocus(copydb->m_copydb->m_hwnddlg);		
     }
 
 	if(copydb->m_copydb->m_summary.GetLength())

@@ -524,7 +524,7 @@ UpgradeCheck::InitDialog(HWND hwnd)
 
 	VERIFY(hwndchk = GetDlgItem(hwnd, IDC_UPGRDCHK));
 	VERIFY(hwndstatic = GetDlgItem(hwnd, IDC_STATICTITLE));
-	VERIFY(hwndlink = GetDlgItem(hwnd, IDC_LINK));
+	VERIFY(hwndlink = GetDlgItem(hwnd, IDC_DOWNLOAD));
 	VERIFY(hwndok = GetDlgItem(hwnd, IDOK));
 
 	//'Dont remid check box be hidden if upgradecheck explicitlle.
@@ -624,22 +624,22 @@ void
 UpgradeCheck::ChangeTextOnExplicitCheck(HWND hwnd)
 {	
 	HICON hicon;
-	HWND hwndstatic = NULL, hwndlink = NULL, hwndok = NULL; 
+	HWND hwndstatic = NULL, hwnddownload = NULL, hwndcancel = NULL; 
 
-	VERIFY(hwndlink = GetDlgItem(hwnd, IDC_LINK));
+	VERIFY(hwnddownload = GetDlgItem(hwnd, IDC_DOWNLOAD));
 	VERIFY(hwndstatic = GetDlgItem(hwnd, IDC_STATICTITLE));
-	VERIFY(hwndok = GetDlgItem(hwnd, IDOK));
+	VERIFY(hwndcancel = GetDlgItem(hwnd, IDCANCEL));
 		    
 	if(m_isupgrade == wyTrue)	
 	{
 #ifndef ENTERPRISE
 		SetWindowText(hwndstatic, UPGRADEYES);
-
-#else //Version specific
+        SetWindowText(hwndcancel, _(L"&Cancel"));
+#else //Version specific      
 		switch(pGlobals->m_pcmainwin->m_connection->m_enttype)
 		{
 		case ENT_PRO:
-			SetWindowText(hwndstatic, UPGRADEYESPRO);
+			SetWindowText(hwndstatic, UPGRADEYESPRO);            
 			break;
 
 		case ENT_NORMAL:
@@ -651,11 +651,13 @@ UpgradeCheck::ChangeTextOnExplicitCheck(HWND hwnd)
 			break;
 		}
 #endif
-		ShowWindow(hwndlink, SW_SHOW);
+		ShowWindow(hwnddownload, SW_SHOW);
 	}
 
 	else if(m_isupgrade == wyFalse && m_iserror == wyFalse)	
 	{
+        SetWindowText(hwndcancel, _(L"&OK"));
+        ShowWindow(hwnddownload, SW_HIDE);
 #ifndef ENTERPRISE
 		SetWindowText(hwndstatic, UPGRADENO);
 
@@ -674,9 +676,7 @@ UpgradeCheck::ChangeTextOnExplicitCheck(HWND hwnd)
 			SetWindowText(hwndstatic, UPGRADENOULT);
 			break;
 		}
-#endif
-
-		ShowWindow(hwndlink, SW_SHOW);
+#endif		
 	}
 
 	else if(m_iserror == wyTrue)
@@ -687,10 +687,11 @@ UpgradeCheck::ChangeTextOnExplicitCheck(HWND hwnd)
 		DestroyIcon(hicon);
 
 		SetWindowText(hwndstatic, CONERROR);
-		ShowWindow(hwndlink, SW_HIDE);
+		ShowWindow(hwnddownload, SW_HIDE);
+        SetWindowText(hwndcancel, _(L"&OK"));
 	}
 
-	ShowWindow(hwndok, SW_SHOW);
+	ShowWindow(hwndcancel, SW_SHOW);
 	m_ischecked = wyTrue;
 }
 
@@ -735,12 +736,15 @@ UpgradeCheck::OnWMCommand(HWND hwnd, WPARAM wParam)
 		}
 		break;
 
-	case IDC_LINK:
+	case IDC_DOWNLOAD:
+
 		//url link
 #ifdef COMMUNITY
-		ShellExecute(NULL, L"open", TEXT(HOMEURL_UPGRADECHECK), NULL, NULL, SW_SHOWNORMAL);		
+		ShellExecute(NULL, L"open", TEXT(COMMUNITYURL), NULL, NULL, SW_SHOWNORMAL);		
+#elif ENTERPRISE
+		ShellExecute(NULL, L"open", TEXT(SUPPORTURL), NULL, NULL, SW_SHOWNORMAL);
 #else
-		ShellExecute(NULL, L"open", TEXT(IMAGEURL), NULL, NULL, SW_SHOWNORMAL);
+        ShellExecute(NULL, L"open", TEXT(PRODUCTURL), NULL, NULL, SW_SHOWNORMAL);
 #endif
 		EndDialog(hwnd, 0);
 		break;	

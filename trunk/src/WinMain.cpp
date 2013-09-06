@@ -19,7 +19,7 @@
 #define CRTDBG_MAP_ALLOC
 #include <stdlib.h>
 #include <crtdbg.h>
-#include <vld.h>
+//#include <vld.h>
 #include "Scintilla.h"
 #include "FrameWindowHelper.h"
 #include "ExportMultiFormat.h"
