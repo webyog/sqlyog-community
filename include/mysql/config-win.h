@@ -213,9 +213,9 @@ inline double ulonglong2double(ulonglong value)
 #define HAVE_STRPBRK
 #define HAVE_STRSTR
 
-#ifdef NOT_USED
+#ifdef WIN32
 #define HAVE_SNPRINTF		/* Gave link error */
-#define _snprintf snprintf
+#define snprintf _snprintf
 #endif
 
 #ifdef _MSC_VER

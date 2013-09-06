@@ -931,6 +931,7 @@
 #define IDC_PROGRESS2                   1712
 #define IDC_RESTORE_PROGRESS            1712
 #define IDC_CONNECTION_NAME             1713
+#define IDC_DOWNLOAD                    1715
 #define IDC_INITCOMMANDDETAIL           1749
 #define IDC_INITCOMMANDHELP             2644
 #define IDC_COMBOCUSTOM                 2645
@@ -1548,7 +1549,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        1018
 #define _APS_NEXT_COMMAND_VALUE         41797
-#define _APS_NEXT_CONTROL_VALUE         1714
+#define _APS_NEXT_CONTROL_VALUE         1716
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

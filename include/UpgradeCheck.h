@@ -22,10 +22,10 @@
 //#define CONERROR L"An error occured when trying to connect to the server.\r\nMake sure your internet connection is active."
 #define CONERROR _(L"Unable to find update information")
 
-#define UPGRADEYES	  _(L"Updates are available for SQLyog.\r\nPlease download and install latest version from")
-#define UPGRADEYESPRO _(L"Updates are available for SQLyog Professional.\r\nPlease download and install latest version from")
-#define UPGRADEYESENT _(L"Updates are available for SQLyog Enterprise.\r\nPlease download and install latest version from")
-#define UPGRADEYESULT _(L"Updates are available for SQLyog Ultimate.\r\nPlease download and install latest version from")
+#define UPGRADEYES	  _(L"Updates are available for SQLyog.\r\nPlease download and install the latest version")
+#define UPGRADEYESPRO _(L"Updates are available for SQLyog Professional.\r\nPlease download and install the latest version")
+#define UPGRADEYESENT _(L"Updates are available for SQLyog Enterprise.\r\nPlease download and install the latest version")
+#define UPGRADEYESULT _(L"Updates are available for SQLyog Ultimate.\r\nPlease download and install the latest version")
 
 #define UPGRADENO	 _(L"You are using the latest version of SQLyog")
 #define UPGRADENOPRO _(L"You are using the latest version of SQLyog Professional")

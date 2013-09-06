@@ -393,10 +393,12 @@ All Files(*.*)\0*.*\0"
 #define     HOMEURL_UPGRADECHECK						"http://www.webyog.com/?ref=community.upgradecheck"
 ////#define		BUYURL_BUYNAGBEGIN							"http://www.webyog.com/shop/?ref=community.buynagbegin"
 #define		BUYURL_BUYNAGEND							"http://www.webyog.com/shop/?ref=community.buynagend"
-#define		SUPPORTURL									"http://www.webyog.com/customer"
+#define		SUPPORTURL									"https://www.webyog.com/customer"
 
 #define     BUYENT										"http://www.webyog.com/shop"
 #define		IMAGEURL									"http://www.webyog.com"
+#define     PRODUCTURL                                  "https://www.webyog.com/product/sqlyog"
+#define     COMMUNITYURL                                "https://www.webyog.com/community" 
 
 // prototypes for some magic numbers
 #define		SIZE_64										64

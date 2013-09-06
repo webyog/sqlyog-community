@@ -272,11 +272,6 @@ typedef struct st_mysql {
   void          *extension;
 } MYSQL;
 
-typedef struct st_mysql_lex_string {
-  char *str;
-  size_t length;
-} MYSQL_LEX_STRING;
-
 struct st_mysql_options_extention {
   char *plugin_dir;
   char *default_auth;
@@ -318,6 +313,9 @@ typedef struct st_mysql_time
   my_bool       neg;
   enum enum_mysql_timestamp_type time_type;
 } MYSQL_TIME;
+
+#define AUTO_SEC_PART_DIGITS 31
+#define SEC_PART_DIGITS 6
 
 typedef struct character_set
 {

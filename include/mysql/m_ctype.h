@@ -42,8 +42,8 @@ typedef struct charset_info_st
   uint  state;
   char	*csname;
   char	*name;
-  char  *comment;
   char  *dir;
+  char  *encoding;
   uint	char_minlen;
   uint	char_maxlen;
   uint 	(*mb_charlen)(uint c);
@@ -52,6 +52,9 @@ typedef struct charset_info_st
 
 extern const CHARSET_INFO  compiled_charsets[];
 extern CHARSET_INFO *default_charset_info;
+extern CHARSET_INFO *my_charset_bin;
+extern CHARSET_INFO *my_charset_latin1;
+extern CHARSET_INFO *my_charset_utf8_general_ci;
 
 CHARSET_INFO *find_compiled_charset(uint cs_number);
 CHARSET_INFO *find_compiled_charset_by_name(const char *name);
