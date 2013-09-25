@@ -142,14 +142,6 @@ EditorQuery::ExecuteAllQuery(wyInt32 *stop)
 
 	ExecuteQueryThread(query.GetString(), stop, wnd, curline);
 
-	EndExecute(wnd, hwnd, ALL);
-	wnd->m_lastfocus = m_hwnd;
-    
-	/* set the focus to the correct control */ 
-	SetFocusToEditor(wnd, m_hwnd);
-
-    //ProcessMessageQueue(wnd);
-
 	return wyTrue;
 }
 
@@ -157,22 +149,22 @@ EditorQuery::ExecuteAllQuery(wyInt32 *stop)
 wyBool
 EditorQuery::ExecuteExplainQuery(wyInt32 * stop, wyBool isExtended)
 {
-    wyString		 query;
+    wyString		 *query = new wyString;
     HWND             hwnd;
 	HANDLE			 evt;
 	QueryThread	 	 thd;
 	MDIWindow		 *wnd;
-	QueryResultList	 list;
-	wyString		 str;
+    QueryResultList	 *list = new QueryResultList;
+    wyString		 *str = new wyString;
 	PMYSQL			 tmpmysql;
 	QUERYTHREADPARAMS	*param    = NULL;
 	TabMgmt				*ptabmgmt = NULL;
-	wyInt32				err		  = 0;
+    wyInt32				*err	= new wyInt32;
 	wyUInt32			start, end, curpos, curline; 
 	TabEditor			*tabeditor;
     wyChar              *tmp;
 
-
+	*err	= 0;
     param					= new QUERYTHREADPARAMS;
 
 	/*no text then forget it */
@@ -189,7 +181,7 @@ EditorQuery::ExecuteExplainQuery(wyInt32 * stop, wyBool isExtended)
     {
         tmp = AllocateBuff(end - start + 1);
 		SendMessage(m_hwnd, SCI_GETSELTEXT, 0, (LPARAM)tmp);
-        query.SetAs(tmp);
+        query->SetAs(tmp);
         free(tmp);
         param->startpos = 0; 
         param->endpos = 0; 
@@ -197,7 +189,7 @@ EditorQuery::ExecuteExplainQuery(wyInt32 * stop, wyBool isExtended)
     }
     else
     {
-        GetCompleteText(query);
+        GetCompleteText(*query);
         param->startpos = curpos; 
         param->endpos = 0; 
         param->executestatus = isExtended == wyTrue? EXECUTE_CURRENT_EXTENDED : EXECUTE_CURRENT_EXPLAIN;
@@ -222,15 +214,16 @@ EditorQuery::ExecuteExplainQuery(wyInt32 * stop, wyBool isExtended)
     tmpmysql = &wnd->m_stopmysql;
 
     param->linenum = curline, 
-    param->query = (wyChar*)query.GetString();
+    param->query = query;
     param->stop = stop; 
-    param->list = &list; 
-    param->str = &str;
+    param->list = list; 
+    param->str = str;
 
 	param->tab = wnd->GetActiveTabEditor()->m_pctabmgmt;
     param->tunnel = wnd->m_tunnel; 
     param->mysql = &wnd->m_mysql; 
-    param->error = &err; 
+	param->tmpmysql = tmpmysql; 
+    param->error = err; 
     param->isadvedit = wyFalse; 
     param->lpcs = &wnd->m_cs;
     param->wnd  = wnd;
@@ -238,45 +231,12 @@ EditorQuery::ExecuteExplainQuery(wyInt32 * stop, wyBool isExtended)
 	param->m_highlimitvalue = -1;
 	param->m_lowlimitvalue = -1;
 	param->m_iseditor = wyTrue;
+	param->executeoption = SINGLE;
+	param->isedit = wyFalse;
 
     InitializeExecution(param);
 
 	evt = thd.Execute(param);
-	
-	HandleMsgs(evt);
-
-	wnd->SetExecuting(wyFalse);
-
-	//now depending upon whether the user had asked to stop the query or not,
-	//we need to perform operation accordingly
-    if(!*stop) 
-	{		
-		if(tabeditor->m_isresultwnd == wyFalse)
-			tabeditor->m_peditorbase->ShowResultWindow();
-
-		///* we keep the tab control from painting to avoid flickering */
-		SendMessage(ptabmgmt->m_hwnd, WM_SETREDRAW, FALSE, 0);
-		if(!err)
-			AddExplainQueryResults(&list, str, ptabmgmt, err, isExtended, wnd);
-		
-		wnd->m_pcquerystatus->AddQueryResult((err)?wyFalse:wyTrue);
-		SendMessage(ptabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
-				
-		InvalidateRect(ptabmgmt->m_hwnd, NULL, FALSE);
-	} 
-	else if(!wnd->m_tunnel->IsTunnel())
-	{
-		/*if its a tunnel the we dont need to close it */
-		wnd->m_tunnel->mysql_close(*tmpmysql);
-	}
-
-	/* free the list and param if necessary..the secons parameter of FreeList is very important */
-	FreeList(&list, *stop);
-
-	EndExecute(wnd, hwnd, SINGLE);
-
-	//from 4.05 BETA 3 we select the last edited table by default if found 
-	SetFocusToEditor(wnd, m_hwnd);
 	
 	return wyTrue;
 }
@@ -285,19 +245,23 @@ EditorQuery::ExecuteExplainQuery(wyInt32 * stop, wyBool isExtended)
 wyBool
 EditorQuery::ExecuteCurrentQuery(wyInt32 * stop, wyBool isedit)
 {	
-	wyString		 query;
+    wyString		 *query;
     HWND             hwnd;
 	HANDLE			 evt;
 	QueryThread	 	 thd;
 	MDIWindow		 *wnd;
-	QueryResultList	 list;
-	wyString		 str;
+    QueryResultList	 *list;
+    wyString		 *str;
 	PMYSQL			 tmpmysql;
 	QUERYTHREADPARAMS	*param    = NULL;
 	TabMgmt				*ptabmgmt = NULL;
-	wyInt32				err		  = 0;
+    wyInt32				*err = new wyInt32;
 	wyUInt32			start, end, curpos, curline; 
 	TabEditor			*tabeditor;
+
+    str = new wyString;
+    query = new wyString;
+    list = new QueryResultList;
 
 	/*no text then forget it */
 	if(!SendMessage(m_hwnd, SCI_GETTEXTLENGTH, 0, 0))
@@ -309,6 +273,8 @@ EditorQuery::ExecuteCurrentQuery(wyInt32 * stop, wyBool isedit)
 	
 	if((start-end) > 1)
 		return ExecuteSelQuery(stop);
+
+    *err = 0;
 
 	/* get the query wnd */
 	//VERIFY(wnd = GetActiveWin());
@@ -328,7 +294,7 @@ EditorQuery::ExecuteCurrentQuery(wyInt32 * stop, wyBool isedit)
 	curpos	= SendMessage(m_hwnd, SCI_GETCURRENTPOS, 0, 0);
 	curline = SendMessage(m_hwnd, SCI_LINEFROMPOSITION, curpos, 0);
 
-	GetCompleteText(query);
+    GetCompleteText(*query);
 	//ChangeCRToLF ( query );
 
 	/* set the flag to executing */
@@ -345,15 +311,16 @@ EditorQuery::ExecuteCurrentQuery(wyInt32 * stop, wyBool isedit)
     param->endpos = 0; 
     param->linenum = curline, 
     param->executestatus = EXECUTE_CURRENT;
-	param->query = (wyChar*)query.GetString();
+    param->query = query;
     param->stop = stop; 
-    param->list = &list; 
-    param->str = &str;
+    param->list = list; 
+    param->str = str;
 
 	param->tab = wnd->GetActiveTabEditor()->m_pctabmgmt;
     param->tunnel = wnd->m_tunnel; 
     param->mysql = &wnd->m_mysql; 
-    param->error = &err; 
+	param->tmpmysql = tmpmysql; 
+    param->error = err; 
     param->isadvedit = wyFalse; 
     param->lpcs = &wnd->m_cs;
     param->wnd  = wnd;
@@ -361,12 +328,37 @@ EditorQuery::ExecuteCurrentQuery(wyInt32 * stop, wyBool isedit)
 	param->m_highlimitvalue = -1;
 	param->m_lowlimitvalue = -1;
 	param->m_iseditor = wyTrue;
+	param->executeoption = SINGLE;
+	param->isedit = isedit;
 
     InitializeExecution(param);
 
 	evt = thd.Execute(param);
+    return wyTrue;
+}
+
+wyBool
+EditorQuery::ExecuteSelQuery(wyInt32 *stop)
+{
+    //starting from v5.1, we dont discriminate between select and all query
+    //and they both go thru the same function 
+    return ExecuteAllQuery(stop);
+}
+
+wyBool 
+EditorQuery::HandleQueryExecFinish(wyInt32 * stop, WPARAM wparam)
+{
+    MDIWindow		*wnd;
+    TabEditor		*tabeditor;
+    TabMgmt			*ptabmgmt = NULL;
 	
-	HandleMsgs(evt);
+    QUERYFINISHPARAMS   *queryparams = (QUERYFINISHPARAMS*) wparam;
+
+    /* get the query wnd */
+    wnd = this->m_pctabeditor->m_parentptr->m_parentptr;
+
+    ptabmgmt = wnd->GetActiveTabEditor()->m_pctabmgmt;	
+    tabeditor = (TabEditor*)ptabmgmt->m_tabeditorptr;
 
 	wnd->SetExecuting(wyFalse);
 
@@ -387,9 +379,9 @@ EditorQuery::ExecuteCurrentQuery(wyInt32 * stop, wyBool isedit)
 			ptabmgmt->m_pcdataviewquery->m_isformview = wyFalse;
 		}*/
 		
-		AddQueryResults(&list, str, ptabmgmt, err, wnd);
+        AddQueryResults(queryparams->list, (*queryparams->str), ptabmgmt, *(queryparams->error), wnd);
 		
-		wnd->m_pcquerystatus->AddQueryResult((err)?wyFalse:wyTrue);
+        wnd->m_pcquerystatus->AddQueryResult((*queryparams->error)?wyFalse:wyTrue);
 		SendMessage(ptabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
 				
 		InvalidateRect(ptabmgmt->m_hwnd, NULL, FALSE);
@@ -397,28 +389,20 @@ EditorQuery::ExecuteCurrentQuery(wyInt32 * stop, wyBool isedit)
 	else if(!wnd->m_tunnel->IsTunnel())
 	{
 		/*if its a tunnel the we dont need to close it */
-		wnd->m_tunnel->mysql_close(*tmpmysql);
+		if(*queryparams->tmpmysql)        
+			wnd->m_tunnel->mysql_close(*queryparams->tmpmysql);
 	}
 
-	/* free the list and param if necessary..the secons parameter of FreeList is very important */
-	FreeList(&list, *stop);
-
-	EndExecute(wnd, hwnd, SINGLE);
+    EndExecute(wnd, wnd->m_hwnd, queryparams->executeoption);
 
 	//from 4.05 BETA 3 we select the last edited table by default if found 
-	if(isedit == wyTrue)
-		SelectFirstTableToEdit(isedit);
+    if(queryparams->isedit == wyTrue)
+        SelectFirstTableToEdit(queryparams->isedit);
+           
+	FreeQueryExeFInishParams(queryparams, *stop);
 			
 	// set the focus to the correct control 
 	SetFocusToEditor(wnd, m_hwnd);
 	
 	return wyTrue;
-}
-
-wyBool
-EditorQuery::ExecuteSelQuery(wyInt32 *stop)
-{
-	//starting from v5.1, we dont discriminate between select and all query
-	//and they both go thru the same function 
-	return ExecuteAllQuery(stop);
 }

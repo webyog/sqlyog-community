@@ -981,6 +981,8 @@ public:
 
 	void						SetThreadBusy(wyBool isexecuting);
 
+    void                        HandleQueryExecFinished(HWND hwndactive, MDIWindow *pcquerywnd, WPARAM wparam);
+
 	/* Function to handle resize
 	@param hwnd         : Window HANDLE
     */

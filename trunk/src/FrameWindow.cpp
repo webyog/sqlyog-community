@@ -131,7 +131,7 @@ FrameWindow::FrameWindow(HINSTANCE hinstance)
     if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
     {
         dirstr.SetAs(directory);
-
+		pGlobals->m_prefpersist=wyIni::IniGetInt(GENERALPREFA, "PrefPersist",   GENERALPREF_PAGE, dirstr.GetString());
         wyIni::IniGetString(GENERALPREFA, "EdgeColumn", "0", &section, dirstr.GetString());
         m_editorcolumnline = section.GetAsInt32();
 
@@ -6612,8 +6612,8 @@ FrameWindow::HandleExecuteCurrentQuery(HWND hwndactive, MDIWindow *pcquerywnd, E
 			pceditorbase->ExecuteCurrentQuery(&pcquerywnd->m_stopquery, isedit);
 		}
 
-		OnQueryExecFinish(pcquerywnd);
-		SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+		/*OnQueryExecFinish(pcquerywnd);
+		SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);*/
 	}
 
     return;
@@ -6682,10 +6682,7 @@ FrameWindow::HandleExecuteAllQuery(HWND hwndactive, MDIWindow *pcquerywnd, Edito
 			pceditorbase->ExecuteAllQuery(&pcquerywnd->m_stopquery);
 		}
 
-        OnQueryExecFinish(pcquerywnd);
-        pGlobals->m_pcmainwin->HandleFirstToolBar();
-
-		SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+		//SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
 	}
     return;
 }
@@ -7741,7 +7738,7 @@ FrameWindow::ManagePreferences()
     
     if(pref)
     {
-	    pref->Create();
+	    pref->Create(pGlobals->m_prefpersist);
         delete pref;
     }
 

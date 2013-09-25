@@ -35,6 +35,7 @@
 #include "GUIHelper.h"
 
 #ifndef COMMUNITY
+#include "SCIFormatter.h"
 #include "TabQueryBuilder.h"
 #include "TabSchemaDesigner.h"
 #include "DatabaseSearch.h"
@@ -2307,9 +2308,21 @@ CQueryObject::CreateInsertStmt()
 	}
 		
 	//Format query
+	#ifdef COMMUNITY
 	pGlobals->m_pcmainwin->m_connection->FormateAllQueries(wnd, 
 														   peditorbase->m_hwnd,
 														   (wyChar*)compquery.GetString(), PASTE_QUERY);
+	
+
+	#else
+	wyInt32 selstart;
+	VERIFY(selstart = SendMessage(peditorbase->m_hwnd, SCI_GETSELECTIONSTART, 0, 0));
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE, (LPARAM)compquery.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_SETSELECTIONSTART, selstart, 0);
+	SendMessage(peditorbase->m_hwnd, SCI_SETSELECTIONEND, selstart + compquery.GetLength() , 0);	
+	Format(peditorbase->m_hwnd, IsStacked(), GetLineBreak() ? wyFalse : wyTrue, FORMAT_SELECTED_QUERY, GetIndentation());
+	
+	#endif
 	SetFocus(peditorbase->m_hwnd);
 	
     SendMessage(m_hwnd, WM_SETREDRAW,  TRUE, NULL);
@@ -2447,9 +2460,20 @@ CQueryObject::CreateUpdateStmt()
 	}
 	
 	//Format query
+	#ifdef COMMUNITY
 	pGlobals->m_pcmainwin->m_connection->FormateAllQueries(wnd, 
 														   peditorbase->m_hwnd,
 														   (wyChar*)compquery.GetString(), PASTE_QUERY);
+
+	#else
+	wyInt32 selstart;
+	VERIFY(selstart = SendMessage(peditorbase->m_hwnd, SCI_GETSELECTIONSTART, 0, 0));		
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE, (LPARAM)compquery.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_SETSELECTIONSTART, selstart, 0);
+	SendMessage(peditorbase->m_hwnd, SCI_SETSELECTIONEND, selstart + compquery.GetLength() , 0);
+	Format(peditorbase->m_hwnd, IsStacked(), GetLineBreak() ? wyFalse : wyTrue, FORMAT_SELECTED_QUERY, GetIndentation());
+	#endif	
+	
 	SetFocus(peditorbase->m_hwnd);
 	
     SendMessage(m_hwnd, WM_SETREDRAW,  TRUE, NULL);
@@ -2579,9 +2603,18 @@ CQueryObject::CreateDeleteStmt()
 	}
 	
 	//Format query
+	#ifdef COMMUNITY
 	pGlobals->m_pcmainwin->m_connection->FormateAllQueries(wnd, 
 														   peditorbase->m_hwnd,
 														   (wyChar*)compquery.GetString(), PASTE_QUERY);
+	#else
+	wyInt32 selstart;
+	VERIFY(selstart = SendMessage(peditorbase->m_hwnd, SCI_GETSELECTIONSTART, 0, 0));		
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE, (LPARAM)compquery.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_SETSELECTIONSTART, selstart, 0);
+	SendMessage(peditorbase->m_hwnd, SCI_SETSELECTIONEND, selstart + compquery.GetLength() , 0);
+	Format(peditorbase->m_hwnd, IsStacked(), GetLineBreak() ? wyFalse : wyTrue, FORMAT_SELECTED_QUERY, GetIndentation());
+	#endif
 		
 	SetFocus(peditorbase->m_hwnd);
 	
@@ -2715,9 +2748,21 @@ CQueryObject::CreateSelectStmt()
 	}
 	
 	//Format query
+	#ifdef COMMUNITY
 	pGlobals->m_pcmainwin->m_connection->FormateAllQueries(wnd, 
 														   wnd->GetActiveTabEditor()->m_peditorbase->m_hwnd,
 														   (wyChar*)compquery.GetString(), PASTE_QUERY);
+	
+	
+	#else
+	wyInt32 selstart;
+	VERIFY(selstart = SendMessage(wnd->GetActiveTabEditor()->m_peditorbase->m_hwnd, SCI_GETSELECTIONSTART, 0, 0));		
+	SendMessage(wnd->GetActiveTabEditor()->m_peditorbase->m_hwnd, SCI_REPLACESEL, TRUE, (LPARAM)compquery.GetString());
+	SendMessage(wnd->GetActiveTabEditor()->m_peditorbase->m_hwnd, SCI_SETSELECTIONSTART, selstart, 0);
+	SendMessage(wnd->GetActiveTabEditor()->m_peditorbase->m_hwnd, SCI_SETSELECTIONEND, selstart + compquery.GetLength() , 0);
+	Format(wnd->GetActiveTabEditor()->m_peditorbase->m_hwnd, IsStacked(), GetLineBreak() ? wyFalse : wyTrue, FORMAT_SELECTED_QUERY, GetIndentation());
+	#endif
+	
 	
 	SetFocus(wnd->GetActiveTabEditor()->m_peditorbase->m_hwnd);
 	SendMessage(m_hwnd, WM_SETREDRAW,  TRUE, NULL);

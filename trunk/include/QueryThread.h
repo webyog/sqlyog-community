@@ -89,7 +89,7 @@ struct QUERYTHREADPARAMS
 	wyInt32	    linenum;
 	wyInt32	    executestatus;
 	wyInt32     *stop;
-	wyChar      *query;
+	wyString    *query;
 	wyInt32     *error;
 	wyBool      isadvedit;
 	TabMgmt     *tab;	
@@ -104,7 +104,7 @@ struct QUERYTHREADPARAMS
 	
 	Tunnel      *tunnel;
 	PMYSQL      mysql;
-
+	PMYSQL      tmpmysql;
 	wyString    *str;
 	HANDLE		event;
 
@@ -113,8 +113,31 @@ struct QUERYTHREADPARAMS
 	wyBool		isprofile;
 
     LPCRITICAL_SECTION lpcs;
+	EXECUTEOPTION executeoption;
+	wyBool		isedit;
 };
 
+struct QUERYFINISHPARAMS
+{
+	QUERYFINISHPARAMS(){
+		list	= NULL;
+		error	= NULL;
+		mysql	= NULL;
+		str		= NULL;
+		query	= NULL;
+		tmpmysql= NULL;
+		executeoption = SINGLE;
+		isedit = wyFalse;
+	}
+    QueryResultList *list;
+    wyInt32     *error;
+    PMYSQL      mysql;
+    wyString   * str;
+    wyString    *query;
+	PMYSQL      tmpmysql;
+	EXECUTEOPTION executeoption;
+	wyBool		isedit;
+};
 
 /// Returns the error or the success messages
 /**
@@ -182,6 +205,13 @@ void        InitializeExecution(QUERYTHREADPARAMS *param);
 @param msg       : In/Out message string
 */
 wyBool		GetWarning(Tunnel * tunnel, PMYSQL mysql, wyString * msg);
+
+/// Removes all the QueryResultElem from the list 
+/**
+@param list         : Query result list
+@param freeparam    : Free parameters
+*/
+void        FreeQueryExeFInishParams(QUERYFINISHPARAMS *params, wyInt32 freeparam = 0);
 
 //// getting the exact query length; 
 //// this is used to implement the single 

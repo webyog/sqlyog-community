@@ -268,6 +268,13 @@ public:
     */
 	virtual wyBool		ExecuteSelQuery(wyInt32 * stop) { return wyFalse; };
 
+    /// Function to handle after query execution finish
+	/**
+	@param stop			: IN Stop condition
+	@returns wyFalse
+    */
+	virtual wyBool		HandleQueryExecFinish(wyInt32 * stop, WPARAM wparam) {return wyFalse;};
+
 	/// Window Procedure
     WNDPROC				wpOrigProc;
 	

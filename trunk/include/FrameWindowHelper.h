@@ -160,6 +160,7 @@
 #define		UM_UPDATEMAINTOOLBAR    					WM_USER+124
 #define		UM_SHOWERROR								WM_USER+125
 #define		UM_CONNECTFROMLIST							WM_USER+126
+#define		UM_QUERYCOMPLETED							WM_USER+127
 
 // some column #defines for validation.
 
@@ -878,7 +879,7 @@ void	    EnsureRangeVisible(HWND hwnd, wyInt32 posstart, wyInt32 posend);
 @param event				: IN Event handle
 @returns void
 */
-void	    HandleMsgs(HANDLE event, wyBool istranslateaccelerator = wyTrue);
+void	    HandleMsgs(HANDLE event, wyBool istranslateaccelerator = wyTrue,HWND hwnd = NULL);
 
 /// 
 /**

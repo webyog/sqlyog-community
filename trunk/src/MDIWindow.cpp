@@ -622,6 +622,11 @@ MDIWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 		}
         return wyTrue;
 
+    case UM_QUERYCOMPLETED:
+        {
+            pcquerywnd->HandleQueryExecFinished(hwnd, pcquerywnd, wparam);
+            return wyTrue;
+        }
 }
 
 //Community ribbon hyper link
@@ -669,11 +674,13 @@ MDIWindow::OnMDIActivate(HWND hwnd, WPARAM wparam, LPARAM lparam)
 		    {
 			    SendMessage(pGlobals->m_pcmainwin->m_hwndtool, TB_CHANGEBITMAP,(WPARAM)IDM_EXECUTE,(LPARAM)0);
 			    SendMessage(pGlobals->m_pcmainwin->m_hwndtool, TB_SETSTATE,(WPARAM)IDM_EXECUTE,(LPARAM)TBSTATE_ENABLED);
+				SendMessage(pGlobals->m_pcmainwin->m_hwndtool, TB_CHANGEBITMAP,(WPARAM)ACCEL_EXECUTEALL,(LPARAM)4);			    
 		    } 
             else if(m_execoption == ALL)
             { 
 			    SendMessage(pGlobals->m_pcmainwin->m_hwndtool, TB_CHANGEBITMAP,(WPARAM)ACCEL_EXECUTEALL,(LPARAM)0);
 			    SendMessage(pGlobals->m_pcmainwin->m_hwndtool, TB_SETSTATE,(WPARAM)ACCEL_EXECUTEALL,(LPARAM)TBSTATE_ENABLED);
+				SendMessage(pGlobals->m_pcmainwin->m_hwndtool, TB_CHANGEBITMAP,(WPARAM)IDM_EXECUTE,(LPARAM)3);			    
 		    }
 	    }
 
@@ -4530,6 +4537,28 @@ MDIWindow::SetThreadBusy(wyBool isexecuting)
 		m_isthreadbusy = wyFalse;
 		if(m_keepaliveinterval)
 			SetTimer(m_hwnd, KEEP_ALIVE, (m_keepaliveinterval*1000), NULL);
-		
 	}
+}
+
+void
+MDIWindow::HandleQueryExecFinished(HWND hwndactive, MDIWindow *pcquerywnd, WPARAM wparam)
+{
+    wyBool		isedit = wyFalse;
+	TabEditor	*pctabeditor = NULL;
+    EditorBase	*peditorbase = NULL;
+		
+ 	pctabeditor = (TabEditor*)pcquerywnd->GetActiveTabEditor();
+
+	if(!pctabeditor->m_pctabmgmt || !pctabeditor->m_pctabmgmt->m_hwnd)
+		return;
+    
+    peditorbase = pctabeditor->m_peditorbase;
+
+	if(hwndactive)
+    {	
+		peditorbase->HandleQueryExecFinish(&pcquerywnd->m_stopquery, wparam);
+		pGlobals->m_pcmainwin->OnQueryExecFinish(pcquerywnd);
+		SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+	}
+    return;
 }

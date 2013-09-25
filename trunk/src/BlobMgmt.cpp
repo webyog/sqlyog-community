@@ -1355,6 +1355,13 @@ BlobMgmt::FindOrReplace(HWND hwnd, wyBool uIsReplace)
 	wyString			findtextstr;
     wyInt32             ret, len = 0;
 	
+	// If the dialog box is available then we dont do anything.
+	if(pGlobals->m_pcmainwin->m_finddlg && IsWindowVisible(pGlobals->m_pcmainwin->m_finddlg))
+	{		
+		SetFocus(pGlobals->m_pcmainwin->m_finddlg);
+		return wyTrue;
+	}
+	
 	// set the flag
 	pGlobals->m_findreplace = wyTrue;
 	

@@ -2499,7 +2499,7 @@ CreatePreferences()
 
 /* simple function to handle and dispatch messages till an event is signalled */
 void
-HandleMsgs(HANDLE event, wyBool istranslateaccelerator)
+HandleMsgs(HANDLE event, wyBool istranslateaccelerator,HWND hwnd)
 {
     //	DEBUG_ENTER("HandleMsgs");
 
@@ -2521,10 +2521,13 @@ HandleMsgs(HANDLE event, wyBool istranslateaccelerator)
                     {
                         FrameWindow::ShowQueryExecToolTip(wyFalse);
                     }
-
+					//added IsDialogMessage() to handle tabs 
+					if (hwnd == NULL || !IsDialogMessage(hwnd, &msg))
+					{
 					TranslateMessage(&msg);
 					DispatchMessage(&msg);
 				}
+			}
 			}
 		} // End of PeekMessage while loop.
 
@@ -2741,6 +2744,7 @@ InitGlobals(PGLOBALS pg)
     pg->m_istabledataunderquery = wyTrue;
     pg->m_isinfotabunderquery = wyTrue;	
     pg->m_ishistoryunderquery = wyFalse;
+	pg->m_prefpersist=0;
     return;
 }
     

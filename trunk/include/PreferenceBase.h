@@ -31,6 +31,7 @@
 #define         GENERALPREF_PAGE    0
 #define         AC_PAGE             1
 #define         FONT_PAGE           2
+#define			FORMATTER_PAGE		3
 #define			OTHERS_PAGE         4
 
 
@@ -181,6 +182,22 @@ public:
 	*/
     virtual void        FormatterPrefHandleWmInitDialog(HWND hwnd) = 0;
 
+	/// Handle the WM_NOTIFY on Autocomplete dialog
+	/**
+	@param hwnd			: IN Windows HANDLE
+	@param lparam		: IN Long message parameter
+	@returns void
+	*/
+	virtual void        ACPrefHandleWmNotify(HWND hwnd, LPARAM lparam)=0;
+	
+	/// Handle the WM_NOTIFY on Formatterpref dialog
+	/**
+	@param hwnd			: IN Windows HANDLE
+	@param lparam		: IN Long message parameter
+	@returns void
+	*/
+    virtual void        FormatterPrefHandleWmNotify(HWND hwnd, LPARAM lparam)=0;
+	
 	/// Handle the WM_COMMAND on Formatter_pref dialog
 	/**
 	@param hwnd : IN Handle to tab
@@ -622,6 +639,8 @@ public:
     wyBool      m_isinfotabunderquery;
 
     wyBool      m_ishistoryunderquery;
+
+	wyBool		m_ispreferenceapplied;
 };
 
 #endif

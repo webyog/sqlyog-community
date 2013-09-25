@@ -271,6 +271,10 @@ public:
 	
 	RECT				m_wndrect;
 
+	//Flag tells not to handle TVN_ITEMEXPANDING notification from TreeView_SelectSetFirstVisible macro
+	
+	wyBool				m_dontnotify;
+
 private:
 
 	//max allowed packet size

@@ -68,6 +68,22 @@ public:
 	@return void
 	*/
 	void        FormatterPrefHandleWmCommand(HWND hwnd, WPARAM wParam);
+
+	/// Handle the WM_NOTIFY on Autocomplete dialog
+	/**
+	@param hwnd			: IN Windows HANDLE
+	@param lparam		: IN Long message parameter
+	@returns void
+	*/
+	void        ACPrefHandleWmNotify(HWND hwnd, LPARAM lparam);
+	
+	/// Handle the WM_NOTIFY on Formatterpref dialog
+	/**
+	@param hwnd			: IN Windows HANDLE
+	@param lparam		: IN Long message parameter
+	@returns void
+	*/
+    void        FormatterPrefHandleWmNotify(HWND hwnd, LPARAM lparam);
 };
 
 #endif
