@@ -36,7 +36,7 @@ CopyDatabase::CopyDatabase()
 {
      // Initialize the critical section one time only.
     InitializeCriticalSection(&m_cs);
-
+	m_dontnotify		= wyFalse;
 	m_newtargetmysql    = NULL;
 	m_targettunnel      = NULL;
 	m_newtargettunnel   = NULL;
@@ -100,7 +100,7 @@ CopyDatabase::Create(HWND hwndparent, Tunnel * tunnel, PMYSQL umysql, wyChar *db
 	wyInt32             ret;
 	m_srcmysql			= umysql;
 	m_srctunnel			= tunnel;
-
+	m_dontnotify		= wyFalse;
     //if table is valid, then set m_table
     if(table)
 	    m_table.SetAs(table);
@@ -127,6 +127,7 @@ CopyDatabase::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	LPNMHDR        lpnm = (LPNMHDR)lParam;
 	LPNMTVKEYDOWN   ptvkd = (LPNMTVKEYDOWN) lParam ;
 	CopyDatabase * pcd =(CopyDatabase*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	LPNMTREEVIEW treeview = (LPNMTREEVIEW)lParam;
 
     switch(message)
 	{
@@ -171,10 +172,15 @@ CopyDatabase::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			HandleTreeViewItem(lParam, wParam);
 		if((ptvkd->hdr.idFrom == IDC_TREE) && ptvkd->wVKey == VK_SPACE)
 			HandleTreeViewItem(lParam, wParam, wyTrue);
-
-		if(lpnm->code == TVN_ITEMEXPANDING)
+				
+		if(lpnm->code == TVN_ITEMEXPANDING )
 		{
-			return pcd->OnItemExpandingHelper(lpnm->hwndFrom, (LPNMTREEVIEW)lParam); 
+			if(treeview->itemNew.iImage == NTABLES)
+			{
+				if(pcd->m_dontnotify)
+					return wyFalse;
+			}
+			return pcd->OnItemExpandingHelper(lpnm->hwndFrom, (LPNMTREEVIEW)lParam);			
 		}
 
 		break;
@@ -344,7 +350,7 @@ CopyDatabase::OnUmCopydatabase(HWND hwnd)
     if(!m_hcopythread)
     	goto cleanup;
 
-    HandleMsgs(evt.m_copydbevent, wyFalse);
+    HandleMsgs(evt.m_copydbevent, wyFalse,m_hwnddlg);
 
 cleanup:
     if(evt.m_copydbevent)
@@ -760,10 +766,9 @@ CopyDatabase::OnItemExpandingHelper(HWND hwnd , LPNMTREEVIEW pnmtv)
     MDIWindow   *wnd = GetActiveWin();
     HWND        hobtree = wnd->m_pcqueryobject->m_hwnd;
     wyInt32     image = 0, image1 = 0;
-    HTREEITEM   hti = NULL;
+    HTREEITEM   hti = NULL,selected_hti = NULL;
     wyWChar     filterText[70], str[70];
     wyBool      atleastOneItemChecked = wyFalse;
-
 	tvi = pnmtv->itemNew;
 
 	treeviewparam.database = m_srcdb.GetAsWideChar();
@@ -887,7 +892,10 @@ CopyDatabase::OnItemExpandingHelper(HWND hwnd , LPNMTREEVIEW pnmtv)
                 if(!wcsicmp(tviOB.pszText, m_table.GetAsWideChar()))
                 {
                     TreeView_SetCheckState(hwnd, hti, 1);
+					selected_hti=hti;
                     atleastOneItemChecked = wyTrue;
+
+
                 }
                 else
                 {
@@ -896,6 +904,14 @@ CopyDatabase::OnItemExpandingHelper(HWND hwnd , LPNMTREEVIEW pnmtv)
             }
             if(atleastOneItemChecked)
             {
+				if(image1 == NTABLES)
+				{
+					m_dontnotify = wyTrue;
+
+					//Fixed:http://code.google.com/p/sqlyog/issues/detail?id=1919
+					//TreeView_SelectItem(hwnd,selected_hti);
+					TreeView_SelectSetFirstVisible(hwnd,selected_hti);
+				}
                 TreeView_SetCheckState(hwnd, tvi.hItem, 1);
             }
             else
@@ -3202,7 +3218,13 @@ CopyDatabase::EnableDlgWindows(wyBool enable)
         EnableWindow(GetDlgItem(m_hwnddlg, IDOK), TRUE);
     }
     else
+	{
+
         SetWindowText(GetDlgItem(m_hwnddlg, IDOK), _(L"&Stop"));
+		SetWindowText(GetDlgItem(m_hwnddlg, IDC_INVISIBLE), _(L"invis"));
+		SetFocus(GetDlgItem(m_hwnddlg, IDC_INVISIBLE));
+
+	}
 
 	if(m_ispromtstorepgrmmessage == wyTrue)
 		MessageBox(m_hwnddlg, COPIED_STOREDPGRMS_MANUALADJUST, pGlobals->m_appname.GetAsWideChar(), 
@@ -3344,6 +3366,7 @@ CopyDatabase::GetCtrlRects()
         IDC_DROP, 0, 0,
         IDC_CPY_BULKINSERT, 0, 0,
         IDC_SUMMARY, 0, 0,
+		IDC_INVISIBLE, 0, 0,
         IDOK, 0, 0,
         IDCANCEL, 0, 0,
         IDDONE, 0, 0,
@@ -3404,6 +3427,7 @@ CopyDatabase::PositionCtrls()
 					x = (rect.right - rect.left)/2 + 8 ;
 					break;
 				case IDC_SUMMARY:
+				case IDC_INVISIBLE:
 				case IDOK:
 				case IDCANCEL:
 				case IDDONE:
@@ -3452,6 +3476,7 @@ CopyDatabase::PositionCtrls()
         {
 			case IDOK:
 			case IDC_SUMMARY:
+			case IDC_INVISIBLE:
 			case IDDONE:
 			case IDCANCEL:
 			case IDC_MESSAGE:

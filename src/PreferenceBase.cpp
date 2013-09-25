@@ -67,9 +67,9 @@ PreferenceBase::PreferenceBase()
 	wyWChar	*lpfileport=0;
 	// Get the complete path.
 	SearchFilePath(L"sqlyog", L".ini", MAX_PATH, m_directory, &lpfileport);
-
+	m_ispreferenceapplied   = wyFalse;
 	m_isrestorealldefaults	= wyFalse;
-	m_startpage = 0;
+	m_startpage = GENERALPREF_PAGE;
     m_isthemechanged = wyFalse;
     m_istabledataunderquery = pGlobals->m_istabledataunderquery;
     m_isinfotabunderquery = pGlobals->m_isinfotabunderquery;
@@ -84,6 +84,8 @@ void
 PreferenceBase::Create(wyInt32 startpage)
 {
 	wyInt32 pagecount = 0;
+	if(!pGlobals->m_entlicense.CompareI("Professional") && startpage == OTHERS_PAGE )
+		startpage = startpage - 1;
 	m_startpage = startpage;
 
 	// we have to create a propertysheet.
@@ -220,6 +222,9 @@ PreferenceBase::ACPrefDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 		ShowHelp("Preferences%20in%20SQLyog%20GUI%20for%20MySQL.htm");
 		return TRUE;
 
+	case WM_NOTIFY:
+	    pref->ACPrefHandleWmNotify(hwnd, lParam);
+		break;
 	}
 	
 	return 0;
@@ -247,6 +252,9 @@ PreferenceBase::FormatterPrefDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 		ShowHelp("Preferences%20in%20SQLyog%20GUI%20for%20MySQL.htm");
 		return TRUE;
 
+	case WM_NOTIFY:
+	    pref->FormatterPrefHandleWmNotify(hwnd, lParam);
+		break;
 	}
 	
 	return 0;
@@ -257,7 +265,7 @@ PreferenceBase::GenPrefHandleWmInitDialog(HWND hwnd, LPARAM lParam)
 {
 	m_hwnd = hwnd;
 
-    if(m_startpage == 0)
+    if(m_startpage == GENERALPREF_PAGE)
         HandlerToSetWindowPos(hwnd);
 
 	InitGeneralPrefValues();
@@ -299,11 +307,14 @@ void
 PreferenceBase::GenPrefHandleWmNotify(HWND hwnd, LPARAM lParam)
 {
     LPNMHDR lpnm = (LPNMHDR)lParam;
-
+	wyString dirstr;
     switch (lpnm->code)
     {
 	case PSN_SETACTIVE:
+		dirstr.SetAs(m_directory);
 		m_hwnd = hwnd;
+		pGlobals->m_prefpersist=GENERALPREF_PAGE;
+		wyIni::IniWriteInt(GENERALPREFA, "PrefPersist", GENERALPREF_PAGE, dirstr.GetString());
 		break;
 	
     case PSN_APPLY: //user pressed the OK button.		
@@ -525,7 +536,8 @@ PreferenceBase::FontPrefHandleWmInitDialog(HWND hwnd)
     TV_INSERTSTRUCT tvinsert;
    
     wyString dirstr(m_directory);
-    
+    if(m_startpage == FONT_PAGE)
+		HandlerToSetWindowPos(hwnd);
     m_htv = GetDlgItem(hwnd,IDC_TREE2);
     m_rgbtexturecolor   =   wyIni::IniGetInt(GENERALPREFA, "FoldingTextureColor",   COLOR_WHITE, dirstr.GetString());
     tvd=new TREEVIEWDATA;
@@ -955,9 +967,15 @@ PreferenceBase::FontPrefHandleWmNotify(HWND hwnd, LPARAM lParam)
 {
     LPNMHDR lpnm = (LPNMHDR)lParam;
     TREEVIEWDATA *tvd;
+	wyString dirstr;
 
     if(lpnm->code == PSN_SETACTIVE)
+	{	
+		dirstr.SetAs(m_directory);
+		pGlobals->m_prefpersist=FONT_PAGE;
 		m_hwnd = hwnd;
+		wyIni::IniWriteInt(GENERALPREFA, "PrefPersist", FONT_PAGE, dirstr.GetString());
+	}
     else if(lpnm->code == TVN_SELCHANGED)
     {
         LPNMTREEVIEW pnmtv = (LPNMTREEVIEW) lParam;
@@ -976,6 +994,9 @@ PreferenceBase::FontPrefHandleWmNotify(HWND hwnd, LPARAM lParam)
         if(pnmtv->action == 2)
             SendDlgItemMessage(hwnd,IDC_TREE2,TVM_SELECTITEM,TVGN_CARET,(LPARAM)pnmtv->itemNew.hItem);
     }
+	else if(lpnm->code == PSN_APPLY) //user pressed the OK button.		
+		Apply();
+		
 }
 
 // dlgprocs for the pages.
@@ -1025,10 +1046,11 @@ void
 PreferenceBase::OthersPrefHandleWmInitDialog(HWND hwnd, LPARAM lParam)
 {
 	m_hwnd = hwnd;
-   
+    wyInt32 i=0;
 	InitOthersPrefValues();
-
-	if(m_startpage == 4)
+	if(!pGlobals->m_entlicense.CompareI("Professional"))
+		i=1;
+	if(m_startpage == OTHERS_PAGE - i)
 		HandlerToSetWindowPos(hwnd);
 }
 
@@ -1068,11 +1090,14 @@ void
 PreferenceBase::OthersPrefHandleWmNotify(HWND hwnd, LPARAM lParam)
 {
     LPNMHDR lpnm = (LPNMHDR)lParam;
-
+	wyString dirstr;
     switch (lpnm->code)
     {
 	case PSN_SETACTIVE:
+		dirstr.SetAs(m_directory);
 		m_hwnd = hwnd;
+		pGlobals->m_prefpersist=OTHERS_PAGE;
+		wyIni::IniWriteInt(GENERALPREFA, "PrefPersist", OTHERS_PAGE, dirstr.GetString());
 		break;
 	
     case PSN_APPLY: //user pressed the OK button.		

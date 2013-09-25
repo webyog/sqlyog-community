@@ -1541,7 +1541,7 @@
 #define ACCEL_VDDTOOL                   41796
 #define IDC_INITCOMMAND                 44114
 #define IDC_EDITINITCOMMAND             44115
-
+#define IDC_INVISIBLE					44116
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

@@ -3059,11 +3059,9 @@ ExpandTableName(HWND hwnd, Tunnel* tunnel, PMYSQL mysql, HTREEITEM htable, wyBoo
 wyBool
 ExpandProcedures(HWND hwnd, Tunnel* tunnel, PMYSQL mysql, HTREEITEM hsp, wyWChar *dbname, wyBool checkstate, wyBool isrefresh)
 {
-	wyInt32             ret;
 	wyString            query, spdetails, rowstr, dbnamestr;
     wyWChar             database[SIZE_512]={0};
 	wyBool				ismysql41 = IsMySQL41(tunnel, mysql);
-	TVITEM              tvi;
 	HCURSOR				hcursor;
 	MYSQL_RES			*myres;
 	MYSQL_ROW			myrow;
@@ -3077,24 +3075,17 @@ ExpandProcedures(HWND hwnd, Tunnel* tunnel, PMYSQL mysql, HTREEITEM hsp, wyWChar
 	{
 		wcscpy(database, dbname);
 		ischeckbox = wyTrue;
-	}
-    
+	}    
 	else
 	{
-		tvi.mask		=	TVIF_TEXT;
-		tvi.pszText		=	database;
-		tvi.cchTextMax	=	SIZE_512 - 1;
-		tvi.hItem		=	TreeView_GetParent(hwnd, hsp);		
+		GetNodeText(hwnd, TreeView_GetParent(hwnd, hsp), database, SIZE_512);	
 	}
     
 	// Set cursor to wait and lockwindow update for less flickering.
 	hcursor	= GetCursor();
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
 	ShowCursor(1);
-
-	ret = TreeView_GetItem(hwnd, &tvi);
-	_ASSERT(ret != wyFalse);
-
+	
 	DeleteChildNodes(hwnd, hsp, isrefresh);
 	dbnamestr.SetAs(database);
 	GetSelectProcedureStmt(dbnamestr.GetString(), query);
@@ -3291,10 +3282,8 @@ ExpandEvents(HWND hwnd, Tunnel* tunnel, PMYSQL mysql, HTREEITEM hevent, wyWChar 
 wyBool
 ExpandTriggers(HWND hwnd, Tunnel* tunnel, PMYSQL mysql, HTREEITEM htrigger, wyWChar *dbname, wyBool checkstate, wyBool isrefresh)
 {
-	wyInt32				ret;
 	wyString            query, dbnamestr, tablenamestr, rowstr; 
     wyWChar             database[SIZE_512] = {0};
-	TVITEM				tv2;
 	HCURSOR				hcursor;    
 	MYSQL_RES			*myres;
 	MYSQL_ROW			myrow;
@@ -3310,17 +3299,10 @@ ExpandTriggers(HWND hwnd, Tunnel* tunnel, PMYSQL mysql, HTREEITEM htrigger, wyWC
 		wcscpy(database, dbname);
 		ischeckbox = wyTrue;
 	}
-
 	else
 	{
-		tv2.mask		=	TVIF_TEXT;
-		tv2.hItem		=	TreeView_GetParent(hwnd, htrigger);
-		tv2.pszText		=	database;
-		tv2.cchTextMax	=	SIZE_512 - 1;		
+		GetNodeText(hwnd, TreeView_GetParent(hwnd, htrigger), database, SIZE_512);		
 	}
-
-	ret = TreeView_GetItem(hwnd, &tv2);
-	_ASSERT(ret != wyFalse);
 
 	// Set cursor to wait and lockwindow update for less flickering.
 	hcursor	= GetCursor();

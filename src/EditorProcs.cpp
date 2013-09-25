@@ -160,14 +160,6 @@ EditorProcs::ExecuteAllQuery(wyInt32 * stop)
 
 	ExecuteQueryThread(query.GetString(), stop, wnd, curline, wyTrue);
 
-	EndExecute(wnd, hwnd, ALL);
-
-	SendMessage(pGlobals->m_pcmainwin->m_hwndtool, TB_SETSTATE, IDM_EXECUTE, TBSTATE_INDETERMINATE);
-	SendMessage(pGlobals->m_pcmainwin->m_hwndtool, TB_SETSTATE, ACCEL_QUERYUPDATE, TBSTATE_INDETERMINATE);
-	/* set the focus to the correct control */
-	if(IsEditorFocus())
-		PostMessage(m_hwnd, UM_FOCUS, 0, 0);
-
 	return wyTrue;
 }
 
@@ -189,4 +181,33 @@ wyBool
 EditorProcs::ExecuteSelQuery(wyInt32 * stop)
 {
     return ExecuteAllQuery(stop);
+}
+
+ /// Function to execute the current query
+	/**
+	@param stop			: IN Stop condition
+	@returns wyFalse
+    */
+wyBool
+EditorProcs::HandleQueryExecFinish(wyInt32 * stop, WPARAM wparam)
+{
+    MDIWindow		 *wnd;
+	HWND			 hwnd = NULL;
+	QUERYFINISHPARAMS *queryparams = (QUERYFINISHPARAMS *)wparam;
+
+    /* get the query wnd */
+	//VERIFY(wnd = GetActiveWin());
+    wnd = this->m_pctabeditor->m_parentptr->m_parentptr;
+
+    EndExecute(wnd, hwnd, ALL);
+
+	SendMessage(pGlobals->m_pcmainwin->m_hwndtool, TB_SETSTATE, IDM_EXECUTE, TBSTATE_INDETERMINATE);
+	SendMessage(pGlobals->m_pcmainwin->m_hwndtool, TB_SETSTATE, ACCEL_QUERYUPDATE, TBSTATE_INDETERMINATE);
+	/* set the focus to the correct control */
+	if(IsEditorFocus())
+		PostMessage(m_hwnd, UM_FOCUS, 0, 0);
+
+	FreeQueryExeFInishParams(queryparams, *stop);
+
+    return wyTrue;
 }

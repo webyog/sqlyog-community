@@ -26,6 +26,8 @@ extern PGLOBALS		pGlobals;
 void
 PreferencesCommunity::Apply()
 {
+	if(m_ispreferenceapplied)
+		return;
     SaveGeneralPreferences(m_hwnd, GENERALPREF_PAGE);
 
     SaveFontPreferences(m_hwnd, FONT_PAGE); 
@@ -34,6 +36,7 @@ PreferencesCommunity::Apply()
 
 	EnumChildWindows(pGlobals->m_hwndclient, EnumChildProc, (LPARAM)this);
 
+	m_ispreferenceapplied = wyTrue;
 	return;
 }
 
@@ -64,6 +67,8 @@ PreferencesCommunity::EnterprisePrefHandleWmInitDialog(HWND hwnd)
 
     wyInt32     count = sizeof(publicid)/ sizeof(publicid[0]);
 
+	if(m_startpage == AC_PAGE)
+        HandlerToSetWindowPos(hwnd);
 	EnableOrDisable(hwnd, publicid, count , wyFalse);	
 
 	//Power Tools Gropbox handle
@@ -77,7 +82,44 @@ void
 PreferencesCommunity::EntPrefHandleWmCommand(HWND hwnd, WPARAM wParam)
 {
 }
+void 
+PreferencesCommunity::FormatterPrefHandleWmNotify(HWND hwnd, LPARAM lParam)
+{
+    LPNMHDR lpnm = (LPNMHDR)lParam;
+	wyString dirstr;
+    switch (lpnm->code)
+    {
+	case PSN_SETACTIVE:
+		dirstr.SetAs(m_directory);
+		m_hwnd = hwnd;
+		pGlobals->m_prefpersist=FORMATTER_PAGE;
+		wyIni::IniWriteInt(GENERALPREFA, "PrefPersist", FORMATTER_PAGE, dirstr.GetString());
+		break;
+	case PSN_APPLY: //user pressed the OK button.		
+		Apply();
+		break;
 
+	}	
+}
+void 
+PreferencesCommunity::ACPrefHandleWmNotify(HWND hwnd, LPARAM lParam)
+{
+    LPNMHDR lpnm = (LPNMHDR)lParam;
+	wyString dirstr;
+    switch (lpnm->code)
+    {
+	case PSN_SETACTIVE:
+		dirstr.SetAs(m_directory);
+		m_hwnd = hwnd;
+		pGlobals->m_prefpersist=AC_PAGE;
+		wyIni::IniWriteInt(GENERALPREFA, "PrefPersist", AC_PAGE, dirstr.GetString());
+		break;
+	case PSN_APPLY: //user pressed the OK button.		
+		Apply();
+		break;
+
+	}	
+}
 //Disabling all Enterprise-Formtter tab controls
 void
 PreferencesCommunity::FormatterPrefHandleWmInitDialog(HWND hwnd)
@@ -91,6 +133,8 @@ PreferencesCommunity::FormatterPrefHandleWmInitDialog(HWND hwnd)
 								IDC_FORMATTERRESTOREALL, IDC_FORMATTERRESTORETAB };
 
 	wyInt32     count = sizeof(publicid)/ sizeof(publicid[0]);
+	if(m_startpage == FORMATTER_PAGE)
+		HandlerToSetWindowPos(hwnd);
 
 	hwndpreview = GetDlgItem(hwnd, IDC_FORMATTERPREVIEW);
 

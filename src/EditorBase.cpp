@@ -805,28 +805,38 @@ EditorBase::SetFont()
 wyInt32
 EditorBase::ExecuteQueryThread(wyString query, wyInt32 *stop, MDIWindow *wnd, wyInt32& curline, wyBool isanalyze)
 {
-	wyInt32			 start=0, end=0, err = 0;
+	wyInt32			 start=0, end=0, *err = 0;
 	QueryThread		 thd;
 	HANDLE			 evt;
-	QueryResultList	 list;
-	wyString         str;
-	TabMgmt			 *ptabmgmt;	
-    TabEditor        *tabeditor;
+	QueryResultList	 *list = NULL;
+	wyString         *str = new wyString;
+    wyString        *querystr;
+	PMYSQL			tmpmysql;
+
+    err = new wyInt32;
+	*err = 0;
+    querystr   = new wyString();
+    querystr->SetAs(query.GetString());
+
+	wnd->m_stopmysql=  wnd->m_mysql;
+
+    tmpmysql = &wnd->m_stopmysql;
    		
     QUERYTHREADPARAMS *param = new QUERYTHREADPARAMS;
+    list = new QueryResultList;
 
     param->startpos = start; 
     param->endpos = end; 
     param->linenum = curline;
     param->executestatus = EXECUTE_ALL;
-	param->query = (wyChar*)query.GetString();
+	param->query = querystr;
     param->stop = stop; 
-    param->list = &list; 
-    param->str = &str;
+    param->list = list; 
+    param->str = str;
 	param->tab = wnd->GetActiveTabEditor()->m_pctabmgmt; 
     param->tunnel = wnd->m_tunnel; 
     param->mysql = &wnd->m_mysql; 
-    param->error = &err;	
+	param->error = err;	
     param->isadvedit = m_isadvedit; 
     param->lpcs = &wnd->m_cs;
     param->wnd  = wnd;
@@ -834,48 +844,13 @@ EditorBase::ExecuteQueryThread(wyString query, wyInt32 *stop, MDIWindow *wnd, wy
 	param->m_highlimitvalue = -1;
 	param->m_lowlimitvalue = -1;
 	param->m_iseditor = isanalyze;
+	param->executeoption = ALL;
+	param->isedit = wyFalse;
+	param->tmpmysql = tmpmysql; 
 
     InitializeExecution(param);
 
    	evt = thd.Execute(param);
-	HandleMsgs(evt);
-
-	wnd->SetExecuting(wyFalse);
-
-	ptabmgmt = wnd->GetActiveTabEditor()->m_pctabmgmt;
-	tabeditor = dynamic_cast<TabEditor*>(ptabmgmt->m_tabeditorptr); 
-	if(!tabeditor)
-		return 0;
-
-	/* now depending upon whether the user had asked to stop the query or not,
-	   we need to perform operation accordingly
-	*/
-	if(!*stop)
-	{
-        //(from 6.2) whether resultwindow is hidden or not - issue reported here http://code.google.com/p/sqlyog/issues/detail?id=366
-		if(tabeditor->m_isresultwnd == wyFalse)
-			tabeditor->m_peditorbase->ShowResultWindow();
-		
-		//query execution is successful or not
-		wnd->m_querysuccessful = err;
-
-		/* we keep the tab control from painting to avoid flickering */
-		
-		SendMessage(ptabmgmt->m_hwnd, WM_SETREDRAW, FALSE, 0);
-
-		AddQueryResults(&list, str, ptabmgmt, err, wnd);		
-				
-        wnd->m_pcquerystatus->AddQueryResult((err)?wyFalse:wyTrue);
-		
-		::SendMessage(ptabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
-		
-		//post 8.01 painting. 
-		InvalidateRect(ptabmgmt->m_hwnd, NULL, FALSE);		
-	}
-	
-	/*free the list and param if necessary..the secons parameter of FreeList is very important*/
-	FreeList(&list, *stop);
-
 	return 1;
 }
 

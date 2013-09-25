@@ -84,6 +84,14 @@ public:
     @returns wyTrue on success else returns wyFalse
 	*/
 	wyBool				ExecuteSelQuery(wyInt32 * stop);
+
+    /// Function to handle after query execution finish
+	/**
+	@param stop			: IN Stop condition
+	@returns wyFalse
+    */
+	wyBool		HandleQueryExecFinish(wyInt32 * stop, WPARAM wparam);
+
 };
 
 #endif

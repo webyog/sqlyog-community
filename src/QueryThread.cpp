@@ -262,6 +262,7 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query)
             {
                 if(myres)
                     param->tunnel->mysql_free_result(myres);
+				delete elem;
 				return 0;
             }
 
@@ -364,6 +365,9 @@ FreeList(QueryResultList * queryresult, wyInt32 freeparam /*= false*/)
 		delete elem;
 		elem = next;
 	}
+
+	delete queryresult;
+	queryresult = NULL;
 }
 
 /* main function that executes the queries that required to be executed */
@@ -382,6 +386,9 @@ ExecuteQuery(QUERYTHREADPARAMS * param)
     wyInt32             querycount = 0;// used to implement the single query execution even if tyhe cursor is outside the query
     wyUInt32            sumoftotaltime = 0, sumofexectime = 0;
     wyString            explainQuery;
+	wyChar *			querystr;
+
+	querystr = (wyChar *)param->query->GetString();
 
 #ifndef COMMUNITY
 	wyBool				isselect = wyFalse;
@@ -402,15 +409,15 @@ ExecuteQuery(QUERYTHREADPARAMS * param)
 		else 
         {
 			selquery = (wyChar*)calloc(sizeof(wyChar), (param->endpos - param->startpos) + 5);
-			memcpy(selquery, param->query + param->startpos, (param->endpos - param->startpos));
+			memcpy(selquery, querystr + param->startpos, (param->endpos - param->startpos));
 			query = selquery;
 			length = param->endpos - param->startpos;
 		}
 	}
     else 
     {
-		query = param->query;
-		length = strlen(param->query);
+		query = querystr;
+		length = strlen(querystr);
 	}
 
 	tok = new SQLTokenizer(param->tunnel, param->mysql, SRC_BUFFER, (void*)query, length);
@@ -868,6 +875,20 @@ unsigned __stdcall
 QueryThread::ExecuteThread(LPVOID lpparam)
 {
 	QUERYTHREADPARAMS       *param =(QUERYTHREADPARAMS*)lpparam;
+    QUERYFINISHPARAMS       *queryparams = NULL;
+
+	if(param->m_iseditor)
+	{    
+		queryparams = new QUERYFINISHPARAMS;
+		queryparams->list = param->list;
+		queryparams->error = param->error;
+		queryparams->mysql = param->mysql;
+		queryparams->tmpmysql = param->tmpmysql;
+		queryparams->str = param->str;
+		queryparams->query = param->query;
+		queryparams->executeoption = param->executeoption;
+		queryparams->isedit = param->isedit;
+	}
 
     if(param && param->tunnel && !param->tunnel->IsTunnel())
     {
@@ -876,8 +897,16 @@ QueryThread::ExecuteThread(LPVOID lpparam)
     
     ExecuteQuery(param);			
 
+	if(param->m_iseditor)
+	{
+		//Post Message to reset the Execute button
+		PostMessage(param->wnd->m_hwnd, UM_QUERYCOMPLETED, (WPARAM)queryparams, NULL);
+	}
+	else
+	{
 	/* set the event and exit the thread */
 	SetEvent(param->event);
+	}
 	
     if(param && param->tunnel && !param->tunnel->IsTunnel())
     {
@@ -985,4 +1014,31 @@ GetWarning(Tunnel * tunnel, PMYSQL mysql, wyString * msg)
 			msg->AddSprintf("\r\n%s\r\n", row[messageval]);
 	}
 	return wyTrue;
+}
+
+void FreeQueryExeFInishParams(QUERYFINISHPARAMS *queryparams, wyInt32 freeparam)
+{
+	if(queryparams->error)
+	{
+		delete queryparams->error;
+		queryparams->error = NULL;
+	}
+
+	if(queryparams->query)
+	{
+		delete queryparams->query;
+		queryparams->query = NULL;
+	}
+
+	if(queryparams->str)
+	{
+		delete queryparams->str;
+		queryparams->str = NULL;
+	}
+
+	/* free the list and param if necessary..the secons parameter of FreeList is very important */
+    FreeList(queryparams->list, freeparam);
+
+	free(queryparams);
+	return;
 }

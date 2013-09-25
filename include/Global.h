@@ -697,7 +697,7 @@ typedef struct tagGlobals
     wyBool      m_istabledataunderquery;
     wyBool      m_isinfotabunderquery;
     wyBool      m_ishistoryunderquery;
-
+	wyInt32		m_prefpersist;
 } GLOBALS, *PGLOBALS;
 
 
