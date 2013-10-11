@@ -2589,13 +2589,15 @@ SQLFormatter::GetQueryWtOutComments(wyString *commstr, wyString *uncommstr)
 	wyString   pattern;
 	wyInt32    matchret, findpos;	
 	wyString   searchchar, temp;
-
+	wyBool	   islefttrim = wyTrue;
 	uncommstr->SetAs("");	
 
 	while(1)
 	{
-		commstr->LTrim();	
-
+		
+		if(islefttrim)
+			commstr->LTrim();
+		islefttrim = wyTrue;
 		if(commstr->GetLength() == 0)
 			return ;
 
@@ -2629,6 +2631,9 @@ SQLFormatter::GetQueryWtOutComments(wyString *commstr, wyString *uncommstr)
 
 			uncommstr->AddSprintf("%s", GetSubStr(commstr, 0, findpos + 1));						
 			commstr->Sprintf("%s", GetSubStr(commstr, findpos +1, commstr->GetLength() - findpos));
+			//Fixed: http://code.google.com/p/sqlyog/issues/detail?id=1923
+			//Ltrim() should not be done since the comment is inside special characters and is a part of the query
+			islefttrim = wyFalse;
 			continue;
 		}
 

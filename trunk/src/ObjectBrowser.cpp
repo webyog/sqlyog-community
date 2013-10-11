@@ -1757,7 +1757,7 @@ CQueryObject::DropDatabase(Tunnel * tunnel, PMYSQL mysql)
 	case IDYES:
 		break;
 
-	case IDNO:
+	default:
 		//Post 8.01
 		//RepaintTabModule();
 		return wyFalse;
@@ -1846,8 +1846,7 @@ CQueryObject::DropTable(Tunnel * tunnel, PMYSQL mysql)
 	{
 	case IDYES:
 		break;
-
-	case IDNO:
+	default:
 		return wyFalse;
 	}
 
@@ -1936,7 +1935,7 @@ CQueryObject::DropField(Tunnel * tunnel, PMYSQL mysql)
 	case IDYES:
 		break;
 
-	case IDNO:
+	default:
 		return wyFalse;
 	}
 
@@ -2045,7 +2044,7 @@ CQueryObject::DropIndex(Tunnel * tunnel, PMYSQL mysql)
 	case IDYES:
 		break;
 
-	case IDNO:
+	default:
 		return wyFalse;
 	}
 
@@ -2154,7 +2153,7 @@ CQueryObject::EmptyTable(Tunnel * tunnel, PMYSQL mysql)
 	case IDYES:
 		break;
 
-	case IDNO:
+	default:
 		return wyFalse;
 	}
 
@@ -5441,7 +5440,7 @@ CQueryObject::TruncateDatabase(HWND hwnd, Tunnel * tunnel, PMYSQL mysql)
 
 	ret = yog_message(hwnd, msg.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
 
-	if(ret == IDNO)
+	if(ret != IDYES)
 		return wyFalse;
 	
 
@@ -6131,7 +6130,7 @@ CQueryObject::DropDatabaseObject(Tunnel * tunnel, PMYSQL mysql, wyChar *objectty
 
 	ret = yog_message(m_hwnd, query.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2 | MB_APPLMODAL);
 	
-	if(ret == IDNO)
+	if(ret != IDYES)
 		return wyFalse;
 
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
@@ -6176,7 +6175,7 @@ CQueryObject::DropTrigger(Tunnel * tunnel, PMYSQL mysql)
 
 	ret = yog_message(m_hwnd, query.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONQUESTION | MB_YESNO | MB_DEFBUTTON2 | MB_APPLMODAL);
 	
-	if(ret == IDNO)
+	if(ret != IDYES)
 		return wyFalse;
 
 	SetCursor(LoadCursor(NULL, IDC_WAIT));

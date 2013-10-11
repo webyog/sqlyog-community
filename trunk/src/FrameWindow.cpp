@@ -3068,8 +3068,9 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 	case ACCEL_FOCUSRESULT:
         if(!ptabeditor)
             break;
-		/*if(hwndactive )
-			ptabmgmt->SetFocusToResultPane();   */
+
+		//if(hwndactive)
+		//	ptabmgmt->SetFocusToResultPane();
 
 		break;
 

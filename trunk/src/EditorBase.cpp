@@ -847,6 +847,7 @@ EditorBase::ExecuteQueryThread(wyString query, wyInt32 *stop, MDIWindow *wnd, wy
 	param->executeoption = ALL;
 	param->isedit = wyFalse;
 	param->tmpmysql = tmpmysql; 
+	param->isexplain = wyFalse;
 
     InitializeExecution(param);
 

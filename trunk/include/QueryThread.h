@@ -84,6 +84,13 @@ public:
 
 struct QUERYTHREADPARAMS
 {
+	QUERYTHREADPARAMS(){
+		executeoption = SINGLE;
+		isedit = wyFalse;
+		isprofile = wyFalse;
+		isexplainextended = wyFalse;
+		isexplain = wyFalse;
+	}
 	wyInt32     startpos;
 	wyInt32	    endpos;
 	wyInt32	    linenum;
@@ -115,6 +122,8 @@ struct QUERYTHREADPARAMS
     LPCRITICAL_SECTION lpcs;
 	EXECUTEOPTION executeoption;
 	wyBool		isedit;
+	wyBool		isexplainextended;
+	wyBool		isexplain;
 };
 
 struct QUERYFINISHPARAMS
@@ -128,6 +137,9 @@ struct QUERYFINISHPARAMS
 		tmpmysql= NULL;
 		executeoption = SINGLE;
 		isedit = wyFalse;
+		isprofile = wyFalse;
+		isexplainextended = wyFalse;
+		isexplain = wyFalse;
 	}
     QueryResultList *list;
     wyInt32     *error;
@@ -137,6 +149,9 @@ struct QUERYFINISHPARAMS
 	PMYSQL      tmpmysql;
 	EXECUTEOPTION executeoption;
 	wyBool		isedit;
+	wyBool		isprofile;
+	wyBool		isexplainextended;
+	wyBool		isexplain;
 };
 
 /// Returns the error or the success messages

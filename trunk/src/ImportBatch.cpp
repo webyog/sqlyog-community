@@ -186,7 +186,7 @@ ImportBatch::ImportDump()
 								dbname.GetString()); 
 
 				ret = MessageBox(wnd->m_hwnd, msg.GetAsWideChar(),pGlobals->m_appname.GetAsWideChar(), MB_ICONQUESTION | MB_YESNO);
-				if(ret == IDNO)
+				if(ret != IDYES)
 					return;
 			}
 		}

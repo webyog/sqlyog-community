@@ -888,6 +888,9 @@ QueryThread::ExecuteThread(LPVOID lpparam)
 		queryparams->query = param->query;
 		queryparams->executeoption = param->executeoption;
 		queryparams->isedit = param->isedit;
+		queryparams->isprofile = param->isprofile;		
+		queryparams->isexplainextended = param->isexplainextended;		
+		queryparams->isexplain = param->isexplain;		
 	}
 
     if(param && param->tunnel && !param->tunnel->IsTunnel())

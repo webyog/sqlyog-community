@@ -1947,7 +1947,7 @@ OverWriteFile(HWND hwnd, const wyWChar *filename)
 
 		VERIFY(CloseHandle(hfile));
 
-		if(create == IDNO)
+		if(create != IDYES)
 			return wyFalse;
 	}
 

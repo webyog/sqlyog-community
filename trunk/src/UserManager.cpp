@@ -1047,7 +1047,7 @@ UserManager::AddNewUser()
                          pGlobals->m_appname.GetAsWideChar(), 
                          MB_YESNO | MB_ICONQUESTION);
 
-        if(ret == IDNO)
+        if(ret != IDYES)
         {
             return wyFalse;
         }
