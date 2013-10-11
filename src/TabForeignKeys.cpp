@@ -3669,7 +3669,7 @@ TabForeignKeys::DropSelectedForeignKeys()
             {
                 /// Prompt the user for the first time only
                 ret = yog_message(m_hgridfk, _(L"Do you want to drop the selected Foreign Key(s)?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
-                if(ret == IDNO)
+                if(ret != IDYES)
                     return wyTrue;
             }
             if(ret == IDYES)
@@ -3771,7 +3771,7 @@ TabForeignKeys::DropForeignKey(wyUInt32 row)
         /// Show confirmation dialog
         ret = MessageBox(m_hgridfk, _(L"Do you want to drop this foreign key?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
         
-        if(ret == IDNO)
+        if(ret != IDYES)
             return wyTrue;
 
         /// Remove ReferencedBy instances from fieldwrappers (Don't delete srccol)
@@ -4059,7 +4059,7 @@ TabForeignKeys::ValidateFKs(wyBool showmsg)
                 flag = wyFalse;
                 wyInt32 ret = MessageBox(m_hwnd, EDITRELERROR, pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONWARNING);
 
-                if(ret == IDNO)
+                if(ret != IDYES)
                 {
                     return wyFalse;
                 }

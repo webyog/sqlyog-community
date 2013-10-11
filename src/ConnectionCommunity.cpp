@@ -152,7 +152,7 @@ ConnectionCommunity::DeleteConnDetail(HWND hdlg)
 	confirm = yog_message(hdlg, _(L"Do you really want to delete the connection detail?"), pGlobals->m_appname.GetAsWideChar(), 
                             MB_YESNO | MB_HELP | MB_ICONQUESTION | MB_DEFBUTTON2);
 
-	if(confirm == IDNO)
+	if(confirm != IDYES)
 		return FALSE;
 
 	// Get the complete path.

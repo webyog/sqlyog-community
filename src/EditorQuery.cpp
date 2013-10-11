@@ -233,7 +233,9 @@ EditorQuery::ExecuteExplainQuery(wyInt32 * stop, wyBool isExtended)
 	param->m_iseditor = wyTrue;
 	param->executeoption = SINGLE;
 	param->isedit = wyFalse;
-
+	param->isexplainextended = isExtended;
+	param->isexplain = wyTrue;
+	
     InitializeExecution(param);
 
 	evt = thd.Execute(param);
@@ -330,6 +332,7 @@ EditorQuery::ExecuteCurrentQuery(wyInt32 * stop, wyBool isedit)
 	param->m_iseditor = wyTrue;
 	param->executeoption = SINGLE;
 	param->isedit = isedit;
+	param->isexplain = wyFalse;
 
     InitializeExecution(param);
 
@@ -370,6 +373,9 @@ EditorQuery::HandleQueryExecFinish(wyInt32 * stop, WPARAM wparam)
 		if(tabeditor->m_isresultwnd == wyFalse)
 			tabeditor->m_peditorbase->ShowResultWindow();
 
+		//query execution is successful or not
+		wnd->m_querysuccessful = *(queryparams->error);
+
 		/* we keep the tab control from painting to avoid flickering */
 		SendMessage(ptabmgmt->m_hwnd, WM_SETREDRAW, FALSE, 0);
 
@@ -378,8 +384,14 @@ EditorQuery::HandleQueryExecFinish(wyInt32 * stop, WPARAM wparam)
 		{
 			ptabmgmt->m_pcdataviewquery->m_isformview = wyFalse;
 		}*/
-		
-        AddQueryResults(queryparams->list, (*queryparams->str), ptabmgmt, *(queryparams->error), wnd);
+		 
+
+		if(queryparams->isexplain == wyFalse){
+			AddQueryResults(queryparams->list, (*queryparams->str), ptabmgmt, *(queryparams->error), wnd);
+		}
+		else{
+			AddExplainQueryResults(queryparams->list, (*queryparams->str), ptabmgmt, *(queryparams->error), queryparams->isexplainextended, wnd);
+		}
 		
         wnd->m_pcquerystatus->AddQueryResult((*queryparams->error)?wyFalse:wyTrue);
 		SendMessage(ptabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);

@@ -4542,8 +4542,7 @@ MDIWindow::SetThreadBusy(wyBool isexecuting)
 
 void
 MDIWindow::HandleQueryExecFinished(HWND hwndactive, MDIWindow *pcquerywnd, WPARAM wparam)
-{
-    wyBool		isedit = wyFalse;
+{    
 	TabEditor	*pctabeditor = NULL;
     EditorBase	*peditorbase = NULL;
 		

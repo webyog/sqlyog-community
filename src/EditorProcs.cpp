@@ -194,10 +194,42 @@ EditorProcs::HandleQueryExecFinish(wyInt32 * stop, WPARAM wparam)
     MDIWindow		 *wnd;
 	HWND			 hwnd = NULL;
 	QUERYFINISHPARAMS *queryparams = (QUERYFINISHPARAMS *)wparam;
+	TabEditor		*tabeditor;
+    TabMgmt			*ptabmgmt = NULL;
 
     /* get the query wnd */
 	//VERIFY(wnd = GetActiveWin());
     wnd = this->m_pctabeditor->m_parentptr->m_parentptr;
+	
+	ptabmgmt = wnd->GetActiveTabEditor()->m_pctabmgmt;	
+    tabeditor = (TabEditor*)ptabmgmt->m_tabeditorptr;
+
+	wnd->SetExecuting(wyFalse);
+
+	//now depending upon whether the user had asked to stop the query or not,
+	//we need to perform operation accordingly
+	if(!*stop) 
+	{		
+		//(from 6.2) whether resultwindow is hidden or not - issue reported here http://code.google.com/p/sqlyog/issues/detail?id=366
+		if(tabeditor->m_isresultwnd == wyFalse)
+			tabeditor->m_peditorbase->ShowResultWindow();
+
+		/* we keep the tab control from painting to avoid flickering */
+		SendMessage(ptabmgmt->m_hwnd, WM_SETREDRAW, FALSE, 0);
+
+		AddQueryResults(queryparams->list, (*queryparams->str), ptabmgmt, *(queryparams->error), wnd);
+		
+        wnd->m_pcquerystatus->AddQueryResult((*queryparams->error)?wyFalse:wyTrue);
+		SendMessage(ptabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+				
+		InvalidateRect(ptabmgmt->m_hwnd, NULL, FALSE);
+	} 
+	else if(!wnd->m_tunnel->IsTunnel())
+	{
+		/*if its a tunnel the we dont need to close it */
+		if(*queryparams->tmpmysql)        
+			wnd->m_tunnel->mysql_close(*queryparams->tmpmysql);
+	}
 
     EndExecute(wnd, hwnd, ALL);
 

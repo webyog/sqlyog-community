@@ -202,6 +202,8 @@ BlobMgmt::InitDlgVales()
 	
     //Line added because to turn off the margin
     SendMessage(m_hwndedit, SCI_SETMARGINWIDTHN,1,0);
+
+	SendMessage(m_hwndedit, SCI_SETSCROLLWIDTHTRACKING, TRUE, 0);
     
 	//m_encodingtype.SetAs(codepage.GetString());
 	

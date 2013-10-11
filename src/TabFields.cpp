@@ -203,7 +203,7 @@ TabFields::DropColumn(wyUInt32 row)
             ret = MessageBox(m_hgridfields, _(L"Do you want to drop this column?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
             
             SetFocus(m_hgridfields);
-            if(ret == IDNO)
+            if(ret != IDYES)
                 return wyFalse;
         }
         
@@ -213,19 +213,19 @@ TabFields::DropColumn(wyUInt32 row)
         if(indexedby && !refby)
         {
             ret2 = MessageBox(m_hgridfields, _(L"The selected column is referenced by one or more indexes. Dropping this column will also modify the corresponding indexes.\r\n\r\nDo you want to continue?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
-	        if(ret2 == IDNO)
+	        if(ret2 != IDYES)
 		        return wyTrue;
         }
         else if(!indexedby && refby)
         {
             ret2 = MessageBox(m_hgridfields, _(L"The selected column is referenced by one or more foreign keys. Dropping this column will also modify the corresponding foreign keys.\r\n\r\nDo you want to continue?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
-	        if(ret2 == IDNO)
+	        if(ret2 != IDYES)
 		        return wyTrue;
         }
         else if(indexedby && refby)
         {
 	        ret2 = MessageBox(m_hgridfields, _(L"The selected column is referenced by one or more indexes and foreign keys. Dropping this column will also modify the corresponding indexes and foreign keys.\r\n\r\nDo you want to continue?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
-	        if(ret2 == IDNO)
+	        if(ret2 != IDYES)
 		        return wyTrue;
         }
 
@@ -397,7 +397,7 @@ TabFields::DropSelectedColumns()
             {
                 ret = MessageBox(m_hgridfields, _(L"Do you want to drop the selected column(s)?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
                 SetFocus(m_hgridfields);
-                if(ret == IDNO)
+                if(ret != IDYES)
                     return wyTrue;
             }
             if(ret == IDYES)
@@ -408,19 +408,19 @@ TabFields::DropSelectedColumns()
                 if(ret2 == IDNO && (indexedby && !refby))
                 {
                     ret2 = MessageBox(m_hgridfields, _(L"The selected columns are referenced by one or more indexes. Dropping these columns will also modify the corresponding indexes.\r\n\r\nDo you want to continue?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
-                    if(ret2 == IDNO)
+                    if(ret2 != IDYES)
                         return wyTrue;
                 }
                 else if(ret2 == IDNO && (!indexedby && refby))
                 {
                     ret2 = MessageBox(m_hgridfields, _(L"The selected columns are referenced by one or more foreign keys. Dropping these columns will also modify the corresponding foreign keys.\r\n\r\nDo you want to continue?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
-                    if(ret2 == IDNO)
+                    if(ret2 != IDYES)
                         return wyTrue;
                 }
                 else if(ret2 == IDNO && (indexedby && refby))
                 {
                     ret2 = MessageBox(m_hgridfields, _(L"The selected columns are referenced by one or more indexes and foreign keys. Dropping these columns will also modify the corresponding indexes and foreign keys.\r\n\r\nDo you want to continue?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
-                    if(ret2 == IDNO)
+                    if(ret2 != IDYES)
                         return wyTrue;
                 }
                 

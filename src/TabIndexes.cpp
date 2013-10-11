@@ -1952,7 +1952,7 @@ TabIndexes::DropSelectedIndexes()
             else if(ret == IDNO)
             {
                 ret = MessageBox(m_hgridindexes, _(L"Do you want to drop the selected index(es)?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
-                if(ret == IDNO)
+                if(ret != IDYES)
                     return wyTrue;
             }
             if(ret == IDYES)
@@ -2072,7 +2072,7 @@ TabIndexes::DropIndex(wyUInt32 row)
             //  Ask for confirmation, if the wrapper is associated with the row and the index-values are not deleted from the row
             ret = MessageBox(m_hgridindexes, _(L"Do you want to drop this index?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2);
             
-            if(ret == IDNO)
+            if(ret != IDYES)
                 return wyFalse;
         }
         IndexColumn *iindcols = NULL;
