@@ -7533,21 +7533,19 @@ FrameWindow::OnAlterEvent(MDIWindow *wnd)
 void 
 FrameWindow::OnAlterView(MDIWindow *wnd)
 {
-    wyString createview, dropview, viewname;
+    wyString viewname, alterview;
 	EditorBase	*peditorbase;
 
-	wnd->m_pcqueryobject->GetCreateView(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, createview);
-
-	if(createview.GetLength()== 0)
+	wnd->m_pcqueryobject->GetAlterView(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, alterview);
+	if(alterview.GetLength()== 0)
 		return;
 	
-	wnd->m_pcqueryobject->GetDropView(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, dropview);
 	pGlobals->m_pcmainwin->GetObjectName(wnd, viewname);
 	
 	VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
 
-	//Format the SELECT clause in 'Create View' statement
-	FormatCreateViewStatement(&createview, viewname.GetString(), wyFalse);
+	//Format the SELECT clause in 'Alter View' statement
+	FormatCreateViewStatement(&alterview, viewname.GetString(), wyFalse);
 
 	wnd->m_pctabmodule->CreateAdvEditorTab(wnd,(wyChar*)viewname.GetString(), IDI_ALTERVIEW,
 	TreeView_GetParent(wnd->m_pcqueryobject->m_hwnd, 
@@ -7556,8 +7554,7 @@ FrameWindow::OnAlterView(MDIWindow *wnd)
 	peditorbase = wnd->GetActiveTabEditor()->m_peditorbase;
     peditorbase->m_isdiscardchange = wyTrue;
     SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITEROPEN);
-	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)dropview.GetString());
-	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)createview.GetString());
+	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)alterview.GetString());
 	SendMessage(peditorbase->m_hwnd, SCI_REPLACESEL, TRUE,(LPARAM)DELIMITERCLOSE);
     SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
     SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);

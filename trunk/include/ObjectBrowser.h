@@ -500,6 +500,15 @@ public:
     @param createstmt  : Create statement.
     */
 	wyBool		GetCreateView(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, wyString &createstmt);
+    
+	/// Alters a view with the given name.
+    /**
+    @param hwnd        : Window HANDLE.
+    @param tunnel      : Tunnel. 
+    @param mysql       : Mysql pointer.
+    @param alterstmt   : Alter statement.
+    */
+	wyBool		GetAlterView(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, wyString &alterstmt);
 
     /// Creates a procedure with the given name.
     /**

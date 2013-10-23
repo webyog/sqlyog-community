@@ -1640,8 +1640,30 @@ MDIWindow::StopQuery()
 	temp = mysql = m_tunnel->mysql_init((MYSQL*)0);
 
     EnterCriticalSection(&m_cs);	
-		
+
+	if(m_conninfo.m_initcommand.GetLength())
+         ExecuteInitCommands(mysql, m_tunnel, m_conninfo.m_initcommand);
+
 	SetMySQLOptions(&m_conninfo, m_tunnel, &mysql);
+
+#ifndef COMMUNITY
+
+	if(m_conninfo.m_issslchecked == wyTrue)
+    {
+        if(m_conninfo.m_issslauthchecked == wyTrue)
+        {
+            mysql_ssl_set(mysql, m_conninfo.m_clikey.GetString(), m_conninfo.m_clicert.GetString(), 
+                            m_conninfo.m_cacert.GetString(), NULL, 
+                            m_conninfo.m_cipher.GetLength() ? m_conninfo.m_cipher.GetString() : NULL);
+        }
+        else
+        {
+            mysql_ssl_set(mysql, NULL, NULL, m_conninfo.m_cacert.GetString(), 
+                NULL, m_conninfo.m_cipher.GetLength() ? m_conninfo.m_cipher.GetString() : NULL);
+        }
+    }
+    
+#endif
 
 	if(!m_tunnel->mysql_real_connect(mysql, m_mysql->host, m_mysql->user, m_mysql->passwd, NULL, 
                            m_mysql->port, NULL, CLIENT_MULTI_RESULTS | CLIENT_REMEMBER_OPTIONS, NULL))

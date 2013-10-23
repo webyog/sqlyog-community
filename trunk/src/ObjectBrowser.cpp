@@ -5971,6 +5971,82 @@ CQueryObject::GetCreateView(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, wyString &
 	return wyTrue;
 }
 
+wyBool    
+CQueryObject::GetAlterView(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, wyString &strview)
+{
+	MYSQL_RES	*myres;
+	MYSQL_ROW	myrow;
+	wyString    query, msg;
+	HTREEITEM	hitem;
+    wyChar      buffer[SIZE_256];
+    wyBool      isfromis = wyFalse;
+    MDIWindow*  wnd = GetActiveWin();
+
+	VERIFY(hitem	=	TreeView_GetSelection(m_hwnd));
+	// Get the database name.
+	GetTableDatabaseName(hitem);
+	VERIFY(hitem = TreeView_GetParent(m_hwnd, hitem));
+	VERIFY(hitem = TreeView_GetParent(m_hwnd, hitem));
+	GetDatabaseName(hitem);
+
+	query.Sprintf("show create table `%s`.`%s`", m_seldatabase.GetString(), m_seltable.GetString());
+		
+	myres = ExecuteAndGetResult(wnd, tunnel, mysql, query);
+	if(!myres)
+	{
+		ShowMySQLError(hwnd, tunnel, mysql, query.GetString());
+
+        if(IsMySQL51(tunnel, mysql) == wyTrue)
+        {
+            isfromis = wyTrue;
+            tunnel->mysql_real_escape_string(*mysql, buffer, m_seldatabase.GetString(), m_seldatabase.GetLength());
+            query.Sprintf("select `IS_UPDATABLE`, `DEFINER`, `SECURITY_TYPE`, `VIEW_DEFINITION` from information_schema.`VIEWS` where `TABLE_SCHEMA` = '%s'", buffer);
+            tunnel->mysql_real_escape_string(*mysql, buffer, m_seltable.GetString(), m_seltable.GetLength());
+            query.AddSprintf(" AND `TABLE_NAME` = '%s'", buffer);
+            SetCursor(LoadCursor(NULL, IDC_WAIT));
+            myres = ExecuteAndGetResult(wnd, tunnel, mysql, query);
+        }
+
+        if(!myres)
+        {
+            if(isfromis == wyTrue)
+            {
+                ShowMySQLError(hwnd, tunnel, mysql, query.GetString());
+            }
+
+            SetCursor(LoadCursor(NULL, IDC_ARROW));
+		    return wyFalse;
+        }
+	}
+
+	if(tunnel->mysql_num_rows(myres)== 0)
+	{
+		msg.Sprintf("View '%s' doesn't exists!", m_seltable.GetString());
+		yog_message(m_hwnd, msg.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONERROR | MB_OK);
+		tunnel->mysql_free_result(myres);
+		return wyFalse;
+	}
+
+	myrow = tunnel->mysql_fetch_row(myres);
+
+    if(isfromis == wyFalse)
+    {
+        strview.SetAs(myrow[1], wnd->m_ismysql41);
+		//Replacing CREATE with ALTER ,Hence 0 is the start position and 6 is the length of substring to be replaced
+		if(strview.GetLength()!=0)
+			strview.Replace(0, 6, "ALTER");
+    }
+    else
+    {
+        strview.Sprintf("alter algorithm=%s definer=%s sql security %s view `%s` as %s", myrow[0] ? (!strcmpi(myrow[0], "yes") ? "MERGE" : "TEMPTABLE") : "UNDEFINED", 
+            myrow[1], myrow[2], m_seltable.GetString(), myrow[3]); 
+    }
+
+	tunnel->mysql_free_result(myres);
+	return wyTrue;
+}
+
+
 wyBool  
 CQueryObject::GetDropView(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, wyString &strview)
 {
