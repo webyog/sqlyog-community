@@ -2873,10 +2873,10 @@ CopyDatabase::ExportView(const wyChar *db, const wyChar *view)
 wyBool 
 CopyDatabase::ExportSP(const wyChar *db, const wyChar *sp, wyBool isproc)
 {
-	 wyString       query, tquery;
+	 wyString       query, tquery,strmsg;
 	 MYSQL_RES		*res, *tgtres;
 	 MYSQL_ROW		row;
-
+	 
 
 	 if(m_dropobjects)
 	 {
@@ -2904,8 +2904,14 @@ CopyDatabase::ExportSP(const wyChar *db, const wyChar *sp, wyBool isproc)
 
 	row = m_newsrctunnel->mysql_fetch_row(res);
 
-    if(row == NULL || row[2] == NULL)
+    if(row == NULL )
         return wyFalse;
+	if(row[2] == NULL)
+	{
+		strmsg.SetAs(PROCEDURE_FUNC_ERRMSG);
+		yog_message(m_hwnddlg, strmsg.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR);
+		return wyFalse;
+	}
 
 	tquery.SetAs(row[2]);
 		

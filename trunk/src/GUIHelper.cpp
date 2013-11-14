@@ -221,7 +221,7 @@ OpenKeyWordsDB(sqlite3 **phdb)
 	
 	directoryname.SetAs(directory);
 
-	rc = sqlite3_open(directoryname.GetString(), phdb);
+	rc = sqlite3_open_v2(directoryname.GetString(), phdb, SQLITE_OPEN_READONLY, 0);
 	
 	if(rc != SQLITE_OK)
 		return wyFalse;

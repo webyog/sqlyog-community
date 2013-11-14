@@ -85,7 +85,8 @@
 #define GVKEY_DOWN                        40
 #define HIGHLIGHTBORDERCOLOR            RGB(242, 149, 54)
 #define HIGHLIGHTCOLOR                  RGB(244, 203, 123)
-#define ROWHIGHLIGHTCOLOR				RGB(226, 229, 238)
+//#define ROWHIGHLIGHTCOLOR				RGB(226, 229, 238)
+#define ROWHIGHLIGHTCOLOR				RGB(180, 204, 238)
 #define ALTHIGHLIGHTCOLOR				RGB(244, 244, 244)
 
 #ifndef _CUST_GRID_
