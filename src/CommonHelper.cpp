@@ -826,7 +826,8 @@ GetCreateFunctionString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const w
 	    strfunction.SetAs(myrow[2]);
     else
     {
-        strmsg.SetAs(_("Unable to retrieve information. Please check your permission."));
+        //strmsg.SetAs(_("Unable to retrieve information. Please check your permission."));
+		strmsg.SetAs(PROCEDURE_FUNC_ERRMSG);
         return wyFalse;
     }
 
@@ -875,8 +876,9 @@ GetCreateProcedureString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const 
     }
     else
     {
-        strmsg.SetAs(_("Unable to retrieve information. Please check your permission."));
-        return wyFalse;
+        //strmsg.SetAs(_("Unable to retrieve information. Please check your permission."));
+        strmsg.SetAs(PROCEDURE_FUNC_ERRMSG);
+		return wyFalse;
     }
 
 	sja_mysql_free_result(tunnel, myres);

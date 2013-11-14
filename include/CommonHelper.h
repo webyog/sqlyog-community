@@ -68,6 +68,7 @@
 #define	 PLINK_LOCK_WAIT_TRY_COUNT  120
 
 #define  WAIT_TIMEOUT_SERVER  "28800"
+#define  PROCEDURE_FUNC_ERRMSG _("Unable to retrieve information. Please check your privileges. For routines (stored procedures and functions) you need SELECT privilege to mysql.proc if you are not the owner of the routines.")
 
 typedef struct ForeignKey
 {

@@ -30,7 +30,8 @@ wyWChar	customname[] = L"CustomGridControl";
 wyWChar	splitter[]   = L"CustomGridSplitter";
 
 #define	GV_GRIDPICKLIST						1000
-#define	GV_SELCOLOR							RGB(221, 220, 235)
+//#define GV_SELCOLOR							RGB(221, 220, 235)
+#define	GV_SELCOLOR							RGB(180,204,238)
 #define	SHIFTED								0x8000
 #define	YOG_GET_WHEEL_DELTA_wparam(wparam)	((short)HIWORD(wparam))
 #define	YOG_DFCS_TRANSPARENT				0x0800
@@ -3526,7 +3527,7 @@ CCustGrid::DrawCell(HDC hdcmem, wyInt32 row, wyInt32 col, PGVCOLNODE topcolstruc
         {
 		    VERIFY(hbrgrey = CreateSolidBrush(GV_SELCOLOR));
 		    VERIFY(hpenthick = CreatePen(PS_SOLID, 2, RGB(0, 0, 0)));
-		    hbrold	= (HBRUSH)SelectObject(hdcmem, isnotgrey?hbrgrey:hbrbkgnd); // no ret
+		    hbrold	= (HBRUSH)SelectObject(hdcmem, hbrgrey); // no ret
 		    hpenold = (HPEN)SelectObject(hdcmem, hpenthick); // no ret
 
 		    VERIFY(Rectangle(hdcmem, rect->left - 1, rect->top - 1, rect->right + 1, rect->bottom + 1));

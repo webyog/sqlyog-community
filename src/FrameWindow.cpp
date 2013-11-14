@@ -8065,7 +8065,7 @@ FrameWindow::CheckForAutoKeywords()
 		
 	FindClose(hfind);
 	
-	ret = sqlite3_open(directorynamestr.GetString(), &hdb);
+	ret = sqlite3_open_v2(directorynamestr.GetString(), &hdb, SQLITE_OPEN_READONLY, 0);
 	
 	if(ret != SQLITE_OK)
 		goto onErr;
