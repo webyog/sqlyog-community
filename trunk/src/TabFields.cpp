@@ -51,7 +51,7 @@ FieldStructWrapper::FieldStructWrapper(FIELDATTRIBS *value, wyBool isnew)
     {
         m_oldval = m_newval = value;
     }
-    
+    m_ischanged = wyFalse;
     m_errmsg.Clear();
 }
 
@@ -625,7 +625,7 @@ TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres)
     wyInt32         typeindex, fieldindex, charindex;
     wyInt32         i = -1;
     FIELDATTRIBS    *fieldattr = NULL;
-    FieldStructWrapper *cwrapobj = NULL;
+    FieldStructWrapper *cwrapobj = NULL,*cwrapobj2 = NULL;
     wyChar          *tempstr = NULL;
 	wyString        strcreate, query;
     MYSQL_ROW		myfieldrow;
@@ -780,7 +780,9 @@ TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres)
 
         /// Creating the wrapper instance and storing it the the class-member variable
         cwrapobj = new FieldStructWrapper(fieldattr, wyFalse);
+		cwrapobj2 = new FieldStructWrapper(fieldattr, wyFalse);
         m_listwrapperstruct.Insert(cwrapobj);
+		m_listwrapperstruct_2.Insert(cwrapobj2);
 	}
     return wyTrue;
 }
@@ -1243,12 +1245,41 @@ void
 TabFields::GetNewAndModifiedColumns(wyString &columnsstr)
 {
     FieldStructWrapper* cwrapobj = NULL, *prevoldcwrap = NULL, *prevcwrap = NULL, *cwrapobjtemp = NULL;
+    FieldStructWrapper* past_ele = NULL,*past_ele_prev = NULL,*present_ele_prev = NULL;
     wyUInt32        count, row;
+	wyInt32			row_temp;
     wyString        defvalue("");
     wyString        coldef("");
     wyString        reorderstr(""), lasterrmsg("");
-
+	wyBool			isremove = wyTrue;
     count = CustomGrid_GetRowCount(m_hgridfields);
+	//if a column was removed then remove it from past list
+	past_ele = (FieldStructWrapper*) m_listwrapperstruct_2.GetFirst();
+	while(past_ele != NULL)
+	{
+		isremove = wyTrue;
+		for(row = 0; row < count; row++)
+		{
+			cwrapobj = (FieldStructWrapper*) CustomGrid_GetRowLongData(m_hgridfields, row);
+			if(!cwrapobj)
+				continue;
+
+			if(!cwrapobj->m_newval)
+				continue;
+
+			if(cwrapobj->m_oldval == past_ele->m_oldval)
+			{
+				isremove = wyFalse;
+				break;
+			}
+		}
+		if(isremove)
+			m_listwrapperstruct_2.Remove(past_ele);
+
+		past_ele = (FieldStructWrapper*)past_ele->m_next;
+	}
+    past_ele = NULL;
+
     for(row = 0; row < count; row++)
     {
         cwrapobj = (FieldStructWrapper*) CustomGrid_GetRowLongData(m_hgridfields, row);
@@ -1258,6 +1289,16 @@ TabFields::GetNewAndModifiedColumns(wyString &columnsstr)
 
         if(!cwrapobj->m_newval)
             continue;
+
+		//after first iteration move to  the next element in the list
+		if(cwrapobj->m_oldval)
+		{
+			if( past_ele == NULL)
+				past_ele = (FieldStructWrapper*) m_listwrapperstruct_2.GetFirst();
+			else
+				past_ele = (FieldStructWrapper*)past_ele->m_next;
+		}
+
 
         reorderstr.Clear();
         if(!cwrapobj->m_oldval)     //..if field is newly added
@@ -1304,18 +1345,64 @@ TabFields::GetNewAndModifiedColumns(wyString &columnsstr)
                 if(cwrapobjtemp)
                     reorderstr.SetAs(" first");
             }
-            else if(prevcwrap != cwrapobj->m_prev)
+			//need to reorder only when the element in the current position is not the same one before
+            else if(prevcwrap != NULL && cwrapobj->m_ischanged == wyTrue ) 
             {
-                cwrapobjtemp = (FieldStructWrapper*)cwrapobj->m_prev;
-
-                while(cwrapobjtemp)
-                {
-                    if(cwrapobjtemp->m_newval != NULL)
-                        break;
-                    cwrapobjtemp = (FieldStructWrapper*)cwrapobjtemp ->m_prev;
-                }
-                if(prevcwrap != cwrapobjtemp)
+				if (cwrapobj->m_oldval != past_ele->m_oldval)
                     reorderstr.Sprintf(" after `%s`", prevcwrap->m_newval->m_name.GetString());
+				else
+				{
+					row_temp =row;
+					cwrapobj->m_ischanged = wyFalse;
+					past_ele_prev = (FieldStructWrapper*)past_ele->m_prev;
+					//present_ele_prev = (FieldStructWrapper*)cwrapobj->m_prev;
+					while(row_temp > 0)
+					{
+						row_temp = row_temp - 1;
+						present_ele_prev = (FieldStructWrapper*) CustomGrid_GetRowLongData(m_hgridfields, row_temp);
+						if(present_ele_prev)
+							break;
+					}
+					while(past_ele_prev !=NULL && present_ele_prev !=NULL)
+					{
+						if(past_ele_prev->m_newval != present_ele_prev->m_newval)
+						{
+							if(past_ele_prev->m_newval && present_ele_prev->m_newval)
+							{
+								if(past_ele_prev->m_newval->m_name.Compare(present_ele_prev->m_newval->m_name) != 0)
+								{
+									reorderstr.Sprintf(" after `%s`", prevcwrap->m_newval->m_name.GetString());
+									cwrapobj->m_ischanged = wyTrue;
+									break;
+								}
+							}
+
+						}
+						past_ele_prev = (FieldStructWrapper*)past_ele_prev->m_prev;
+						//find the valid row from the grid
+						row_temp = row_temp - 1;
+						if(row_temp < 0)
+							present_ele_prev = NULL;
+						while(row_temp >= 0)
+                {
+						present_ele_prev = (FieldStructWrapper*) CustomGrid_GetRowLongData(m_hgridfields, row_temp);
+						if(present_ele_prev)
+                        break;
+						row_temp = row_temp - 1;
+						}
+
+
+                }
+					if(cwrapobj->m_ischanged  == wyFalse)
+					{
+						if(!( past_ele_prev ==NULL && present_ele_prev == NULL))
+						{
+                    reorderstr.Sprintf(" after `%s`", prevcwrap->m_newval->m_name.GetString());
+							cwrapobj->m_ischanged = wyTrue;
+						}
+					}
+					
+				}
             }
 
             if(reorderstr.GetLength())
@@ -4082,7 +4169,7 @@ void
 TabFields::CancelChanges(wyBool    isaltertable)
 {
     wyUInt32    count = -1, row = -1;
-    FieldStructWrapper *cwrapobj = NULL;
+    FieldStructWrapper *cwrapobj = NULL,*cwrapobj_2 = NULL;
 
     /// Applying grid changes
     CustomGrid_ApplyChanges(m_hgridfields);
@@ -4108,11 +4195,22 @@ TabFields::CancelChanges(wyBool    isaltertable)
 
     cwrapobj = (FieldStructWrapper*)m_listwrapperstruct.GetFirst();
 
+	cwrapobj_2 = (FieldStructWrapper*) m_listwrapperstruct_2.GetFirst();
+    while(cwrapobj_2)
+    {
+        //cwrapobjtemp = cwrapobj;
+        cwrapobj_2 = (FieldStructWrapper*) m_listwrapperstruct_2.Remove(cwrapobj_2);
+        
+        //delete cwrapobjtemp;
+    }
+	
     while(cwrapobj)
     {
         cwrapobj->m_errmsg.Clear();
         cwrapobj->m_newval = cwrapobj->m_oldval;
-
+		cwrapobj->m_ischanged = wyFalse;
+		cwrapobj_2 = new FieldStructWrapper(cwrapobj->m_oldval, wyFalse);
+		m_listwrapperstruct_2.Insert(cwrapobj_2);
         //..removing indexcolumns working copy elements
         IndexedBy *indexedby = (IndexedBy *)cwrapobj->m_listindexesworkingcopy.GetFirst(), *tmpindby = NULL;
         while(indexedby)
@@ -4176,6 +4274,14 @@ TabFields::ClearAllMemory()
         delete cwrapobjtemp;
     }
 
+    cwrapobj = (FieldStructWrapper*) m_listwrapperstruct_2.GetFirst();
+    while(cwrapobj)
+    {
+        cwrapobjtemp = cwrapobj;
+        cwrapobj = (FieldStructWrapper*) m_listwrapperstruct_2.Remove(cwrapobjtemp);
+        
+        //delete cwrapobjtemp;
+    }
     return;
 }
 
@@ -4184,7 +4290,7 @@ TabFields::OnClickMoveUp()
 {
     wyInt32     selrow = -1, totrows = -1;
     wyInt32     selcol = -1;
-
+	FieldStructWrapper* cwrapobj1 = NULL;
     selrow  = CustomGrid_GetCurSelRow(m_hgridfields);
     selcol  = CustomGrid_GetCurSelCol(m_hgridfields);
     totrows = CustomGrid_GetRowCount(m_hgridfields);
@@ -4193,7 +4299,8 @@ TabFields::OnClickMoveUp()
 
     if(selrow <=0)
         return;
-
+	cwrapobj1 = (FieldStructWrapper *) CustomGrid_GetRowLongData(m_hgridfields, selrow);
+	cwrapobj1->m_ischanged = wyTrue;
     /// Exchangin row values
     ExchangeRowValues(selrow - 1, selrow);
 
@@ -4209,7 +4316,7 @@ TabFields::OnClickMoveDown()
 {
     wyInt32     selrow = -1, totrows = -1;
     wyInt32     selcol = -1;
-
+	FieldStructWrapper* cwrapobj1 = NULL;
     selrow  = CustomGrid_GetCurSelRow(m_hgridfields);
     selcol  = CustomGrid_GetCurSelCol(m_hgridfields);
     totrows = CustomGrid_GetRowCount(m_hgridfields);
@@ -4218,7 +4325,8 @@ TabFields::OnClickMoveDown()
         return;
     
     CustomGrid_ApplyChanges(m_hgridfields, wyTrue);
-
+	cwrapobj1 = (FieldStructWrapper *) CustomGrid_GetRowLongData(m_hgridfields, selrow);
+	cwrapobj1->m_ischanged = wyTrue;
     /// Exchangin row values
     ExchangeRowValues(selrow, selrow + 1);
 

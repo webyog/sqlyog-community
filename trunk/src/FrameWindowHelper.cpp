@@ -309,7 +309,7 @@ GetActiveMySQLPtr()
 
 LPSTR
 MySqlEscape(LPCSTR pstr, DWORD size, wyUInt32 * newsize, 
-				wyChar esc, wyBool isfterm, wyChar fterm, wyBool isfenc, wyChar fenc, wyBool islterm, wyChar lterm, wyBool isescaped)
+				wyChar esc, wyBool isfterm, wyChar fterm, wyBool isfenc, wyChar fenc, wyBool islterm, wyChar lterm, wyBool isescaped, wyBool isescdoublequotes)
 {
     DWORD   count = 0, rcount = 0;
 	LPSTR	ret = 0;
@@ -326,12 +326,21 @@ MySqlEscape(LPCSTR pstr, DWORD size, wyUInt32 * newsize,
 			(isfenc &&(c == fenc))|| 
 			(islterm &&(c == lterm))|| 
 			(c == esc)){
+			if((c != '"') || ((c != fenc) || (isescdoublequotes == wyFalse)))
+			{
 			ret[rcount++]= esc;
 			ret[rcount++]= c;
+			}
+			else
+			{
+				ret[rcount++]= '"';
+				ret[rcount++]= c;
+			}
 		} else if(c == 0){
 			ret[rcount++]= esc;
 			ret[rcount++]= '0';
-		} else
+		} 
+		  else
 			ret[rcount++]= c;
 
 		count++;

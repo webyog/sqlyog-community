@@ -635,7 +635,7 @@ wyBool IsNumber(enum_field_types t);
 */
 LPSTR MySqlEscape(LPCSTR pstr, DWORD size, wyUInt32* newsize, wyChar esc, 
                   wyBool isfterm, wyChar fterm, wyBool isfenc, wyChar fenc, 
-                  wyBool islterm, wyChar lterm, wyBool isescaped = wyTrue);
+                  wyBool islterm, wyChar lterm, wyBool isescaped = wyTrue, wyBool isescdoublequotes = wyFalse);
 
 /// Function writes a formatted text on a text buffer and return the pointer.
 /**

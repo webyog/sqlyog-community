@@ -1507,7 +1507,7 @@ CopyDatabase::ExportEventsOnParentNotExpanded(HWND hwndtree)
 	//fetching list from server
 	m_gui_routine((void*)m_gui_lparam, "events", 0, wyFalse, FETCHCOPYDATA);
 
-	query.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s'", 
+	query.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s' COLLATE utf8_bin", 
 					m_srcdb.GetString());
 
 	myres = ExecuteAndGetResult(wnd, m_srctunnel, m_srcmysql, query);
@@ -1784,13 +1784,13 @@ CopyDatabase::HandleProcedureFunOnParentNotExpanded(HWND hwndtree, wyBool isproc
 	if(isproc == wyTrue)
 	{
 		m_gui_routine((void*)m_gui_lparam, "procedures", 0, wyFalse, FETCHCOPYDATA);	
-		query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' and ROUTINE_TYPE = 'PROCEDURE'",m_srcdb.GetString());
+		query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'PROCEDURE'",m_srcdb.GetString());
 	}
 	
 	else
 	{
 		m_gui_routine((void*)m_gui_lparam, "functions", 0, wyFalse, FETCHCOPYDATA);	
-		query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' and ROUTINE_TYPE = 'FUNCTION'",m_srcdb.GetString());	
+		query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'FUNCTION'",m_srcdb.GetString());	
 	}
 	
 	myres = ExecuteAndGetResult(wnd, m_srctunnel, m_srcmysql,query);

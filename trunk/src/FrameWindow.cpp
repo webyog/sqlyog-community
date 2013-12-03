@@ -66,6 +66,7 @@
 #include "FormView.h"
 #include "DatabaseSearch.h"
 #include "VisualDataDiff.h"
+#include "QueryAnalyzerEnt.h"
 #endif
 
 #ifdef COMMUNITY
@@ -598,7 +599,19 @@ FrameWindow::RegisterPQAResultwindow(HINSTANCE hinstanceent)
 	
 	// Register the main window.
 	wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+#ifndef COMMUNITY
+	switch(pGlobals->m_pcmainwin->m_connection->m_enttype)
+	{
+	case ENT_ULTIMATE:
+	case ENT_TRIAL:
+		wndclass.lpfnWndProc   = QueryAnalyzer::PQAHtmlWndProc;
+		break;
+	default:
 	wndclass.lpfnWndProc   = QueryAnalyzerBase::PQAHtmlWndProc;
+	}
+#else
+	wndclass.lpfnWndProc   = QueryAnalyzerBase::PQAHtmlWndProc;
+#endif
 	wndclass.cbClsExtra    = 0;
 	wndclass.cbWndExtra    = sizeof(HANDLE);
 	wndclass.hInstance     = hinstanceent ;

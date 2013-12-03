@@ -6079,7 +6079,7 @@ DataView::WriteFixed(HGLOBAL* hglobal, LPWSTR* buffer, wyUInt32 * nsize, wyChar 
 	else
 	{
 		textstr.SetAs(text);
-		temp = MySqlEscape((LPCSTR)textstr.GetString(), length, &newsize, escape, isfterm, fterm, isencl, encl, islterm, lterm);
+		temp = MySqlEscape((LPCSTR)textstr.GetString(), length, &newsize, escape, isfterm, fterm, isencl, encl, islterm, lterm, wyTrue, wyTrue);
 
 		if(field->max_length == 0 && field->name_length == 0)
         {
@@ -6189,7 +6189,7 @@ DataView::WriteVarible(HGLOBAL* hglobal, LPWSTR* buffer, wyUInt32 *nsize, wyChar
 			}
 		}
 
-		tempval = MySqlEscape(text, length, &newsize, escape, isfterm, fterm, isencl, encl, islterm, lterm);
+		tempval = MySqlEscape(text, length, &newsize, escape, isfterm, fterm, isencl, encl, islterm, lterm, wyTrue, wyTrue);
 		
 		tempstr.SetAs(tempval);
 				

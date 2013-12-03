@@ -1542,6 +1542,8 @@
 #define IDC_INITCOMMAND                 44114
 #define IDC_EDITINITCOMMAND             44115
 #define IDC_INVISIBLE					44116
+#define IDR_SAVEPROFILERMENU              44117
+#define ID_OPEN_SAVEPROFILER            44118
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
