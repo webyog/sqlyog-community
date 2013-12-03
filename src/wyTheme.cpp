@@ -1091,8 +1091,10 @@ wyTheme::SetThemeDir(wyString* pstr)
 		}
 	}
 	else
+	{
 		pstr->SetAs(pGlobals->m_configdirpath.GetString());
 		pstr->AddSprintf("\\%s\\", THEMEDIR);
+	}
 }
 
 //allocat the theme object

@@ -103,6 +103,7 @@ public:
     List            m_listfkworkingcopy;                /// list of "ReferencedBy" class object-pointers
     List            m_listfkbackupcopy;                 /// list of "ReferencedBy" class object-pointers (used for Alter Table only)
 
+	wyBool			m_ischanged;
     FieldStructWrapper(FIELDATTRIBS *value, wyBool isnew);
     ~FieldStructWrapper();
 };
@@ -126,6 +127,8 @@ public:
     
     /// Structure pointer to store fields values
     List                        m_listwrapperstruct;
+
+	List                        m_listwrapperstruct_2;
 
     HWND                        m_hwndparent;
 

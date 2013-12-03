@@ -104,7 +104,7 @@ ExportCsv::WriteFixed(wyString * buffer, wyChar *text, MYSQL_FIELD * field,wyUIn
     else 
     {
 		temp = MySqlEscape(text, length, &newsize, m_esch.m_escape[0], isfterm, 
-						   fterm, isencl, encl, islterm, lterm);
+						   fterm, isencl, encl, islterm, lterm, wyTrue, wyTrue);
 
         sizelen = field->length == 0 ? field->max_length : field->length;
 		size = sizelen + (newsize-length);
@@ -159,7 +159,7 @@ ExportCsv::WriteVarible(wyString * buffer, wyChar *text, MYSQL_FIELD * field, wy
 		}
 
 		temp = MySqlEscape(text, length,&newsize, m_esch.m_escape[0], isfterm, fterm, isencl, 
-							encl, islterm, lterm, m_esch.m_isescaped);
+							encl, islterm, lterm, m_esch.m_isescaped, wyTrue);
 				
 		//Add in buffer
 		buffer->Add(temp);
