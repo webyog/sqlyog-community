@@ -165,8 +165,12 @@ class wyIni
 
 			static wyInt32 IniDeleteSection(const wyChar *sec, const wyChar *path);
 
-			static wyInt32 IniDeleteKey(const wyChar *sec, wyChar *key, const wyChar *path);			
+			static wyInt32 IniDeleteKey(const wyChar *sec, wyChar *key, const wyChar *path);
 
+			void IniGetSectionDetailsInit(wyString *sec, wyString *path);
+			void IniGetSectionDetailsFinalize();
+			wyInt32 IniGetString2(const wyChar *sec, const wyChar *key, const wyChar *defval, wyString *returnedstring, const wyChar *path);
+			wyInt32 IniGetInt2(const wyChar *sec, const wyChar *key, wyInt32 defval, const wyChar *path);
     private:
             
 		// variables 

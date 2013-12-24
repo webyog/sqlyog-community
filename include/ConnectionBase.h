@@ -221,7 +221,7 @@ public:
     virtual void    OnConnect(HWND hwnd, ConnectionInfo * dbname) = 0;
 
 
-	virtual	void    OnConnect(ConnectionInfo * dbname) = 0;
+	virtual	void    OnConnect(ConnectionInfo * dbname, wyBool iscon_res) = 0;
 
 		    /// Gets the details to connect to mysql
     /**
@@ -229,7 +229,7 @@ public:
     @param coninfo: IN ConnectionInfo structure
     @returns MYSQL pointer, If SUCCESS, otherwise NULL
     */
-	virtual MYSQL* ConnectToMySQL(ConnectionInfo * coninfo) = 0;
+	virtual MYSQL* ConnectToMySQL(ConnectionInfo * coninfo, wyBool iscon_res) = 0;
 
     
 	/// Command handler for connection dialog

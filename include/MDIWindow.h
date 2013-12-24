@@ -338,7 +338,7 @@ public:
     /**
 	@returns wyTrue
     */
-	wyBool				Create();
+	wyBool				Create(wyBool iscon_res = wyFalse, ConnectionInfo* conninfo = NULL);
 
     /// Create the query window.
     /**

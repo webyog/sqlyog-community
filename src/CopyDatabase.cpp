@@ -2502,7 +2502,8 @@ CopyDatabase::ExportActualData(wyChar * table)
 	wyInt32         querylength = 0;
 	wyInt32			rowscopied = 0;
 	MDIWindow		*wnd = GetActiveWin();
-
+	wyInt32			chunklimit;
+	wyBool			ischunkinsert;
 	//wyString st;
 	//MYSQL_RES *rs;
 	//MYSQL_ROW row;
@@ -2516,6 +2517,16 @@ CopyDatabase::ExportActualData(wyChar * table)
 
 	rowcount = GetRowCount(m_newsrctunnel, m_newsrcmysql, m_srcdb.GetString(), table, NULL);
    
+	ischunkinsert = IsChunkInsert();
+	GetChunkLimit(&chunklimit);
+	if(m_newsrctunnel->IsTunnel())
+	{
+		//In HTTP, if don't break into chunks is checked or chunk size is zero or chunk size is > 1000 , then we will use the chunk size as 1000
+		//otherwise , means if chunksize is <1000, that size will use.
+		if(chunklimit > MAX_ROW_LIMIT || ischunkinsert == wyFalse || chunklimit == 0)
+			chunklimit = MAX_ROW_LIMIT;
+	}
+
 	/* if it is in tunnel mode we need to retrieve row by packet by packet, 
 	other wise the HTTP buffer cannot hold all the values if the table 
 	contains a large number of rows. So we make use of MAX_ROW_COUNT 
@@ -2524,14 +2535,14 @@ CopyDatabase::ExportActualData(wyChar * table)
 	do
 	{
 		startrowcount	= endrowcount;
-		endrowcount		+= MAX_ROW_LIMIT;
+		endrowcount		+= chunklimit;
 
 		 if(IsCopyStopped() == wyTrue)
 			return wyTrue;
-		
-		if(m_newsrctunnel->IsTunnel())
+		//if source is tunnel OR when chunkinsert is enabled in preferences with a value > 0 we break into chunks
+		if(m_newsrctunnel->IsTunnel() || (ischunkinsert && chunklimit > 0))
 			query.Sprintf("select * from `%s`.`%s` limit %d, %d", 
-					m_srcdb.GetString(), table, startrowcount, MAX_ROW_LIMIT);
+					m_srcdb.GetString(), table, startrowcount, chunklimit);
 		else
 		    query.Sprintf("select * from `%s`.`%s`", m_srcdb.GetString(), table);
 

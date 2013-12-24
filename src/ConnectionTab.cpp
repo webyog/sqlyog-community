@@ -105,7 +105,7 @@ ConnectionTab::DeleteConnectionTabItem(HWND hwnd)
 
 //To insert a connection tab item 
 wyBool
-ConnectionTab::InsertConnectionTab(wyString * title, LPARAM lparam)
+ConnectionTab::InsertConnectionTab(wyString * title, LPARAM lparam, wyBool iscon_res,ConnectionInfo* conninfo)
 {
 	wyInt32			count, ret;
 	HWND			 hwndtab;
@@ -132,27 +132,34 @@ ConnectionTab::InsertConnectionTab(wyString * title, LPARAM lparam)
 	
 
 	//if connection color is there
-	if(wnd->m_conninfo.m_rgbconn  >= 0)
+	if(!iscon_res)
 	{
-		//if color is -1, then set color as system color because
-		//TreeView_SetBkColor will take -1 as system color
-		if(wnd->m_conninfo.m_rgbconn == tempcolor)
+		if(wnd->m_conninfo.m_rgbconn  >= 0)
 		{
-			item.m_color = GetSysColor(COLOR_WINDOW);
-			item.m_fgcolor = item.m_color^0xFFFFFF;
+			//if color is -1, then set color as system color because
+			//TreeView_SetBkColor will take -1 as system color
+			if(wnd->m_conninfo.m_rgbconn == tempcolor)
+			{
+				item.m_color = GetSysColor(COLOR_WINDOW);
+				item.m_fgcolor = item.m_color^0xFFFFFF;
+			}
+			else
+			{
+				item.m_color = wnd->m_conninfo.m_rgbconn;
+				item.m_fgcolor = wnd->m_conninfo.m_rgbfgconn;
+			}
 		}
 		else
 		{
-			item.m_color = wnd->m_conninfo.m_rgbconn;
-			item.m_fgcolor = wnd->m_conninfo.m_rgbfgconn;
+			item.m_color = COLOR_WHITE;
+			item.m_fgcolor = RGB(0,0,0);
 		}
 	}
 	else
 	{
-		item.m_color = COLOR_WHITE;
-		item.m_fgcolor = RGB(0,0,0);
+		item.m_color = pGlobals->m_pcmainwin->m_connection->m_rgbobbkcolor;
+		item.m_fgcolor = pGlobals->m_pcmainwin->m_connection->m_rgbobfgcolor;
 	}
-
 	count = CustomTab_GetItemCount(hwndtab);
 	
 	VERIFY((ret = CustomTab_InsertItem(hwndtab, count, &item))!= -1);

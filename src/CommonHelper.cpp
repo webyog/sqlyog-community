@@ -3189,19 +3189,30 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
 	HANDLE					mutex = NULL, hReadPipe = NULL, hWritePipe = NULL;
 	DWORD					retmutex;
 	wyFile					plinklock;
-	
+	HANDLE					namedmutex;
+	SECURITY_ATTRIBUTES		lpMutexAttributes;
+
+	lpMutexAttributes.bInheritHandle = TRUE;
+	lpMutexAttributes.lpSecurityDescriptor = NULL;
+	lpMutexAttributes.nLength = sizeof(lpMutexAttributes);
+
+
 	/* get the full path */
 	VERIFY(GetSjaExecPath(fullpath));
 	strcat(fullpath, SSHTUNNELER);
 
     mutex = CreateEvent(NULL, FALSE, FALSE, TEXT(SQLYOG_MUTEX_NAME));
 
+
+	namedmutex = CreateMutex(&lpMutexAttributes, FALSE, TEXT(SQLYOG_NAMEDMUTEX));
+	WaitForSingleObject(namedmutex, INFINITE);
+
 	hmapfile = CreateSQLyogMMF();
 
     if(hmapfile == NULL)
         return 1;
 
-	prret = GetLocalEmptyPort(conninfo, &plinklock);
+	prret = GetLocalEmptyPort(conninfo);
 
 	if(prret == -1)
 	{
@@ -3251,18 +3262,20 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
 	si.hStdError = hWritePipe;
 
 #ifndef _CONSOLE
-	EnterCriticalSection(&pGlobals->m_csiniglobal);
+	//EnterCriticalSection(&pGlobals->m_csiniglobal);
 #endif
 		
 	prret = CreateProcess(NULL, (wyWChar*)appname.GetAsWideChar(), NULL, NULL, TRUE, 0, NULL, NULL, &si, pi);
 
 	if(prret == 0)
 	{
-		plinklock.Close();
+		ReleaseMutex(namedmutex);
+		CloseHandle(namedmutex);
+		//plinklock.Close();
 
 #ifndef _CONSOLE
 		DisplayErrorText(GetLastError(), _("FATAL ERROR: Network error: Connection timed out"));
-		LeaveCriticalSection(&pGlobals->m_csiniglobal);
+		//LeaveCriticalSection(&pGlobals->m_csiniglobal);
 #endif	
 		
 		return 1;		/* createprocess failed */
@@ -3276,13 +3289,15 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
     retmutex = WaitForSingleObject(mutex, 30000);
 
 #ifndef _CONSOLE
-	LeaveCriticalSection(&pGlobals->m_csiniglobal);
+	//LeaveCriticalSection(&pGlobals->m_csiniglobal);
 #endif
 
     CloseHandle(mutex);
 
 	//Close the temp file
-	plinklock.Close();
+	//plinklock.Close();
+	ReleaseMutex(namedmutex);
+	CloseHandle(namedmutex);
 
     if(retmutex==WAIT_OBJECT_0)
         return 0;
@@ -3724,7 +3739,7 @@ GetTableEngine(Tunnel * tunnel, MYSQL *mysql, const wyChar *tablename, const wyC
 
 #if ! defined COMMUNITY && defined _WIN32
 wyInt32
-GetLocalEmptyPort(ConnectionInfo *con, wyFile *plinklock)
+GetLocalEmptyPort(ConnectionInfo *con)
 {
 	wyInt32 namelen = 0, retval = 0, ret, port = 0;
 #ifdef _WIN32	
@@ -3768,19 +3783,19 @@ GetLocalEmptyPort(ConnectionInfo *con, wyFile *plinklock)
 
 	con->m_localport = port;
 
-
+	//changed in 11.31beta1 - we use a named mutex to protect another SQLyog/sja from getting the same port
 	/*Handle the local port in between processe and threads
 	- Concern is time lap between closesocket and PLINK, another SQLyog/sja could get the same port.
 	- To avoid this we keep a file open and it would close only once the PLINK is connected
 	-Also we always allow connect plink whether the 'lock-file' functionalites got failed or not 
 	*/
-	if(LockPlinkLockFile(plinklock) == wyFalse)
-	{
-		closesocket(psocket);
-		con->m_sshsocket = NULL;	
-		
-		return port;
-	}
+	//if(LockPlinkLockFile(plinklock) == wyFalse)
+	//{
+	//	closesocket(psocket);
+	//	con->m_sshsocket = NULL;	
+	//	
+	//	return port;
+	//}
 
 	if(psocket)
 		closesocket(psocket);
@@ -4096,4 +4111,26 @@ EncodePassword(wyString &text)
 		free(encode);
 
 	return wyTrue;
+}
+void DebugLog(const char *buffer)
+{
+        wyWChar                directory[MAX_PATH+1];
+        wyWChar                *lpfileport;
+        wyBool                ret;
+        
+        ret = SearchFilePath(L"sqlyog_debug1", L".log", MAX_PATH, directory, &lpfileport);
+
+        if(ret != wyTrue)
+        {
+                return;
+        }
+
+        FILE* fp = _wfopen(directory, L"a+");
+        if(!fp)
+        {
+                return;
+        }
+
+        fprintf(fp, "%s\r\n", buffer);
+        fclose(fp);
 }

@@ -653,6 +653,8 @@ typedef struct tagGlobals
     CRITICAL_SECTION m_csglobal;
     wyBool      m_issshchecked;
 	CRITICAL_SECTION m_csiniglobal;	
+	CRITICAL_SECTION m_cssshglobal;	
+	
 
 	//Using Find dialog, how many times the selected text is found 
 	wyInt32		m_findcount;
@@ -698,6 +700,7 @@ typedef struct tagGlobals
     wyBool      m_isinfotabunderquery;
     wyBool      m_ishistoryunderquery;
 	wyInt32		m_prefpersist;
+	wyBool		m_conrestore;
 } GLOBALS, *PGLOBALS;
 
 

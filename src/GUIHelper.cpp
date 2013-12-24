@@ -1628,6 +1628,8 @@ void
 ShowMySQLError(HWND hdlg, Tunnel * tunnel, PMYSQL mysql, const wyChar * query, wyBool val)
 {
 	MySQLError errorobj;
+	if(pGlobals->m_conrestore)
+		return;
 	errorobj.Show(hdlg, tunnel, mysql, query, val);
 
 }
@@ -1825,7 +1827,8 @@ DisplayErrorText(wyUInt32 dwlasterror, const wyChar *extratext, HWND hwnd)
     wyUInt32    len, lasterror = 0;
     wyUInt32    flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS |
 									FORMAT_MESSAGE_FROM_SYSTEM; 
-
+	if(pGlobals->m_conrestore)
+		return;
     VERIFY(len = FormatMessage(flags, NULL, dwlasterror, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(LPWSTR)&mess, 0, NULL));
 
 	// null terminate the buffer
@@ -8831,36 +8834,39 @@ GetSessionFile(wyWChar *path)
 	return wyFalse;
 }
 
-wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo)
+wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo, wyIni *inimgr)
 {
 	wyString connstr, pathstr;
 	connstr.SetAs(conn);
 	pathstr.SetAs(path);
+	wyBool isfocussed;
 	
-	wyIni::IniGetString(connstr.GetString(), "Name", "", &conninfo->m_title, pathstr.GetString());
-	wyIni::IniGetString(connstr.GetString(), "Host", "localhost", &conninfo->m_host, pathstr.GetString());
-	wyIni::IniGetString(connstr.GetString(), "User", "root", &conninfo->m_user, pathstr.GetString());
-	conninfo->m_isstorepwd = wyIni::IniGetInt(connstr.GetString(), "StorePassword", 1, pathstr.GetString()) ? wyTrue: wyFalse;
-	wyIni::IniGetString(connstr.GetString(), "Password", "", &conninfo->m_pwd, pathstr.GetString());
+	
+	//inimgr.IniGetSectionDetailsInit(&connstr , &pathstr);
+	inimgr->IniGetString2(connstr.GetString(), "Name", "", &conninfo->m_title, pathstr.GetString());
+	inimgr->IniGetString2(connstr.GetString(), "Host", "localhost", &conninfo->m_host, pathstr.GetString());
+	inimgr->IniGetString2(connstr.GetString(), "User", "root", &conninfo->m_user, pathstr.GetString());
+	conninfo->m_isstorepwd = inimgr->IniGetInt2(connstr.GetString(), "StorePassword", 1, pathstr.GetString()) ? wyTrue: wyFalse;
+	inimgr->IniGetString2(connstr.GetString(), "Password", "", &conninfo->m_pwd, pathstr.GetString());
 	DecodePassword(conninfo->m_pwd);
-	conninfo->m_port = wyIni::IniGetInt(connstr.GetString(), "Port", 3306, pathstr.GetString());
+	conninfo->m_port = inimgr->IniGetInt2(connstr.GetString(), "Port", 3306, pathstr.GetString());
 	
 	
 
-	wyIni::IniGetString(connstr.GetString(), "Database","", &conninfo->m_db, pathstr.GetString());
-	conninfo->m_iscompress = wyIni::IniGetInt(connstr.GetString(), "compressedprotocol", 0, pathstr.GetString()) ? wyTrue: wyFalse;
+	inimgr->IniGetString2(connstr.GetString(), "Database","", &conninfo->m_db, pathstr.GetString());
+	conninfo->m_iscompress = inimgr->IniGetInt2(connstr.GetString(), "compressedprotocol", 0, pathstr.GetString()) ? wyTrue: wyFalse;
 	
 	//Wait_TimeOut
-	conninfo->m_isdeftimeout = wyIni::IniGetInt(connstr.GetString(), "defaulttimeout", conninfo->m_isdeftimeout, pathstr.GetString())? wyTrue: wyFalse;
-	wyIni::IniGetString(connstr.GetString(), "waittimeoutvalue", WAIT_TIMEOUT_SERVER, &conninfo->m_strwaittimeout, pathstr.GetString());
+	conninfo->m_isdeftimeout = inimgr->IniGetInt2(connstr.GetString(), "defaulttimeout", conninfo->m_isdeftimeout, pathstr.GetString())? wyTrue: wyFalse;
+	inimgr->IniGetString2(connstr.GetString(), "waittimeoutvalue", WAIT_TIMEOUT_SERVER, &conninfo->m_strwaittimeout, pathstr.GetString());
 			
 #ifndef COMMUNITY
 
-	conninfo->m_ishttp = wyIni::IniGetInt(connstr.GetString(), "Tunnel", wyFalse, pathstr.GetString())? wyTrue: wyFalse;
-	wyIni::IniGetString (connstr.GetString(), "Http", "", &conninfo->m_url, pathstr.GetString());
-	conninfo->m_timeout = wyIni::IniGetInt(connstr.GetString(), "HTTPTime", 30000, pathstr.GetString());
-	conninfo->m_ishttpuds = wyIni::IniGetInt (connstr.GetString(), "HTTPuds", 0, pathstr.GetString()) ? wyTrue: wyFalse;
-	wyIni::IniGetString(connstr.GetString(), "HTTPudsPath", "", &conninfo->m_httpudspath, pathstr.GetString());
+	conninfo->m_ishttp = inimgr->IniGetInt2(connstr.GetString(), "Tunnel", wyFalse, pathstr.GetString())? wyTrue: wyFalse;
+	inimgr->IniGetString2 (connstr.GetString(), "Http", "", &conninfo->m_url, pathstr.GetString());
+	conninfo->m_timeout = inimgr->IniGetInt2(connstr.GetString(), "HTTPTime", 30000, pathstr.GetString());
+	conninfo->m_ishttpuds = inimgr->IniGetInt2(connstr.GetString(), "HTTPuds", 0, pathstr.GetString()) ? wyTrue: wyFalse;
+	inimgr->IniGetString2(connstr.GetString(), "HTTPudsPath", "", &conninfo->m_httpudspath, pathstr.GetString());
 			
 	TUNNELAUTH *auth = &pGlobals->m_pcmainwin->m_tunnelauth;
 	wyString	chalusername, chalpwd;
@@ -8868,14 +8874,14 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo)
 	if(auth)
 	{
 		/* get the two auth flags */
-		auth->ischallenge = (bool)wyIni::IniGetInt(connstr.GetString(), "Is401", 0, pathstr.GetString()); 
-		auth->isproxy = (bool)wyIni::IniGetInt(connstr.GetString(), "IsProxy", 0, pathstr.GetString()); 
+		auth->ischallenge = (bool)inimgr->IniGetInt2(connstr.GetString(), "Is401", 0, pathstr.GetString()); 
+		auth->isproxy = (bool)inimgr->IniGetInt2(connstr.GetString(), "IsProxy", 0, pathstr.GetString()); 
 
 		/* get the proxy auth info and decode the password too */
-		wyIni::IniGetString(connstr.GetString(), "Proxy", "", &proxy, pathstr.GetString());
-		auth->proxyport = wyIni::IniGetInt(connstr.GetString(), "ProxyPort", 808, pathstr.GetString());
-		wyIni::IniGetString(connstr.GetString(), "ProxyUser", "", &proxyusername, pathstr.GetString());
-		wyIni::IniGetString(connstr.GetString(), "ProxyPwd", "", &proxypwd, pathstr.GetString());
+		inimgr->IniGetString2(connstr.GetString(), "Proxy", "", &proxy, pathstr.GetString());
+		auth->proxyport = inimgr->IniGetInt2(connstr.GetString(), "ProxyPort", 808, pathstr.GetString());
+		inimgr->IniGetString2(connstr.GetString(), "ProxyUser", "", &proxyusername, pathstr.GetString());
+		inimgr->IniGetString2(connstr.GetString(), "ProxyPwd", "", &proxypwd, pathstr.GetString());
 	
 		wcscpy(auth->proxy, proxy.GetAsWideChar());
 		wcscpy(auth->proxyusername, proxyusername.GetAsWideChar());
@@ -8886,8 +8892,8 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo)
 		wcscpy(auth->proxypwd, proxypwd.GetAsWideChar());
 
 		/* get the 401 error and decode the password too */
-		wyIni::IniGetString(connstr.GetString(), "401User", "", &chalusername, pathstr.GetString());
-		wyIni::IniGetString(connstr.GetString(), "401Pwd", "", &chalpwd, pathstr.GetString());
+		inimgr->IniGetString2(connstr.GetString(), "401User", "", &chalusername, pathstr.GetString());
+		inimgr->IniGetString2(connstr.GetString(), "401Pwd", "", &chalpwd, pathstr.GetString());
 
 		wcscpy(auth->chalusername, chalusername.GetAsWideChar());
 
@@ -8897,41 +8903,42 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo)
 		wcscpy(auth->chalpwd, chalpwd.GetAsWideChar());
 
 		//get the content-type info
-		wyIni::IniGetString(connstr.GetString(), "ContentType", "text/xml", &contenttype, pathstr.GetString());
+		inimgr->IniGetString2(connstr.GetString(), "ContentType", "text/xml", &contenttype, pathstr.GetString());
 		wcscpy(auth->content_type, contenttype.GetAsWideChar());
 
 		//Encode con.info and query to base64 or not
-		auth->isbase64encode = (wyIni::IniGetInt(connstr.GetString(), "HttpEncode", 0, pathstr.GetString()))? true : false;
+		auth->isbase64encode = (inimgr->IniGetInt2(connstr.GetString(), "HttpEncode", 0, pathstr.GetString()))? true : false;
 	}
 
-	conninfo->m_isssh = wyIni::IniGetInt(connstr.GetString(), "SSH",	0, pathstr.GetString()) ? wyTrue: wyFalse;
-	wyIni::IniGetString(connstr.GetString(), "SshUser", "", &conninfo->m_sshuser, pathstr.GetString());
-	wyIni::IniGetString (connstr.GetString(), "SshPwd", "", &conninfo->m_sshpwd, pathstr.GetString());
+	conninfo->m_isssh = inimgr->IniGetInt2(connstr.GetString(), "SSH",	0, pathstr.GetString()) ? wyTrue: wyFalse;
+	inimgr->IniGetString2(connstr.GetString(), "SshUser", "", &conninfo->m_sshuser, pathstr.GetString());
+	inimgr->IniGetString2(connstr.GetString(), "SshPwd", "", &conninfo->m_sshpwd, pathstr.GetString());
 	DecodePassword(conninfo->m_sshpwd);
-	wyIni::IniGetString (connstr.GetString(), "SshHost", "", &conninfo->m_sshhost, pathstr.GetString());
-	conninfo->m_sshport = wyIni::IniGetInt (connstr.GetString(), "SshPort", 0, pathstr.GetString());
-	wyIni::IniGetString (connstr.GetString(), "SshForHost", "", &conninfo->m_forhost, pathstr.GetString());
-	conninfo->m_ispassword = wyIni::IniGetInt(connstr.GetString(), "SshPasswordRadio", 1, pathstr.GetString()) ? wyTrue: wyFalse;
-	wyIni::IniGetString (connstr.GetString(), "SSHPrivateKeyPath", "", &conninfo->m_privatekeypath, pathstr.GetString());
-	conninfo->m_issshsavepassword =  wyIni::IniGetInt (connstr.GetString(), "SshSavePassword", 1, pathstr.GetString())? wyTrue: wyFalse;
+	inimgr->IniGetString2(connstr.GetString(), "SshHost", "", &conninfo->m_sshhost, pathstr.GetString());
+	conninfo->m_sshport = inimgr->IniGetInt2 (connstr.GetString(), "SshPort", 0, pathstr.GetString());
+	inimgr->IniGetString2(connstr.GetString(), "SshForHost", "", &conninfo->m_forhost, pathstr.GetString());
+	conninfo->m_ispassword = inimgr->IniGetInt2(connstr.GetString(), "SshPasswordRadio", 1, pathstr.GetString()) ? wyTrue: wyFalse;
+	inimgr->IniGetString2(connstr.GetString(), "SSHPrivateKeyPath", "", &conninfo->m_privatekeypath, pathstr.GetString());
+	conninfo->m_issshsavepassword =  inimgr->IniGetInt2 (connstr.GetString(), "SshSavePassword", 1, pathstr.GetString())? wyTrue: wyFalse;
 
-	conninfo->m_issslchecked = wyIni::IniGetInt (connstr.GetString(), "SslChecked", 0, pathstr.GetString())? wyTrue: wyFalse;
-	conninfo->m_issslauthchecked = wyIni::IniGetInt (connstr.GetString(), "SshAuth", 0, pathstr.GetString()) ? wyTrue: wyFalse;
-	wyIni::IniGetString (connstr.GetString(), "Client_Key", "" , &conninfo->m_clikey, pathstr.GetString());
-	wyIni::IniGetString (connstr.GetString(), "Client_Cert", "", &conninfo->m_clicert, pathstr.GetString());
-	wyIni::IniGetString (connstr.GetString(), "CA", "", &conninfo->m_cacert, pathstr.GetString());
-	wyIni::IniGetString(connstr.GetString(), "Cipher", "", &conninfo->m_cipher, pathstr.GetString());
+	conninfo->m_issslchecked = inimgr->IniGetInt2(connstr.GetString(), "SslChecked", 0, pathstr.GetString())? wyTrue: wyFalse;
+	conninfo->m_issslauthchecked = inimgr->IniGetInt2 (connstr.GetString(), "SshAuth", 0, pathstr.GetString()) ? wyTrue: wyFalse;
+	inimgr->IniGetString2(connstr.GetString(), "Client_Key", "" , &conninfo->m_clikey, pathstr.GetString());
+	inimgr->IniGetString2(connstr.GetString(), "Client_Cert", "", &conninfo->m_clicert, pathstr.GetString());
+	inimgr->IniGetString2(connstr.GetString(), "CA", "", &conninfo->m_cacert, pathstr.GetString());
+	inimgr->IniGetString2(connstr.GetString(), "Cipher", "", &conninfo->m_cipher, pathstr.GetString());
 #endif
 	
-	conninfo->m_rgbconn = wyIni::IniGetInt(connstr.GetString(), "ObjectbrowserBkcolor",	RGB(255,255,255), pathstr.GetString());
-	conninfo->m_rgbfgconn = wyIni::IniGetInt(connstr.GetString(), "ObjectbrowserFgcolor",	0, pathstr.GetString());
+	conninfo->m_rgbconn = inimgr->IniGetInt2(connstr.GetString(), "ObjectbrowserBkcolor",	RGB(255,255,255), pathstr.GetString());
+	conninfo->m_rgbfgconn = inimgr->IniGetInt2(connstr.GetString(), "ObjectbrowserFgcolor",	0, pathstr.GetString());
 
-	conninfo->m_isglobalsqlmode = wyIni::IniGetInt(connstr.GetString(), "sqlmode_global", 0, pathstr.GetString()) ? wyTrue: wyFalse;
-	wyIni::IniGetString(connstr.GetString(), "sqlmode_value", "", &conninfo->m_sqlmode, pathstr.GetString());
-	wyIni::IniGetString(connstr.GetString(), "init_command", "", &conninfo->m_initcommand, pathstr.GetString());
-	conninfo->m_keepaliveinterval = wyIni::IniGetInt(connstr.GetString(), "keep_alive", 0, pathstr.GetString());
-
-	return wyIni::IniGetInt(connstr.GetString(), "is_focussed", 0, pathstr.GetString()) ? wyTrue : wyFalse;
+	conninfo->m_isglobalsqlmode = inimgr->IniGetInt2(connstr.GetString(), "sqlmode_global", 0, pathstr.GetString()) ? wyTrue: wyFalse;
+	inimgr->IniGetString2(connstr.GetString(), "sqlmode_value", "", &conninfo->m_sqlmode, pathstr.GetString());
+	inimgr->IniGetString2(connstr.GetString(), "init_command", "", &conninfo->m_initcommand, pathstr.GetString());
+	conninfo->m_keepaliveinterval = inimgr->IniGetInt2(connstr.GetString(), "keep_alive", 0, pathstr.GetString());
+	isfocussed = inimgr->IniGetInt2(connstr.GetString(), "is_focussed", 0, pathstr.GetString()) ? wyTrue : wyFalse;
+	//inimgr.IniGetSectionDetailsFinalize();
+	return isfocussed;
 
 }
 
@@ -9125,6 +9132,114 @@ WriteFullSectionToFile(FILE *out_stream, wyInt32 conno, ConnectionInfo *coninfo,
 	temp.Sprintf("is_focussed=%d\r\n", isfocussed);
 	fputs(temp.GetString(), out_stream);
 }
+
+//wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo, wyIni *inimgr)
+//{
+//	wyString connstr, pathstr;
+//	connstr.SetAs(conn);
+//	pathstr.SetAs(path);
+//	wyBool isfocussed;
+//	
+//	
+//	//inimgr.IniGetSectionDetailsInit(&connstr , &pathstr);
+//	inimgr.IniGetString2(connstr.GetString(), "Name", "", &conninfo->m_title, pathstr.GetString());
+//	inimgr.IniGetString2(connstr.GetString(), "Host", "localhost", &conninfo->m_host, pathstr.GetString());
+//	inimgr.IniGetString2(connstr.GetString(), "User", "root", &conninfo->m_user, pathstr.GetString());
+//	conninfo->m_isstorepwd = inimgr.IniGetInt2(connstr.GetString(), "StorePassword", 1, pathstr.GetString()) ? wyTrue: wyFalse;
+//	inimgr.IniGetString2(connstr.GetString(), "Password", "", &conninfo->m_pwd, pathstr.GetString());
+//	DecodePassword(conninfo->m_pwd);
+//	conninfo->m_port = inimgr.IniGetInt2(connstr.GetString(), "Port", 3306, pathstr.GetString());
+//	
+//	
+//
+//	inimgr.IniGetString2(connstr.GetString(), "Database","", &conninfo->m_db, pathstr.GetString());
+//	conninfo->m_iscompress = inimgr.IniGetInt2(connstr.GetString(), "compressedprotocol", 0, pathstr.GetString()) ? wyTrue: wyFalse;
+//	
+//	//Wait_TimeOut
+//	conninfo->m_isdeftimeout = inimgr.IniGetInt2(connstr.GetString(), "defaulttimeout", conninfo->m_isdeftimeout, pathstr.GetString())? wyTrue: wyFalse;
+//	inimgr.IniGetString2(connstr.GetString(), "waittimeoutvalue", WAIT_TIMEOUT_SERVER, &conninfo->m_strwaittimeout, pathstr.GetString());
+//			
+//#ifndef COMMUNITY
+//
+//	conninfo->m_ishttp = inimgr.IniGetInt2(connstr.GetString(), "Tunnel", wyFalse, pathstr.GetString())? wyTrue: wyFalse;
+//	inimgr.IniGetString2 (connstr.GetString(), "Http", "", &conninfo->m_url, pathstr.GetString());
+//	conninfo->m_timeout = inimgr.IniGetInt2(connstr.GetString(), "HTTPTime", 30000, pathstr.GetString());
+//	conninfo->m_ishttpuds = inimgr.IniGetInt2(connstr.GetString(), "HTTPuds", 0, pathstr.GetString()) ? wyTrue: wyFalse;
+//	inimgr.IniGetString2(connstr.GetString(), "HTTPudsPath", "", &conninfo->m_httpudspath, pathstr.GetString());
+//			
+//	TUNNELAUTH *auth = &pGlobals->m_pcmainwin->m_tunnelauth;
+//	wyString	chalusername, chalpwd;
+//	wyString	proxy, proxyusername, proxypwd,contenttype;
+//	if(auth)
+//	{
+//		/* get the two auth flags */
+//		auth->ischallenge = (bool)inimgr.IniGetInt2(connstr.GetString(), "Is401", 0, pathstr.GetString()); 
+//		auth->isproxy = (bool)inimgr.IniGetInt2(connstr.GetString(), "IsProxy", 0, pathstr.GetString()); 
+//
+//		/* get the proxy auth info and decode the password too */
+//		inimgr.IniGetString2(connstr.GetString(), "Proxy", "", &proxy, pathstr.GetString());
+//		auth->proxyport = inimgr.IniGetInt2(connstr.GetString(), "ProxyPort", 808, pathstr.GetString());
+//		inimgr.IniGetString2(connstr.GetString(), "ProxyUser", "", &proxyusername, pathstr.GetString());
+//		inimgr.IniGetString2(connstr.GetString(), "ProxyPwd", "", &proxypwd, pathstr.GetString());
+//	
+//		wcscpy(auth->proxy, proxy.GetAsWideChar());
+//		wcscpy(auth->proxyusername, proxyusername.GetAsWideChar());
+//		wcscpy(auth->proxypwd, proxypwd.GetAsWideChar());
+//
+//		if(proxypwd.GetLength())
+//			DecodePassword(proxypwd);
+//		wcscpy(auth->proxypwd, proxypwd.GetAsWideChar());
+//
+//		/* get the 401 error and decode the password too */
+//		inimgr.IniGetString2(connstr.GetString(), "401User", "", &chalusername, pathstr.GetString());
+//		inimgr.IniGetString2(connstr.GetString(), "401Pwd", "", &chalpwd, pathstr.GetString());
+//
+//		wcscpy(auth->chalusername, chalusername.GetAsWideChar());
+//
+//		if(chalpwd.GetLength())
+//			DecodePassword(chalpwd);
+//
+//		wcscpy(auth->chalpwd, chalpwd.GetAsWideChar());
+//
+//		//get the content-type info
+//		inimgr.IniGetString2(connstr.GetString(), "ContentType", "text/xml", &contenttype, pathstr.GetString());
+//		wcscpy(auth->content_type, contenttype.GetAsWideChar());
+//
+//		//Encode con.info and query to base64 or not
+//		auth->isbase64encode = (inimgr.IniGetInt2(connstr.GetString(), "HttpEncode", 0, pathstr.GetString()))? true : false;
+//	}
+//
+//	conninfo->m_isssh = inimgr.IniGetInt2(connstr.GetString(), "SSH",	0, pathstr.GetString()) ? wyTrue: wyFalse;
+//	inimgr.IniGetString2(connstr.GetString(), "SshUser", "", &conninfo->m_sshuser, pathstr.GetString());
+//	inimgr.IniGetString2(connstr.GetString(), "SshPwd", "", &conninfo->m_sshpwd, pathstr.GetString());
+//	DecodePassword(conninfo->m_sshpwd);
+//	inimgr.IniGetString2(connstr.GetString(), "SshHost", "", &conninfo->m_sshhost, pathstr.GetString());
+//	conninfo->m_sshport = inimgr.IniGetInt2 (connstr.GetString(), "SshPort", 0, pathstr.GetString());
+//	inimgr.IniGetString2(connstr.GetString(), "SshForHost", "", &conninfo->m_forhost, pathstr.GetString());
+//	conninfo->m_ispassword = inimgr.IniGetInt2(connstr.GetString(), "SshPasswordRadio", 1, pathstr.GetString()) ? wyTrue: wyFalse;
+//	inimgr.IniGetString2(connstr.GetString(), "SSHPrivateKeyPath", "", &conninfo->m_privatekeypath, pathstr.GetString());
+//	conninfo->m_issshsavepassword =  inimgr.IniGetInt2 (connstr.GetString(), "SshSavePassword", 1, pathstr.GetString())? wyTrue: wyFalse;
+//
+//	conninfo->m_issslchecked = inimgr.IniGetInt2(connstr.GetString(), "SslChecked", 0, pathstr.GetString())? wyTrue: wyFalse;
+//	conninfo->m_issslauthchecked = inimgr.IniGetInt2 (connstr.GetString(), "SshAuth", 0, pathstr.GetString()) ? wyTrue: wyFalse;
+//	inimgr.IniGetString2(connstr.GetString(), "Client_Key", "" , &conninfo->m_clikey, pathstr.GetString());
+//	inimgr.IniGetString2(connstr.GetString(), "Client_Cert", "", &conninfo->m_clicert, pathstr.GetString());
+//	inimgr.IniGetString2(connstr.GetString(), "CA", "", &conninfo->m_cacert, pathstr.GetString());
+//	inimgr.IniGetString2(connstr.GetString(), "Cipher", "", &conninfo->m_cipher, pathstr.GetString());
+//#endif
+//	
+//	conninfo->m_rgbconn = inimgr.IniGetInt2(connstr.GetString(), "ObjectbrowserBkcolor",	RGB(255,255,255), pathstr.GetString());
+//	conninfo->m_rgbfgconn = inimgr.IniGetInt2(connstr.GetString(), "ObjectbrowserFgcolor",	0, pathstr.GetString());
+//
+//	conninfo->m_isglobalsqlmode = inimgr.IniGetInt2(connstr.GetString(), "sqlmode_global", 0, pathstr.GetString()) ? wyTrue: wyFalse;
+//	inimgr.IniGetString2(connstr.GetString(), "sqlmode_value", "", &conninfo->m_sqlmode, pathstr.GetString());
+//	inimgr.IniGetString2(connstr.GetString(), "init_command", "", &conninfo->m_initcommand, pathstr.GetString());
+//	conninfo->m_keepaliveinterval = inimgr.IniGetInt2(connstr.GetString(), "keep_alive", 0, pathstr.GetString());
+//	isfocussed = inimgr.IniGetInt2(connstr.GetString(), "is_focussed", 0, pathstr.GetString()) ? wyTrue : wyFalse;
+//	//inimgr.IniGetSectionDetailsFinalize();
+//	return isfocussed;
+//
+//}
 
 //wyBool WriteSessionDetails(wyChar* title, ConnectionInfo *conninfo, wyInt32 conno, wyBool isfocus)
 //{

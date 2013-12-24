@@ -252,7 +252,7 @@ wyInt32 WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance,
     // Release resources used by the critical section object.
     DeleteCriticalSection(&pGlobals->m_csglobal);
 	DeleteCriticalSection(&pGlobals->m_csiniglobal);
-
+	DeleteCriticalSection(&pGlobals->m_cssshglobal);
 	delete mainwin;
 	delete pGlobals;
 
