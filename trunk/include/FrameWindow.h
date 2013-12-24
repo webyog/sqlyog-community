@@ -1618,11 +1618,20 @@ public:
 	wyInt32				m_showwindowstyle;
 
 	HWND				m_hwndrestorestatus;
+
 };
 
 /// Function to rstore connections
 /**
 */
+	typedef struct ConnectFromList_arg
+	{
+		wyString connstr;
+		wyString pathstr;
+		ConnectionInfo	conninfo;
+		wyBool			isfocussed;
+		wyIni *inimgr;
+	}MY_ARG;
 void	ConnectFromList(wyString* failledconnections);
-
+unsigned __stdcall  ConnectFromList_mt(void* arg_list);
 #endif

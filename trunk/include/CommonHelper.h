@@ -61,6 +61,7 @@
 
 #define		SSHTUNNELER 	  "plink.exe"
 #define     SQLYOG_MUTEX_NAME "SQLyogSSHMutex"
+#define		SQLYOG_NAMEDMUTEX "SQLyogNamedMutex"
 
 #define	 BULK_SIZE           16*1024*1024
 
@@ -814,7 +815,7 @@ wyBool		  GetTableEngine(Tunnel * tunnel, MYSQL *mysql, const wyChar *tablename,
 @return 0 for succcess else error number
 */
 #if ! defined COMMUNITY && defined _WIN32
-wyInt32		  GetLocalEmptyPort(ConnectionInfo *con, wyFile *plinklock);
+wyInt32		  GetLocalEmptyPort(ConnectionInfo *con);
 #endif
 
 //Initialise the socket
@@ -898,7 +899,7 @@ void	RotateBitRight(unsigned char *str);
 */
 void    RotateBitLeft (unsigned char *str);
 
-
+void DebugLog(const char *buffer);
 #ifdef _WIN32
 void			WriteLog(const wyChar* str);
 #endif

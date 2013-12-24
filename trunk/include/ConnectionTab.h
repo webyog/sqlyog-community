@@ -77,7 +77,7 @@ public:
 	@param lparam   : IN Long message parameter
 	@returns tab handle
     */
-	wyBool      InsertConnectionTab(wyString *title, LPARAM lparam);
+	wyBool      InsertConnectionTab(wyString *title, LPARAM lparam, wyBool iscon_res = wyFalse,ConnectionInfo* conninfo = NULL);
 
 	/// To get active window handle
 	/*

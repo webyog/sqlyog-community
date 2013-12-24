@@ -173,7 +173,7 @@ MDIWindow::~MDIWindow()
 }
 
 wyBool
-MDIWindow::Create()
+MDIWindow::Create(wyBool iscon_res, ConnectionInfo* conninfo)
 {
     HANDLE hfile;
 	wyString  title;
@@ -195,10 +195,10 @@ MDIWindow::Create()
 	{
 		title.Sprintf("%s %s", m_title.GetString(), m_tunneltitle.GetString());
 	}
-
+    
    	//tab interface, create a tab with new connection
     //create connection tab control
-	pGlobals->m_pcmainwin->m_conntab->InsertConnectionTab(&title, (LPARAM)this);
+	pGlobals->m_pcmainwin->m_conntab->InsertConnectionTab(&title, (LPARAM)this, iscon_res, conninfo);
 
 	//Setting focus to History tab.
 	//m_pctabmodule->GetActiveTabEditor()->m_pctabmgmt->SelectQueryInfoTab();

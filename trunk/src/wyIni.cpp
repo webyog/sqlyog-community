@@ -116,6 +116,63 @@ wyIni::IniGetSection(wyString *allsecnames, wyString *path)
     return noofsections;
 }
 
+
+void
+wyIni::IniGetSectionDetailsInit(wyString *sec, wyString *path)
+{
+    //Initialize(path->GetString(),sec->GetString());
+	Initialize(path->GetString());
+}
+
+void
+wyIni::IniGetSectionDetailsFinalize()
+{
+	Finialize(wyFalse);
+}
+
+wyInt32
+wyIni::IniGetString2(const wyChar *sec,const wyChar *key, const wyChar *defval, wyString *returnedstring, const wyChar *path)
+{
+    
+    wyInt32     noofchars;
+    
+    if(!path)
+    {
+        returnedstring->SetAs(defval);
+        noofchars = strlen(defval);
+        return noofchars;
+    }
+
+    
+    
+    noofchars = GetValue(sec, key, defval, returnedstring);
+   
+    return noofchars;
+}
+
+wyInt32  
+wyIni::IniGetInt2(const wyChar *sec,const wyChar *key, wyInt32 defval, const wyChar *path)
+{
+    
+    wyChar      defvalbuffer[20] = {0};
+    wyInt32     noofchars;
+    wyString    retint;
+
+    if(!path)
+        return defval;
+
+    
+    
+    noofchars = GetValue(sec, key, itoa(defval, defvalbuffer, 10), &retint);  
+
+    if(retint.GetLength() == 0)
+        retint.SetAs(defvalbuffer);
+
+    
+    return retint.GetAsInt32();
+}
+
+
 wyBool
 wyIni::IniIsConnectionExists(const wyWChar *path)
 {

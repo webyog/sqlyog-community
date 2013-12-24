@@ -1524,7 +1524,7 @@ wyBool CreateSessionFile();
 
 wyBool GetSessionFile(wyWChar *path);
 
-wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo);
+wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo, wyIni *inimgr);
 
 //wyBool WriteSessionDetails(wyChar* title, ConnectionInfo *conninfo, wyInt32 connectionno, wyBool isfocus);
 

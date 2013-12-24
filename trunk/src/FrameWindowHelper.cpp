@@ -2712,6 +2712,7 @@ InitGlobals(PGLOBALS pg)
 {
     InitializeCriticalSection(&pg->m_csglobal);
 	InitializeCriticalSection(&pg->m_csiniglobal);
+	InitializeCriticalSection(&pg->m_cssshglobal);
     pg->m_colcount = 0;
     pg->m_conncount = 0;
     pg->m_entinst = NULL;
@@ -2753,7 +2754,8 @@ InitGlobals(PGLOBALS pg)
     pg->m_istabledataunderquery = wyTrue;
     pg->m_isinfotabunderquery = wyTrue;	
     pg->m_ishistoryunderquery = wyFalse;
-	pg->m_prefpersist=0;
+	pg->m_prefpersist = 0;
+	pg->m_conrestore = wyFalse;
     return;
 }
     

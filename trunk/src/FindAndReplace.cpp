@@ -210,7 +210,7 @@ FindAndReplace::FindNextText(HWND hwnd, LPARAM lparam)
 		{
 			ret = FindNextconfirmationMessage(wyTrue);
 			
-			if(ret == IDNO)
+			if(ret != IDYES)
 			{
 				m_count = 0;
 				m_firstfound = 0;
@@ -231,7 +231,7 @@ FindAndReplace::FindNextText(HWND hwnd, LPARAM lparam)
 		{
 			ret = FindNextconfirmationMessage(wyFalse);
 			
-			if(ret == IDNO)
+			if(ret != IDYES)
 			{
 				m_count = 0;
 				m_firstfound = 0;
@@ -280,7 +280,7 @@ FindAndReplace::FindNextText(HWND hwnd, LPARAM lparam)
 				{
 					ret = FindNextconfirmationMessage(wyTrue);
 			
-					if(ret == IDNO)
+					if(ret != IDYES)
 					{
 						m_count = 0;
 						m_firstfound = 0;
@@ -301,7 +301,7 @@ FindAndReplace::FindNextText(HWND hwnd, LPARAM lparam)
 				{
 					ret = FindNextconfirmationMessage(wyFalse);
 			
-					if(ret == IDNO)
+					if(ret != IDYES)
 					{
 						m_count = 0;
 						m_firstfound = 0;
@@ -481,7 +481,7 @@ start:
 		{
 			ret = FindNextconfirmationMessage(wyTrue);
 			
-			if(ret == IDNO)
+			if(ret != IDYES)
 				return 1;
 
             m_cyclecompleted = wyTrue;
@@ -505,7 +505,7 @@ start:
 		//Handles if end of the document is reached 
 		ret = FindNextconfirmationMessage(wyFalse);
 			
-		if(ret == IDNO)
+		if(ret != IDYES)
 			return 1;
 		m_cyclecompleted = wyTrue;
 		startposition = 0; 
@@ -557,7 +557,7 @@ FindAndReplace::FindTextPostion(wyString * findwhatstr, wyInt32 flags, wyInt32 s
 wyInt32 
 FindAndReplace::FindNextconfirmationMessage(wyBool  isbeginning)
 {
-	return ShowMessage(isbeginning == wyTrue ? BEGINNING_REACHED : END_REACHED, MB_YESNO | MB_DEFBUTTON2 | MB_ICONQUESTION);
+	return ShowMessage(isbeginning == wyTrue ? BEGINNING_REACHED : END_REACHED, MB_YESNOCANCEL | MB_DEFBUTTON2 | MB_ICONQUESTION);
 }
 
 

@@ -3084,6 +3084,17 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 
 		//if(hwndactive)
 		//	ptabmgmt->SetFocusToResultPane();
+		if(hwndactive)
+		{
+			//ptabeditor->m_peditorbase->ShowResultWindow();
+
+			//if(ptabeditor->m_pctabmgmt && ptabeditor->m_pctabmgmt->m_presultview)
+			//	if(ptabeditor->m_pctabmgmt->m_presultview->GetActiveDispWindow())
+			//SetFocus(ptabeditor->m_pctabmgmt->m_presultview->GetActiveDispWindow());
+			//SetFocus(ptabmgmt->m_hwnd);
+			if(ptabmgmt && ptabmgmt->m_hwnd)
+				ptabmgmt->SelectTab(CustomTab_GetCurSel(ptabmgmt->m_hwnd));
+		}
 
 		break;
 
@@ -8724,94 +8735,6 @@ FrameWindow::SaveConnectionDetails()
 	return wyTrue;
 }
 
-void
-ConnectFromList(wyString* failledconnections)
-{
-	ConnectionInfo	conninfo;
-	MDIWindow		*pcquerywnd = NULL;
-	wyInt32         concount = 0, focussedconn = -1, totalcon = 0, i = 0;
-	wyUInt32		threadid;
-	wyBool			isfocussed = wyFalse;
-    wyWChar			path[MAX_PATH +1];
-	wyString		pathstr, connstr, sectionstring;
-	wyChar			seps[] = ";";
-	const wyChar*	str = NULL;
-	
-
-	if(GetSessionFile(path) == wyTrue)
-	{
-		pathstr.SetAs(path);
-
-		wyIni::IniGetSection(&sectionstring, &pathstr);
-
-		for(i = 0, str = sectionstring.GetString(); str[i]; ++i)
-		{
-			totalcon += str[i] == seps[0] ? 1 : 0;
-		}
-
-		i = 0;
-		sectionstring.StripToken(seps, &connstr);
-		
-		while(connstr.GetLength())
-		{
-			if(i == 0)
-			{
-				_beginthreadex(NULL, 0, FrameWindow::RestoreStatusThreadProc, (void*)totalcon, 0, &threadid);
-			}
-
-			++i;
-			InitializeConnectionInfo(conninfo);
-
-			isfocussed = GetSessionDetails(connstr.GetAsWideChar(), pathstr.GetAsWideChar(), &conninfo);
-				
-			sectionstring.StripToken(seps, &connstr); 
-			
-			PostMessage(pGlobals->m_pcmainwin->m_hwndrestorestatus, UM_UPDATE_CONNECTION, 0, (LPARAM)strdup(conninfo.m_title.GetString()));
-			pGlobals->m_pcmainwin->m_connection->OnConnect(&conninfo);
-			PostMessage(pGlobals->m_pcmainwin->m_hwndrestorestatus, UM_UPDATE_PROGRESS, 0, 0);
-				
-			if(!conninfo.m_mysql )
-			{
-				failledconnections->AddSprintf("%s\r\n", conninfo.m_title.GetString());
-				continue;
-			}
-
-			if(pGlobals->m_pcmainwin->m_hwndconntab == NULL)
-			{
-				//create connection tab
-				pGlobals->m_pcmainwin->m_hwndconntab = pGlobals->m_pcmainwin->m_conntab->CreateConnectionTabControl(pGlobals->m_pcmainwin->GetHwnd());
-			}
-
-			pcquerywnd	= new MDIWindow(pGlobals->m_pcmainwin->GetMDIWindow(), &conninfo, conninfo.m_db, conninfo.m_title);
-			if(pcquerywnd)
-			{
-				pcquerywnd->m_postactivatemsg = wyFalse;
-				
-				pcquerywnd->Create();
-				
-				pGlobals->m_conncount++;
-				
-				pGlobals->m_pcmainwin->SetConnectionNumber();
-				pcquerywnd->m_pcqueryobject->OnSelChanged(TreeView_GetSelection(pcquerywnd->m_pcqueryobject->m_hwnd));
-				pGlobals->m_pcmainwin->OnActiveConn();
-
-				if(isfocussed)
-				{	
-					focussedconn = concount;
-				}
-
-				concount++;
-			}
-		}
-		
-		if(focussedconn >= 0)
-			CustomTab_SetCurSel(pGlobals->m_pcmainwin->m_hwndconntab, focussedconn, 1);
-		
-		SetCursor(LoadCursor(NULL, IDC_ARROW));
-	}
-}
-
-
 unsigned __stdcall  
 FrameWindow::RestoreStatusThreadProc(LPVOID lpparam)
 {
@@ -8840,6 +8763,7 @@ FrameWindow::RestoreStatusDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM
 			SendMessage(GetDlgItem(hwnd, IDC_RESTORE_PROGRESS), PBM_SETSTEP, 1, 0);
 			SendMessage(GetDlgItem(hwnd, IDC_RESTORE_PROGRESS), PBM_SETPOS, 0, 0);
             SetWindowText(hwnd, pGlobals->m_appname.GetAsWideChar());
+			SetWindowText(GetDlgItem(hwnd, IDC_CONNECTION_NAME), L"Restoring connections");
 			break;
 
 		case UM_UPDATE_PROGRESS:
@@ -8861,3 +8785,122 @@ FrameWindow::RestoreStatusDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM
 
 	return FALSE;
 }
+
+
+
+
+void
+ConnectFromList(wyString* failledconnections)
+{
+	ConnectionInfo	conninfo;
+	MDIWindow		*pcquerywnd = NULL;
+	wyInt32         focussedconn = -1, totalcon = 0, i = 0,j = 0;
+	wyUInt32		threadid;
+    wyWChar			path[MAX_PATH +1];
+	wyString		pathstr, connstr, sectionstring;
+	wyChar			seps[] = ";";
+	const wyChar*	str = NULL;
+	HANDLE *thread_handle_l;
+	MY_ARG *my_arg;
+	wyIni inimgr;
+
+	if(GetSessionFile(path) == wyTrue)
+	{
+		pathstr.SetAs(path);
+
+		wyIni::IniGetSection(&sectionstring, &pathstr);
+		inimgr.IniGetSectionDetailsInit(&connstr , &pathstr);
+
+		for(i = 0, str = sectionstring.GetString(); str[i]; ++i)
+		{
+			totalcon += str[i] == seps[0] ? 1 : 0;
+		}
+
+		thread_handle_l=new HANDLE[totalcon];
+		my_arg = new MY_ARG[totalcon];
+		i = 0;
+		pGlobals->m_conrestore = wyTrue;
+		sectionstring.StripToken(seps, &connstr);
+		while(connstr.GetLength())
+		{
+			if(i == 0)
+			{
+				_beginthreadex(NULL, 0, FrameWindow::RestoreStatusThreadProc, (void*)totalcon, 0, &threadid);
+			}
+
+			my_arg[i].connstr.SetAs(connstr);
+			my_arg[i].pathstr.SetAs(pathstr);
+			my_arg[i].inimgr = &inimgr;
+			thread_handle_l[i] = (HANDLE)_beginthreadex(NULL, 0, ConnectFromList_mt,(void*) &my_arg[i], 0, NULL);
+			++i;
+			sectionstring.StripToken(seps, &connstr); 
+
+		}
+				
+		for(j=0;j<totalcon;j++)
+			{
+			WaitForSingleObject(thread_handle_l[j], INFINITE);
+			PostMessage(pGlobals->m_pcmainwin->m_hwndrestorestatus, UM_UPDATE_PROGRESS, 0, 0);
+			if(!my_arg[j].conninfo.m_mysql )
+			{
+				failledconnections->AddSprintf("%s\r\n", my_arg[j].conninfo.m_title.GetString());
+				continue;
+			}
+			if(pGlobals->m_pcmainwin->m_hwndconntab == NULL)
+			{
+				//create connection tab
+				pGlobals->m_pcmainwin->m_hwndconntab = pGlobals->m_pcmainwin->m_conntab->CreateConnectionTabControl(pGlobals->m_pcmainwin->GetHwnd());
+			}
+
+			pcquerywnd	= new MDIWindow(pGlobals->m_pcmainwin->GetMDIWindow(), &my_arg[j].conninfo, my_arg[j].conninfo.m_db, my_arg[j].conninfo.m_title);
+			if(pcquerywnd)
+			{
+				pcquerywnd->m_postactivatemsg = wyFalse;
+				pGlobals->m_pcmainwin->m_connection->m_rgbobbkcolor = my_arg[j].conninfo.m_rgbconn;
+				pGlobals->m_pcmainwin->m_connection->m_rgbobfgcolor = my_arg[j].conninfo.m_rgbfgconn;
+				pcquerywnd->Create(wyTrue,&my_arg[j].conninfo);
+				
+				pGlobals->m_conncount++;
+				
+				pGlobals->m_pcmainwin->SetConnectionNumber();
+				pcquerywnd->m_pcqueryobject->OnSelChanged(TreeView_GetSelection(pcquerywnd->m_pcqueryobject->m_hwnd));
+				pGlobals->m_pcmainwin->OnActiveConn();
+				if(my_arg[j].isfocussed)
+				{	
+					focussedconn = j;
+				}
+
+			}
+		}
+		WaitForMultipleObjects(totalcon, thread_handle_l, TRUE, INFINITE);
+		delete[] thread_handle_l;
+		delete[] my_arg;
+		//focussedconn = 0;
+		if(focussedconn >= 0)
+			CustomTab_SetCurSel(pGlobals->m_pcmainwin->m_hwndconntab, focussedconn, 1);
+		pGlobals->m_conrestore = wyFalse;
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
+		inimgr.IniGetSectionDetailsFinalize();
+		//PostMessage(pGlobals->m_pcmainwin->m_hwndrestorestatus, UM_CLOSE_RESTORE_STATUS, 0, 0);
+
+	}
+}
+
+unsigned __stdcall  
+ConnectFromList_mt(void* arg_list)
+{
+	ConnectionInfo	conninfo;
+	wyString		pathstr, connstr, sectionstring;
+	
+	connstr.SetAs(((MY_ARG*)arg_list)->connstr);
+	pathstr.SetAs(((MY_ARG*)arg_list)->pathstr);
+
+	InitializeConnectionInfo(((MY_ARG*)arg_list)->conninfo);
+
+	((MY_ARG*)arg_list)->isfocussed = GetSessionDetails(connstr.GetAsWideChar(), pathstr.GetAsWideChar(), &((MY_ARG*)arg_list)->conninfo, ((MY_ARG*)arg_list)->inimgr);
+
+	pGlobals->m_pcmainwin->m_connection->OnConnect(&((MY_ARG*)arg_list)->conninfo, wyTrue);
+
+    return 0;
+}
+
