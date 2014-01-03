@@ -1547,7 +1547,7 @@ ConnectionCommunity::FormateAllQueries(MDIWindow *wnd, HWND hwndeditor,
 }
 
 void    
-ConnectionCommunity::OnConnect(ConnectionInfo *dbname, wyBool iscon_res)
+ConnectionCommunity::OnConnect(ConnectionInfo *dbname)
 {
 	Tunnel		*tunnel;
     MYSQL		*mysql;
@@ -1562,7 +1562,7 @@ ConnectionCommunity::OnConnect(ConnectionInfo *dbname, wyBool iscon_res)
 
 	dbname->m_tunnel = tunnel;
 
-    mysql = ConnectToMySQL(dbname, iscon_res);
+    mysql = ConnectToMySQL(dbname);
 
 	if(mysql == NULL)
     {
@@ -1574,7 +1574,7 @@ ConnectionCommunity::OnConnect(ConnectionInfo *dbname, wyBool iscon_res)
     {
 		dbname->m_mysql = mysql;
 		dbname->m_tunnel = tunnel;
-		if(!iscon_res)
+		if(!pGlobals->m_conrestore)
 		{
 			m_rgbobbkcolor = dbname->m_rgbconn;
 			m_rgbobfgcolor = dbname->m_rgbfgconn;
@@ -1592,7 +1592,7 @@ ConnectionCommunity::OnConnect(ConnectionInfo *dbname, wyBool iscon_res)
 
 
 MYSQL* 
-ConnectionCommunity::ConnectToMySQL(ConnectionInfo * coninfo, wyBool iscon_res)
+ConnectionCommunity::ConnectToMySQL(ConnectionInfo * coninfo)
 {
 	Tunnel			*tunnel = coninfo->m_tunnel;
 	wyUInt32		client=0;

@@ -899,7 +899,7 @@ void	RotateBitRight(unsigned char *str);
 */
 void    RotateBitLeft (unsigned char *str);
 
-void DebugLog(const char *buffer);
+//void DebugLog(const char *buffer);
 #ifdef _WIN32
 void			WriteLog(const wyChar* str);
 #endif

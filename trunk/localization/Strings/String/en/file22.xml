@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3620">Restoring connections</string>
+	<string name="3621">Error in tunneling. The HTTP/XML response may be invalid, PHP settings may not allow for tunneling or similar. You may send the HTTP response to support@webyog.com. You may also try the settings behind the &apos;advanced&apos; button to resolve the problem.</string>
+</resources>
