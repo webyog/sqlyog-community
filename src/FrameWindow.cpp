@@ -8763,7 +8763,7 @@ FrameWindow::RestoreStatusDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM
 			SendMessage(GetDlgItem(hwnd, IDC_RESTORE_PROGRESS), PBM_SETSTEP, 1, 0);
 			SendMessage(GetDlgItem(hwnd, IDC_RESTORE_PROGRESS), PBM_SETPOS, 0, 0);
             SetWindowText(hwnd, pGlobals->m_appname.GetAsWideChar());
-			SetWindowText(GetDlgItem(hwnd, IDC_CONNECTION_NAME), L"Restoring connections");
+			SetWindowText(GetDlgItem(hwnd, IDC_CONNECTION_NAME), _(L"Restoring connections"));
 			break;
 
 		case UM_UPDATE_PROGRESS:
@@ -8899,7 +8899,7 @@ ConnectFromList_mt(void* arg_list)
 
 	((MY_ARG*)arg_list)->isfocussed = GetSessionDetails(connstr.GetAsWideChar(), pathstr.GetAsWideChar(), &((MY_ARG*)arg_list)->conninfo, ((MY_ARG*)arg_list)->inimgr);
 
-	pGlobals->m_pcmainwin->m_connection->OnConnect(&((MY_ARG*)arg_list)->conninfo, wyTrue);
+	pGlobals->m_pcmainwin->m_connection->OnConnect(&((MY_ARG*)arg_list)->conninfo);
 
     return 0;
 }

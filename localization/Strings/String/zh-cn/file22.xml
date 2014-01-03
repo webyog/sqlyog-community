@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3620">恢复连接</string>
+	<string name="3621">隧道建立失败。HTTP/XML 响应可能为无效，PHP 设置可能未允许隧道建立。您可以发送 HTTP 响应到 support@webyog.com。您也可以尝试更改‘高级’设置来解决问题。</string>
+</resources>

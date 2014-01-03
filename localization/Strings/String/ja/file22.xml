@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3620">接続を回復しています</string>
+	<string name="3621">トンネル中にエラーが発生しました。HTTP/XML応答が無効な可能性があります。PHP設定でトンネルなどが無効化されている必要があります。もしご希望なら、HTTP応答をsupport@webyog.comにお送りください。[Advanced]ボタンで設定変更をすると問題が解決される場合もあります。</string>
+</resources>

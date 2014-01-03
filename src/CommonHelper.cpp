@@ -4112,25 +4112,25 @@ EncodePassword(wyString &text)
 
 	return wyTrue;
 }
-void DebugLog(const char *buffer)
-{
-        wyWChar                directory[MAX_PATH+1];
-        wyWChar                *lpfileport;
-        wyBool                ret;
-        
-        ret = SearchFilePath(L"sqlyog_debug1", L".log", MAX_PATH, directory, &lpfileport);
-
-        if(ret != wyTrue)
-        {
-                return;
-        }
-
-        FILE* fp = _wfopen(directory, L"a+");
-        if(!fp)
-        {
-                return;
-        }
-
-        fprintf(fp, "%s\r\n", buffer);
-        fclose(fp);
-}
+//void DebugLog(const char *buffer)
+//{
+//        wyWChar                directory[MAX_PATH+1];
+//        wyWChar                *lpfileport;
+//        wyBool                ret;
+//        
+//        ret = SearchFilePath(L"sqlyog_debug1", L".log", MAX_PATH, directory, &lpfileport);
+//
+//        if(ret != wyTrue)
+//        {
+//                return;
+//        }
+//
+//        FILE* fp = _wfopen(directory, L"a+");
+//        if(!fp)
+//        {
+//                return;
+//        }
+//
+//        fprintf(fp, "%s\r\n", buffer);
+//        fclose(fp);
+//}

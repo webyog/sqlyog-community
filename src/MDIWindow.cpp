@@ -4109,7 +4109,7 @@ MDIWindow::ReConnectSSH(ConnectionInfo *coninfo)
 {
 #ifndef COMMUNITY		
 	wyInt32         sshret;
-    
+    wyString		errormsg;
 	PROCESS_INFORMATION     pi;
 
 	if(coninfo->m_hprocess != INVALID_HANDLE_VALUE)
@@ -4126,21 +4126,16 @@ MDIWindow::ReConnectSSH(ConnectionInfo *coninfo)
 		TerminateProcess(coninfo->m_hprocess, 1);
 	}
 	
-	sshret = CConnectionEnt::CreateSSHSession(coninfo, &pi);
+	sshret = CConnectionEnt::CreateSSHSession(coninfo, &pi, &errormsg);
 
 	if(sshret)
 	{	
-		ShowSSHError(m_hwnd );
+		if(errormsg.GetLength())
+				yog_message(m_hwnd, errormsg.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR );
       	coninfo->m_hprocess = INVALID_HANDLE_VALUE;
 		return wyFalse;
 	}
-    else
-    {
-        if(pGlobals->m_hmapfile)
-          VERIFY(CloseHandle(pGlobals->m_hmapfile));
 
-        pGlobals->m_hmapfile = NULL;
-    }
 
 	coninfo->m_hprocess      = pi.hProcess;	
 
