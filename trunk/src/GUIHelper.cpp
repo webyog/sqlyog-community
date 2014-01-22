@@ -2583,19 +2583,22 @@ GetmySQLCaseVariable(MDIWindow *wnd)
 	ismysql41 = wnd->m_ismysql41;  
 
 	query.Sprintf("show variables like 'lower_case_table_names'");
-	res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
+	res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query, wyFalse);
 	//res = SjaExecuteAndGetResult(tunnel, mysql, query);
 	if(!res && wnd->m_tunnel->mysql_affected_rows(wnd->m_mysql)== -1)
 	{
-		VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
-		ShowMySQLError(pGlobals->m_pcmainwin->m_hwndmain, wnd->m_tunnel, &wnd->m_mysql, query.GetString());
+		//VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
+		//ShowMySQLError(pGlobals->m_pcmainwin->m_hwndmain, wnd->m_tunnel, &wnd->m_mysql, query.GetString());
 		return wyFalse;
 	}
 
 	fldindex = GetFieldIndex(wnd->m_tunnel, res, "Value"); 
     row =  wnd->m_tunnel->mysql_fetch_row(res);
 	if(!row)
+	{
+		wnd->m_tunnel->mysql_free_result(res);
 		return wyFalse;
+	}
 	
 	casevalue.SetAs(row[fldindex], ismysql41);
 	wnd->m_tunnel->mysql_free_result(res);
@@ -2604,6 +2607,48 @@ GetmySQLCaseVariable(MDIWindow *wnd)
 
 	return value;        
 }
+
+wyBool
+IsLowercaseFS(MDIWindow *wnd)
+{
+	wyString	query, dbname, casevalue;
+	wyInt32		fldindex;
+	wyBool		ismysql41 = wyFalse; 
+	MYSQL_RES*	res;
+	MYSQL_ROW	row;
+	wyBool		islowercasefs;
+	if(!wnd)
+		return wyTrue;
+
+	ismysql41 = wnd->m_ismysql41;  
+
+	query.Sprintf("show variables like 'lower_case_file_system'");
+	res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query, wyFalse);
+	//res = SjaExecuteAndGetResult(tunnel, mysql, query);
+	if(!res && wnd->m_tunnel->mysql_affected_rows(wnd->m_mysql)== -1)
+	{
+		return wyTrue;
+	}
+
+	fldindex = GetFieldIndex(wnd->m_tunnel, res, "Value"); 
+    row =  wnd->m_tunnel->mysql_fetch_row(res);
+	if(!row)
+	{
+		wnd->m_tunnel->mysql_free_result(res);
+		return wyTrue;
+	}
+	
+	casevalue.SetAs(row[fldindex], ismysql41);
+	if(casevalue.CompareI("ON") == 0)
+		islowercasefs = wyTrue;
+	else
+		islowercasefs = wyFalse;
+
+	wnd->m_tunnel->mysql_free_result(res);
+
+	return islowercasefs;        
+}
+
 //function used in   querythread and autocompleteent 
 wyInt32 GetQuerySpaceLen(int orglen, const wyChar *query)
 {
@@ -3070,7 +3115,7 @@ ExpandProcedures(HWND hwnd, Tunnel* tunnel, PMYSQL mysql, HTREEITEM hsp, wyWChar
 	MYSQL_ROW			myrow;
 	MDIWindow			*wnd = NULL;
 	wyBool				ischeckbox = wyFalse;
-
+	wyBool				iscollate = wyFalse;
 	VERIFY(wnd = GetActiveWin());
 
 	// First get the database of the table.
@@ -3091,7 +3136,12 @@ ExpandProcedures(HWND hwnd, Tunnel* tunnel, PMYSQL mysql, HTREEITEM hsp, wyWChar
 	
 	DeleteChildNodes(hwnd, hsp, isrefresh);
 	dbnamestr.SetAs(database);
-	GetSelectProcedureStmt(dbnamestr.GetString(), query);
+
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVariable(wnd) == 0)
+		if(!IsLowercaseFS(wnd))
+			iscollate = wyTrue;
+	GetSelectProcedureStmt(dbnamestr.GetString(), query, iscollate);
 
     myres = ExecuteAndGetResult(wnd, tunnel, mysql, query);
     if(!myres)
@@ -3125,7 +3175,7 @@ ExpandFunctions(HWND hwnd , Tunnel* tunnel, PMYSQL mysql, HTREEITEM hfunction, w
 	MYSQL_ROW			myrow;
 	MDIWindow			*wnd = NULL;
 	wyBool				ischeckbox = wyFalse;
-
+	wyBool				iscollate = wyFalse;
 	VERIFY(wnd = GetActiveWin());
 	
 	//Gets the database name
@@ -3144,9 +3194,13 @@ ExpandFunctions(HWND hwnd , Tunnel* tunnel, PMYSQL mysql, HTREEITEM hfunction, w
 	ShowCursor(1);
 
 	DeleteChildNodes(hwnd, hfunction, isrefresh);
-	
+
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVariable(wnd) == 0)
+		if(!IsLowercaseFS(wnd))
+			iscollate = wyTrue;
 	dbnamestr.SetAs(database);
-	GetSelectFunctionStmt(dbnamestr.GetString(), query);
+	GetSelectFunctionStmt(dbnamestr.GetString(), query, iscollate);
 
     myres = ExecuteAndGetResult(wnd, tunnel, mysql, query);
     if(!myres)
@@ -3237,7 +3291,7 @@ ExpandEvents(HWND hwnd, Tunnel* tunnel, PMYSQL mysql, HTREEITEM hevent, wyWChar 
 	MYSQL_ROW			myrow;
 	MDIWindow			*wnd = NULL;
 	wyBool				ischeckbox = wyFalse;
-	
+	wyBool				iscollate = wyFalse;
 	VERIFY(wnd = GetActiveWin());
 
 	//Gets the database name
@@ -3259,7 +3313,11 @@ ExpandEvents(HWND hwnd, Tunnel* tunnel, PMYSQL mysql, HTREEITEM hevent, wyWChar 
 	DeleteChildNodes(hwnd, hevent, isrefresh);
 	dbnamestr.SetAs(database);
 
-	GetSelectEventStmt(dbnamestr.GetString(), query);
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVariable(wnd) == 0)
+		if(!IsLowercaseFS(wnd))
+			iscollate = wyTrue;
+	GetSelectEventStmt(dbnamestr.GetString(), query, iscollate);
 
     myres = ExecuteAndGetResult(wnd, tunnel, mysql, query);
     if(!myres)

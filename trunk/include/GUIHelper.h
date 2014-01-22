@@ -660,6 +660,8 @@ wyBool	GetCreateViewStatement(MDIWindow *wnd, Tunnel * tunnel, PMYSQL pmysql, co
 */
 wyInt32						GetmySQLCaseVariable(MDIWindow *wnd);
 
+
+wyBool	IsLowercaseFS(MDIWindow *wnd);
 // getting the exact query length; 
 // this is used to implement the single 
 // query execution even if tyhe cursor is outside the query

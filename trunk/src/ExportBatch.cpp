@@ -800,9 +800,14 @@ ExportBatch::ValidateInput()
 	MYSQL_RES   *myres = NULL;
 	wyString	query;
 	MDIWindow	*wnd = NULL;
+	wyBool		iscollate = wyFalse;
 
 	VERIFY(wnd = GetActiveWin());
 
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVariable(wnd) == 0)
+		if(!IsLowercaseFS(wnd))
+			iscollate = wyTrue;
 	dataonly = SendMessage(GetDlgItem(m_hwnd, IDC_CHK_DATAONLY), BM_GETCHECK, 0, 0)	;
 	VERIFY(treehandle	= GetDlgItem(m_hwnd, IDC_EXPORTTREE));
 	
@@ -908,7 +913,7 @@ ExportBatch::ValidateInput()
 		{
 			if(isexpanded == wyFalse)
 			{
-				count = GetSelectProcedureStmt(m_db.GetString(), query);
+				count = GetSelectProcedureStmt(m_db.GetString(), query, iscollate);
 				count = GetObjectsMyRes(m_hwnd, wnd, m_tunnel, m_mysql, myres , &query);
 				if(count == -1)
 					return wyFalse;
@@ -929,7 +934,7 @@ ExportBatch::ValidateInput()
 		{
 			if(isexpanded == wyFalse)
 			{
-				count = GetSelectFunctionStmt(m_db.GetString(), query);
+				count = GetSelectFunctionStmt(m_db.GetString(), query, iscollate);
 				count = GetObjectsMyRes(m_hwnd, wnd, m_tunnel, m_mysql, myres , &query);
 				if(count == -1)
 					return wyFalse;
@@ -971,7 +976,7 @@ ExportBatch::ValidateInput()
 		{
 			if(isexpanded == wyFalse)
 			{
-				count = GetSelectEventStmt(m_db.GetString(), query);
+				count = GetSelectEventStmt(m_db.GetString(), query, iscollate);
 				count = GetObjectsMyRes(m_hwnd, wnd, m_tunnel, m_mysql, myres , &query);
 				if(count == -1)
 					return wyFalse;

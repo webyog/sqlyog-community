@@ -4958,7 +4958,11 @@ FrameWindow::HandleCreateEvent(HWND hwnd, MDIWindow *pcquerywnd, wyWChar *eventn
     wyString    query, msg, db;
     MYSQL_RES	*res;
 	wyString	eventnamestr;
-		
+	wyBool		iscollate = wyFalse;
+
+	if(GetmySQLCaseVariable(pcquerywnd) == 0)
+		if(!IsLowercaseFS(pcquerywnd))
+			iscollate = wyTrue;
 	GetSelectedDB(pcquerywnd, db);
 	// get the db name.
 	hwndedit = GetDlgItem(hwnd, IDC_DBNAME);
@@ -4978,7 +4982,10 @@ FrameWindow::HandleCreateEvent(HWND hwnd, MDIWindow *pcquerywnd, wyWChar *eventn
 		return wyFalse;
 	}
 
-	query.Sprintf("show events where db = '%s' and name = '%s'", db.GetString(), eventnamestr.GetString());
+	if(iscollate)
+		query.Sprintf("show events where db = '%s' COLLATE utf8_bin and name = '%s'", db.GetString(), eventnamestr.GetString());
+	else
+		query.Sprintf("show events where db = '%s' and name = '%s'", db.GetString(), eventnamestr.GetString());
 	
     res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
 
@@ -5007,10 +5014,13 @@ FrameWindow::HandleCreateProcedure(HWND hwnd, MDIWindow *pcquerywnd, wyWChar *pr
     wyString    query, msg, db;
     MYSQL_RES	*res;
 	wyString	procedurenamestr;
-         
-        if(!procedurename)
+    wyBool		iscollate = wyFalse;  
+
+    if(!procedurename)
 		return wyFalse;	    		
-	
+	if(GetmySQLCaseVariable(pcquerywnd) == 0)
+		if(!IsLowercaseFS(pcquerywnd))
+			iscollate = wyTrue;
         GetSelectedDB(pcquerywnd, db);
 	// get the db name.
 	VERIFY(hwndedit = GetDlgItem(hwnd, IDC_DBNAME));
@@ -5028,8 +5038,10 @@ FrameWindow::HandleCreateProcedure(HWND hwnd, MDIWindow *pcquerywnd, wyWChar *pr
 
 	//to trim empty spaces from right, to avoid mysql errors
 	procedurenamestr.RTrim();
-
-	query.Sprintf("show procedure status where db = '%s' and name = '%s'", db.GetString(), procedurenamestr.GetString());
+	if(iscollate)
+		query.Sprintf("show procedure status where db = '%s' COLLATE utf8_bin and name = '%s'", db.GetString(), procedurenamestr.GetString());
+	else
+		query.Sprintf("show procedure status where db = '%s' and name = '%s'", db.GetString(), procedurenamestr.GetString());
     res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
 
 	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
@@ -5057,10 +5069,12 @@ FrameWindow::HandleCreateFunction(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *fun
     wyString    query, msg, db;
 	MYSQL_RES	*res;
 	wyString	functionnamestr;
-
+	wyBool		iscollate = wyFalse;
 	if(!functionname)
 		return wyFalse;
-
+	if(GetmySQLCaseVariable(pcquerywnd) == 0)
+		if(!IsLowercaseFS(pcquerywnd))
+			iscollate = wyTrue;
 	GetSelectedDB(pcquerywnd, db);
 	// get the db name.
 	VERIFY(hwndedit = GetDlgItem(hwnd, IDC_DBNAME));
@@ -5078,7 +5092,9 @@ FrameWindow::HandleCreateFunction(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *fun
 
 	//to trim empty spaces from right, to avoid mysql errors
 	functionnamestr.RTrim();
-
+	if(iscollate)
+		query.Sprintf("show function status where db = '%s' COLLATE utf8_bin and name = '%s'", db.GetString(), functionnamestr.GetString());
+	else
 	query.Sprintf("show function status where db = '%s' and name = '%s'", db.GetString(), functionnamestr.GetString());
 
     res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);

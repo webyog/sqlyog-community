@@ -1615,6 +1615,11 @@ ObjectInfo::ShowAllProcedures(MDIWindow *pcquerywnd,const wyChar *db, OBJECT obj
 {	
 	wyBool		ret = wyTrue;
 	wyString    query, temptitle, columns;
+	wyBool		iscollate = wyFalse;
+
+	if(GetmySQLCaseVariable(pcquerywnd) == 0)
+		if(!IsLowercaseFS(pcquerywnd))
+			iscollate = wyTrue;
 
 	if(obj == OBJECT_PROCEDURES)
 	{
@@ -1624,7 +1629,10 @@ ObjectInfo::ShowAllProcedures(MDIWindow *pcquerywnd,const wyChar *db, OBJECT obj
 		VERIFY(SendMessage(m_hwnd, SCI_APPENDTEXT, temptitle.GetLength(),(LPARAM)temptitle.GetString()));	
 	}
 
-	query.Sprintf("show procedure status where Db = '%s'", db);
+	if(iscollate)
+		query.Sprintf("show procedure status where Db = '%s' COLLATE utf8_bin", db);
+	else
+		query.Sprintf("show procedure status where Db = '%s'", db);
 
 	//temptitle.Sprintf("/*Procedure Information For - %s*/\r\n", db);
 	temptitle.SetAs(_("/*Procedure Information*/\r\n"));
@@ -1671,6 +1679,12 @@ wyBool
 ObjectInfo::ShowAllFunctions(MDIWindow *pcquerywnd,const wyChar *db, OBJECT obj)
 {
 	wyString    query, temptitle, columns;
+	wyBool		iscollate = wyFalse;
+
+
+	if(GetmySQLCaseVariable(pcquerywnd) == 0)
+		if(!IsLowercaseFS(pcquerywnd))
+			iscollate = wyTrue;
 
 	if(obj == OBJECT_FUNCTIONS)
 	{
@@ -1680,7 +1694,10 @@ ObjectInfo::ShowAllFunctions(MDIWindow *pcquerywnd,const wyChar *db, OBJECT obj)
 		VERIFY(SendMessage(m_hwnd, SCI_APPENDTEXT, temptitle.GetLength(),(LPARAM)temptitle.GetString()));	
 	}
 	
-	query.Sprintf("show function status where Db='%s'", db);
+	if(iscollate)
+		query.Sprintf("show function status where Db='%s' COLLATE utf8_bin", db);
+	else
+		query.Sprintf("show function status where Db='%s'", db);
 
 	temptitle.SetAs(_("/*Function Information*/\r\n"));
 	AppendLine(temptitle);
@@ -1781,7 +1798,10 @@ ObjectInfo::ShowAllEvents(MDIWindow *pcquerywnd,const wyChar *db, OBJECT obj)
 {
 	wyBool		ret;
 	wyString    query, temptitle;
-
+	wyBool		iscollate = wyFalse;
+	if(GetmySQLCaseVariable(pcquerywnd) == 0)
+		if(!IsLowercaseFS(pcquerywnd))
+			iscollate = wyTrue;
 	if(obj == OBJECT_EVENTS)
 	{
 		temptitle.Sprintf(_("/*Database: %s*/\r\n"), db);
@@ -1791,8 +1811,10 @@ ObjectInfo::ShowAllEvents(MDIWindow *pcquerywnd,const wyChar *db, OBJECT obj)
 	}
 
 	SendMessage(m_hwnd, SCI_APPENDTEXT, 2, (LPARAM)"\r\n");	
-	
-	query.Sprintf("Select `Event_name`,`Definer`,`Event_type`,`Execute_at`,`Interval_value`,`Interval_field`,`Starts`,`Ends`,`Status` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s'",db);
+	if(iscollate)
+		query.Sprintf("Select `Event_name`,`Definer`,`Event_type`,`Execute_at`,`Interval_value`,`Interval_field`,`Starts`,`Ends`,`Status` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s' COLLATE utf8_bin",db);
+	else
+		query.Sprintf("Select `Event_name`,`Definer`,`Event_type`,`Execute_at`,`Interval_value`,`Interval_field`,`Starts`,`Ends`,`Status` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s'",db);
 
 	temptitle.SetAs(_("/*Event Information*/\r\n"));
 	AppendLine(temptitle);

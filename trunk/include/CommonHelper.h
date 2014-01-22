@@ -389,7 +389,7 @@ wyInt32 GetSelectViewStmt(const wyChar *db, wyString &selectstmt);
 @param selectstmt   : OUT The SELECT stmt
 @returns length
 */
-wyInt32 GetSelectProcedureStmt(const wyChar *db, wyString &selectstmt);
+wyInt32 GetSelectProcedureStmt(const wyChar *db, wyString &selectstmt, wyBool iscollate = wyFalse);
 
 /// Create the SELECT stmt to get all FUNCTIONs for the given database
 /*
@@ -397,14 +397,14 @@ wyInt32 GetSelectProcedureStmt(const wyChar *db, wyString &selectstmt);
 @param selectstmt   : OUT The SELECT stmt
 @returns length
 */
-wyInt32 GetSelectFunctionStmt(const wyChar *db, wyString &selectstmt);
+wyInt32 GetSelectFunctionStmt(const wyChar *db, wyString &selectstmt, wyBool iscollate = wyFalse);
 /// Create the SELECT stmt to get all events for the given database
 /*
 @param db           : IN Database name
 @param selectstmt   : OUT The SELECT stmt
 @returns length
 */
-wyInt32 GetSelectEventStmt(const wyChar *db, wyString &selectstmt);
+wyInt32 GetSelectEventStmt(const wyChar *db, wyString &selectstmt, wyBool iscollate = wyFalse);
 
 /// Create the SELECT stmt to get all Triggeres for the given database
 /*

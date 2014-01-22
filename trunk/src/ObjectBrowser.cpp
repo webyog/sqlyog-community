@@ -5689,8 +5689,13 @@ CQueryObject::DropProcedures(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyC
     MDIWindow   *wnd = GetActiveWin();
 	wyString	dbname(db);
 	wyBool		ismysql41 = IsMySQL41(tunnel, mysql);
+	wyBool		iscollate = wyFalse;
 
-	GetSelectProcedureStmt(db, query);
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVariable(wnd) == 0)
+		if(!IsLowercaseFS(wnd))
+			iscollate = wyTrue;
+	GetSelectProcedureStmt(db, query, iscollate);
 	myres = ExecuteAndGetResult(wnd, tunnel, mysql, query);
 	if(!myres)
 	{
@@ -5729,8 +5734,13 @@ CQueryObject::DropEvents(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar 
 	wyString    query;
     MDIWindow   *wnd = GetActiveWin(); 
 	wyString    dbnameasstring(db), myrowstr;
+	wyBool		iscollate = wyFalse;
 
-	GetSelectEventStmt(db, query);
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVariable(wnd) == 0)
+		if(!IsLowercaseFS(wnd))
+			iscollate = wyTrue;
+	GetSelectEventStmt(db, query, iscollate);
 	
     myres = ExecuteAndGetResult(wnd, tunnel, mysql, query);
 
@@ -5773,8 +5783,13 @@ CQueryObject::DropFunctions(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyCh
 	wyString    query;
     MDIWindow   *wnd = GetActiveWin();
 	wyString    dbnameasstring(db), myrowstr;
+	wyBool		iscollate = wyFalse;
 
-	GetSelectFunctionStmt(db, query);
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVariable(wnd) == 0)
+		if(!IsLowercaseFS(wnd))
+			iscollate = wyTrue;
+	GetSelectFunctionStmt(db, query, iscollate);
 	
     myres = ExecuteAndGetResult(wnd, tunnel, mysql, query);
 
@@ -6429,13 +6444,20 @@ CQueryObject::EndRenameEvent(LPNMTVDISPINFO ptvdi)
 {
 	wyString    renameevent, query, msg;
 	MYSQL_RES   *res;	
-		
+	wyBool		iscollate = wyFalse;	
 	MDIWindow*	wnd = (MDIWindow*)GetWindowLongPtr(m_hwndparent, GWLP_USERDATA);
 	_ASSERT(wnd);
 	
+	if(GetmySQLCaseVariable(wnd) == 0)
+		if(!IsLowercaseFS(wnd))
+			iscollate = wyTrue;
 	renameevent.SetAs(ptvdi->item.pszText);
 
-	query.Sprintf("show events where db= '%s' and name = '%s'", m_seldatabase.GetString(), 
+	if(iscollate)
+		query.Sprintf("show events where db= '%s' COLLATE utf8_bin and name = '%s'", m_seldatabase.GetString(), 
+															 renameevent.GetString());
+	else
+		query.Sprintf("show events where db= '%s' and name = '%s'", m_seldatabase.GetString(), 
 															 renameevent.GetString());
    res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
    
