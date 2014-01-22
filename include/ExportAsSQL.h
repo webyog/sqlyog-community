@@ -1112,6 +1112,8 @@ public:
 
     void                StopExporting();
     wyBool              IsExportingStopped();
+	wyInt32				GetmySQLCaseVar();
+	wyBool				IsLowercaseFS();
 
 private:	
 	

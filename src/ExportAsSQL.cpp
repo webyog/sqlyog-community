@@ -1038,7 +1038,84 @@ MySQLDump::DumpViews(wyString * buffer, const wyChar *db, wyBool isviewstructure
     sja_mysql_free_result(m_tunnel, res);
 
 	return wyTrue;
-}	
+}
+
+wyInt32
+MySQLDump::GetmySQLCaseVar()
+{
+	wyString	query, dbname, casevalue;
+	wyInt32		fldindex, value;
+	wyBool		ismysql41 = wyFalse; 
+	MYSQL_RES*	res;
+	MYSQL_ROW	row;
+
+
+	ismysql41 = IsMySQL41(m_tunnel, &m_mysql);  
+
+	query.Sprintf("show variables like 'lower_case_table_names'");
+	res =SjaExecuteAndGetResult(m_tunnel, &m_mysql, query); 
+	//res = SjaExecuteAndGetResult(tunnel, mysql, query);
+	if(!res && sja_mysql_affected_rows(m_tunnel,m_mysql) == -1)
+	{
+		return 0;
+	}
+
+	fldindex = GetFieldIndex(m_tunnel, res, "Value"); 
+    row =  sja_mysql_fetch_row(m_tunnel, res);
+	if(!row)
+	{
+		sja_mysql_free_result(m_tunnel, res);
+		return 0;
+	}
+	
+	casevalue.SetAs(row[fldindex], ismysql41);
+	sja_mysql_free_result(m_tunnel, res);
+
+	value = casevalue.GetAsInt32();
+
+	return value; 
+}
+
+
+wyBool
+MySQLDump::IsLowercaseFS()
+{
+	wyString	query, dbname, casevalue;
+	wyInt32		fldindex;
+	wyBool		ismysql41 = wyFalse; 
+	MYSQL_RES*	res;
+	MYSQL_ROW	row;
+	wyBool		islowercasefs;
+
+
+	ismysql41 = IsMySQL41(m_tunnel, &m_mysql);  
+
+	query.Sprintf("show variables like 'lower_case_file_system'");
+	res =SjaExecuteAndGetResult(m_tunnel, &m_mysql, query); 
+	//res = SjaExecuteAndGetResult(tunnel, mysql, query);
+	if(!res && sja_mysql_affected_rows(m_tunnel, m_mysql) == -1)
+	{
+		return wyTrue;
+	}
+
+	fldindex = GetFieldIndex(m_tunnel, res, "Value"); 
+    row =  sja_mysql_fetch_row(m_tunnel, res);
+	if(!row)
+	{
+		sja_mysql_free_result(m_tunnel, res);
+		return wyTrue;
+	}
+	
+	casevalue.SetAs(row[fldindex], ismysql41);
+	if(casevalue.CompareI("ON") == 0)
+		islowercasefs = wyTrue;
+	else
+		islowercasefs = wyFalse;
+
+	sja_mysql_free_result(m_tunnel, res);
+	return islowercasefs; 
+}
+
 
 wyBool
 MySQLDump::DumpProcedures(wyString * buffer, const wyChar *db)
@@ -1047,13 +1124,17 @@ MySQLDump::DumpProcedures(wyString * buffer, const wyChar *db)
 	MYSQL_ROW	row = NULL;
 	wyString	query;
     wyInt32     err = 0;
-
+	wyBool		iscollate = wyFalse;
 	if(IsMySQL5010(m_tunnel, &m_mysql) == wyFalse)
 		return wyTrue;
 
 	m_routine(m_lpparam, "stored procedures", 0, FETCHDATA);
-	
-	GetSelectProcedureStmt(db, query);
+
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVar() == 0)
+		if(!IsLowercaseFS())
+			iscollate = wyTrue;
+	GetSelectProcedureStmt(db, query, iscollate);
 
     res = SjaExecuteAndGetResult(m_tunnel, &m_mysql, query);
 	if(!res)
@@ -1110,13 +1191,17 @@ MySQLDump::DumpFunctions(wyString * buffer, const wyChar *db)
 	MYSQL_ROW	row = NULL;
 	wyString	query;
     wyInt32     err = 0;
-	
+	wyBool		iscollate = wyFalse;
 	if(IsMySQL5010(m_tunnel, &m_mysql) == wyFalse)
 		return wyTrue;
 
 	m_routine(m_lpparam, "functions", 0, FETCHDATA);
-	
-	GetSelectFunctionStmt(db, query);
+
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVar() == 0)
+		if(!IsLowercaseFS())
+			iscollate = wyTrue;
+	GetSelectFunctionStmt(db, query, iscollate);
 
     res = SjaExecuteAndGetResult(m_tunnel, &m_mysql, query); 
 
@@ -1175,13 +1260,17 @@ MySQLDump::DumpEvents(wyString * buffer, const wyChar *db)
 	wyString	query;
     wyInt32     err = 0;
 	wyBool      seteventschdule;
-
+	wyBool		iscollate = wyFalse;
 	if(IsMySQL516(m_tunnel, &m_mysql) == wyFalse)
 		return wyTrue;
 
 	m_routine(m_lpparam, "events", 0, FETCHDATA);
-		
-	GetSelectEventStmt(db, query);
+
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVar() == 0)
+		if(!IsLowercaseFS())
+			iscollate = wyTrue;	
+	GetSelectEventStmt(db, query, iscollate);
 
     res = SjaExecuteAndGetResult(m_tunnel, &m_mysql, query); 
 

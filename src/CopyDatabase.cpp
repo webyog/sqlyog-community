@@ -1499,17 +1499,23 @@ CopyDatabase::ExportEventsOnParentNotExpanded(HWND hwndtree)
 	MYSQL_ROW	myrow;
 	wyBool		ismysql41 = ((GetActiveWin())->m_ismysql41), ret;
 	MDIWindow   *wnd;
-	
+	wyBool		iscollate = wyFalse;
 	VERIFY(wnd = GetActiveWin());
 	if(!wnd)
 		return wyFalse;
-	
+
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVariable(wnd) == 0)
+		if(!IsLowercaseFS(wnd))
+			iscollate = wyTrue;
 	//fetching list from server
 	m_gui_routine((void*)m_gui_lparam, "events", 0, wyFalse, FETCHCOPYDATA);
-
-	query.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s' COLLATE utf8_bin", 
+	if(iscollate)
+		query.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s' COLLATE utf8_bin", 
 					m_srcdb.GetString());
-
+	else
+		query.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s' ", 
+					m_srcdb.GetString());
 	myres = ExecuteAndGetResult(wnd, m_srctunnel, m_srcmysql, query);
 	if(!myres)
 	{
@@ -1774,23 +1780,33 @@ CopyDatabase::HandleProcedureFunOnParentNotExpanded(HWND hwndtree, wyBool isproc
 	MYSQL_ROW	myrow;
 	wyBool		ismysql41, ret;
 	MDIWindow   *wnd = NULL;
-
+	wyBool		iscollate = wyFalse;
 	VERIFY(wnd = GetActiveWin());
 	if(!wnd)
         return wyFalse;
 
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVariable(wnd) == 0)
+		if(!IsLowercaseFS(wnd))
+			iscollate = wyTrue;
 	ismysql41 = wnd->m_ismysql41;
 
 	if(isproc == wyTrue)
 	{
-		m_gui_routine((void*)m_gui_lparam, "procedures", 0, wyFalse, FETCHCOPYDATA);	
-		query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'PROCEDURE'",m_srcdb.GetString());
+		m_gui_routine((void*)m_gui_lparam, "procedures", 0, wyFalse, FETCHCOPYDATA);
+		if(iscollate)
+			query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'PROCEDURE'",m_srcdb.GetString());
+		else
+			query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' and ROUTINE_TYPE = 'PROCEDURE'",m_srcdb.GetString());
 	}
 	
 	else
 	{
 		m_gui_routine((void*)m_gui_lparam, "functions", 0, wyFalse, FETCHCOPYDATA);	
-		query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'FUNCTION'",m_srcdb.GetString());	
+		if(iscollate)
+			query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'FUNCTION'",m_srcdb.GetString());	
+		else
+			query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' and ROUTINE_TYPE = 'FUNCTION'",m_srcdb.GetString());	
 	}
 	
 	myres = ExecuteAndGetResult(wnd, m_srctunnel, m_srcmysql,query);

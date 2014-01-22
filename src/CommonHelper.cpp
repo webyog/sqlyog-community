@@ -1110,30 +1110,39 @@ GetSelectViewStmt(const wyChar *db, wyString &selectstmt)
 	return len;
 }
 wyInt32 
-GetSelectProcedureStmt(const wyChar *db, wyString &selectstmt)
+GetSelectProcedureStmt(const wyChar *db, wyString &selectstmt, wyBool iscollate)
 {
 	wyInt32 len;
  	wyString dbname(db);    // This will convert to Widechar to UTF8 format.
 	// depends on the preferences we can go for whether to use "show" command or not 
-	len = selectstmt.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'PROCEDURE'", dbname.GetString());
+	if(iscollate)
+		len = selectstmt.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'PROCEDURE'", dbname.GetString());
+	else
+		len = selectstmt.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' and ROUTINE_TYPE = 'PROCEDURE'", dbname.GetString());
 	return len;
 }
 
 wyInt32 
-GetSelectFunctionStmt(const wyChar *db, wyString &selectstmt)
+GetSelectFunctionStmt(const wyChar *db, wyString &selectstmt, wyBool iscollate)
 {
 	wyInt32 len;
 	wyString dbnamestr(db);
 	// depends on the preferences we can go for whether to use "show" command or not 
-	len = selectstmt.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'FUNCTION'", dbnamestr.GetString());
+	if(iscollate)
+		len = selectstmt.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'FUNCTION'", dbnamestr.GetString());
+	else
+		len = selectstmt.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s'and ROUTINE_TYPE = 'FUNCTION'", dbnamestr.GetString());
 	return len;
 }
 wyInt32 
-GetSelectEventStmt(const wyChar *db, wyString &selectstmt)
+GetSelectEventStmt(const wyChar *db, wyString &selectstmt, wyBool iscollate)
 {
 	wyInt32 len = 0;
 	wyString dbnamestr(db);
-	len = selectstmt.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s' COLLATE utf8_bin order by EVENT_NAME", dbnamestr.GetString());
+	if(iscollate)
+		len = selectstmt.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s' COLLATE utf8_bin order by EVENT_NAME", dbnamestr.GetString());
+	else
+		len = selectstmt.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s' order by EVENT_NAME", dbnamestr.GetString());
 	return len;
 }
 

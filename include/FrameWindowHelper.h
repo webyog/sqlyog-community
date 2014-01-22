@@ -349,7 +349,7 @@
 #define     TEXTFILE									L"TEXT Files(*.txt)\0*.txt\0All Files(*.*)\0*.*\0"
 #define		BMPFILE										L"Bitmap(*.bmp)\0*.bmp\0All Files(*.*)\0*.*\0"
 #define		ACCESSFILE									L"Access Files(*.mdb, *.accdb)\0*.mdb;*.accdb\0All Files(*.*)\0*.*\0"
-#define		EXCELFILE									L"Excel Files(*.xls, *.xlsx)\0*.xls;*.xlsx\0All Files(*.*)\0*.*\0"
+#define		EXCELFILE									L"Excel Files(*.xls, *.xlsx, *.xlsm, *.xlsb)\0*.xls;*.xlsx;*.xlsm;*.xlsb\0All Files(*.*)\0*.*\0"
 //#define     QUERYXML                                    L"XML Files(*.queryxml)\0*.queryxml\0All Files(*.*)\0*.*\0"
 //#define     SQLYOG_FILES								L"SQLyog Files(*.sql; *.queryxml; *.schemaxml)\0*.sql;*.queryxml;*.schemaxml\0All Files(*.*)\0*.*\0"  
 #define		PPKFILE									    L"PuTTY Private Key Files(*.ppk)\0*.ppk\0All Files(*.*)\0*.*\0"
