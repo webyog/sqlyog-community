@@ -149,6 +149,7 @@ enum enum_server_command
 #define CLIENT_MULTI_RESULTS     (1UL << 17)
 #define CLIENT_PS_MULTI_RESULTS  (1UL << 18)
 #define CLIENT_PLUGIN_AUTH       (1UL << 19)
+#define CLIENT_CONNECT_ATTRS     (1UL << 20)
 #define CLIENT_PROGRESS          (1UL << 29) /* client supports progress indicator */
 #define CLIENT_SSL_VERIFY_SERVER_CERT (1UL << 30)
 #define CLIENT_REMEMBER_OPTIONS  (1UL << 31)
@@ -173,7 +174,8 @@ enum enum_server_command
                                  CLIENT_MULTI_RESULTS |\
                                  CLIENT_PROGRESS |\
 		                             CLIENT_SSL_VERIFY_SERVER_CERT |\
-                                 CLIENT_REMEMBER_OPTIONS)
+                                 CLIENT_REMEMBER_OPTIONS |\
+                                 CLIENT_CONNECT_ATTRS)
 
 #define CLIENT_CAPABILITIES	(CLIENT_LONG_PASSWORD |\
                                  CLIENT_LONG_FLAG |\
@@ -182,7 +184,8 @@ enum enum_server_command
                                  CLIENT_MULTI_RESULTS | \
                                  CLIENT_PS_MULTI_RESULTS |\
                                  CLIENT_PROTOCOL_41 |\
-                                 CLIENT_PLUGIN_AUTH)
+                                 CLIENT_PLUGIN_AUTH |\
+                                 CLIENT_CONNECT_ATTRS)
 
 #define CLIENT_DEFAULT_FLAGS ((CLIENT_SUPPORTED_FLAGS & ~CLIENT_COMPRESS)\
                                                       & ~CLIENT_SSL)
@@ -217,6 +220,16 @@ typedef struct st_vio Vio;
 
 #define MAX_CHAR_WIDTH		255	/* Max length for a CHAR colum */
 #define MAX_BLOB_WIDTH		8192	/* Default width for blob */
+
+/* the following defines were added for PHP's mysqli and pdo extensions: 
+   see: CONC-56
+*/
+#define MAX_TINYINT_WIDTH     3
+#define MAX_SMALLINT_WIDTH    5
+#define MAX_MEDIUMINT_WIDTH   8
+#define MAX_INT_WIDTH        10
+#define MAX_BIGINT_WIDTH     20
+
 
 typedef struct st_net {
   Vio *vio;

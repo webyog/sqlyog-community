@@ -136,7 +136,9 @@ extern my_string my_strndup(const char *from, size_t length, myf MyFlags);
 #pragma alloca
 #endif /* _AIX */
 #if defined(__GNUC__) && !defined(HAVE_ALLOCA_H)
+#ifndef alloca
 #define alloca __builtin_alloca
+#endif
 #endif /* GNUC */
 #define my_alloca(SZ) alloca((size_t) (SZ))
 #define my_afree(PTR) {}

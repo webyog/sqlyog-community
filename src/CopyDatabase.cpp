@@ -2747,7 +2747,7 @@ CopyDatabase::ExportActualData(wyChar * table)
         if(IsCopyStopped() == wyTrue)
             break;
 	
-	}while(m_newsrctunnel->IsTunnel()&& rowcount > endrowcount);
+	}while((m_newsrctunnel->IsTunnel() && rowcount > endrowcount) || (!m_newsrctunnel->IsTunnel() && ischunkinsert && rowcount > endrowcount));
 
 	insertstmt.Clear();
 	m_gui_routine((void*)m_gui_lparam, table, exportedrowcount, wyTrue, ROWSCOPIED);

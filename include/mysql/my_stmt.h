@@ -25,6 +25,9 @@
 #define MYSQL_DATA_TRUNCATED 101
 #define MYSQL_DEFAULT_PREFETCH_ROWS (unsigned long) 1
 
+/* Bind flags */
+#define MADB_BIND_DUMMY 1
+
 
 #define SET_CLIENT_STMT_ERROR(a, b, c, d) \
 { \
@@ -94,7 +97,7 @@ typedef struct st_mysql_bind
   unsigned long  buffer_length;
   unsigned long  offset;           /* offset position for char/binary fetch */
   unsigned long  length_value;     /* Used if length is 0 */
-  unsigned int   param_number;     /* For null count and error messages */
+  unsigned int   flags;            /* special flags, e.g. for dummy bind  */
   unsigned int   pack_length;      /* Internal length for packed data */
   enum enum_field_types buffer_type;  /* buffer type */
   my_bool        error_value;      /* used if error is 0 */
@@ -215,6 +218,8 @@ extern MYSQL_PS_CONVERSION mysql_ps_fetch_functions[MYSQL_TYPE_GEOMETRY + 1];
 unsigned long net_safe_read(MYSQL *mysql);
 void mysql_init_ps_subsystem(void);
 unsigned long net_field_length(unsigned char **packet);
+int simple_command(MYSQL *mysql,enum enum_server_command command, const char *arg,
+          	       size_t length, my_bool skipp_check, void *opt_arg);
 /*
  *  function prototypes
  */

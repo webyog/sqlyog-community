@@ -297,7 +297,9 @@ typedef unsigned short ushort;
 
 #if defined(__GNUC__)
 #define function_volatile	volatile
+#ifndef my_reinterpret_cast
 #define my_reinterpret_cast(A) reinterpret_cast<A>
+#endif
 #define my_const_cast(A) const_cast<A>
 #elif !defined(my_reinterpret_cast)
 #define my_reinterpret_cast(A) (A)
@@ -329,14 +331,6 @@ typedef unsigned short ushort;
 #define MIN_ARRAY_SIZE	0	/* Zero or One. Gcc allows zero*/
 #define ASCII_BITS_USED 8	/* Bit char used */
 #define NEAR_F			/* No near function handling */
-
-struct st_mysql_lex_string
-{
-  char *str;
-  size_t length;
-};
-typedef struct st_mysql_lex_string LEX_STRING;
-typedef struct st_mysql_lex_string MYSQL_LEX_STRING;
 
 /* Some types that is different between systems */
 
@@ -650,6 +644,7 @@ typedef long long int longlong;
 typedef unsigned long	ulonglong;	/* ulong or unsigned long long */
 typedef long		longlong;
 #endif
+#define longlong_defined
 #endif
 
 #ifndef MIN
@@ -748,7 +743,7 @@ typedef char		bool;	/* Ordinary boolean values 0 1 */
 
 #define NOT_FIXED_DEC 31
 
-#ifdef _WIN32
+#if defined(_WIN32) && defined(_MSVC)
 #define MYSQLND_LLU_SPEC "%I64u"
 #define MYSQLND_LL_SPEC "%I64d"
 #ifndef L64

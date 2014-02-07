@@ -275,3 +275,4 @@
 #define SHAREDIR "share"
 #define DEFAULT_CHARSET_HOME "C:/Program Files (x86)/mariadb-client"
 #define PLUGINDIR "C:/Program Files (x86)/mariadb-client/lib/plugin"
+

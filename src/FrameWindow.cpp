@@ -3443,10 +3443,10 @@ FrameWindow::OnToolTipInfo(LPNMTTDISPINFO lpnmtdi)
 	    case IDM_EXECUTE:
 		    if(wnd && wnd->m_executing)
 			    wcscpy(string, L"Stop Execution");
-			else if(wnd /*&& wnd->m_pingexecuting*/)
-			{
-				break;
-			}
+			//else if(wnd /*&& wnd->m_pingexecuting*/)
+			//{
+			//	break;
+			//}
 		    else
 		    {
 			    if(pGlobals->m_isrefreshkeychange == wyFalse)

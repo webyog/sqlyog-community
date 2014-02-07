@@ -1,4 +1,6 @@
-/* Copyright (C) 2000 MySQL AB & MySQL Finland AB & TCX DataKonsult AB
+/************************************************************************************
+    Copyright (C) 2000, 2012 MySQL AB & MySQL Finland AB & TCX DataKonsult AB,
+                 Monty Program AB
    
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -11,11 +13,13 @@
    Library General Public License for more details.
    
    You should have received a copy of the GNU Library General Public
-   License along with this library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-   MA 02111-1307, USA */
+   License along with this library; if not see <http://www.gnu.org/licenses>
+   or write to the Free Software Foundation, Inc., 
+   51 Franklin St., Fifth Floor, Boston, MA 02110, USA
 
-/* Dynamic hashing of record with different key-length */
+   Part of this code includes code from the PHP project which
+   is freely available from http://www.php.net
+*************************************************************************************/
 
 #ifndef _hash_h
 #define _hash_h
@@ -23,7 +27,7 @@
 extern "C" {
 #endif
 
-typedef byte *(*hash_get_key)(const byte *,uint*,my_bool);
+typedef uchar *(*hash_get_key)(const uchar *,uint*,my_bool);
 typedef void (*hash_free_key)(void *);
 
   /* flags for hash_init */
@@ -31,7 +35,7 @@ typedef void (*hash_free_key)(void *);
 
 typedef struct st_hash_info {
   uint next;					/* index to next key */
-  byte *data;					/* data for current entry */
+  uchar *data;					/* data for current entry */
 } HASH_LINK;
 
 typedef struct st_hash {
@@ -41,7 +45,7 @@ typedef struct st_hash {
   DYNAMIC_ARRAY array;				/* Place for hash_keys */
   hash_get_key get_key;
   void (*free)(void *);
-  uint (*calc_hashnr)(const byte *key,uint length);
+  uint (*calc_hashnr)(const uchar *key,uint length);
 } HASH;
 
 #define hash_init(A,B,C,D,E,F,G) _hash_init(A,B,C,D,E,F,G CALLER_INFO)
@@ -49,12 +53,12 @@ my_bool _hash_init(HASH *hash,uint default_array_elements, uint key_offset,
 		  uint key_length, hash_get_key get_key,
 		  void (*free_element)(void*), uint flags CALLER_INFO_PROTO);
 void hash_free(HASH *tree);
-byte *hash_element(HASH *hash,uint idx);
-gptr hash_search(HASH *info,const byte *key,uint length);
-gptr hash_next(HASH *info,const byte *key,uint length);
-my_bool hash_insert(HASH *info,const byte *data);
-my_bool hash_delete(HASH *hash,byte *record);
-my_bool hash_update(HASH *hash,byte *record,byte *old_key,uint old_key_length);
+uchar *hash_element(HASH *hash,uint idx);
+gptr hash_search(HASH *info,const uchar *key,uint length);
+gptr hash_next(HASH *info,const uchar *key,uint length);
+my_bool hash_insert(HASH *info,const uchar *data);
+my_bool hash_delete(HASH *hash,uchar *record);
+my_bool hash_update(HASH *hash,uchar *record,uchar *old_key,uint old_key_length);
 my_bool hash_check(HASH *hash);			/* Only in debug library */
 
 #define hash_clear(H) bzero((char*) (H),sizeof(*(H)))
