@@ -2649,7 +2649,7 @@ CExportResultSet::SaveDataAsHTML(HANDLE hfile)
 
 	buffer.Add("<title>query data</title>\r\n");
 
-	buffer.Add("<style type=\"text/css\" <!--\r\n.normal {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px; font-weight: normal; color: #000000}\r\n.medium {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 15px; font-weight: bold; color: #000000; text-decoration: none}\r\n--></style>\r\n</head>\r\n");
+	buffer.Add("<style type=\"text/css\"> <!--\r\n.normal {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px; font-weight: normal; color: #000000}\r\n.medium {  font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 15px; font-weight: bold; color: #000000; text-decoration: none}\r\n--></style>\r\n</head>\r\n");
 
 	buffer.Add("<body>\r\n<h3>query result</h3>");
 	

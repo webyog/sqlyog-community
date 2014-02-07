@@ -35,6 +35,7 @@ int my_ssl_close(Vio *vio);
 size_t my_ssl_write(Vio *vio, const uchar* buf, size_t size);
 SSL *my_ssl_init(MYSQL *mysql);
 int my_ssl_connect(SSL *ssl);
+int my_ssl_verify_server_cert(SSL *ssl);
 
 int my_ssl_start(MYSQL *mysql);
 void my_ssl_end(void);

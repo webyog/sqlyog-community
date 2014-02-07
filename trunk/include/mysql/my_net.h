@@ -41,6 +41,8 @@ extern "C" {
 #define h_errno errno
 #endif
 
+void my_inet_ntoa(struct in_addr in, char *buf);
+
 #ifdef	__cplusplus
 }
 #endif

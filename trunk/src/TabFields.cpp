@@ -4300,7 +4300,8 @@ TabFields::OnClickMoveUp()
     if(selrow <=0)
         return;
 	cwrapobj1 = (FieldStructWrapper *) CustomGrid_GetRowLongData(m_hgridfields, selrow);
-	cwrapobj1->m_ischanged = wyTrue;
+	if(cwrapobj1)
+		cwrapobj1->m_ischanged = wyTrue;
     /// Exchangin row values
     ExchangeRowValues(selrow - 1, selrow);
 
@@ -4326,7 +4327,8 @@ TabFields::OnClickMoveDown()
     
     CustomGrid_ApplyChanges(m_hgridfields, wyTrue);
 	cwrapobj1 = (FieldStructWrapper *) CustomGrid_GetRowLongData(m_hgridfields, selrow);
-	cwrapobj1->m_ischanged = wyTrue;
+	if(cwrapobj1)
+		cwrapobj1->m_ischanged = wyTrue;
     /// Exchangin row values
     ExchangeRowValues(selrow, selrow + 1);
 
