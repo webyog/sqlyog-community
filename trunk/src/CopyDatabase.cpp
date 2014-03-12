@@ -77,6 +77,7 @@ CopyDatabase::CopyDatabase()
 	m_tgtsshpipehandles.m_hwritepipe2 = INVALID_HANDLE_VALUE;
 
     m_selalltables = wyFalse;
+	m_isremdefiner = wyFalse;
 }
 
 CopyDatabase::~CopyDatabase()
@@ -564,7 +565,13 @@ CopyDatabase::OnWmCommand(HWND hwnd, WPARAM wparam)
 	case IDCANCEL:
 		yog_enddialog(hwnd, 0);
 		break;
-
+	case IDC_CPY_DEFINER:
+		if(SendMessage(GetDlgItem(hwnd, IDC_CPY_DEFINER), BM_GETCHECK, 0, 0) == BST_CHECKED)
+			m_isremdefiner = wyTrue;
+		else
+			m_isremdefiner = wyFalse;
+		//m_isremdefiner = m_isremdefiner?wyFalse:wyTrue;
+		break;
 	case IDC_SOURCEDB:
 		if(HIWORD(wparam) == CBN_SELCHANGE)
 			OnCBSelChange(hwnd);
@@ -626,7 +633,7 @@ CopyDatabase::AddInitData()
 	m_p->Add(m_hwnddlg, IDC_STRUCDATA, "StrucData", "1", CHECKBOX);
 	m_p->Add(m_hwnddlg, IDC_STRUC, "StrucOnly", "0", CHECKBOX);
 	m_p->Add(m_hwnddlg, IDC_CPY_BULKINSERT, "CpyBulkInsert", "1", CHECKBOX);
-
+	m_p->Add(m_hwnddlg, IDC_CPY_DEFINER, "RemoveDefiner", "0", CHECKBOX);
     if(wnd)
         m_srcinfo = &wnd->m_conninfo;
 	
@@ -665,7 +672,11 @@ CopyDatabase::AddInitData()
 	EnableDisable(IDC_STRUC);
 
 	EnableWindow(GetDlgItem(m_hwnddlg, IDC_SUMMARY), wyFalse);
-
+	
+    if(SendMessage(GetDlgItem(m_hwnddlg, IDC_CPY_DEFINER), BM_GETCHECK, 0, 0) == BST_CHECKED)
+		m_isremdefiner = wyTrue;
+	else
+		m_isremdefiner = wyFalse;
 	//Initialise the treeview
 	InitializeTree(m_hwnddlg, m_srcdb.GetString(), flag);
 
@@ -1131,7 +1142,10 @@ CopyDatabase::InitExportData(HWND hwndtree)
 			
 	// let us see if user wants data also.
 	m_exportdata =(wyBool)SendMessage(GetDlgItem(m_hwnddlg, IDC_STRUCDATA), BM_GETCHECK, 0, 0);
-    	
+    if(SendMessage(GetDlgItem(m_hwnddlg, IDC_CPY_DEFINER), BM_GETCHECK, 0, 0) == BST_CHECKED)
+		m_isremdefiner = wyTrue;
+	else
+		m_isremdefiner = wyFalse;
 	InitTargetServer();	
 	SetNamesToUTF8();	
 
@@ -2842,7 +2856,7 @@ CopyDatabase::ExportView(const wyChar *db, const wyChar *view)
 	 wyString       query, tquery;
 	 MYSQL_RES		*res, *tgtres;
 	 MYSQL_ROW		row;
-     
+     wyString pattern("DEFINER=`.*`@`.*`\\sSQL\\sSECURITY");
 	query.Sprintf("drop table if exists `%s`.`%s`", m_targetdb.GetString(), view);
 
 	res = SjaExecuteAndGetResult(m_newtargettunnel, &m_newtargetmysql, query);
@@ -2876,7 +2890,8 @@ CopyDatabase::ExportView(const wyChar *db, const wyChar *view)
     row = m_newsrctunnel->mysql_fetch_row(res);
 	
 	tquery.SetAs(row[1]);
-
+	if(m_isremdefiner)
+		RemoveDefiner(tquery, pattern.GetString(), 12);
     //StripDatabase(tquery, m_srcdb.GetString());
 
     tgtres = SjaExecuteAndGetResult(m_newtargettunnel, &m_newtargetmysql, tquery);
@@ -2903,14 +2918,22 @@ CopyDatabase::ExportSP(const wyChar *db, const wyChar *sp, wyBool isproc)
 	 wyString       query, tquery,strmsg;
 	 MYSQL_RES		*res, *tgtres;
 	 MYSQL_ROW		row;
-	 
-
+	 wyString pattern("DEFINER=`.*`@`.*`\\s");
+	 wyInt32 extra;
 	 if(m_dropobjects)
 	 {
 		if(isproc)
+		{
+			pattern.AddSprintf("PROCEDURE");
+			extra = 9;
 			query.Sprintf("drop procedure if exists `%s`.`%s`", m_targetdb.GetString(), sp);
-		 else
+		}
+		else
+		{
+			pattern.AddSprintf("FUNCTION");
+			extra = 8;
 			query.Sprintf("drop function if exists `%s`.`%s`", m_targetdb.GetString(), sp);
+		}
 
         res = SjaExecuteAndGetResult(m_newtargettunnel, &m_newtargetmysql, query);
 	    if(res)
@@ -2941,7 +2964,8 @@ CopyDatabase::ExportSP(const wyChar *db, const wyChar *sp, wyBool isproc)
 	}
 
 	tquery.SetAs(row[2]);
-		
+	if(m_isremdefiner)
+		RemoveDefiner(tquery, pattern.GetString(), extra);	
 	//StripDatabase(tquery, m_srcdb.GetString());
 	
     tgtres = SjaExecuteAndGetResult(m_newtargettunnel, &m_newtargetmysql, tquery);
@@ -2971,7 +2995,7 @@ CopyDatabase::ExportEvent(const wyChar *db, const wyChar *event)
 	wyString     query, eventstr;	
 	MYSQL_ROW    row;
 	wyInt32      index = 0;
-
+	wyString	pattern("DEFINER=`.*`@`.*`\\sEVENT");
 	if(m_dropobjects == wyTrue)
 	{  
 		//drop event if event is exists in the target 
@@ -3007,7 +3031,8 @@ CopyDatabase::ExportEvent(const wyChar *db, const wyChar *event)
 		return wyFalse;
 	
 	eventstr.SetAs(row[index]);
-
+	if(m_isremdefiner)
+		RemoveDefiner(eventstr, pattern.GetString(), 5);
 	res = SjaExecuteAndGetResult(m_newtargettunnel, &m_newtargetmysql, eventstr);
 
 	if(!res && (m_newtargetmysql)->affected_rows == -1)
@@ -3135,7 +3160,8 @@ CopyDatabase::CreateTemporaryTables(const wyChar *db, const wyChar *view)
 	MYSQL_ROW		row;
 
 	MDIWindow		*wnd = GetActiveWin();
-
+	wyString pattern("DEFINER=`.*`@`.*`\\sSQL\\sSECURITY");
+	
 	 /* Create a dummy table for the view. ie. a table  which has the
            same columns as the view should have. This table is dropped
            just before the view is created. The table is used to handle the
@@ -3199,7 +3225,8 @@ CopyDatabase::CreateTemporaryTables(const wyChar *db, const wyChar *view)
 	
 
 		m_newsrctunnel->mysql_free_result(res);
-
+		if(m_isremdefiner)
+			RemoveDefiner(query, pattern.GetString(), 12);
         res = SjaExecuteAndGetResult(m_newtargettunnel, &m_newtargetmysql, query);
         
         if(!res && (m_newtargetmysql)->affected_rows == -1)
@@ -3238,7 +3265,7 @@ CopyDatabase::EnableDlgWindows(wyBool enable)
     EnableWindow(GetDlgItem(m_hwnddlg, IDC_STRUCDATA), state);
     EnableWindow(GetDlgItem(m_hwnddlg, IDC_STRUC), state);
 	EnableWindow(GetDlgItem(m_hwnddlg, IDC_CPY_BULKINSERT), state);
-	
+	EnableWindow(GetDlgItem(m_hwnddlg, IDC_CPY_DEFINER), state);
 
     if(m_is5xobjects == wyTrue)
         EnableWindow(GetDlgItem(m_hwnddlg, IDC_CHK_DROPOBJECTS), state);
@@ -3398,6 +3425,7 @@ CopyDatabase::GetCtrlRects()
         IDC_GROUP4, 1, 0,
         IDC_DROP, 0, 0,
         IDC_CPY_BULKINSERT, 0, 0,
+		IDC_CPY_DEFINER, 0, 0,
         IDC_SUMMARY, 0, 0,
 		IDC_INVISIBLE, 0, 0,
         IDOK, 0, 0,
@@ -3457,6 +3485,7 @@ CopyDatabase::PositionCtrls()
 				case IDC_STRUC:
 				case IDC_DROP:
 				case IDC_CPY_BULKINSERT:
+				case IDC_CPY_DEFINER:
 					x = (rect.right - rect.left)/2 + 8 ;
 					break;
 				case IDC_SUMMARY:

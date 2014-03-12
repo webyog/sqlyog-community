@@ -239,6 +239,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Announcements.cpp" />
     <ClCompile Include="..\src\AutoCompleteInterface.cpp" />
     <ClCompile Include="..\src\BlobMgmt.cpp" />
     <ClCompile Include="..\src\ButtonDropDown.cpp" />
@@ -381,6 +382,7 @@
     <ClCompile Include="..\src\wyTheme.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\Announcements.h" />
     <ClInclude Include="..\include\AppInfo.h" />
     <ClInclude Include="..\include\AutoCompleteInterface.h" />
     <ClInclude Include="..\include\BlobMgmt.h" />

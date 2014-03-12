@@ -145,6 +145,7 @@ MySQLDump::MySQLDump()
 	m_rowcount = 0;
 	m_startpose = 0;
 	m_iscommit = wyFalse;
+	m_isremdefiner = wyFalse;
 
 	m_abortonerr = wyTrue;
 	m_compress = wyFalse;
@@ -611,6 +612,13 @@ void
 MySQLDump::SetInsertDelayed(wyBool val)
 {
     m_optdelayed =	val;
+	return;
+}
+
+void
+MySQLDump::SetDefiner(wyBool flag)
+{
+	m_isremdefiner = flag;
 	return;
 }
 
@@ -1370,32 +1378,33 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 		return OnError();
 		
 	//Definer
-	if(ismysql5017 == wyTrue)
-	{
-		if(!row[7])
-			return OnError();
-
-		def.SetAs(row[7]);	
-
-		if(def.GetLength())
+	if(!m_isremdefiner)
+		if(ismysql5017 == wyTrue)
 		{
-			ch = strrchr((wyChar*)def.GetString(), '@');
+			if(!row[7])
+				return OnError();
+
+			def.SetAs(row[7]);	
+
+			if(def.GetLength())
+			{
+				ch = strrchr((wyChar*)def.GetString(), '@');
 			
-			pos = ch - def.GetString();
+				pos = ch - def.GetString();
 			
-			if(pos > 0)
-			{	
-				def.Substr(0, pos);
+				if(pos > 0)
+				{	
+					def.Substr(0, pos);
 
-				ch++;
+					ch++;
 
-				deftemp.Sprintf("'%s'@'%s'", def.Substr(0, pos), ch);
+					deftemp.Sprintf("'%s'@'%s'", def.Substr(0, pos), ch);
 
-				//Keeps the definer
-				definer.Sprintf("/*!50017 DEFINER = %s */", deftemp.GetString()); 
+					//Keeps the definer
+					definer.Sprintf("/*!50017 DEFINER = %s */", deftemp.GetString()); 
+				}
 			}
 		}
-	}
 		
     buffer->AddSprintf("%s/* Trigger structure for table `%s` */%s", 
         m_strnewline.GetString(), row[2], m_strnewline.GetString());
@@ -1410,7 +1419,18 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 		buffer->AddSprintf("/*!50032 IF EXISTS */ /*!50003 `%s` */$$%s",  trigger, m_strnewline.GetString());
 	}
 	
-	buffer->AddSprintf("%s/*!50003 CREATE */ %s /*!50003 TRIGGER `%s` %s %s ON `%s` FOR EACH ROW %s */$$%s%s", 
+	if(m_isremdefiner)
+		buffer->AddSprintf("%s/*!50003 CREATE */ /*!50003 TRIGGER `%s` %s %s ON `%s` FOR EACH ROW %s */$$%s%s", 
+						m_strnewline.GetString(),
+						row[0], /* Trigger */
+						row[4], /* Timing */
+						row[1], /* Event */
+						row[2], /* table */
+						row[3], /*  Statement */
+                        m_strnewline.GetString(),
+                        m_strnewline.GetString());
+	else
+		buffer->AddSprintf("%s/*!50003 CREATE */ %s /*!50003 TRIGGER `%s` %s %s ON `%s` FOR EACH ROW %s */$$%s%s", 
 						m_strnewline.GetString(),
                         definer.GetString(), /*Definer*/
 						row[0], /* Trigger */
@@ -3171,7 +3191,7 @@ MySQLDump::DumpView(wyString * buffer, const wyChar *db, const wyChar *view, wyI
 	MYSQL_RES		*res;
 	MYSQL_ROW		row;
 	wyString		dbname(db);
-
+	wyString pattern("DEFINER=`.*`@`.*`\\sSQL\\sSECURITY");
 	 if(m_individualtablefiles == wyTrue )
         if(OnIndividualFiles(buffer, view, fileerr) == wyFalse)
              return wyFalse;
@@ -3195,7 +3215,8 @@ MySQLDump::DumpView(wyString * buffer, const wyChar *db, const wyChar *view, wyI
 		buffer->AddSprintf("%s/*!50001 DROP VIEW IF EXISTS `%s` */;%s", m_strnewline.GetString(), view, m_strnewline.GetString());
 		
 	strview.SetAs(row[1]);
-
+	if(m_isremdefiner)
+		RemoveDefiner(strview, pattern.GetString(), 12);
 	//StripDatabase(strview, dbname.GetString());
 
 	buffer->AddSprintf("%s/*!50001 %s */;%s", m_strnewline.GetString(), strview.GetString(), m_strnewline.GetString());   
@@ -3222,7 +3243,8 @@ MySQLDump::DumpProcedure(wyString * buffer, const wyChar *db, const wyChar *proc
 	wyBool			ret = wyTrue;
 	wyString		dbname(db);
 	wyString		strprocedure, strmsg;
-
+	wyString		pattern("DEFINER=`.*`@`.*`\\sPROCEDURE");
+	//pattern.AddSprintf("`%s`",procedure);
 	if(m_individualtablefiles == wyTrue )
     {
         if(OnIndividualFiles(buffer, procedure, fileerr) == wyFalse)
@@ -3249,7 +3271,8 @@ MySQLDump::DumpProcedure(wyString * buffer, const wyChar *db, const wyChar *proc
 		m_error.SetAs(strmsg);
 		return wyFalse;
 	}
-
+	if(m_isremdefiner)
+		RemoveDefiner(strprocedure, pattern.GetString(), 9);
 	// writing to the file
 	buffer->AddSprintf("%s/* Procedure structure for procedure `%s` */%s", m_strnewline.GetString(), procedure, m_strnewline.GetString());
 	
@@ -3294,7 +3317,7 @@ MySQLDump::DumpEvent(wyString * buffer, const wyChar * db, const wyChar * event,
 	 MYSQL_ROW		row;
 	 wyString		dbname(db);
 	 wyInt32        index = 0;
-
+	 wyString	pattern("DEFINER=`.*`@`.*`\\sEVENT");
 	 if(m_individualtablefiles == wyTrue )
     {
         if(OnIndividualFiles(buffer, event, fileerr) == wyFalse)
@@ -3344,7 +3367,8 @@ MySQLDump::DumpEvent(wyString * buffer, const wyChar * db, const wyChar * event,
 	buffer->AddSprintf("%sDELIMITER $$%s", m_strnewline.GetString(), m_strnewline.GetString());
 	
 	strevent.SetAs(row[index]);
-
+	if(m_isremdefiner)
+		RemoveDefiner(strevent, pattern.GetString(), 5);
 	//StripDatabase(strevent, db);
 	
 	buffer->AddSprintf("%s/*!50106 ", m_strnewline.GetString());
@@ -3379,7 +3403,8 @@ MySQLDump::DumpFunction(wyString * buffer, const wyChar *db, const wyChar *funct
 	wyString		strfunction, strmsg;
     wyBool			ret = wyTrue;
 	wyString		dbname(db);
-	
+	wyString pattern("DEFINER=`.*`@`.*`\\sFUNCTION");
+	//pattern.AddSprintf("`%s`",function);
 	if(m_individualtablefiles == wyTrue )
      {
         if(OnIndividualFiles(buffer, function, fileerr) == wyFalse)
@@ -3402,7 +3427,8 @@ MySQLDump::DumpFunction(wyString * buffer, const wyChar *db, const wyChar *funct
 		m_error.SetAs(strmsg);
 		return wyFalse;
 	}
-
+	if(m_isremdefiner)
+		RemoveDefiner(strfunction, pattern.GetString(), 8);
 	//Adding to buffer
 	buffer->AddSprintf("%s/* Function  structure for function  `%s` */%s", m_strnewline.GetString(), function, m_strnewline.GetString());
 	

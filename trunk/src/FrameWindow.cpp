@@ -58,8 +58,11 @@
 #include "TabIndexes.h"
 #include "DataView.h"
 #include "CCustomComboBox.h"
+#include "Http.h"
+#include "htmlayout.h"
 
 #ifndef COMMUNITY
+#include "RegistrationApi.h"
 #include "TabSchemaDesigner.h"
 #include "TabQueryBuilder.h"
 #include "HttpError.h"
@@ -262,6 +265,8 @@ FrameWindow::Create()
     RegisterDataWindow(m_hinstance);
     RegisterPlainWindow(m_hinstance);
 	RegisterPQAResultwindow(m_hinstance);
+	RegisterAnnouncementswindow(m_hinstance);
+	RegisterAnnouncementsMainwindow(m_hinstance);
 	RegisterHTMLInfoTabwindow(m_hinstance);
 	RegisterHTMLFormViewWindow(m_hinstance);
 	RegisterHTMLDbSearchWindow(m_hinstance);
@@ -620,6 +625,52 @@ FrameWindow::RegisterPQAResultwindow(HINSTANCE hinstanceent)
 	wndclass.hbrBackground =(HBRUSH)(COLOR_BTNFACE+1);
 	wndclass.lpszMenuName  = NULL ;
 	wndclass.lpszClassName = PQA_RESULT_WINDOW;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::RegisterAnnouncementswindow(HINSTANCE hinstanceent)
+{
+	ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wndclass.lpfnWndProc   = Announcements::AnnounceWndProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hinstanceent ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground =(HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = NULL ;
+	wndclass.lpszClassName = ANNOUNCEMENTS_WINDOW;	
+	
+	VERIFY(ret = RegisterClass(&wndclass));
+
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::RegisterAnnouncementsMainwindow(HINSTANCE hinstanceent)
+{
+	ATOM		ret;
+	WNDCLASS	wndclass;
+	
+	// Register the main window.
+	wndclass.style         = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+	wndclass.lpfnWndProc   = Announcements::AnnounceWndMainProc;
+	wndclass.cbClsExtra    = 0;
+	wndclass.cbWndExtra    = sizeof(HANDLE);
+	wndclass.hInstance     = hinstanceent ;
+	wndclass.hIcon         = LoadIcon(NULL, IDI_APPLICATION);
+	wndclass.hCursor       = LoadCursor(NULL, IDC_ARROW);
+	wndclass.hbrBackground =(HBRUSH)(COLOR_BTNFACE+1);
+	wndclass.lpszMenuName  = NULL ;
+	wndclass.lpszClassName = ANNOUNCEMENTS_MAIN_WINDOW;	
 	
 	VERIFY(ret = RegisterClass(&wndclass));
 
@@ -6458,8 +6509,9 @@ wyInt32
 FrameWindow::ONWmMainWinNotify(HWND hwnd, LPARAM lparam, WPARAM wparam)
 {
 	LPNMHDR			lpnmhdr =(LPNMHDR)lparam;
-	HWND            hwndwindow, hwndtemp;
+	HWND            hwndwindow, hwndtemp,wndann;
 	MDIWindow       *wnd,*tempwnd = NULL;
+	MDIWindow		*mdiwndann = NULL;
     HMENU           hmenu, htrackmenu;
     POINT           pnt;
 	
@@ -6538,7 +6590,12 @@ FrameWindow::ONWmMainWinNotify(HWND hwnd, LPARAM lparam, WPARAM wparam)
 				}
 				else
 				{
+					tempwnd = GetActiveWin();
+					mdiwndann = (MDIWindow*)tempwnd;
+
 				    SendMessage(GetActiveWin()->m_hwndparent, WM_MDIACTIVATE, (WPARAM)hwndwindow, 0);
+					if(mdiwndann && pGlobals->m_isannouncementopen) 
+						mdiwndann->m_isanncreate = wyTrue;
 				}
 
 				//Set the flag of custom WM_MDINEXT message to false
@@ -7108,6 +7165,8 @@ FrameWindow::OnWmSize(WPARAM wparam)
 	//Repaint tha tabs
 	if(m_connection)
 		m_connection->RepaintTabs(wparam);
+	if(pGlobals->m_pcquerywnd)
+		pGlobals->m_pcquerywnd->m_isanncreate = wyTrue;
 
 	return 0;
 }
@@ -8137,9 +8196,15 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 	ConnectionInfo	conninfo;
     wyWChar path[MAX_PATH+1] ={0};
 	wyString		failedconnections;
-
+	HANDLE thread_handle;
     InitializeConnectionInfo(conninfo);
-
+	SYSTEMTIME	systime ={0};
+	DWORD		currntday = 0, lastchkdday = 0;
+	wyString	dirstr;
+	wyWChar		directory[MAX_PATH +1]={0}, *lpfileport;
+	wyString	keyvaluestr, currentdate;
+	UpgradeCheck upg;
+	wyBool		isannthread = wyFalse;
 	VERIFY(IsWindow(pGlobals->m_hwndclient));
 	
 	pGlobals->m_pcmainwin->AddTextInStatusBar(CONNECT_MYSQL_MSG);
@@ -8154,7 +8219,31 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 		UpdateWindow(wnd->m_pcqueryobject->m_hwnd);
 	}*/
 
-
+	//call thread only during startup
+	//read last chect date time from ini
+	if(readsession)
+	{
+		SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+		if(directory)
+		{
+			dirstr.SetAs(directory);
+		}
+		if(dirstr.GetLength())
+		{
+			ret = wyIni::IniGetString(GENERALPREFA, "AnnouncementsCheckedDate", "0", &keyvaluestr, dirstr.GetString());
+			lastchkdday = strtoul(keyvaluestr.GetString(), NULL, 10); 
+		}
+		GetSystemTime(&systime);		
+		currntday = upg.HandleSetDayFormat(systime.wDay, systime.wMonth, systime.wYear);
+		currentdate.Sprintf("%lu", currntday);
+		if(currntday > lastchkdday && currntday - lastchkdday >= 1)
+		//if(TRUE)
+		{
+			isannthread = wyTrue;
+			thread_handle = (HANDLE)_beginthreadex(NULL, 0, Htmlannouncementsproc, NULL, 0, NULL);
+			pGlobals->m_isannouncementopen = wyFalse;
+		}
+	}
 	//check if pref option says do not open restore connection dlg
 	if(readsession && IsConnectionRestore() && GetSessionFile(path))
 	{
@@ -8204,6 +8293,7 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 		// info.
 		if(pcquerywnd)
         {
+			pGlobals->m_pcquerywnd = pcquerywnd;
 			pGlobals->m_conncount++;
             pGlobals->m_pcmainwin->SetConnectionNumber();
 			pGlobals->m_pcmainwin->OnActiveConn();
@@ -8214,6 +8304,28 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 		}
 
 		break;
+	}
+	if(readsession && isannthread)
+	{
+		if(WaitForSingleObject (thread_handle, 5000) == WAIT_TIMEOUT )
+		{
+			//pGlobals->m_announcementshtml.SetAs("");
+			pGlobals->m_isannouncementopen = wyFalse;
+		}
+		else
+		{
+			pGlobals->m_isannouncementopen = wyTrue;
+			if(pGlobals->m_pcquerywnd !=NULL)
+			{
+				if(pGlobals->m_announcementshtml.GetLength()!= 0)
+					pGlobals->m_pcquerywnd->Resize();
+				else
+					pGlobals->m_isannouncementopen = wyFalse;
+					
+				//write date time to ini
+				wyIni::IniWriteString(GENERALPREFA, "AnnouncementsCheckedDate", currentdate.GetString(), dirstr.GetString());
+			}
+		}
 	}
 
 	SetCursor(LoadCursor(NULL, IDC_ARROW));
@@ -8884,6 +8996,7 @@ ConnectFromList(wyString* failledconnections)
 				if(my_arg[j].isfocussed)
 				{	
 					focussedconn = j;
+					pGlobals->m_pcquerywnd = pcquerywnd;
 				}
 
 			}
@@ -8920,3 +9033,97 @@ ConnectFromList_mt(void* arg_list)
     return 0;
 }
 
+
+
+unsigned __stdcall  
+Htmlannouncementsproc(void *arg)
+{
+	CHttp		http;
+	char		*received=NULL;
+	int status;
+	const wyChar    *langcode;
+	wyString productid, appmajorversion, appminorversion, extrainfo, url, htmlbuffer;
+	wyWChar		headers[1024*3] = {0};
+	wyUInt32 daysleft = 0;
+
+	//Gets the product id(Ent, Commmunity or Trial)
+#ifdef COMMUNITY
+	productid.SetAs("Community");
+#elif ENTERPRISE
+	//SQLyog versions
+	if(!pGlobals)
+		return 1;
+
+	if(!pGlobals->m_entlicense.CompareI("Professional"))
+		productid.SetAs("Pro");
+		
+	else if(!pGlobals->m_entlicense.CompareI("Enterprise"))
+		productid.SetAs("Ent");
+
+	else if(!pGlobals->m_entlicense.CompareI("Ultimate"))			
+		productid.SetAs("Ulti");	
+	
+		
+#else
+	productid.SetAs("Trial");
+	GetTimeDifference(&daysleft);
+#endif
+	
+	productid.EscapeURL();
+	//Major and minor version num
+	appmajorversion.SetAs(MAJOR_VERSION);
+	appminorversion.SetAs(MINOR_VERSION UPDATE_VERSION);
+	extrainfo.SetAs(EXTRAINFO); // beta string	
+			
+	url.SetAs("http://www.webyog.com/notifications/sqlyog");
+
+#ifdef _WIN64
+
+		url.AddSprintf("?user_type=%s&major_version=%s&minor_version=%s&extra=%s&os=win64&language=%s&uuid=%s", productid.GetString(), 
+		appmajorversion.GetString(), appminorversion.GetString(), extrainfo.GetString(), 
+        (langcode = GetL10nLangcode()) ? langcode : "en", 
+        pGlobals->m_appuuid.GetString());
+#else
+		url.AddSprintf("?user_type=%s&major_version=%s&minor_version=%s&extra=%s&os=win32&language=%s&uuid=%s", productid.GetString(), 
+		appmajorversion.GetString(), appminorversion.GetString(), extrainfo.GetString(), 
+        (langcode = GetL10nLangcode()) ? langcode : "en", 
+        pGlobals->m_appuuid.GetString());
+#endif
+
+    if(pGlobals->m_regname.GetLength()>0)
+		url.AddSprintf("&regname=%s",pGlobals->m_regname.GetString());
+	if(daysleft > 0 && daysleft <= 7)
+		url.AddSprintf("&trialends=1");
+    //no of days left 
+	http.SetUrl(url.GetAsWideChar());
+	http.SetContentType(L"text/xml");
+	//if(!http.SendData("<xml><connect_info><host e='0'>192.168.1.115</host><user e='0'>root</user><password e='0'>root</password><port e='0'>3337</port></connect_info><query_info><query b='0' e='0'>select version()</query><querylen>16</querylen></query_info></xml>", 240, false, &status, false ))
+	if(!http.SendData("abc", 3, false, &status, false ))
+	{
+		goto cleanup;
+	}
+	if(!http.GetAllHeaders(headers, sizeof(headers)))
+	{
+		goto cleanup;
+	}
+	if(status != HTTP_STATUS_OK )
+	{
+		goto cleanup;
+	}
+	
+	received = http.GetResponse();
+	if(!received)
+	{
+		goto cleanup;
+	}
+	htmlbuffer.SetAs(received);
+	//if(HTMLayoutLoadHtml((HWND)NULL, (PBYTE)htmlbuffer.GetString(), htmlbuffer.GetLength()))
+	//{
+		pGlobals->m_announcementshtml.SetAs(received);
+
+	//}
+
+cleanup:
+	//_sleep(5000);
+    return 0;
+}

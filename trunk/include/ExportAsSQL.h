@@ -111,6 +111,7 @@ typedef struct __schdextra_options
 	wyBool	  m_createfunction;
 	wyBool	  m_createtrigger;
 	wyBool	  m_dropobjects;
+	wyBool	  m_definer;
 	wyBool	  m_dropview;
 	wyBool	  m_dropfunction;
 	wyBool	  m_dropprocedure;
@@ -622,6 +623,8 @@ private:
 
     wyString        m_strnewline;
 
+	wyBool			m_isremdefiner;
+
 #if !defined _WIN32 || defined _CONSOLE 
 	CWyZip			m_zip;
 #endif
@@ -944,6 +947,7 @@ public:
 	*/
 	void			SetChunkLimit			(wyInt32 val);
 
+	void			SetDefiner				(wyBool flag);
 	/// Sets the bulk size 
 	/**
 	@param val			: IN Size of the bulk

@@ -244,7 +244,8 @@ public:
     @return wyTrue is success, otherwise wyFalse
     */
 	wyBool					RegisterPQAResultwindow(HINSTANCE hinstanceent);
-
+	wyBool					RegisterAnnouncementswindow(HINSTANCE hinstanceent);
+	wyBool					RegisterAnnouncementsMainwindow(HINSTANCE hinstanceent);
 	/// Function registers the HTML window for object tab(shown result in html format)
     /**
     @param hinstance            : IN Handle to the instance
@@ -1634,4 +1635,5 @@ public:
 	}MY_ARG;
 void	ConnectFromList(wyString* failledconnections);
 unsigned __stdcall  ConnectFromList_mt(void* arg_list);
+unsigned __stdcall  Htmlannouncementsproc(void* arg);
 #endif

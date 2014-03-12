@@ -39,6 +39,9 @@
 #include "TabQueryBuilder.h"
 #include "TabSchemaDesigner.h"
 #include "DatabaseSearch.h"
+//#include "htmlayout.h"
+//#include "QueryAnalyzerBase.h"
+//#include "htmlrender.h"
 #endif
 
 extern	PGLOBALS		pGlobals;
@@ -973,14 +976,17 @@ CQueryObject::GetHwnd()
 // the verical, horizontal splitter and the status bar at the bottom.
 
 void
-CQueryObject::Resize()
+CQueryObject::Resize(wyBool isannouncements, wyBool isstart)
 {
 	MDIWindow			*wnd			= (MDIWindow*)GetWindowLongPtr(m_hwndparent, GWLP_USERDATA);
 	FrameWindowSplitter		*pcqueryvsplitter	= wnd->GetVSplitter();
 
 	RECT                rcmain, rcvsplitter;
 	wyInt32             ret;
-	wyInt32             hpos, vpos, width, height, widthEditFilter;
+	wyInt32             hpos, vpos, width, height, widthEditFilter, htmlh;
+	
+	if(isannouncements && wnd->m_isanncreate == wyFalse)
+		pcqueryvsplitter->Resize(wyTrue);
 
 	VERIFY(GetClientRect(m_hwndparent, &rcmain));
 	VERIFY(GetWindowRect(pcqueryvsplitter->GetHwnd(), &rcvsplitter));
@@ -991,14 +997,20 @@ CQueryObject::Resize()
 	width			=	rcvsplitter.left-2;
     widthEditFilter =   (width - 26) > 0 ? (width - 26) : 0;
 	height			=	rcmain.bottom - (2 * vpos) - 10;
+    htmlh			=   (wyInt32)(0.2 * height);
+	htmlh+=2;
+
     
     MoveWindow(m_hwndStParent, 2, 2, width, vpos * 2 + 6, TRUE);
     MoveWindow(m_hwndStMsg, 6, 4, width - 28, vpos - 5, TRUE);
     
     MoveWindow(m_hwndFilter, 2, vpos, widthEditFilter + 22, vpos - 2, TRUE); 
     
-    VERIFY(ret = MoveWindow(m_hwnd, hpos, (vpos * 2) + 8, width, height, TRUE));
-    
+	if(!isannouncements)
+		VERIFY(ret = MoveWindow(m_hwnd, hpos, (vpos * 2) + 8, width, height, TRUE));
+	else
+		VERIFY(ret = MoveWindow(m_hwnd, hpos, (vpos * 2) + 8, width, height - htmlh, TRUE));
+
     InvalidateRect(m_hwndStMsg, NULL, TRUE);
     InvalidateRect(m_hwnd, NULL, TRUE);
     InvalidateRect(m_hwndFilter, NULL, TRUE);

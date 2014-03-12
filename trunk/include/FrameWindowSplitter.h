@@ -53,7 +53,7 @@ public:
     /**
     @returns wyBool, wyTrue always
     */
-	wyBool      Resize();
+	wyBool      Resize(wyBool isannouncements = wyFalse);
 
     /// Helps to Resize connection window
     /**

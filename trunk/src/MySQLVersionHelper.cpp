@@ -394,6 +394,19 @@ IsMySQL565(Tunnel *tunnel, PMYSQL mysql)
 		return wyFalse;
 }
 
+//fractional seconds support
+wyBool
+IsMySQL564MariaDB53(Tunnel *tunnel, PMYSQL mysql)
+{
+    long me = mysql_get_server_version(*mysql);/* Only available from MySQLv4.1*/
+    const char *dbString = mysql_get_server_info(*mysql);
+
+	if((me >= 50604 && !strstr(dbString, "MariaDB"))||(me >= 50300 && strstr(dbString, "MariaDB")))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
 wyBool
 IsMySQL502(Tunnel * tunnel, PMYSQL mysql)
 {

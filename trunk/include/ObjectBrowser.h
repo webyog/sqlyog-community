@@ -75,7 +75,7 @@ public:
     /// Resize the object browser. 
     /**
     */
-	void		Resize();
+	void		Resize(wyBool isannouncements = wyFalse, wyBool isstart = wyFalse);
 
     /// Function to create the object browser.
     /**
@@ -1001,6 +1001,7 @@ public:
 
     HWND        m_hwndStClear;
 
+	HWND        m_hwndHTML;
 
     WNDPROC     m_stWndProc;
 
