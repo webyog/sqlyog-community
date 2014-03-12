@@ -2756,6 +2756,9 @@ InitGlobals(PGLOBALS pg)
     pg->m_ishistoryunderquery = wyFalse;
 	pg->m_prefpersist = 0;
 	pg->m_conrestore = wyFalse;
+	pg->m_isannouncementopen = wyTrue;
+	pg->m_pcquerywnd = NULL;
+	pg->m_announcements = NULL;
     return;
 }
     

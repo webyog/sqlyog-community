@@ -267,7 +267,7 @@ wyInt32 GetFieldIndex(Tunnel *tunnel, MYSQL_RES * result, wyChar * colname);
 @returns wyTrue on success else wyFalse
 */
 wyBool  GetCreateTriggerString(HWND hwnd , Tunnel * tunnel, PMYSQL mysql, const wyChar *db, 
-                               const wyChar *trigger, wyString &strtrigger, wyString &strmsg);
+                               const wyChar *trigger, wyString &strtrigger, wyString &strmsg, wyBool isdefiner = wyFalse);
 #endif
 
 /// Get Error
@@ -898,6 +898,8 @@ void	RotateBitRight(unsigned char *str);
 @returns void
 */
 void    RotateBitLeft (unsigned char *str);
+
+void    RemoveDefiner(wyString &text, const wyChar* pattern, wyInt32 extra);
 
 //void DebugLog(const char *buffer);
 #ifdef _WIN32

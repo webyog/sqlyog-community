@@ -154,6 +154,8 @@ MDIWindow::MDIWindow(HWND hwnd, ConnectionInfo * conninfo, wyString &dbname, wyS
     m_hevtkeepalive = NULL;
 	m_hevtexecution = NULL;
 	m_postactivatemsg = wyTrue;
+	m_announcements = NULL;
+	m_isanncreate = wyFalse;
 }
 
 MDIWindow::~MDIWindow()
@@ -184,7 +186,8 @@ MDIWindow::Create(wyBool iscon_res, ConnectionInfo* conninfo)
 	SelectDefaultDatabase();
 	SetObjBrowVis();
 	SetResultTextOrGrid();
-
+	if(m_announcements)
+		m_isanncreate = wyTrue;
 	//title for  connection tab
    if(m_filterdb.GetLength())
    {
@@ -1767,10 +1770,43 @@ void
 MDIWindow::Resize()
 {
 	m_pcqueryvsplitter->Resize();
+	m_pctabmodule->Resize();
 
-	m_pctabmodule->Resize();	
-	m_pcqueryobject->Resize();
+	if(pGlobals->m_isannouncementopen)
+	{
+		if(m_announcements)
+		{
 
+			m_pcqueryobject->Resize(wyTrue);
+			m_pctabmodule->Resize();	
+			m_announcements->Resize(m_pcqueryobject->m_hwndparent);
+			
+		}
+		else
+		{
+			m_announcements = new Announcements();
+			if(m_announcements->HandleAnnouncementsCheck(m_pcqueryobject->m_hwndparent))
+			{
+				m_pcqueryobject->Resize(wyTrue, wyTrue);
+				m_announcements->Resize(m_pcqueryobject->m_hwndparent, wyTrue);
+				m_pcqueryvsplitter->Resize(wyTrue);
+				m_pctabmodule->Resize();
+			}
+			else
+			{
+				pGlobals->m_isannouncementopen = wyFalse;
+			}
+		}
+	}
+	else
+	{
+		if(m_announcements)
+		{
+			delete m_announcements;
+			m_announcements = NULL;
+		}
+		m_pcqueryobject->Resize();
+	}
 	return;
 }
 

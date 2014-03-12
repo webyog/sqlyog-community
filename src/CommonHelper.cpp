@@ -25,13 +25,12 @@
 #include <string>
 #include <stddef.h>
 #include <assert.h>
-
+#include "pcre.h"
 #include "Verify.h"
 #include "AppInfo.h"
 #include "CommonHelper.h" 
 #include "L10nText.h"
 #include "SQLTokenizer.h"
-
 #ifdef COMMUNITY 
 #include "Global.h"
 #else
@@ -641,7 +640,7 @@ GetFieldIndex(Tunnel *tunnel, MYSQL_RES * result, wyChar * colname)
 
 #ifdef _WIN32
 wyBool 
-GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *trigger, wyString &strtrigger, wyString &strmsg)
+GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *trigger, wyString &strtrigger, wyString &strmsg, wyBool isdefiner)
 {
 	wyInt32		pos;
 	wyChar		*ch = NULL;
@@ -684,21 +683,22 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 			
 	
 	//Trigger Definer
-	if(ismysql5017 == wyTrue) 
-	{
-		coldefiner = GetFieldIndex(tunnel, myres, "Definer");
+	if(!isdefiner)
+		if(ismysql5017 == wyTrue) 
+		{
+			coldefiner = GetFieldIndex(tunnel, myres, "Definer");
 
-		if(coldefiner == -1)
-		{
-			sja_mysql_free_result(tunnel, myres);
-			return wyFalse;
-		}
+			if(coldefiner == -1)
+			{
+				sja_mysql_free_result(tunnel, myres);
+				return wyFalse;
+			}
 		
-		if(myrow[coldefiner])
-		{
-			definer.SetAs(myrow[coldefiner], ismysql41);
+			if(myrow[coldefiner])
+			{
+				definer.SetAs(myrow[coldefiner], ismysql41);
+			}
 		}
-	}
 
 	//Trigger Table
 	coltablename = GetFieldIndex(tunnel, myres, "Table");
@@ -740,24 +740,25 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	}
 		
 	//Parse the Definer and inserts single quotes ('user'@'host')
-	if(definer.GetLength())
-	{
-		ch = strrchr((wyChar*)definer.GetString(), '@');
+	if(!isdefiner)
+		if(definer.GetLength())
+		{
+			ch = strrchr((wyChar*)definer.GetString(), '@');
 		
-		pos = ch - definer.GetString();
+			pos = ch - definer.GetString();
 		
-		if(pos > 0)
-		{	
-			definer.Substr(0, pos);
+			if(pos > 0)
+			{	
+				definer.Substr(0, pos);
 
-			ch++;
+				ch++;
 
-			deftemp.Sprintf("'%s'@'%s'", definer.Substr(0, pos), ch);
+				deftemp.Sprintf("'%s'@'%s'", definer.Substr(0, pos), ch);
 
-			//Keeps the definer
-			def.Sprintf("/*!50017 DEFINER = %s */", deftemp.GetString()); 
+				//Keeps the definer
+				def.Sprintf("/*!50017 DEFINER = %s */", deftemp.GetString()); 
+			}
 		}
-	}
 		
 	//if(myrow && myrow[0] && myrow[1] && myrow[3] && myrow[4])
 	if(myrow && myrow[colevent] && myrow[colstmt] && myrow[coltiming] && myrow[coltablename])
@@ -766,8 +767,11 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 			FMT_SPACE_4, def.GetString(), FMT_SPACE_4,db, myrow[0], myrow[4], myrow[1], db, table, FMT_SPACE_4, myrow[3]);*/
 		/*strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
 			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, myrow[0], myrow[4], myrow[1], table, FMT_SPACE_4, myrow[3]);*/
-
-		strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
+		if(isdefiner)
+			strtrigger.Sprintf("CREATE\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
+			FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, myrow[colstmt]);
+		else
+			strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
 			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, myrow[colstmt]);
     }
     else
@@ -3200,7 +3204,7 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
 	wyFile					plinklock;
 	HANDLE					namedmutex;
 	SECURITY_ATTRIBUTES		lpMutexAttributes;
-
+	wyString				escuser,escpass;
 	lpMutexAttributes.bInheritHandle = TRUE;
 	lpMutexAttributes.lpSecurityDescriptor = NULL;
 	lpMutexAttributes.nLength = sizeof(lpMutexAttributes);
@@ -3232,17 +3236,21 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
 		return 1;		/* createprocess failed */
 	}
 
+	escuser.SetAs(conninfo->m_sshuser.GetString());
+	escpass.SetAs(conninfo->m_sshpwd.GetString());
+	escuser.FindAndReplace("\"","\"\"");
+	escpass.FindAndReplace("\"","\"\"");
     if(conninfo->m_ispassword == wyTrue)
     {
 	    appname.Sprintf("\"%s\" -ssh -l \"%s\" -pw \"%s\" -L %d:%s:%d -P %d \"%s\"", 
-						fullpath, conninfo->m_sshuser.GetString(), conninfo->m_sshpwd.GetString(), 
+						fullpath, escuser.GetString(), escpass.GetString(), 
                         conninfo->m_localport, conninfo->m_host.GetString(), conninfo->m_port, 
                         conninfo->m_sshport, conninfo->m_sshhost.GetString());
     }
     else
     {
         appname.Sprintf("\"%s\" -ssh -l \"%s\" -pw \"%s\" -L %d:%s:%d -P %d %s -i \"%s\"", 
-						fullpath, conninfo->m_sshuser.GetString(), conninfo->m_sshpwd.GetString(), 
+						fullpath, escuser.GetString(), escpass.GetString(), 
                         conninfo->m_localport, conninfo->m_host.GetString(), conninfo->m_port, 
                         conninfo->m_sshport, conninfo->m_sshhost.GetString(), conninfo->m_privatekeypath.GetString());
 
@@ -4120,6 +4128,61 @@ EncodePassword(wyString &text)
 		free(encode);
 
 	return wyTrue;
+}
+
+//wyInt32 extra : part of the pattern that should not be erased but only used in pattern for matching
+void
+RemoveDefiner(wyString &text, const wyChar* pattern, wyInt32 extra)
+{
+	//wyString pattern("DEFINER=`.*`@`.*`\\s");
+	wyInt32   regexret = 0;	
+	wyInt32   ovector[30];  
+	pcre           *re;
+	wyInt32         erroffset, rc = -1;//, i = 0;
+	wyInt32         subject_length;	
+	const char      *error;
+	wyString        tempstr;
+
+	
+
+	subject_length = (wyInt32)strlen(text.GetString());
+
+	re = pcre_compile(
+		pattern,              /* the pattern */
+		PCRE_UTF8|PCRE_CASELESS|PCRE_NEWLINE_CR,/* default options */ //match is a case insensitive 
+		&error,               /* for error message */
+		&erroffset,           /* for error offset */
+		NULL);                /* use default character tables */
+
+	/* Compilation failed: print the error message and exit */
+
+	if (re == NULL)
+		return ; 
+
+	/*************************************************************************
+	* If the compilation succeeded, we call PCRE again, in order to do a     *
+	* pattern match against the subject string. This does just ONE match *
+	*************************************************************************/
+
+	rc = pcre_exec(
+	re,                   /* the compiled pattern */
+	NULL,                 /* no extra data - we didn't study the pattern */
+	text.GetString(),              /* the subject string */
+	subject_length,       /* the length of the subject */
+	0,                    /* start at offset 0 in the subject */
+	PCRE_NO_UTF8_CHECK,             /* default options */
+	ovector,              /* output vector for substring information */
+	30);           /* number of elements in the output vector */
+
+	if(re)
+		pcre_free(re);
+
+	if(rc == 1)
+	{
+		text.Erase(ovector[0], ovector[1]-ovector[0]-extra);
+	}
+
+
 }
 //void DebugLog(const char *buffer)
 //{

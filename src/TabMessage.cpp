@@ -244,6 +244,10 @@ TabMessage::CopyTextToClipBoard()
         {
             selstartpos = selstart;
             len -= (selstartpos - linestartpos);
+			if(i == lineend)
+			{
+				len = selend - selstartpos;
+			}
         }
         else if(i == lineend)
         {

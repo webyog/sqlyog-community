@@ -259,6 +259,7 @@ public:
     //flag tells whether to select only tables
     wyBool          m_selalltables;
 
+	wyBool          m_isremdefiner;
 	/// List to store the dialogbox component values
 	
 	List				m_controllist;

@@ -144,7 +144,7 @@ FrameWindowSplitter::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
 
 // function to resize the splitter window.
 wyBool
-FrameWindowSplitter::Resize()
+FrameWindowSplitter::Resize(wyBool isannouncements)
 {
 	RECT	parentrect;
 	LONG	ret;
@@ -157,26 +157,32 @@ FrameWindowSplitter::Resize()
     parentrect.bottom -= 2;
     parentrect.left += 2;
     parentrect.right -= 2;
+	if(isannouncements)
+	{
+		//force splitter to 22% of the screen for announcements window
+		//m_rect.left = 272;
+		m_leftortoppercent = 22;
+	}
 
-		m_rect.left     = (long)((parentrect.right *((long)m_leftortoppercent /(float)100)));
-		m_rect.top      = parentrect.top; //set the splitter size same as other controls
-        m_rect.right    = m_width;
-		m_rect.bottom   = parentrect.bottom - m_rect.top;
+	m_rect.left     = (long)((parentrect.right *((long)m_leftortoppercent /(float)100)));
+	m_rect.top      = parentrect.top; //set the splitter size same as other controls
+    m_rect.right    = m_width;
+	m_rect.bottom   = parentrect.bottom - m_rect.top;
 
-        if(m_rect.left < 2)
-        {
-            m_rect.left = 2;
-        }
+    if(m_rect.left < 2)
+    {
+        m_rect.left = 2;
+    }
 
-        if(m_rect.left + m_width > parentrect.right)
-        {
-            m_rect.left = parentrect.right - m_width;
-        }
+    if(m_rect.left + m_width > parentrect.right)
+    {
+        m_rect.left = parentrect.right - m_width;
+    }
 		
-		if(pcquerywnd->m_isobjbrowvis == wyTrue)
-			pGlobals->m_pcmainwin->SetSplitterPos(&m_rect, m_leftortoppercent);
+	if(pcquerywnd->m_isobjbrowvis == wyTrue)
+		pGlobals->m_pcmainwin->SetSplitterPos(&m_rect, m_leftortoppercent);
 
-    	VERIFY(ret = MoveWindow(m_hwnd, m_rect.left, m_rect.top, m_rect.right, m_rect.bottom, TRUE));
+    VERIFY(ret = MoveWindow(m_hwnd, m_rect.left, m_rect.top, m_rect.right, m_rect.bottom, TRUE));
 
 	return wyTrue;
 }

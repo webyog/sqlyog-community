@@ -46,6 +46,7 @@ class CAddUser;
 class Tunnel;
 class List;
 class wyString;
+class Announcements;
 
 
 #define IS_NUMBER(t) ((t)==FIELD_TYPE_LONG || (t)==FIELD_TYPE_LONGLONG || (t)==FIELD_TYPE_DECIMAL || (t)==FIELD_TYPE_DOUBLE || (t)==FIELD_TYPE_FLOAT || (t)==FIELD_TYPE_INT24 || (t)==FIELD_TYPE_YEAR || (t)==FIELD_TYPE_SHORT || (t)==FIELD_TYPE_TINY || (t)== FIELD_TYPE_NEWDECIMAL)
@@ -701,6 +702,11 @@ typedef struct tagGlobals
     wyBool      m_ishistoryunderquery;
 	wyInt32		m_prefpersist;
 	wyBool		m_conrestore;
+	wyBool		m_isannouncementopen;
+	wyString	m_announcementshtml;
+	wyString	m_regname;
+	MDIWindow	*m_pcquerywnd;
+	Announcements	*m_announcements;
 } GLOBALS, *PGLOBALS;
 
 

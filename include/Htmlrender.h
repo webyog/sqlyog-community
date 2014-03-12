@@ -154,6 +154,23 @@ LRESULT OnLoadData(LPNMHL_LOAD_DATA pnmld)
 	  return LoadResourceData(pnmld->hdr.hwndFrom, pnmld->uri);
   }
 
+//static
+//LRESULT OnCreateControl(LPNMHL_CREATE_CONTROL pnmld)
+//  {
+////    ATLTRACE(_T("CHTMLayoutHost::OnLoadData: uri='%s'\n"), CString(pnmld->uri));
+//
+//    // Try to load data from resource and if failed, proceed with default processing.
+//    // Note that this code assumes that the host and control windows are the same. If
+//    // you are handling HTMLayout control notification in another window, you'll have
+//    // to override this method and provide proper hWnd.
+//
+// //   T* pT = static_cast<T*>(this);
+//    
+//   // ATLASSERT(::IsWindow(pT->m_hWnd));
+//	  //pnmld->helement->G
+//	  return 0;
+//  }
+
 static
 LRESULT CALLBACK HTMLayoutNotifyHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LPVOID vParam)
 {

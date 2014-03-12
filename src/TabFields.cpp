@@ -3440,8 +3440,13 @@ TabFields::HandleDataTypeValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &ind
 	CustomGrid_SetBoolValue     (hwndgrid, row, AUTOINCR+ index, GV_FALSE);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyTrue);
 	CustomGrid_SetBoolValue     (hwndgrid, row, ZEROFILL+ index, GV_FALSE);
-	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue);
-	CustomGrid_SetText			(hwndgrid, row, LENGTH, "");
+	if(!IsMySQL564MariaDB53(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql))
+	{
+		CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue);
+		CustomGrid_SetText			(hwndgrid, row, LENGTH, "");
+	}
+	else
+		CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 
     if(m_autoincrowid == row)
         m_autoincrowid = -1;
@@ -3491,6 +3496,12 @@ TabFields::HandleTimeStampValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &in
 	CustomGrid_SetBoolValue     (hwndgrid, row, AUTOINCR+ index, GV_FALSE);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyTrue);
 	CustomGrid_SetBoolValue     (hwndgrid, row, ZEROFILL+ index, GV_FALSE);
+	if(!IsMySQL564MariaDB53(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql))
+	{
+		CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue);
+		CustomGrid_SetText			(hwndgrid, row, LENGTH, "");
+	}
+	else
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 
     if(m_autoincrowid == row)
@@ -3538,7 +3549,13 @@ TabFields::HandleTimeValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
 	CustomGrid_SetBoolValue     (hwndgrid, row, AUTOINCR+ index, GV_FALSE);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyTrue);
 	CustomGrid_SetBoolValue     (hwndgrid, row, ZEROFILL+ index, GV_FALSE);
-	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue);
+	if(!IsMySQL564MariaDB53(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql))
+	{
+		CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue);
+		CustomGrid_SetText			(hwndgrid, row, LENGTH, "");
+	}
+	else
+		CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 
     if(m_autoincrowid == row)
         m_autoincrowid = -1;
@@ -3554,7 +3571,7 @@ TabFields::HandleTimeValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
         cwrapobj->m_newval->m_len.Clear();
     }
 
-	CustomGrid_SetText			(hwndgrid, row, LENGTH, "");
+	
 	return wyTrue;
 }
 

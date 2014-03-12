@@ -493,6 +493,7 @@
 #define IDC_WARNING                     1093
 #define IDC_SETUNIQUE                   1093
 #define IDC_BULKINSERT                  1094
+#define IDC_CHK_DEFINER                 1095
 #define IDC_NULLREPLACEBY               1098
 #define IDC_OBFONT                      1099
 #define IDC_NULLCHAR                    1099
@@ -716,6 +717,7 @@
 #define IDC_STATIC_MYSQLERROR           1461
 #define IDC_TRANSACTIONENABLE           1467
 #define IDC_CPY_BULKINSERT              1467
+#define IDC_CPY_DEFINER                 1468
 #define IDC_POWERTOOLSRESTOREALL        1469
 #define IDC_OTHERSRESTOREALL            1469
 #define IDC_NOTNOW                      1488
@@ -1541,9 +1543,10 @@
 #define ACCEL_VDDTOOL                   41796
 #define IDC_INITCOMMAND                 44114
 #define IDC_EDITINITCOMMAND             44115
-#define IDC_INVISIBLE					44116
-#define IDR_SAVEPROFILERMENU              44117
+#define IDC_INVISIBLE                   44116
+#define IDR_SAVEPROFILERMENU            44117
 #define ID_OPEN_SAVEPROFILER            44118
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

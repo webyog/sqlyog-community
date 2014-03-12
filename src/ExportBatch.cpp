@@ -279,6 +279,7 @@ ExportBatch::EnableDisableOptions(wyInt32 id)
 			{
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_CREATEDB), FALSE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DROPOBJECT), FALSE);
+				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DEFINER), FALSE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_BULKINSERT), TRUE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_LOCKAROUNDINSERT), TRUE);
 			}
@@ -649,6 +650,7 @@ ExportBatch::HandleDlgPersistance(HWND hwnd)
 	m_p->Add(hwnd, IDC_CHK_FLUSHLOGS, "FlushLogs", "0", CHECKBOX);
 	m_p->Add(hwnd, IDC_SETUNIQUE, "ForeignChecks", "1", CHECKBOX);
 	m_p->Add(hwnd, IDC_CHK_DROPOBJECT , "DropObject", "1", CHECKBOX);
+	m_p->Add(hwnd, IDC_CHK_DEFINER , "RemoveDefiner", "0", CHECKBOX);
 	m_p->Add(hwnd, IDC_CHK_LOCKFORREAD, "LocksForRead", "0", CHECKBOX);
 	m_p->Add(hwnd, IDC_CHK_LOCKAROUNDINSERT, "LocksAroundInsert", "0", CHECKBOX);
 	m_p->Add(hwnd, IDC_BULKINSERT, "CreateBulk", "1", CHECKBOX);
@@ -1408,6 +1410,11 @@ ExportBatch::SetOtherValues(MySQLDump *dump)
 	if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd, IDC_SINGLE_TRANSACTION), BM_GETCHECK, 0, 0))
 		dump->SetSingleTransaction(wyTrue);
 
+	if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd, IDC_CHK_DEFINER), BM_GETCHECK, 0, 0))
+		dump->SetDefiner(wyTrue);
+	else
+		dump->SetDefiner(wyFalse);
+
 	GetWindowText(GetDlgItem(m_hwnd, IDC_EXPORTFILENAME), file, MAX_PATH);
 	
 	filename.SetAs(file);
@@ -1434,7 +1441,7 @@ ExportBatch::EnableDlgWindows(bool state)
 					 IDC_CHK_USEDBNAME, IDC_CHK_DROPTABLE, IDC_CHK_CREATEDB,
 					 IDC_CHK_LOCKFORREAD, IDC_CHK_FLUSHLOGS, IDC_CHK_LOCKAROUNDINSERT,
 					 IDC_SETUNIQUE, IDC_BULKINSERT, IDC_SINGLE_TRANSACTION, IDCANCEL, IDC_CHK_DROPPROCEDURES, IDC_CHK_DROPVIEWS,
-					 IDC_CHK_DROPFUNCTIONS, IDC_CHK_DROPTRIGGERS
+					 IDC_CHK_DROPFUNCTIONS, IDC_CHK_DROPTRIGGERS, IDC_CHK_DEFINER 
 	};
 
 	wyInt32 i, count;
@@ -1777,6 +1784,7 @@ ExportBatch::GetCtrlRects()
 		IDC_CHK_LOCKAROUNDINSERT, 0, 0,
 		IDC_BULKINSERT, 0, 0,
 		IDC_CHK_DROPOBJECT, 0, 0,
+		IDC_CHK_DEFINER, 0, 0,
 		IDC_PROGRESS, 1, 0,
 		IDC_MESSAGE2, 1, 0,
 		IDOK, 0, 0,

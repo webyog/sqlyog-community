@@ -33,6 +33,7 @@
 #include "ExportMultiFormat.h"
 #include "AutoCompleteInterface.h"	
 #include "ConnectionTab.h"
+#include "Announcements.h"
 
 #ifndef COMMUNITY
 #include "ProfilerAdvisors.h"
@@ -1005,6 +1006,8 @@ public:
 	/// Querytab object pointer
 	CQueryObject	*m_pcqueryobject;
 
+	Announcements	*m_announcements;
+
 	///	TabModule object pointer
 	TabModule	*m_pctabmodule;
 
@@ -1253,6 +1256,8 @@ public:
 	wyBool				m_postactivatemsg;
 
 	wyInt32				m_focussedcon;
+
+	wyBool				m_isanncreate;
 
 #ifndef COMMUNITY
 	///The PQA SHAOW STATUS advice array keep in Connection level

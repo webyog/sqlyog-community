@@ -199,6 +199,8 @@
 #define     TTI_INDEXES_TAB_WNDCLS                      L"TabInterfaceIndexesTabWindow"
 #define     TTI_FK_TAB_WNDCLS                           L"TabInterfaceFKTabWindow"
 #define     TTI_PREVIEW_TAB_WNDCLS                      L"TabInterfacePreviewTabWindow"
+#define		ANNOUNCEMENTS_WINDOW						L"AnnouncementsWindow"
+#define		ANNOUNCEMENTS_MAIN_WINDOW					L"AnnouncementsMainWindow"
 
 #define		CONNECTION_FILE								"connection.ini"
 #define		KEYSHORT_FILE								"keyshort.txt"
