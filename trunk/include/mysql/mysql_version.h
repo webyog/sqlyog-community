@@ -18,7 +18,7 @@
 
 #define MARIADB_PACKAGE_VERSION "1.1.2"
 #define MARIADB_SYSTEM_TYPE "Windows"
-#define MARIADB_MACHINE_TYPE "x86"
+#define MARIADB_MACHINE_TYPE "AMD64"
 
 /* mysqld compile time options */
 #ifndef MYSQL_CHARSET

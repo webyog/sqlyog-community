@@ -129,7 +129,7 @@ Announcements::Resize(HWND hwnd, wyBool isstart)
 	vpos_ob			=	(ob_height + 10) > 22 ? ob_height + 10: 22;
 	width			=	rcvsplitter.left-2;
 	height			=	rcmain.bottom - (2 * vpos_ob) - 10;
-	m_htmlh			=   (wyInt32)(0.2 * height);
+	m_htmlh			=   (wyInt32)(0.3 * height);
 	vpos			=	(vpos_ob * 2)+ 8 + height - m_htmlh; 
 
 	if( wnd->m_isanncreate == wyFalse )	

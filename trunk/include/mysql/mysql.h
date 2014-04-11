@@ -479,7 +479,7 @@ int STDCALL mysql_options4(MYSQL *mysql,enum mysql_option option,
                           const void *arg1, const void *arg2);
 MYSQL_PARAMETERS *STDCALL mysql_get_parameters(void);
 
-#include <my_stmt.h>
+#include "my_stmt.h"
   
 /* these methods can be overwritten by db plugins */
 struct st_mysql_methods {

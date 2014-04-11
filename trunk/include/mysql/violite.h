@@ -51,6 +51,10 @@ typedef struct st_vio Vio;
 #define HANDLE void *
 #endif
 
+/* vio read-ahead cachine */
+#define VIO_CACHE_SIZE 16384
+#define VIO_CACHE_MIN_SIZE 2048
+
 enum enum_vio_type { VIO_CLOSED, VIO_TYPE_TCPIP, VIO_TYPE_SOCKET,
 		     VIO_TYPE_NAMEDPIPE, VIO_TYPE_SSL};
 
@@ -139,6 +143,9 @@ struct st_vio
 #ifdef HAVE_OPENSSL
   SSL *ssl;
 #endif
+  uchar *cache;       /* read-ahead cache to reduce reads (see CONC-79) */
+  uchar *cache_pos;   /* position of read-ahead cached data */
+  size_t cache_size;  /* <= VIO_CACHE_SIZE */
 };
 
 #ifdef	__cplusplus

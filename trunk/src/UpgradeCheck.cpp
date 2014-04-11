@@ -258,9 +258,11 @@ UpgradeCheck::HandleHttpRequest(LPVOID param)
 #endif
 	if(upgrd->m_url.GetLength())
 	{	
-		CHttp		http;
+		CHttp		http, http_success;
 		wyString	ret;
-	
+		wyString	url_success;
+	    url_success.SetAs(upgrd->m_url.GetString());
+		url_success.AddSprintf("&shown=1");
 		http.SetUrl(upgrd->m_url.GetAsWideChar());
 		http.SetContentType(CONTENT_TYPE);
 
@@ -365,6 +367,9 @@ UpgradeCheck::HandleHttpRequest(LPVOID param)
 		{
 			upgrd->m_isupgrade = wyFalse;
 		}
+		http_success.SetUrl(url_success.GetAsWideChar());
+		http_success.SetContentType(CONTENT_TYPE);
+		http_success.SendData((char*)garbage.GetString(), garbage.GetLength(), false, &status, false);
 	}
 		
 	/*ret.SetAs(xmlreceived);	
