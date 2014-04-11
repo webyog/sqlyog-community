@@ -677,7 +677,10 @@ CQueryObject::SetFont()
     if(hdc)
 	ReleaseDC(m_hwnd, hdc);
 
-    Resize();
+    if(!pGlobals->m_isannouncementopen)
+		Resize();
+	else
+		Resize(wyTrue);
     
     return wyTrue;
 }
@@ -997,7 +1000,7 @@ CQueryObject::Resize(wyBool isannouncements, wyBool isstart)
 	width			=	rcvsplitter.left-2;
     widthEditFilter =   (width - 26) > 0 ? (width - 26) : 0;
 	height			=	rcmain.bottom - (2 * vpos) - 10;
-    htmlh			=   (wyInt32)(0.2 * height);
+    htmlh			=   (wyInt32)(0.3 * height);
 	htmlh+=2;
 
     

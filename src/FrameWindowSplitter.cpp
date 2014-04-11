@@ -161,7 +161,8 @@ FrameWindowSplitter::Resize(wyBool isannouncements)
 	{
 		//force splitter to 22% of the screen for announcements window
 		//m_rect.left = 272;
-		m_leftortoppercent = 22;
+		if(m_leftortoppercent < 22)
+			m_leftortoppercent = 22;
 	}
 
 	m_rect.left     = (long)((parentrect.right *((long)m_leftortoppercent /(float)100)));
