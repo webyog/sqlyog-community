@@ -435,4 +435,49 @@ public:
 
 };
 
+
+//Object Browser Color dialog box
+class RenameTabDlg
+{
+public:
+	/// Default constructor.
+    /**
+    Initializes the member variables with the default values.
+    */
+	RenameTabDlg();
+
+	 /// Default destructor
+    /**
+    Free up all the allocated resources
+    */
+	~RenameTabDlg();
+
+	/// The main dialog proc for the invalid registration dialog box.
+	/**
+	@param hwnd			: IN Windows HANDLE
+	@param message		: IN Window messages
+	@param wparam		: IN Unsigned message parameter
+	@param lparam		: IN Long message parameter
+	@returns 1 on success else 0
+	*/
+	static INT_PTR		CALLBACK RenameTabDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+	/// Displayes the dialog box
+	/**
+	@param hwnd			: Window Handler
+	*/
+	wyInt32		    ShowRenameTabDlg(HWND hwndparent);
+
+	/// Function handles the WM_COMMAND on the main dialog window
+    /** 
+    @param hwnd			: IN window handle
+    @param wparam		: IN WPARAM value returned by the window procedure
+    @returns void
+    */
+    void            OnWmColorCommand(HWND hwnd, WPARAM wparam, LPARAM lParam);
+
+	//wyBool			m_changecolor;
+
+};
+
 #endif

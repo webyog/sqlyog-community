@@ -1546,7 +1546,13 @@
 #define IDC_INVISIBLE                   44116
 #define IDR_SAVEPROFILERMENU            44117
 #define ID_OPEN_SAVEPROFILER            44118
-
+#define IDR_TABMENU2					44119
+#define ID_FILE_RENAMETAB               44120
+#define IDR_TABMENU3					44121
+#define IDD_RENAMETAB					44122
+#define IDC_RENAMETAB					44123
+#define ACCEL_RENAMEQUERYTAB            44124
+#define IDI_RENAMEQUERY_16              44125
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

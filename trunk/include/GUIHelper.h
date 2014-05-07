@@ -30,6 +30,8 @@
 #include "wyTheme.h"
 
 class MySQLDataEx;
+class MDIlist;
+class tabdetailelem;
 
 
 #if defined _WIN32 && ! defined _CONSOLE
@@ -1528,10 +1530,14 @@ wyBool GetSessionFile(wyWChar *path);
 
 wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo, wyIni *inimgr);
 
+wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt32 id, MDIlist* tempmdilist);
+wyBool GetTabDetailsFromTable(wyWChar* path, wyInt32 id, List* temptablist);
 //wyBool WriteSessionDetails(wyChar* title, ConnectionInfo *conninfo, wyInt32 connectionno, wyBool isfocus);
 
 void WriteFullSectionToFile(FILE *fstream, wyInt32 conno, ConnectionInfo *coninfo, const wyChar *title, wyBool isfocussed);
-
+//Returns wyTrue on success
+wyBool WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, ConnectionInfo *coninfo, const wyChar *title, wyBool isfocussed);
+//wyBool WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem,wyInt32 tabid, wyInt32 position, TabEditor *tabqueryactive, MDIWindow *wnd);
 #endif
 
 

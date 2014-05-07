@@ -41,12 +41,14 @@ class CommunityRibbon;
 #endif
 
 #define			CONRESTORE_TIMER	1001
+#define			CONSAVE_TIMER		1002
 
 class	MDIWindow;
 class	EditorBase;
 class	Favorites;
 class	UpgradeCheck;
 class	ConnectionTab;
+class	tabeditorelem;
 
 
 /*! \struct SSHPORTINFO
@@ -61,6 +63,52 @@ struct SSHPORTINFO
 };
 void 
 tablog(const char * buff);
+
+class MDIlist : public wyElem
+{
+public:
+	MDIWindow	*mdi;
+	wyInt32		m_id;
+	wyInt32		m_position;
+	wyBool		m_ispresent;
+	wyBool		m_isfocussed;
+	COLORREF	m_rgbconn;	
+	COLORREF	m_rgbfgconn;
+};
+
+class tabdetailelem : public wyElem
+{
+public:
+	
+	wyInt32		m_id;
+	wyInt32		m_tabid;
+	wyInt32		m_position;
+	wyString	m_psztext;
+	COLORREF	m_color;//Color of tab
+	COLORREF	m_fgcolor;//Text color of tab
+	wyString	m_tooltiptext;//tooltip text (also filename if it is a file)
+	wyBool		m_isfile;
+	wyBool		m_isedited;
+	wyBool		m_isfocussed;
+	wyString	m_content;
+	wyInt32		m_leftortoppercent;
+};
+
+class QueryRestore : public wyElem
+{
+public:
+	wyInt32		m_id;
+	wyInt32		m_tabid;
+	wyInt32		m_position;
+	wyBool		m_ispresent;
+	wyString	m_psztext;
+	COLORREF	m_color;//Color of tab
+	COLORREF	m_fgcolor;//Text color of tab
+	wyString	m_tooltiptext;//tooltip text (also filename if it is a file)
+	wyBool		m_isfile;
+	wyBool		m_isfocussed;
+	wyString	m_content;
+};
 
 class FrameWindow
 {
@@ -1583,6 +1631,8 @@ public:
 
 	wyBool				SaveConnectionDetails();
 
+	wyBool				WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id,TabEditor *tabqueryactive, MDIWindow *wnd);
+
 
     //flag tells whether to close all the mdi windows
     wyBool              m_iscloseallmdi;
@@ -1620,6 +1670,12 @@ public:
 
 	HWND				m_hwndrestorestatus;
 
+	HANDLE				m_savetimerevent;
+	HANDLE				m_sqlyogcloseevent;
+	HANDLE				m_sessionsaveevent;
+	HANDLE				m_savethread_handle;
+	wyBool				m_sqlyogclosed;
+
 };
 
 /// Function to rstore connections
@@ -1632,8 +1688,12 @@ public:
 		ConnectionInfo	conninfo;
 		wyBool			isfocussed;
 		wyIni *inimgr;
+		List			*tabdetails;
+		MDIlist			*tempmdilist;
+		wyInt32			id;
 	}MY_ARG;
-void	ConnectFromList(wyString* failledconnections);
+wyBool	ConnectFromList(wyString* failledconnections);
 unsigned __stdcall  ConnectFromList_mt(void* arg_list);
 unsigned __stdcall  Htmlannouncementsproc(void* arg);
+unsigned __stdcall  testthreadsproc(void* arg);
 #endif

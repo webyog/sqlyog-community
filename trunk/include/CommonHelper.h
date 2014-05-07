@@ -61,6 +61,7 @@
 
 #define		SSHTUNNELER 	  "plink.exe"
 #define     SQLYOG_MUTEX_NAME "SQLyogSSHMutex"
+#define     SQLYOG_SAVETIMER "SQLyogSaveTimer"
 #define		SQLYOG_NAMEDMUTEX "SQLyogNamedMutex"
 
 #define	 BULK_SIZE           16*1024*1024
@@ -643,7 +644,7 @@ void		GetTableEngineString(Tunnel *tunnel, PMYSQL mysql, wyString &strengine);
 wyBool		CheckForUtf8Bom(wyString &filename);
 
 wyBool      GetServerDefaultCharset(Tunnel *tunnel, MYSQL *mysql, wyString &charset, wyString &query);
-
+wyBool      GetDbCollation(Tunnel *tunnel, MYSQL *mysql, wyString &collation);
 /*! \struct Datatype
 	\brief Struct to hold the mysql data type and the respective excel data type
 
@@ -829,9 +830,9 @@ wyBool		  InitWinSock();
 @filetype : IN wyFile class pointer
 @return wyTrue if temp file could be oponed, else return wyFalse(means some other thread/prcess already oponed it but not closed still)
 */
-#if ! defined COMMUNITY && defined _WIN32
+//#if ! defined COMMUNITY && defined _WIN32
 wyBool			LockPlinkLockFile(wyFile *plinklock); 
-#endif
+//#endif
 
 #ifdef _WIN32
 //Kills the chid process of a parent proc

@@ -51,6 +51,7 @@ typedef LRESULT(CALLBACK* CTBWNDPROC)(HWND, UINT, WPARAM, LPARAM, wyBool* pishan
 #define CTCN_PLUSBUTTONCLICK    WM_USER+128
 #define CTCN_PAINTTIMERSTART    WM_USER+130
 #define CTCN_PAINTTIMEREND      WM_USER+132
+#define CTCN_TABRENAME		    WM_USER+133
 
 #define CTBIF_TEXT              1
 #define CTBIF_IMAGE             2
@@ -58,6 +59,7 @@ typedef LRESULT(CALLBACK* CTBWNDPROC)(HWND, UINT, WPARAM, LPARAM, wyBool* pishan
 #define CTBIF_CMENU             8
 #define CTBIF_COLOR             16
 #define CTBIF_TOOLTIP           32
+
 
 #define CTCF_TABBG1                     0x1
 #define CTCF_TABBG2                     0x2
@@ -145,6 +147,7 @@ struct tab_item_information
 	COLORREF	m_color;//Color of tab
 	COLORREF	m_fgcolor;//Text color of tab
 	LPSTR		m_tooltiptext;//tooltip text
+	
 };
 
 /*! Creates a type tab_item_information*/ 
@@ -247,7 +250,9 @@ public:
     @returns wyBool, wyTrue if success, otherwise wyFalse
     */
 	wyBool                          GetItem(wyInt32 tabindex, LPCTCITEM pitem);
-
+	
+	const wyChar*  						GetItemTitle(wyInt32 tabindex, wyString *title);
+	const wyChar*  						GetItemTooltip(wyInt32 tabindex, wyString *Tooltip);
     ///Gets the total tab count
     /**
     @returns wyInt32 Number of tabs
@@ -1115,4 +1120,8 @@ void                CustomTab_GetColorInfo(HWND hwnd, LPTABCOLORINFO pcolorinfo)
 
 void                CustomTab_SetPaintTimer(HWND hwnd);
 
+
+
+const wyChar*			CustomTab_GetTitle(HWND hwnd, wyInt32 index, wyString* title);
+const wyChar*			CustomTab_GetTooltip(HWND hwnd, wyInt32 index, wyString* Tooltip);
 #endif

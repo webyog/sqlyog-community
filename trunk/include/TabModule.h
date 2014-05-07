@@ -229,6 +229,8 @@ public:
     */
 	wyInt32				GetActiveTabImage();
 
+	LPSTR			GetActiveTabText();
+
     //Sets the parent connection window pointer
 	/**
     @param wnd: IN the connection window pointer to set.
@@ -315,7 +317,7 @@ public:
 	@return void
 	*/
 	 VOID		SetTabName(wyWChar *filename, wyBool isshowext, wyBool isedited = wyFalse);
-
+	 VOID		SetTabRename(wyWChar *name, wyBool isedited = wyFalse);
 	/// Shows/Hides all the content of the editor
     /**
     @param tabindex: IN currently selected tab index.

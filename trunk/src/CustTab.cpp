@@ -1235,6 +1235,8 @@ CCustTab::InsertItem(wyInt32 position, LPCTCITEM pitem)
             m_tabdet[ i ].m_tabwidth            = m_tabdet[i - 1].m_tabwidth;
             m_tabdet[ i ].m_animationdelay      = m_tabdet[i - 1].m_animationdelay;
             m_tabdet[ i ].m_iconindex           = m_tabdet[i - 1].m_iconindex;
+			
+			
 
 			if(m_tabdet[i-1].ctcitem.m_mask & CTBIF_LPARAM)
 				m_tabdet[ i ].ctcitem.m_lparam = m_tabdet[i-1].ctcitem.m_lparam;
@@ -1278,6 +1280,8 @@ CCustTab::InsertItem(wyInt32 position, LPCTCITEM pitem)
 	m_tabdet[position].ctcitem.m_cchtextmax		= pitem->m_cchtextmax;
 	m_tabdet[position].ctcitem.m_color			= pitem->m_color;
 	m_tabdet[position].ctcitem.m_fgcolor		= pitem->m_fgcolor;
+	
+	
     m_tabdet[position].m_iconindex              = -1;
     m_tabdet[position].m_animationdelay         = -1;
 
@@ -1906,6 +1910,15 @@ CCustTab::OnLButtonDblClick(HWND hwnd, WPARAM wParam, LPARAM lParam)
     {
         SendTabMessage(CTCN_LBUTTONDBLCLK);
     }
+	else
+	{
+		//OverTabs(&pnt, &isoverclose);
+		if(m_id == IDC_CTAB && OverTabControls(&pnt) == -1 && pnt.y <= m_size.cy + EXTRAHEIGHT)
+		{
+			SendTabMessage(CTCN_TABRENAME);
+		}
+	}
+	
 
    	return TRUE;
 }
@@ -2153,6 +2166,21 @@ CCustTab::GetVisibleTabCount()
 }
 
 
+
+const wyChar*  
+CCustTab::GetItemTitle(wyInt32 tabindex, wyString* title)
+{
+	title->SetAs(m_tabdet[tabindex].ctcitem.m_psztext);
+	return title->GetString();
+}
+
+const wyChar*  
+CCustTab::GetItemTooltip(wyInt32 tabindex, wyString* Tooltip)
+{
+	Tooltip->SetAs(m_tabdet[tabindex].ctcitem.m_tooltiptext);
+	return Tooltip->GetString();
+}
+
 wyBool  
 CCustTab::GetItem(wyInt32 index, LPCTCITEM pitem)
 {
@@ -2178,6 +2206,7 @@ CCustTab::GetItem(wyInt32 index, LPCTCITEM pitem)
 
 		if(pitem->m_mask & CTBIF_TOOLTIP)
 		    strcpy(pitem->m_tooltiptext, m_tabdet[index].ctcitem.m_tooltiptext);
+		
 		
 		return wyTrue;
 	}
@@ -2242,7 +2271,8 @@ CCustTab::SetItem(wyInt32 index, LPCTCITEM pitem)
 		    m_tabdet[index].ctcitem.m_lparam = pitem->m_lparam;
 
         m_tabdet[index].ctcitem.m_mask |= pitem->m_mask;
-
+		
+		
         hdc = GetDC(m_hwnd);
         m_tabdet[index].m_tabwidth = CalculateTabLength(hdc, index);
         ReleaseDC(m_hwnd, hdc);
@@ -3903,4 +3933,18 @@ CustomTab_SetPaintTimer(HWND hwnd)
 {
     CCustTab* pct = GetCustTabCtrlData(hwnd);
     pct->SetPaintTimer();
+}
+
+const wyChar*				
+CustomTab_GetTitle(HWND hwnd, wyInt32 index, wyString* title)
+{
+	CCustTab* pct = GetCustTabCtrlData(hwnd);
+	return pct->GetItemTitle(index, title);
+}
+
+const wyChar*				
+CustomTab_GetTooltip(HWND hwnd, wyInt32 index, wyString* Tooltip)
+{
+	CCustTab* pct = GetCustTabCtrlData(hwnd);
+	return pct->GetItemTooltip(index, Tooltip);
 }

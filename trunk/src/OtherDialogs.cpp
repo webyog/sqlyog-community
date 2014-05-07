@@ -5454,3 +5454,161 @@ ConnColorDlg::OnWmColorCommand(HWND hwnd, WPARAM wparam, LPARAM lparam)
 	
 	return;
 }
+
+
+////Connection Color dialog box
+////Default constructor
+RenameTabDlg::RenameTabDlg()
+{
+	
+}
+
+//Default destructor
+RenameTabDlg::~RenameTabDlg()
+{
+}
+
+wyInt32 
+RenameTabDlg::ShowRenameTabDlg(HWND hwndparent)
+{
+	wyInt32 ret;
+
+	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_RENAMETAB), 
+						   hwndparent, RenameTabDlg::RenameTabDlgProc, (LPARAM)this);
+
+	return	ret;
+}
+
+// Callback function for the invalid registration dialog box
+INT_PTR CALLBACK
+RenameTabDlg::RenameTabDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+{
+	RenameTabDlg*	pcconncolor	=	(RenameTabDlg*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	CTCITEM pitem;
+	pitem.m_mask = CTBIF_TEXT;
+	wyString title;
+	wyWChar     temptext[SIZE_1024];
+	MDIWindow* wnd = GetActiveWin();
+	
+	switch(message)
+	{
+	case WM_INITDIALOG:
+		{
+			SetWindowLongPtr(hwnd, GWLP_USERDATA, lparam);
+            LocalizeWindow(hwnd);
+			PostMessage(hwnd, WM_INITDLGVALUES, 0, 0);
+		}
+		break;
+
+	case WM_INITDLGVALUES:
+		{
+			//if(CustomTab_GetItem(wnd->m_pctabmodule->m_hwnd, CustomTab_GetCurSel(wnd->m_pctabmodule->m_hwnd), &pitem))
+			//{
+				CustomTab_GetTitle(wnd->m_pctabmodule->m_hwnd, CustomTab_GetCurSel(wnd->m_pctabmodule->m_hwnd), &title);
+				SendMessage(GetDlgItem(hwnd, IDC_RENAMETAB), EM_LIMITTEXT, WPARAM(24), 0);
+				SetWindowText(GetDlgItem(hwnd, IDC_RENAMETAB), title.GetAsWideChar());
+			//}
+			//else
+				//SetWindowText(GetDlgItem(hwnd, IDC_RENAMETAB), L"Query");
+			//EnableWindow(GetDlgItem(hwnd, IDOK), wyFalse);
+			//ColorComboInitValues(GetDlgItem(hwnd, IDC_COLORCOMBO1));
+			//ColorComboFgInitValues(GetDlgItem(hwnd, IDC_COLORCOMBO2));
+		}
+		break;
+
+	case WM_COMMAND:
+		if((LOWORD(wparam)) == IDOK)
+		{
+			GetWindowText(GetDlgItem(hwnd, IDC_RENAMETAB), temptext, sizeof(temptext)- 1);
+			title.SetAs(temptext);
+			if(IsQueryEmpty(title.GetAsWideChar()))
+			{
+				yog_message(hwnd, _(L"Please enter a valid name"), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_HELP | MB_ICONINFORMATION);
+				return 0;
+			}
+			wnd->m_pctabmodule->SetTabRename(temptext);
+			yog_enddialog(hwnd, 0);
+		}
+		else 
+		if((LOWORD(wparam)) == IDCANCEL)
+		{
+			yog_enddialog(hwnd, 0);
+		}
+        //pcconncolor->OnWmColorCommand(hwnd, wparam, lparam);
+		break;
+
+	//case WM_HELP:
+	//	ShowHelp("Advanced%20Connection%20SQLyog%20MySQL%20Manager.htm");
+	//	return 1;
+
+		
+	//case WM_MEASUREITEM:
+	//	{
+	//		LPMEASUREITEMSTRUCT lpmis;
+	//		lpmis = (LPMEASUREITEMSTRUCT) lparam;
+	//		lpmis->itemWidth = 10;
+	//		lpmis->itemHeight = 16;
+	//	}
+	//	break;
+
+	//case WM_DRAWITEM:
+	//	{
+	//		LPDRAWITEMSTRUCT lpdis = (LPDRAWITEMSTRUCT)lparam;
+	//		switch(lpdis->CtlID)
+	//		{
+	//			case IDC_COLORCOMBO:
+	//			case IDC_COLORCOMBO1:
+	//				OnDrawColorCombo(hwnd, (LPDRAWITEMSTRUCT)lparam, pGlobals->m_pcmainwin->m_connection->m_rgbconnection);
+	//				break;
+	//			case IDC_COLORCOMBO2:
+	//				OnDrawColorCombo(hwnd, (LPDRAWITEMSTRUCT)lparam, pGlobals->m_pcmainwin->m_connection->m_rgbconnectionfg);
+	//				break;
+	//		}
+	//	}
+	//	break;
+	}
+
+	return 0;
+}
+
+//Function handles the WM_COMMAND on the main dialog window
+void 
+RenameTabDlg::OnWmColorCommand(HWND hwnd, WPARAM wparam, LPARAM lparam)
+{
+	/*wyString	msg;*/
+	//ConnectionBase *conbase = NULL;
+
+	//conbase = pGlobals->m_pcmainwin->m_connection;
+
+	//if(LOWORD(wparam)== IDC_COLORCOMBO1)
+	//{
+	//	//Command handler for color combo box
+	//	OnWmCommandColorCombo(hwnd, wparam, lparam);
+
+	//	//if color is changed in combo, then enable OK button
+	//	if(HIWORD(wparam)== CBN_SELCHANGE)
+	//		EnableWindow(GetDlgItem(hwnd, IDOK), wyTrue);
+	//}
+	//else 
+	//if(LOWORD(wparam)== IDC_COLORCOMBO2)
+	//{
+	//	//Command handler for color combo box
+	//	OnWmCommandColorCombo(hwnd, wparam, lparam);
+
+	//	//if color is changed in combo, then enable OK button
+	//	if(HIWORD(wparam)== CBN_SELCHANGE)
+	//		EnableWindow(GetDlgItem(hwnd, IDOK), wyTrue);
+	//}
+	if((LOWORD(wparam)) == IDOK)
+	{
+		//SetTabRename
+		yog_enddialog(hwnd, 0);
+	}
+	else if((LOWORD(wparam)) == IDCANCEL)
+	{
+		yog_enddialog(hwnd, 0);
+	}
+	
+	
+	return;
+}

@@ -263,7 +263,11 @@ TabEditor::OnTabClosing(wyBool ismanual)
     {
         return 1;
     }
-
+	//no dialog if wnd->m_ismdiclosealltabs == wyTrue and session save is running
+	if(pGlobals->m_pcmainwin->m_iscloseallmdi && pGlobals->m_issessionsaveactive)
+    {
+        return 1;
+    }
 	if((peditorbase->m_edit == wyTrue)&& IsConfirmOnTabClose() == wyTrue 
 			|| (peditorbase->m_save == wyTrue) && (peditorbase->m_edit == wyTrue))
 	{

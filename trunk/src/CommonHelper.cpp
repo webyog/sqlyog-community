@@ -2988,6 +2988,32 @@ GetOnFkeyOption(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam, wyBool isupdate)
 	else
 		return NOOPTION;	
 }
+
+wyBool
+GetDbCollation(Tunnel *tunnel, MYSQL *mysql, wyString &collation)
+{
+    MYSQL_RES   *myres;
+    MYSQL_ROW   myrow;
+	wyString	query;
+    query.SetAs("SHOW VARIABLES LIKE 'collation_database';");    
+    myres = SjaExecuteAndGetResult(tunnel, &mysql, query);
+    if(!myres)
+    {
+        //collation.SetAs("latin1");
+        return wyFalse;
+	}
+
+    myrow =tunnel->mysql_fetch_row(myres);
+    
+    if(myrow[1])
+        collation.SetAs(myrow[1]);
+    
+    if(myres)
+        tunnel->mysql_free_result(myres);
+
+    return wyTrue;
+}
+
 wyBool
 GetServerDefaultCharset(Tunnel *tunnel, MYSQL *mysql, wyString &charset, wyString &query)
 {
@@ -3841,7 +3867,7 @@ InitWinSock()
 	return wyTrue;
 }
 
-#if !defined COMMUNITY && defined _WIN32
+
 wyBool 
 LockPlinkLockFile(wyFile *plinklock) 
 {		
@@ -3855,13 +3881,13 @@ LockPlinkLockFile(wyFile *plinklock)
 	if(plinklock->GetTempFilePath(&tempfile) == wyFalse)
 		return wyFalse;
 	    
-	tempfile.Add("SQLyog_plink.tmp");
+	tempfile.Add("SQLyog_session.tmp");
 	
 	// make sure you are setting file before calling any common function
 	plinklock->SetFilename(&tempfile);
 
-	do
-	{
+	//do
+	//{
 		if (plinklock->CheckIfFileExists() == wyFalse || 
 			plinklock->RemoveFile())
 		{
@@ -3871,14 +3897,14 @@ LockPlinkLockFile(wyFile *plinklock)
 			}			
 		}
 		
-		Sleep(PLINK_LOCK_WAIT);
-		trycount++;		
+		//Sleep(PLINK_LOCK_WAIT);
+		//trycount++;		
 	
-	}while(trycount <= PLINK_LOCK_WAIT_TRY_COUNT);
+	//}while(trycount <= PLINK_LOCK_WAIT_TRY_COUNT);
 	
 	return wyFalse;	
 }
-#endif
+
 
 
 /*Terminationg the child processes of a process.

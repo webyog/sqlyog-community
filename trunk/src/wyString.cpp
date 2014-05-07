@@ -231,12 +231,17 @@ wyString::SetAsDirect(const wyChar* toset, const wyUInt32 len)
 wyUInt32
 wyString::SetAs(const wyChar* toset, wyBool ismysql41)
 {
-	wyInt32 lengthofstring = strlen(toset);
+	wyInt32 lengthofstring = 0;
 	wyInt32 lengthwidechar = 0;
 	wyInt32 lengthtoallocate = 0;
 	wyInt32 length = 0;
 	wyWChar *widecharbuff = 0;
 	
+	//crash fix http://forums.webyog.com/index.php?showtopic=7438
+	if(!toset)
+		return 0;
+
+	lengthofstring = strlen(toset);
 	length = strlen(toset);
 
 	if(ismysql41 == wyFalse)
