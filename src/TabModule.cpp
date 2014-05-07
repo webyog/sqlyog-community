@@ -135,13 +135,57 @@ TabModule::~TabModule()
 wyBool
 TabModule::Create(MDIWindow * wnd)
 {    
+    wyInt32		i,totaltabs = 0;
+	tabdetailelem  *temptabdetail;
+	tabeditorelem  *temptabeditorele;
     m_isdefault     = wyTrue;
-       
+    wyString temptest;   
     CreateTabControl();
 	CreateCommunityTabHeader();
     CreateHistoryTab(wnd, wyFalse, wyFalse);
+	if(!pGlobals->m_conrestore)
 	CreateQueryEditorTab(wnd);    
+	else
+	{
+		totaltabs = wnd->m_listtabdetails->GetCount();
+		if(totaltabs > 0)
+		{
+			temptabdetail = (tabdetailelem*)wnd->m_listtabdetails->GetFirst();
+			for(i = 0; i < totaltabs ; i++)
+			{
+			
+				temptabeditorele = new tabeditorelem;
+				temptabeditorele->m_ispresent = wyTrue;
+				temptabeditorele->m_id = temptabdetail->m_id;
+				temptabeditorele->m_tabid = temptabdetail->m_tabid;
+				//temptabeditorele->m_position = temptabdetail->m_position;
+				temptabeditorele->m_position = i;
+				temptabeditorele->m_color = temptabdetail->m_color;
+				temptabeditorele->m_fgcolor = temptabdetail->m_fgcolor;
+				temptabeditorele->m_isfile = temptabdetail->m_isfile;
+				temptabeditorele->m_isedited = temptabdetail->m_isedited;
+				temptabeditorele->m_isfocussed = temptabdetail->m_isfocussed;
+				temptabeditorele->m_leftortoppercent = temptabdetail->m_leftortoppercent;
+				temptabeditorele->m_psztext.SetAs(temptabdetail->m_psztext);
+				temptabeditorele->m_tooltiptext.SetAs(temptabdetail->m_tooltiptext);
+				CreateQueryEditorTab(wnd);
+				if(!temptabeditorele->m_isfile)
+				{
+					
+					SetTabRename(temptabdetail->m_psztext.GetAsWideChar());
 
+				}
+				temptabeditorele->m_pctabeditor = m_pctabeditor;
+				m_pctabeditor->m_pcetsplitter->SetLeftTopPercent(temptabeditorele->m_leftortoppercent);
+
+				wnd->m_listtabeditor->Insert(temptabeditorele);
+				temptabdetail = (tabdetailelem*)temptabdetail->m_next;
+			 
+			}
+		}
+		else
+			CreateQueryEditorTab(wnd);    
+	}
     if(pGlobals->m_istabledataunderquery == wyFalse &&
         GetTabOpenPersistence(IDI_TABLE) == wyTrue)
     {
@@ -340,7 +384,8 @@ TabModule::CreateQueryEditorTab(MDIWindow* wnd, wyInt32 pos, wyBool setfocus)
 	item.m_mask       = CTBIF_IMAGE | CTBIF_TEXT | CTBIF_LPARAM | CTBIF_CMENU | CTBIF_TOOLTIP;
 	item.m_iimage     = IDI_QUERY_16;
 	item.m_tooltiptext = _("Query");
-
+	
+	
 	m_pctabeditor = CreateTabEditor(wnd);
 	m_pctabeditor->Create(wnd, NULL, wyTrue);
 	
@@ -408,6 +453,8 @@ TabModule::CreateAdvEditorTab(MDIWindow *wnd, wyChar* title, wyInt32 image, HTRE
 	item.m_mask       = CTBIF_IMAGE | CTBIF_TEXT | CTBIF_LPARAM | CTBIF_CMENU  | CTBIF_TOOLTIP;
 	item.m_iimage     = image;
 	item.m_tooltiptext = title;
+	
+	
 
 	m_istabcreate = wyTrue;
 
@@ -468,7 +515,8 @@ TabModule::CreateQueryBuilderTab(MDIWindow * wnd)
 	item.m_iimage     = IDI_QUERYBUILDER_16;
 	m_pctabqb		  = CreateTabQB(wnd);
 	item.m_tooltiptext = _("Query Builder");
-
+	
+	
 	if(!m_pctabqb)
 		return wyFalse;
 			
@@ -776,6 +824,8 @@ TabModule::CreateSchemaDesigner(MDIWindow * wnd)
 	item.m_mask       = CTBIF_IMAGE | CTBIF_TEXT | CTBIF_LPARAM | CTBIF_CMENU  | CTBIF_TOOLTIP;
 	item.m_iimage     = IDI_SCHEMADESIGNER_16;
 	item.m_tooltiptext = _("Schema Designer");
+	
+	
 
 	ptabschemadesigner = new TabSchemaDesigner(m_hwnd);
 		
@@ -1276,6 +1326,25 @@ TabModule::GetActiveTabImage()
 }
 
 
+LPSTR
+TabModule::GetActiveTabText()
+{
+	CTCITEM				item;
+	wyInt32				itemindex;
+	wyString			name;
+
+    item.m_mask       = CTBIF_IMAGE | CTBIF_LPARAM;
+
+	itemindex	 =	CustomTab_GetCurSel(m_hwnd);
+	
+	if(itemindex < 0)
+        return 0;
+
+	CustomTab_GetItem(m_hwnd, itemindex, &item);
+	return item.m_psztext;	
+}
+
+
 // Set the EditorBase font
 void
 TabModule::SetTabFont()
@@ -1656,7 +1725,11 @@ TabModule::SetTabName(wyWChar *filename, wyBool isshowext, wyBool isedited)
 		file.AddSprintf("%s", extn.GetString());	
 
 	if(isedited == wyTrue)
+	{
 		file.AddSprintf("%s", "*");
+		
+	}
+	
 		
 	itemindex	 =	CustomTab_GetCurSel(m_hwnd);
 	
@@ -1664,8 +1737,39 @@ TabModule::SetTabName(wyWChar *filename, wyBool isshowext, wyBool isedited)
 	item.m_psztext      = (wyChar*)file.GetString();
 	item.m_cchtextmax   = file.GetLength();	
 	item.m_iimage		= tabimage;
-	item.m_tooltiptext  = (wyChar*)path.GetString();;
+	item.m_tooltiptext  = (wyChar*)path.GetString();
+	
+	VERIFY(CustomTab_SetItem(m_hwnd, itemindex, &item));
+	return;	
+}
 
+
+//Setting tab name
+void
+TabModule::SetTabRename(wyWChar *name, wyBool isedited)
+{
+	CTCITEM         item;
+	wyInt32         itemindex, tabimage;
+	wyString		newname;
+	
+	tabimage = GetActiveTabImage();
+	newname.SetAs(name);
+	if(isedited == wyTrue)
+	{
+		newname.AddSprintf("%s", "*");
+		
+	}
+	
+
+	itemindex	 =	CustomTab_GetCurSel(m_hwnd);
+	
+	item.m_mask         = CTBIF_TEXT | CTBIF_IMAGE | CTBIF_CMENU | CTBIF_TOOLTIP;
+	item.m_psztext      = (wyChar*)newname.GetString();
+	item.m_cchtextmax   = newname.GetLength();	
+	item.m_iimage		= tabimage;
+	item.m_tooltiptext  = (wyChar*)newname.GetString();
+	
+	//m_pctabeditor->m_tabtitle.SetAs(item.m_psztext);
 	VERIFY(CustomTab_SetItem(m_hwnd, itemindex, &item));
 	return;	
 }

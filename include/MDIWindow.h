@@ -46,6 +46,24 @@ class TabHistory;
 class TabObject;
 class TabTableData;
 
+class tabeditorelem : public wyElem
+{
+public:
+	TabEditor*	m_pctabeditor;
+	wyInt32		m_id;
+	wyInt32		m_tabid;
+	wyInt32		m_position;
+	wyBool		m_ispresent;
+	wyString	m_psztext;
+	COLORREF	m_color;//Color of tab
+	COLORREF	m_fgcolor;//Text color of tab
+	wyString	m_tooltiptext;//tooltip text (also filename if it is a file)
+	wyBool		m_isfile;
+	wyBool		m_isfocussed;
+	wyBool		m_isedited;
+	wyInt32		m_leftortoppercent;
+};
+
 class TableDiag
 {
 public:
@@ -518,7 +536,7 @@ public:
 	@returns wyTrue on success else wyFalse
     */
 	wyBool				OpenSQLFile (wyString *filename, wyBool issametab = wyFalse, wyBool isrecentfiles = wyFalse);
-	
+	wyBool				OpenSQLFile2 (wyString *filename, EditorBase *peditorbase, wyBool isrecentfiles = wyFalse);
 	// This function opens the Schema file asked by user and copies its content in the schema designer.
     /**
 	@param filename         : IN filename to be loaded
@@ -543,7 +561,7 @@ public:
 	@returns wyTrue on success else wyFalse
     */
 	wyBool				WriteSQLToEditor (HANDLE hfile, wyBool issametab = wyFalse);
-
+	wyBool				WriteSQLToEditor2 (HANDLE hfile, EditorBase* peditorbase);
     /// Collects all the supported Engines and add to the menu
     /**
     @param hmenu: IN parent menu handle
@@ -1259,6 +1277,10 @@ public:
 
 	wyBool				m_isanncreate;
 
+	//wyInt32				m_tabposition;
+
+	List				*m_listtabeditor;
+	List				*m_listtabdetails;
 #ifndef COMMUNITY
 	///The PQA SHAOW STATUS advice array keep in Connection level
 	paramadvice			*m_constatusparm;

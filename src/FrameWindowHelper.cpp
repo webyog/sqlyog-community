@@ -2361,7 +2361,7 @@ IsConnectionRestore()
 	// Get the complete path.
 	SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
 	dirstr.SetAs(directory);
-	ret = wyIni::IniGetInt(GENERALPREFA, "ConnectionRestore", 0, dirstr.GetString());
+	ret = wyIni::IniGetInt(GENERALPREFA, "SessionRestore", 1, dirstr.GetString());
 
 	return(ret)?(wyTrue):(wyFalse);
 }
@@ -2759,6 +2759,10 @@ InitGlobals(PGLOBALS pg)
 	pg->m_isannouncementopen = wyTrue;
 	pg->m_pcquerywnd = NULL;
 	pg->m_announcements = NULL;
+	pg->m_mdiwlist = NULL;
+	pg->m_sqliteobj = NULL;
+	pg->m_issessionsaveactive = wyFalse;
+	pg->m_sessionsavemutex = NULL;
     return;
 }
     

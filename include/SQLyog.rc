@@ -61,6 +61,7 @@ BEGIN
     "V",            ACCEL_CHANGEVIEW,       VIRTKEY, CONTROL, ALT, NOINVERT
     "W",            ACCEL_CLOSECONNECTION,  VIRTKEY, CONTROL, NOINVERT
     "L",            ACCEL_CLOSETAB,         VIRTKEY, ALT, NOINVERT
+	VK_F2,          ACCEL_RENAMEQUERYTAB,   VIRTKEY, ALT, NOINVERT
     "C",            ACCEL_COMMENT,          VIRTKEY, SHIFT, CONTROL, NOINVERT
     "D",            ACCEL_CREATEDB,         VIRTKEY, CONTROL, NOINVERT
     "D",            ACCEL_DATASEARCH,       VIRTKEY, SHIFT, CONTROL, NOINVERT
@@ -373,6 +374,23 @@ BEGIN
     END
 END
 
+IDR_TABMENU2 MENU
+BEGIN
+    POPUP "Tab"
+    BEGIN
+        MENUITEM "&Close\tAlt+L",               ID_FILE_CLOSETAB
+		MENUITEM "&Rename\tAlt+F2",				ID_FILE_RENAMETAB
+    END
+END
+
+IDR_TABMENU3 MENU
+BEGIN
+    POPUP "Tab"
+    BEGIN
+		MENUITEM "&Rename",						ID_FILE_RENAMETAB
+    END
+END
+
 IDR_QBGRIDMENU MENU
 BEGIN
     POPUP "Grid Menu"
@@ -434,6 +452,7 @@ BEGIN
         MENUITEM "New Data Searc&h\tCtrl+Shift+D", ID_DATASEARCH
         MENUITEM SEPARATOR
         MENUITEM "Close &Tab\tAlt+L",           ID_FILE_CLOSETAB
+		MENUITEM "&Rename Tab\tAlt+F2",			ID_FILE_RENAMETAB
         MENUITEM "&Disconnect\tCtrl+F4/Ctrl+W", IDM_FILE_CLOSECONNECTION
         MENUITEM "Disconnect Al&l",             IDM_FILE_CLOASEALL
         MENUITEM SEPARATOR
@@ -1704,7 +1723,7 @@ BEGIN
     COMBOBOX        IDC_THEMECOMBO,93,195,153,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Restore &All Defaults",IDC_OTHERSRESTOREALL,97,262,75,15
     PUSHBUTTON      "Restore &Tab Defaults",IDC_OTHERSRESTORETAB,176,262,75,15
-    CONTROL         "R&estore connections on startup",IDC_CONRESTORE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,74,216,9
+    CONTROL         "R&estore session on startup",IDC_CONRESTORE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,74,216,9
 END
 
 IDD_PREFGENERAL DIALOGEX 0, 0, 255, 280
@@ -1861,6 +1880,18 @@ BEGIN
     LTEXT           "(These colors will be used in the Object Browser for this connection only)",IDC_COLORSTATIC3,5,58,183,16
     DEFPUSHBUTTON   "&OK",IDOK,85,85,50,14
     PUSHBUTTON      "Cance&l",IDCANCEL,139,85,50,14
+END
+
+IDD_RENAMETAB DIALOGEX 150, 150, 186, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Rename Tab"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+//FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Name",IDC_STATIC,7,8,130,10
+	EDITTEXT        IDC_RENAMETAB,7,22,172,13,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&OK",IDOK,73,41,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,129,41,50,14
 END
 
 IDD_USERMANAGER DIALOGEX 0, 0, 460, 240
@@ -2055,7 +2086,7 @@ END
 
 IDD_RESTORE_STATUS DIALOGEX 0, 0, 316, 42
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "Restoring Connections"
+CAPTION "Restoring Session"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_RESTORE_PROGRESS,"msctls_progress32",WS_BORDER,7,21,302,14
@@ -2229,6 +2260,7 @@ IDI_EXECUTEFORUPD_16    ICON                    "bitmaps\\execforupd_16.ico"
 IDI_EXPORTDATA_16       ICON                    "bitmaps\\export_data_16.ico"
 IDI_QUERYBUILDER_16     ICON                    "bitmaps\\querybuilder_16.ico"
 IDI_QUERY_16            ICON                    "bitmaps\\query_16.ico"
+IDI_RENAMEQUERY_16      ICON                    "bitmaps\\renamequery_16.ico"
 IDI_SCHEMADESIGNER_16   ICON                    "bitmaps\\schemadesigner_16.ico"
 IDI_SCHDEXPORT_16       ICON                    "bitmaps\\schdexport_16.ico"
 IDI_NOTIFICATION_16     ICON                    "bitmaps\\notification_16.ico"
@@ -2543,6 +2575,14 @@ BEGIN
     END
 
     IDD_OBCOLOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 189
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 99
+    END
+
+	IDD_RENAMETAB, DIALOG
     BEGIN
         LEFTMARGIN, 4
         RIGHTMARGIN, 189

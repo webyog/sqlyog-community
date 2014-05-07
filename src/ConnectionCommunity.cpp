@@ -975,6 +975,7 @@ ConnectionCommunity::CreateIconList(HWND hwndmain, wyUInt32 *numicons)
     yogIcons    *icons; 
 
 	wyUInt32    ids[] = { 
+		ID_FILE_RENAMETAB,
 		IDM_FILE_NEWCONNECTION,			IDM_FILE_CLOSECONNECTION, 
         IDM_FILE_CLOASEALL,				IDM_FILE_SAVESQL, 
 		IDM_FILE_CLOSECONNECTION,		IDM_FILE_CLOASEALL, 
@@ -1044,6 +1045,7 @@ ConnectionCommunity::CreateIconList(HWND hwndmain, wyUInt32 *numicons)
 	};
 
 	wyUInt32    iconid[] = { 
+		IDI_RENAMEQUERY_16,
 		IDI_CONNECT_16,		IDI_DISCON, 
 		IDI_DISCONALL,		IDI_SAVE, 
         IDI_DISCON,			IDI_DISCONALL, 

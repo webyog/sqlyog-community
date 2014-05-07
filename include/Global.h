@@ -47,6 +47,8 @@ class Tunnel;
 class List;
 class wyString;
 class Announcements;
+class wySQLite;
+//class MDIlist;
 
 
 #define IS_NUMBER(t) ((t)==FIELD_TYPE_LONG || (t)==FIELD_TYPE_LONGLONG || (t)==FIELD_TYPE_DECIMAL || (t)==FIELD_TYPE_DOUBLE || (t)==FIELD_TYPE_FLOAT || (t)==FIELD_TYPE_INT24 || (t)==FIELD_TYPE_YEAR || (t)==FIELD_TYPE_SHORT || (t)==FIELD_TYPE_TINY || (t)== FIELD_TYPE_NEWDECIMAL)
@@ -707,6 +709,10 @@ typedef struct tagGlobals
 	wyString	m_regname;
 	MDIWindow	*m_pcquerywnd;
 	Announcements	*m_announcements;
+	List		*m_mdiwlist;
+	wySQLite			*m_sqliteobj;
+	wyBool		m_issessionsaveactive;
+	HANDLE		m_sessionsavemutex;
 } GLOBALS, *PGLOBALS;
 
 

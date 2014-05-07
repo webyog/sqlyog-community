@@ -41,6 +41,7 @@
 #include "ConnectionTab.h"
 #include "TableTabInterface.h"
 #include "TableTabInterfaceTabMgmt.h"
+#include "OtherDialogs.h"
 
 #ifndef COMMUNITY
 #include "ConnectionEnt.h"
@@ -156,6 +157,9 @@ MDIWindow::MDIWindow(HWND hwnd, ConnectionInfo * conninfo, wyString &dbname, wyS
 	m_postactivatemsg = wyTrue;
 	m_announcements = NULL;
 	m_isanncreate = wyFalse;
+	m_listtabeditor = NULL;
+	m_listtabdetails = NULL;
+	//m_tabposition = 0;
 }
 
 MDIWindow::~MDIWindow()
@@ -181,7 +185,7 @@ MDIWindow::Create(wyBool iscon_res, ConnectionInfo* conninfo)
 	wyString  title;
 	wyUInt32 tid;
 
-	
+	m_listtabeditor = new List();
 	CreateQueryWindow(m_hwndparent, &m_mysql);
 	SelectDefaultDatabase();
 	SetObjBrowVis();
@@ -930,7 +934,12 @@ MDIWindow::OnWmNotify(HWND hwnd, WPARAM wparam, LPARAM lparam)
     POINT           pnt;
     TabTypes*       ptab;
     TabQueryTypes*  ptabqtype;
-	
+	wyInt32			ptabimage, tabcount;
+	wyBool			isclose = wyFalse;
+	wyBool			isrename = wyFalse;
+	RenameTabDlg	conncolor;
+	CTCITEM quetabitem = {0};
+	TabEditor*		tabquery;
 	switch(lpnmhdr->code)
 	{
     case TVN_ITEMEXPANDING:
@@ -1021,8 +1030,7 @@ MDIWindow::OnWmNotify(HWND hwnd, WPARAM wparam, LPARAM lparam)
 
 	case CTCN_WMDESTROY:
 		break;
-
-	case CTCN_LBUTTONDBLCLK:
+	case CTCN_TABRENAME:
 		if(m_executing == wyTrue /*|| m_pingexecuting == wyTrue*/)
         {
             FrameWindow::ShowQueryExecToolTip();
@@ -1030,6 +1038,31 @@ MDIWindow::OnWmNotify(HWND hwnd, WPARAM wparam, LPARAM lparam)
         else if(lpnmhdr->idFrom == IDC_CTAB)
 		{
 			//open query tab on double click on empty space
+			ptabimage = m_pctabmodule->GetActiveTabImage();
+			
+			if(( ptabimage == IDI_QUERY_16 ))
+			{
+				quetabitem.m_mask = quetabitem.m_mask |CTBIF_LPARAM|CTBIF_IMAGE; 
+				CustomTab_GetItem(m_pctabmodule->m_hwnd, CustomTab_GetCurSel(m_pctabmodule->m_hwnd), &quetabitem);
+				tabquery = (TabEditor*)quetabitem.m_lparam;
+				if( tabquery->m_peditorbase->m_filename.GetLength() == 0)
+					conncolor.ShowRenameTabDlg(m_hwnd);
+			}
+		}
+		break;
+	case CTCN_LBUTTONDBLCLK:
+		if(m_executing == wyTrue /*|| m_pingexecuting == wyTrue*/)
+        {
+            FrameWindow::ShowQueryExecToolTip();
+        }
+		else if(lpnmhdr->idFrom == IDC_CTAB)
+		{
+		//	//open query tab on double click on empty space
+		//	ptabimage = m_pctabmodule->GetActiveTabImage();
+		//	if(( ptabimage == IDI_QUERY_16 ) && !CustomTab_IsFile(m_pctabmodule->m_hwnd, CustomTab_GetCurSel(m_pctabmodule->m_hwnd)))
+		//		conncolor.ShowRenameTabDlg(m_hwnd);
+		//		//SendMessage();
+		//	else
 			pGlobals->m_pcmainwin->CreateNewQueryEditor(GetActiveWin());
 		}
 		break;
@@ -1043,12 +1076,59 @@ MDIWindow::OnWmNotify(HWND hwnd, WPARAM wparam, LPARAM lparam)
         break;
 
     case CTCN_ONCONTEXTMENU:
-        if(lpnmhdr->idFrom == IDC_CTAB && CustomTab_GetItemCount(lpnmhdr->hwndFrom) > 1)
+		tabcount = CustomTab_GetItemCount(lpnmhdr->hwndFrom);
+        if(lpnmhdr->idFrom == IDC_CTAB)
         {
+			//ptab = m_pctabmodule->GetActiveTabEditor();
+			isrename = wyFalse;
+			ptabimage = m_pctabmodule->GetActiveTabImage();
+			//if(( ptabimage == IDI_QUERY_16 || ptabimage == IDI_QUERYBUILDER_16 || ptabimage == IDI_SCHEMADESIGNER_16 ) && !CustomTab_IsFile(m_pctabmodule->m_hwnd, CustomTab_GetCurSel(m_pctabmodule->m_hwnd)))
+			if(( ptabimage == IDI_QUERY_16 ))
+			{
+				quetabitem.m_mask = quetabitem.m_mask |CTBIF_LPARAM|CTBIF_IMAGE; 
+				CustomTab_GetItem(m_pctabmodule->m_hwnd, CustomTab_GetCurSel(m_pctabmodule->m_hwnd), &quetabitem);
+				tabquery = (TabEditor*)quetabitem.m_lparam;
+				if( tabquery->m_peditorbase->m_filename.GetLength() == 0)
+				{
+					if(tabcount > 1)
+					{
+						isclose = wyTrue;
+						hmenu = LoadMenu(pGlobals->m_hinstance, MAKEINTRESOURCE(IDR_TABMENU2));
+					}
+					else
+					{
+						isclose = wyFalse;
+						hmenu = LoadMenu(pGlobals->m_hinstance, MAKEINTRESOURCE(IDR_TABMENU2));
+					}
+
+					isrename = wyTrue;
+					EnableMenuItem(hmenu, ID_FILE_CLOSETAB, isclose ? MF_ENABLED : MF_DISABLED);
+					EnableMenuItem(hmenu, ID_FILE_RENAMETAB, isrename ? MF_ENABLED : MF_DISABLED);				
+					//Also need to set a flag so that query tab saved as files cannot be renamed
+					//limit name to 24 characters
+					//m_pctabmodule->SetTabName(L"abc1abc2abc3abc4abc5abc6", wyFalse);
+				}
+			}
+			if(!isrename)
+			{
             hmenu = LoadMenu(pGlobals->m_hinstance, MAKEINTRESOURCE(IDR_TABMENU));
+				
+				if(tabcount > 1)
+				{
+					isclose = wyTrue;
+				}
+				else
+				{
+					isclose = wyFalse;
+				}
+			}
+
+
             LocalizeMenu(hmenu);
 	        htrackmenu = GetSubMenu(hmenu, 0);
             wyTheme::SetMenuItemOwnerDraw(htrackmenu);
+				EnableMenuItem(hmenu, ID_FILE_CLOSETAB, isclose ? MF_ENABLED : MF_DISABLED);
+				//EnableMenuItem(hmenu, ID_FILE_RENAMETAB, isrename ? MF_ENABLED : MF_DISABLED);
             GetCursorPos(&pnt);
             TrackPopupMenu(htrackmenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, pnt.x, pnt.y, 0, pGlobals->m_pcmainwin->m_hwndmain, NULL);
             FreeMenuOwnerDrawItem(htrackmenu);
@@ -2303,6 +2383,66 @@ MDIWindow::OpenSQLFile(wyString *filename, wyBool issametab, wyBool isrecentfile
 	return wyTrue;
 }
 
+
+wyBool
+MDIWindow::OpenSQLFile2(wyString *filename, EditorBase* peditorbase, wyBool isrecentfiles)
+{
+	HANDLE			hfile;
+    
+    
+
+	
+	m_bopenflag = wyTrue;
+			
+	//Gets the file handle
+	hfile = CreateFile(filename->GetAsWideChar(), GENERIC_READ, 
+						FILE_SHARE_READ, NULL, 
+						OPEN_EXISTING, 
+						FILE_ATTRIBUTE_NORMAL, NULL);                     
+
+	if(hfile == INVALID_HANDLE_VALUE)
+	{
+        DisplayErrorText(GetLastError(), _("Could not open file."), peditorbase->m_hwnd);
+		return wyFalse;
+	}
+	
+	//if(issametab == wyFalse)
+		peditorbase->m_filename.SetAs(*filename);
+
+	SendMessage(peditorbase->m_hwnd, WM_SETREDRAW, (WPARAM)FALSE, (LPARAM)0);
+				
+	if(WriteSQLToEditor2(hfile, peditorbase) == wyFalse)
+	{
+		SendMessage(peditorbase->m_hwnd, WM_SETREDRAW, (WPARAM)TRUE, (LPARAM)0);
+
+		SetFocus(peditorbase->m_hwnd);
+		return wyFalse;
+	}
+	
+	if(isrecentfiles == wyFalse)
+		pGlobals->m_pcmainwin->WriteLatestFile(filename->GetAsWideChar());
+
+	SendMessage(peditorbase->m_hwnd, WM_SETREDRAW, (WPARAM)TRUE, (LPARAM)0);
+	InvalidateRect(peditorbase->m_hwnd, NULL, TRUE);
+	
+	if(peditorbase->m_save == wyTrue)
+		peditorbase->m_edit = wyFalse;
+
+	else 
+		peditorbase->m_edit = wyTrue;
+
+	//else
+	//{
+	//	peditorbase->m_save = wyTrue;
+	//	peditorbase->m_edit = wyFalse;
+ //       SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+	//}
+		
+    SetFocus(peditorbase->GetHWND());
+	
+	return wyTrue;
+}
+
 // This function initiate the process of opening queryxml
 wyBool
 MDIWindow::OpenQBFile(wyString *filename, wyBool issametab, wyBool isrecentfiles)
@@ -2487,6 +2627,113 @@ MDIWindow::WriteSQLToEditor(HANDLE hfile, wyBool issametab)
     {
         delete[] data;
     }
+
+	//SetWindowText(m_hwnd, m_title.GetAsWideChar());
+	VERIFY (CloseHandle(hfile));
+	
+	SetCursor(hcursor);
+	ShowCursor(1);
+	
+	SetFocus(peditorbase->m_hwnd);
+
+	return wyTrue;
+}
+
+wyBool
+MDIWindow::WriteSQLToEditor2(HANDLE hfile, EditorBase* peditorbase)
+{
+	DWORD		dwbytesread;
+	HCURSOR		hcursor;
+    
+	TabEditor	*ptabeditor = NULL;
+	wyString	datastr, codepage;
+    wyInt32     headersize = 0, fileformat = 0, size;
+    wyWChar     *buff = NULL;
+    wyChar      temp[SIZE_1024 + 1];
+    wyBool      isfirstiteration = wyTrue;
+    wyChar*      data;
+    
+
+
+	hcursor = GetCursor();
+	SetCursor(LoadCursor(NULL, IDC_WAIT));				
+	ShowCursor(1);
+
+    //if(issametab == wyTrue)
+    //{
+        size = GetFileSize(hfile, NULL);
+        data = new wyChar[size + 2];
+    //}
+    //else
+    //{
+    //    size = SIZE_1024;
+    //    data = temp;
+    //}
+
+    while(ReadFile(hfile, data, size, &dwbytesread, NULL) && dwbytesread)
+	{
+        headersize = 0;
+        data[dwbytesread/sizeof(wyChar)] = 0;
+
+        if(isfirstiteration == wyTrue)
+        {
+            fileformat = DetectFileFormat(data, SIZE_1024 < dwbytesread ? SIZE_1024 : dwbytesread, &headersize);
+	    }
+
+        switch(fileformat)
+	    {
+            case NCP_UTF16:
+		        buff = (wyWChar *)(data + headersize);
+                buff[(dwbytesread - headersize)/sizeof(wyWChar)] = 0;
+                datastr.SetAs(buff);
+                break;
+
+            case NCP_UTF8:
+                 datastr.SetAs(data + headersize);
+                 break;
+
+            default:
+                datastr.SetAs(data + headersize);
+
+                // there is a chance that the data may be Utf8 without BOM, so we are checking for the pattern
+		        if(isfirstiteration == wyTrue && CheckForUtf8(datastr) == wyTrue)
+	            {
+		            datastr.SetAs(data + headersize);
+                    fileformat = NCP_UTF8;
+	            }
+	            else
+                {
+                    datastr.SetAs(data, wyFalse);
+                }
+        };
+
+	    //if(issametab == wyTrue)
+	   // {
+            SendMessage(peditorbase->m_hwnd , SCI_APPENDTEXT,(WPARAM)datastr.GetLength(),(LPARAM)datastr.GetString());
+	   // }
+        //else
+        //{
+        //    SendMessage(peditorbase->m_hwnd , SCI_APPENDTEXT, (WPARAM)datastr.GetLength(),(LPARAM)datastr.GetString());
+        //}
+
+        isfirstiteration = wyFalse;
+    }
+
+	EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);
+
+	//if(issametab == wyFalse)
+	//{
+	//	peditorbase->m_save = wyTrue;
+	//	//m_pctabmodule->Resize();
+	//	/*SetQueryWindowTitle();
+
+	//	SetWindowText(m_hwnd, m_title.GetAsWideChar());*/
+ //       SendMessage(peditorbase->m_hwnd, SCI_EMPTYUNDOBUFFER, 0, 0);
+	//}
+ //   else
+ //   {
+        delete[] data;
+   // }
 
 	//SetWindowText(m_hwnd, m_title.GetAsWideChar());
 	VERIFY (CloseHandle(hfile));
