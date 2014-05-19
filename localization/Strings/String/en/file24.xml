@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3623">Rename</string>
+	<string name="3624">Rename Tab</string>
+	<string name="3625">Restoring session</string>
+	<string name="3626">R&amp;estore session on startup</string>
+	<string name="3627">&amp;Rename	Alt+F2</string>
+	<string name="3628">&amp;Rename Tab	Alt+F2</string>
+</resources>

@@ -3867,11 +3867,11 @@ InitWinSock()
 	return wyTrue;
 }
 
-
+#if defined _WIN32
 wyBool 
 LockPlinkLockFile(wyFile *plinklock) 
 {		
-	wyInt32 trycount = 1;
+	//wyInt32 trycount = 1;
 	wyString tempfile;
 
 	if(!plinklock)
@@ -3904,7 +3904,7 @@ LockPlinkLockFile(wyFile *plinklock)
 	
 	return wyFalse;	
 }
-
+#endif
 
 
 /*Terminationg the child processes of a process.
@@ -4161,7 +4161,7 @@ void
 RemoveDefiner(wyString &text, const wyChar* pattern, wyInt32 extra)
 {
 	//wyString pattern("DEFINER=`.*`@`.*`\\s");
-	wyInt32   regexret = 0;	
+	//wyInt32   regexret = 0;	
 	wyInt32   ovector[30];  
 	pcre           *re;
 	wyInt32         erroffset, rc = -1;//, i = 0;

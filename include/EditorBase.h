@@ -223,8 +223,7 @@ public:
 	@returns pointer to buffer allocated for query
     */
 	void				GetCompleteText(wyString &query);
-	
-
+	void				GetCompleteTextByPost(wyString &query, MDIWindow *wnd);
 	/// Allocates buffer for query text
 	/**
 	@returns pointer to allocated buffer

@@ -191,5 +191,7 @@
 	<string name="205">変更を取り消す</string>
 	
 	<string name="206">選択した変更を取り消す</string>
+	
+	<string name="207">クエリエディタをリネームする</string>
 
 </resources>
