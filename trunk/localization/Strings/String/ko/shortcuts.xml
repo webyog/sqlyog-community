@@ -102,4 +102,6 @@
 	<string name="205">편집 취소</string>
 	
 	<string name="206">선택한 변경 내용 되돌림</string>
+	
+	<string name="207">쿼리 이름 다시짓기 편집기</string>
 </resources>

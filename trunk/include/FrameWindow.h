@@ -79,10 +79,11 @@ public:
 class tabdetailelem : public wyElem
 {
 public:
-	
+	//~tabdetailelem();
 	wyInt32		m_id;
 	wyInt32		m_tabid;
 	wyInt32		m_position;
+	wyInt32		m_iimage;
 	wyString	m_psztext;
 	COLORREF	m_color;//Color of tab
 	COLORREF	m_fgcolor;//Text color of tab
@@ -1685,6 +1686,7 @@ public:
 	{
 		wyString connstr;
 		wyString pathstr;
+		wyString historydata;
 		ConnectionInfo	conninfo;
 		wyBool			isfocussed;
 		wyIni *inimgr;
@@ -1695,5 +1697,5 @@ public:
 wyBool	ConnectFromList(wyString* failledconnections);
 unsigned __stdcall  ConnectFromList_mt(void* arg_list);
 unsigned __stdcall  Htmlannouncementsproc(void* arg);
-unsigned __stdcall  testthreadsproc(void* arg);
+unsigned __stdcall  sessionsavesproc(void* arg);
 #endif

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3623">重命名</string>
+	<string name="3624">重命名标签</string>
+	<string name="3625">正在还原会话</string>
+	<string name="3626">在启动时还原会话</string>
+	<string name="3627">&amp;重命名	Alt+F2</string>
+	<string name="3628">&amp;重命名标签	Alt+F2</string>
+</resources>

@@ -272,7 +272,7 @@ wyChar *GetUtf8String(const wyChar *ansistr);
 @return MDIWindow pointer
 */
 MDIWindow * GetActiveWin();
-
+MDIWindow * GetActiveWinByPost();
 /// Gets back the max bulk size
 /**
 @param              : OUT The resultant size
@@ -1531,6 +1531,7 @@ wyBool GetSessionFile(wyWChar *path);
 wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo, wyIni *inimgr);
 
 wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt32 id, MDIlist* tempmdilist);
+wyBool GetHistoryDetailsFromTable(wyWChar* path, wyInt32 id, wyString* historydata);
 wyBool GetTabDetailsFromTable(wyWChar* path, wyInt32 id, List* temptablist);
 //wyBool WriteSessionDetails(wyChar* title, ConnectionInfo *conninfo, wyInt32 connectionno, wyBool isfocus);
 

@@ -178,6 +178,7 @@ public:
     static void        OnWmCommand(HWND hwnd, WPARAM wParam);
 	
 	FindAndReplace		*m_findreplace;
+	void GetCompleteTextByPost(wyString &query, MDIWindow *wnd);
 
 private:
 
@@ -196,6 +197,7 @@ private:
     @return wyBool, wyTrue if success, otherwise wyFalse
     */
 	wyBool      SetLastLineVisible();
+	
 
     WNDPROC     m_wporigproc;
 

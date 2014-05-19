@@ -139,12 +139,13 @@ TabModule::Create(MDIWindow * wnd)
 	tabdetailelem  *temptabdetail;
 	tabeditorelem  *temptabeditorele;
     m_isdefault     = wyTrue;
+	HTREEITEM	hitem = NULL;
     wyString temptest;   
     CreateTabControl();
 	CreateCommunityTabHeader();
     CreateHistoryTab(wnd, wyFalse, wyFalse);
 	if(!pGlobals->m_conrestore)
-	CreateQueryEditorTab(wnd);    
+		CreateQueryEditorTab(wnd);    
 	else
 	{
 		totaltabs = wnd->m_listtabdetails->GetCount();
@@ -168,12 +169,19 @@ TabModule::Create(MDIWindow * wnd)
 				temptabeditorele->m_leftortoppercent = temptabdetail->m_leftortoppercent;
 				temptabeditorele->m_psztext.SetAs(temptabdetail->m_psztext);
 				temptabeditorele->m_tooltiptext.SetAs(temptabdetail->m_tooltiptext);
-				CreateQueryEditorTab(wnd);
-				if(!temptabeditorele->m_isfile)
+				//if not IDI_QUERY_16 create advanced editor
+				//CreateAdvEditorTab(wnd, (wyChar *)temptabeditorele->m_psztext.GetString(), temptabeditorele->m_iimage, hfunctionitem, &temptabeditorele->m_psztext);
+				if(temptabdetail->m_iimage == IDI_QUERY_16 || temptabeditorele->m_isfile)
 				{
-					
-					SetTabRename(temptabdetail->m_psztext.GetAsWideChar());
-
+					CreateQueryEditorTab(wnd);
+					if(!temptabeditorele->m_isfile)
+					{
+						SetTabRename(temptabdetail->m_psztext.GetAsWideChar());
+					}
+				}
+				else
+				{
+					CreateAdvEditorTab(wnd, (wyChar *)temptabeditorele->m_psztext.GetString(), temptabdetail->m_iimage, hitem, &temptabeditorele->m_psztext);
 				}
 				temptabeditorele->m_pctabeditor = m_pctabeditor;
 				m_pctabeditor->m_pcetsplitter->SetLeftTopPercent(temptabeditorele->m_leftortoppercent);

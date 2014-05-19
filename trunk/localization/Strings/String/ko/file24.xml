@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3623">이름 바꾸기</string>
+	<string name="3624">탭 이름 바꾸기</string>
+	<string name="3625">세션을 복원 중</string>
+	<string name="3626">시작 시에 세션을 복원</string>
+	<string name="3627">&amp;이름 바꾸기	Alt+F2</string>
+	<string name="3628">&amp;탭 이름 바꾸기	Alt+F2</string>
+</resources>

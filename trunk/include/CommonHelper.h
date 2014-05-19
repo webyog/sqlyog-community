@@ -831,8 +831,9 @@ wyBool		  InitWinSock();
 @return wyTrue if temp file could be oponed, else return wyFalse(means some other thread/prcess already oponed it but not closed still)
 */
 //#if ! defined COMMUNITY && defined _WIN32
+#if defined _WIN32
 wyBool			LockPlinkLockFile(wyFile *plinklock); 
-//#endif
+#endif
 
 #ifdef _WIN32
 //Kills the chid process of a parent proc

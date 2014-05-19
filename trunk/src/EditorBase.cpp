@@ -424,6 +424,59 @@ EditorBase::GetCompleteText(wyString &query)
 	return;
 }
 
+void 
+EditorBase::GetCompleteTextByPost(wyString &query, MDIWindow *wnd)
+{
+	wyUInt32		nstrlen;
+	wyChar			*data;
+
+	THREAD_MSG_PARAM tmp = {0};
+
+    //set the lparam sent
+    
+	if(GetWindowThreadProcessId(m_hwnd , NULL) == GetCurrentThreadId())
+    {
+        nstrlen = SendMessage(m_hwnd, SCI_GETTEXTLENGTH, 0, 0);
+		data = AllocateBuff(nstrlen + 1);
+		SendMessage(m_hwnd, SCI_GETTEXT, (WPARAM)nstrlen+1, (LPARAM)data);
+		query.SetAs(data);
+
+		free(data);
+    }
+    else
+    {
+		if(WaitForSingleObject(pGlobals->m_pcmainwin->m_sqlyogcloseevent, 0) != WAIT_OBJECT_0 )
+		{
+			query.SetAs("");
+			return;
+		}
+		tmp.m_lparam = (LPARAM)&query;
+		tmp.m_hevent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+		//now post the message to ui thread and wait for the event to be set
+		PostMessage(wnd->GetHwnd(), UM_GETEDITORTEXT, (WPARAM)this->GetHWND(), (LPARAM)&tmp);
+		if(WaitForSingleObject(tmp.m_hevent, 10000) == WAIT_TIMEOUT)
+		{
+			//CloseHandle(tmp.m_hevent);
+			query.SetAs("");
+			//return;
+		}
+		//WaitForSingleObject(tmp.m_hevent, INFINITE);
+
+
+		//close the event handle
+		CloseHandle(tmp.m_hevent);
+		tmp.m_hevent = NULL;
+		//data = (wyChar*)tmp.m_lparam;
+		
+	}
+	
+
+	return;
+}
+
+
+
 void
 EditorBase::PasteData()
 {

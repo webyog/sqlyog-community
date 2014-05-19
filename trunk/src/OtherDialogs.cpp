@@ -5483,7 +5483,7 @@ RenameTabDlg::ShowRenameTabDlg(HWND hwndparent)
 INT_PTR CALLBACK
 RenameTabDlg::RenameTabDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	RenameTabDlg*	pcconncolor	=	(RenameTabDlg*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	
 	CTCITEM pitem;
 	pitem.m_mask = CTBIF_TEXT;
 	wyString title;

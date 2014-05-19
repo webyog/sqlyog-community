@@ -191,6 +191,8 @@
 	<string name="205">Revert changes</string>
 	
 	<string name="206">Revert selected changes</string>
+	
+	<string name="207">Rename Query Editor</string>
 
 </resources>
 

@@ -2941,9 +2941,17 @@ CopyDatabase::ExportSP(const wyChar *db, const wyChar *sp, wyBool isproc)
 	 }
 
 	 if(isproc)
+	 {
+		pattern.AddSprintf("PROCEDURE");
+		extra = 9;
 		query.Sprintf("show create procedure `%s`.`%s`", db, sp);
+	 }
 	 else
+	 {
+		pattern.AddSprintf("FUNCTION");
+		extra = 8;
 		query.Sprintf("show create function `%s`.`%s`", db, sp);
+	 }
 
 	res = SjaExecuteAndGetResult(m_newsrctunnel, &m_newsrcmysql, query);
 	if(!res)

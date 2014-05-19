@@ -161,6 +161,8 @@
 #define		UM_SHOWERROR								WM_USER+125
 #define		UM_CONNECTFROMLIST							WM_USER+126
 #define		UM_QUERYCOMPLETED							WM_USER+127
+#define		UM_MDIGETACTIVE								WM_USER+128
+#define		UM_GETEDITORTEXT							WM_USER+129
 
 // some column #defines for validation.
 

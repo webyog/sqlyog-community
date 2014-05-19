@@ -634,6 +634,25 @@ MDIWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
             pcquerywnd->HandleQueryExecFinished(hwnd, pcquerywnd, wparam);
             return wyTrue;
         }
+	case UM_GETEDITORTEXT:
+		//This message is posted by sessionsave thread
+		wyUInt32			nstrlen;
+		LPTHREAD_MSG_PARAM  lptmp = (LPTHREAD_MSG_PARAM)lparam;
+		wyChar				*data;
+		HWND			  hwndedi = (HWND)wparam; 
+
+		nstrlen = SendMessage(hwndedi, SCI_GETTEXTLENGTH, 0, 0);
+		data = AllocateBuff(nstrlen + 1);
+		SendMessage(hwndedi, SCI_GETTEXT, (WPARAM)nstrlen+1, (LPARAM)data);
+		//if there is a valid event handle, then signal the event. if the message was sent using SendMessage, then event handle will be NULL
+		if(lptmp && lptmp->m_hevent && lptmp->m_lparam)
+		{
+			//lptmp->m_lparam = LPARAM(data);
+			((wyString*)lptmp->m_lparam)->SetAs(data);
+			SetEvent(lptmp->m_hevent);
+		}
+		free(data);
+		return wyTrue;
 }
 
 //Community ribbon hyper link
@@ -2645,11 +2664,11 @@ MDIWindow::WriteSQLToEditor2(HANDLE hfile, EditorBase* peditorbase)
 	DWORD		dwbytesread;
 	HCURSOR		hcursor;
     
-	TabEditor	*ptabeditor = NULL;
+	
 	wyString	datastr, codepage;
     wyInt32     headersize = 0, fileformat = 0, size;
     wyWChar     *buff = NULL;
-    wyChar      temp[SIZE_1024 + 1];
+   
     wyBool      isfirstiteration = wyTrue;
     wyChar*      data;
     

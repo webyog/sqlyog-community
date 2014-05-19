@@ -14,6 +14,7 @@ Ctrl+Shift+B		Set Focus On Object Browser Filter
 
 SQL Window
 Ctrl+T			New Query Editor
+Alt+F2			Rename Query Editor
 Ctrl+E			Set Focus On SQL Window
 Ctrl+Y			Redo
 Ctrl+Z			Undo
