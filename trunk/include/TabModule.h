@@ -33,6 +33,7 @@ class TabEditor;
 class EditorBase;
 class TabTypes;
 class TabQueryBuilder;
+class TabSchemaDesigner;
 class TableTabInterface;
 class TabObject;
 class TabHistory;
@@ -340,6 +341,9 @@ public:
 
 	/// TabQueryBuilder class pointer
 	TabQueryBuilder		*m_pctabqb;
+
+	/// TabSchemaDesigner class pointer
+	TabSchemaDesigner		*m_pctabsd;
 
     /// TableTabInterface class pointer
     TableTabInterface   *m_tabinterface;

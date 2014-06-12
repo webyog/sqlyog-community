@@ -2763,6 +2763,7 @@ InitGlobals(PGLOBALS pg)
 	pg->m_sqliteobj = NULL;
 	pg->m_issessionsaveactive = wyFalse;
 	pg->m_sessionsavemutex = NULL;
+	pg->m_sessionrestore = wyTrue;
     return;
 }
     

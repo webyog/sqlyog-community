@@ -88,9 +88,9 @@ extern	PGLOBALS		pGlobals;
 #define			DELIMITERCLOSE		"$$\r\n\r\nDELIMITER ;"
 #define			MAX_RECENT_FILES	9
 #define			RECENT_FILE_COUNT	10
-#define			RECENT_SQLFILE_SUBMENU			16
-#define         RECENT_QUERYBUILDER_SUBMENU     17
-#define			RECENT_SCHEMADESIGNS_SUBMENU	18
+#define			RECENT_SQLFILE_SUBMENU			17
+#define         RECENT_QUERYBUILDER_SUBMENU     18
+#define			RECENT_SCHEMADESIGNS_SUBMENU	19
 #define         WND_MNU_ITEMS       3
 #define         MNU_QUERYBUILDER    8
 #define         MNU_SCHEMADESIGNER				9
@@ -896,13 +896,6 @@ FrameWindow::MoveToInitPos(HWND hwnd)
 	
 	dirstr.SetAs(directory);
 
-    lstyle = wyIni::IniGetInt(SECTION_NAME, "Maximize", 0, dirstr.GetString());
-
-    if(lstyle == 1)
-    {
-		m_showwindowstyle = SW_MAXIMIZE;
-        return wyTrue;
-    }
 
     rc.left = wyIni::IniGetInt(SECTION_NAME, "Left", 0, dirstr.GetString());
 	rc.top	= wyIni::IniGetInt(SECTION_NAME, "Top", 0, dirstr.GetString());
@@ -1010,8 +1003,16 @@ FrameWindow::MoveToInitPos(HWND hwnd)
 		rc.bottom = height;
 	}
 	
-	MoveWindow(hwnd, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, FALSE);        
-    m_showwindowstyle = SW_NORMAL;
+	MoveWindow(hwnd, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, FALSE);  
+
+
+	lstyle = wyIni::IniGetInt(SECTION_NAME, "Maximize", 0, dirstr.GetString());
+
+    if(lstyle == 1)
+		m_showwindowstyle = SW_MAXIMIZE;
+	else
+		 m_showwindowstyle = SW_NORMAL;
+
 	return wyTrue;
 }
 
@@ -1219,6 +1220,7 @@ FrameWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 			ShowWindow(hwnd, pcmainwin->m_showwindowstyle);
 			pcmainwin->m_showwindowstyle = SW_HIDE;
 			SetForegroundWindow(hwnd);
+
 		}
 		else
 		if(wparam == CONSAVE_TIMER)
@@ -6355,7 +6357,8 @@ FrameWindow::OnWmClose(HWND hwnd)
 	wyString  vddmsg;
 #endif
 
-	wyBool retval;
+	wyBool retval = wyTrue;
+	wyString sqlitequery, sqliteerr;
 
 	//block background save thread
 	
@@ -6363,7 +6366,7 @@ FrameWindow::OnWmClose(HWND hwnd)
 		//m_sqlyogclosed = wyTrue;
 	SetEvent(m_savetimerevent);
 	ResetEvent(m_sqlyogcloseevent);
-	if(IsConnectionRestore())
+	if(pGlobals->m_sessionrestore)
 	{
 		if(pGlobals->m_issessionsaveactive == wyTrue)
 		{
@@ -6416,7 +6419,12 @@ FrameWindow::OnWmClose(HWND hwnd)
 	KillTimer(pGlobals->m_pcmainwin->m_hwndmain, CONSAVE_TIMER);
 	SetEvent(m_sqlyogcloseevent);
 	WaitForSingleObject (m_savethread_handle, 1000);
-	
+	if(!retval)
+	{
+		sqlitequery.Sprintf("DELETE FROM conndetails");
+		pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+	}
+	pGlobals->m_sqliteobj->Close();
     return wyTrue;
 }
 
@@ -8893,35 +8901,99 @@ FrameWindow::ShowQueryExecToolTip(wyBool show)
 }
 
 wyBool
-FrameWindow::WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id, TabEditor *tabqueryactive, MDIWindow *wnd)
+FrameWindow::WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id, TabTypes *tabactive, MDIWindow *wnd)
 {
 	sqlite3_stmt*   stmt;
 	TabEditor		*tabquery;
 	wyString		testquery, sqlitequery;
+#ifndef COMMUNITY
+//if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+	TabQueryBuilder		*tabquerybuilder;	
+	TabSchemaDesigner	*tabschemadesigner;
+#endif
 	
+	if(quetabitem.m_iimage == IDI_QUERYBUILDER_16)
+	{
+#ifndef COMMUNITY
+if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+		tabquerybuilder = (TabQueryBuilder*)quetabitem.m_lparam;
+#endif
+	}
+	else
+	if(quetabitem.m_iimage == IDI_SCHEMADESIGNER_16)
+	{
+#ifndef COMMUNITY
+if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+		tabschemadesigner = (TabSchemaDesigner*)quetabitem.m_lparam;
+#endif
+	}
+	else
+	{
 	tabquery = (TabEditor*)quetabitem.m_lparam;
+		temptabeditorele->m_pctabeditor = tabquery;
+	}
+
+		
+	//tabquery = (TabEditor*)quetabitem.m_lparam;
 	temptabeditorele->m_id = id;
 	temptabeditorele->m_ispresent = wyTrue;
-	temptabeditorele->m_pctabeditor = tabquery;
+	
 	temptabeditorele->m_tabid = tabid;
 	temptabeditorele->m_position = position;
 	temptabeditorele->m_color = quetabitem.m_color;
 	temptabeditorele->m_fgcolor = quetabitem.m_fgcolor;
+	temptabeditorele->m_isfocussed = wyFalse;
+	if((TabTypes*)quetabitem.m_lparam == tabactive)
+			temptabeditorele->m_isfocussed = wyTrue;
+	if(quetabitem.m_iimage != IDI_QUERYBUILDER_16 && quetabitem.m_iimage != IDI_SCHEMADESIGNER_16 )
+	{
 	temptabeditorele->m_isedited = temptabeditorele->m_pctabeditor->m_peditorbase->m_edit;
-	CustomTab_GetTitle(wnd->m_pctabmodule->m_hwnd, position, &temptabeditorele->m_psztext);
-	CustomTab_GetTooltip(wnd->m_pctabmodule->m_hwnd, position, &temptabeditorele->m_tooltiptext);
 	temptabeditorele->m_isfile = temptabeditorele->m_pctabeditor->m_peditorbase->m_filename.GetLength() > 0 ? wyTrue : wyFalse;
+		
+		
+		if(!temptabeditorele->m_isfile || temptabeditorele->m_isedited )
+				temptabeditorele->m_pctabeditor->m_peditorbase->GetCompleteTextByPost(testquery, wnd);
+		else
+			testquery.SetAs("");
 	temptabeditorele->m_leftortoppercent = tabquery->m_pcetsplitter->GetLeftTopPercent();
-	if(tabquery == tabqueryactive)
-		temptabeditorele->m_isfocussed = wyTrue;
+	}
 	else
-		temptabeditorele->m_isfocussed = wyFalse;
-	wnd->m_listtabeditor->Insert(temptabeditorele);
+	if(quetabitem.m_iimage == IDI_SCHEMADESIGNER_16)
+	{
+#ifndef COMMUNITY
+if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+{
+		temptabeditorele->m_isedited = tabschemadesigner->m_isedited;
+		temptabeditorele->m_isfile = tabschemadesigner->m_filename.GetLength() > 0 ? wyTrue : wyFalse;
+		temptabeditorele->m_leftortoppercent = 50;
+		if(!temptabeditorele->m_isfile || temptabeditorele->m_isedited )
+			tabschemadesigner->WriteToXMLbuffer(testquery);
+		else
+			testquery.SetAs("");
+}
+#endif
+	}
+	else
+	{
+#ifndef COMMUNITY
+if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+{
+		temptabeditorele->m_isedited = tabquerybuilder->m_isedited;
+		temptabeditorele->m_isfile = tabquerybuilder->m_filename.GetLength() > 0 ? wyTrue : wyFalse;
+		temptabeditorele->m_leftortoppercent = 50;
 	if(!temptabeditorele->m_isfile || temptabeditorele->m_isedited )
-		temptabeditorele->m_pctabeditor->m_peditorbase->GetCompleteTextByPost(testquery, wnd);
+			tabquerybuilder->WriteToXMLbuffer(testquery);
 	else
 		testquery.SetAs("");
-	temptabeditorele->m_leftortoppercent = tabquery->m_pcetsplitter->GetLeftTopPercent();
+}
+#endif
+	}
+	CustomTab_GetTitle(wnd->m_pctabmodule->m_hwnd, position, &temptabeditorele->m_psztext);
+	CustomTab_GetTooltip(wnd->m_pctabmodule->m_hwnd, position, &temptabeditorele->m_tooltiptext);
+
+	
+	wnd->m_listtabeditor->Insert(temptabeditorele);
+	
 	sqlitequery.Sprintf("INSERT INTO tabdetails (Id, Tabid,Tabtype, position,leftortoppercent,isedited, title, tooltip, isfile,isfocussed,content) VALUES \
 												(? , ?,?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -8965,10 +9037,14 @@ FrameWindow::SaveConnectionDetails()
 	wyInt32				subtabcount, totalquetabs;
 	TabEditor			*tabquery,*tabqueryactive;
 	TabHistory			*tabhistory;	
+#ifndef COMMUNITY
+	TabQueryBuilder		*tabquerybuilder;	
+	TabSchemaDesigner	*tabschemadesigner;
+#endif
 	wyString			sqlitequery,sqliteerr,tempstr;
 	wyInt32				newid = 0,newqid = 0;
 	sqlite3_stmt*		stmt;
-
+	TabTypes			*activetab;
 
 	
 	/*if(m_sqlyogclosed)
@@ -9065,6 +9141,9 @@ FrameWindow::SaveConnectionDetails()
 				//flag as new tab
 				subtabcount = CustomTab_GetItemCount(wnd->m_pctabmodule->m_hwnd);
 				tabqueryactive = wnd->GetActiveTabEditor();
+				activetab = wnd->m_pctabmodule->GetActiveTabType();
+				/*if(!tabqueryactive)
+					tabquerybuilderactive = wnd->g*/
 				if(j == totalconntabs && !isend)
 				{
 					//write to sqlite connection attr which will not change throughout the entire session
@@ -9098,11 +9177,11 @@ FrameWindow::SaveConnectionDetails()
 					{
 						quetabitem.m_mask = quetabitem.m_mask |CTBIF_COLOR|CTBIF_LPARAM|CTBIF_IMAGE; 
 						CustomTab_GetItem(wnd->m_pctabmodule->m_hwnd, k, &quetabitem);
-						if(quetabitem.m_iimage == IDI_QUERY_16 || quetabitem.m_iimage == IDI_CREATEVIEW || quetabitem.m_iimage == IDI_CREATEEVENT|| quetabitem.m_iimage == IDI_CREATEPROCEDURE|| quetabitem.m_iimage == IDI_CREATEFUNCTION|| quetabitem.m_iimage == IDI_CREATETRIGGER || quetabitem.m_iimage == IDI_ALTERVIEW || quetabitem.m_iimage == IDI_ALTEREVENT || quetabitem.m_iimage == IDI_ALTERPROCEDURE || quetabitem.m_iimage == IDI_ALTERFUNCTION || quetabitem.m_iimage == IDI_ALTERTRIGGER )
+						if(quetabitem.m_iimage == IDI_SCHEMADESIGNER_16 || quetabitem.m_iimage == IDI_QUERYBUILDER_16 || quetabitem.m_iimage == IDI_QUERY_16 || quetabitem.m_iimage == IDI_CREATEVIEW || quetabitem.m_iimage == IDI_CREATEEVENT|| quetabitem.m_iimage == IDI_CREATEPROCEDURE|| quetabitem.m_iimage == IDI_CREATEFUNCTION|| quetabitem.m_iimage == IDI_CREATETRIGGER || quetabitem.m_iimage == IDI_ALTERVIEW || quetabitem.m_iimage == IDI_ALTEREVENT || quetabitem.m_iimage == IDI_ALTERPROCEDURE || quetabitem.m_iimage == IDI_ALTERFUNCTION || quetabitem.m_iimage == IDI_ALTERTRIGGER )
 						{
 							
 							temptabeditorele = new tabeditorelem;
-							WriteTabDetailsToTable(temptabeditorele, quetabitem, k, k, tempmdilist->m_id, tabqueryactive,  wnd);
+							WriteTabDetailsToTable(temptabeditorele, quetabitem, k, k, tempmdilist->m_id, activetab,  wnd);
 
 						}
 					}
@@ -9126,30 +9205,41 @@ FrameWindow::SaveConnectionDetails()
 					{
 						quetabitem.m_mask = quetabitem.m_mask |CTBIF_COLOR|CTBIF_LPARAM|CTBIF_IMAGE; 
 						CustomTab_GetItem(wnd->m_pctabmodule->m_hwnd, k, &quetabitem);
-						if(quetabitem.m_iimage == IDI_QUERY_16 || quetabitem.m_iimage == IDI_CREATEVIEW || quetabitem.m_iimage == IDI_CREATEEVENT|| quetabitem.m_iimage == IDI_CREATEPROCEDURE|| quetabitem.m_iimage == IDI_CREATEFUNCTION|| quetabitem.m_iimage == IDI_CREATETRIGGER || quetabitem.m_iimage == IDI_ALTERVIEW || quetabitem.m_iimage == IDI_ALTEREVENT || quetabitem.m_iimage == IDI_ALTERPROCEDURE || quetabitem.m_iimage == IDI_ALTERFUNCTION || quetabitem.m_iimage == IDI_ALTERTRIGGER )
+						if(quetabitem.m_iimage == IDI_SCHEMADESIGNER_16 || quetabitem.m_iimage == IDI_QUERYBUILDER_16 || quetabitem.m_iimage == IDI_QUERY_16 || quetabitem.m_iimage == IDI_CREATEVIEW || quetabitem.m_iimage == IDI_CREATEEVENT|| quetabitem.m_iimage == IDI_CREATEPROCEDURE|| quetabitem.m_iimage == IDI_CREATEFUNCTION|| quetabitem.m_iimage == IDI_CREATETRIGGER || quetabitem.m_iimage == IDI_ALTERVIEW || quetabitem.m_iimage == IDI_ALTEREVENT || quetabitem.m_iimage == IDI_ALTERPROCEDURE || quetabitem.m_iimage == IDI_ALTERFUNCTION || quetabitem.m_iimage == IDI_ALTERTRIGGER )
 						{
+							if(quetabitem.m_iimage == IDI_QUERYBUILDER_16)
+							{
+#ifndef COMMUNITY
+if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+								tabquerybuilder = (TabQueryBuilder*)quetabitem.m_lparam;
+#endif
+							}
+							else
+							if(quetabitem.m_iimage == IDI_SCHEMADESIGNER_16)
+						{
+#ifndef COMMUNITY
+if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+								tabschemadesigner = (TabSchemaDesigner*)quetabitem.m_lparam;
+#endif
+							}
+							else
 							tabquery = (TabEditor*)quetabitem.m_lparam;
+								
 							isendq = wyFalse;
 							for(l = 0; l < totalquetabs && !isendq; l++)
 							{
 								if(l == 0)
 									temptabeditorele = (tabeditorelem*)wnd->m_listtabeditor->GetFirst();
-								if(temptabeditorele->m_pctabeditor == tabquery )
+								//if((quetabitem.m_iimage == IDI_QUERY_16 && temptabeditorele->m_pctabeditor == tabquery) || (quetabitem.m_iimage == IDI_QUERYBUILDER_16 && temptabeditorele->m_pctabeditor == tabquerybuilder))
+								if(temptabeditorele->m_tabptr == quetabitem.m_lparam)
 								{
 									//mark as present
 									temptabeditorele->m_ispresent = wyTrue;
+									isendq = wyTrue;//end of loop matched querytab
 									if(temptabeditorele->m_position!=k)
 									{
 										temptabeditorele->m_position = k;//position change update to sqlite based on tempmdilist->m_id & update list
 										sqlitequery.Sprintf("UPDATE tabdetails SET position = %d WHERE Id = %d AND Tabid = %d", k,tempmdilist->m_id, temptabeditorele->m_tabid);
-										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
-									}
-									//else
-									isendq = wyTrue;//end of loop matched querytab
-									if(temptabeditorele->m_isedited != temptabeditorele->m_pctabeditor->m_peditorbase->m_edit)
-									{
-										temptabeditorele->m_isedited = temptabeditorele->m_pctabeditor->m_peditorbase->m_edit;
-										sqlitequery.Sprintf("UPDATE tabdetails set isedited = %d where Id = %d AND Tabid = %d",temptabeditorele->m_isedited,tempmdilist->m_id, temptabeditorele->m_tabid);
 										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
 									}
 									if(temptabeditorele->m_color != quetabitem.m_color)
@@ -9175,35 +9265,45 @@ FrameWindow::SaveConnectionDetails()
 										pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
 										pGlobals->m_sqliteobj->Finalize(&stmt);	
 									}
-									CustomTab_GetTooltip(wnd->m_pctabmodule->m_hwnd, k, &tempstr);
+										CustomTab_GetTooltip(wnd->m_pctabmodule->m_hwnd, k, &tempstr);
 									if(temptabeditorele->m_tooltiptext.Compare(tempstr.GetString()) != 0 )
 									{
 										temptabeditorele->m_tooltiptext.SetAs(tempstr.GetString());
-										sqlitequery.Sprintf("UPDATE tabdetails set tooltiptext = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
+										sqlitequery.Sprintf("UPDATE tabdetails set tooltip = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
 										pGlobals->m_sqliteobj->Prepare(&stmt, sqlitequery.GetString());
 										pGlobals->m_sqliteobj->SetText(&stmt, 1,  temptabeditorele->m_tooltiptext.GetString());
 										pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
 										pGlobals->m_sqliteobj->Finalize(&stmt);	
 									}
-									if(!temptabeditorele->m_isfile && temptabeditorele->m_pctabeditor->m_peditorbase->m_filename.GetLength() > 0)
-									{
-										temptabeditorele->m_isfile = wyTrue;
-										sqlitequery.Sprintf("UPDATE tabdetails set isfile = 1 where Id = %d AND Tabid = %d",tempmdilist->m_id,temptabeditorele->m_tabid);
-										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
-									}
-									if(tabquery == tabqueryactive && !temptabeditorele->m_isfocussed)
+									if((TabTypes*)quetabitem.m_lparam == activetab && !temptabeditorele->m_isfocussed)
 									{
 										temptabeditorele->m_isfocussed = wyTrue;
 										sqlitequery.Sprintf("UPDATE tabdetails set isfocussed = 1 where Id = %d AND Tabid = %d", tempmdilist->m_id, temptabeditorele->m_tabid );
 										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
 									}
 									else
-									if(tabquery != tabqueryactive && temptabeditorele->m_isfocussed)
+									if((TabTypes*)quetabitem.m_lparam != activetab && temptabeditorele->m_isfocussed)
 									{
 										temptabeditorele->m_isfocussed = wyFalse;
 										sqlitequery.Sprintf("UPDATE tabdetails set isfocussed = 0 where Id = %d AND Tabid = %d", tempmdilist->m_id, temptabeditorele->m_tabid );
 										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
 									}
+									if(quetabitem.m_iimage != IDI_QUERYBUILDER_16 && quetabitem.m_iimage != IDI_SCHEMADESIGNER_16)
+									{
+										//pctabeditor = (TabEditor*)quetabitem.m_lparam;
+										if(temptabeditorele->m_isedited != tabquery->m_peditorbase->m_edit)
+										{
+											temptabeditorele->m_isedited = temptabeditorele->m_pctabeditor->m_peditorbase->m_edit;
+											sqlitequery.Sprintf("UPDATE tabdetails set isedited = %d where Id = %d AND Tabid = %d",temptabeditorele->m_isedited,tempmdilist->m_id, temptabeditorele->m_tabid);
+											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										}
+										if(!temptabeditorele->m_isfile && tabquery->m_peditorbase->m_filename.GetLength() > 0)
+										{
+											temptabeditorele->m_isfile = wyTrue;
+											sqlitequery.Sprintf("UPDATE tabdetails set isfile = 1 where Id = %d AND Tabid = %d",tempmdilist->m_id,temptabeditorele->m_tabid);
+											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										}
+										
 	
 									if(!temptabeditorele->m_isfile || temptabeditorele->m_isedited )
 									{
@@ -9224,6 +9324,70 @@ FrameWindow::SaveConnectionDetails()
 										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
 									}
 								}
+									else
+									if(quetabitem.m_iimage == IDI_QUERYBUILDER_16)
+									{
+#ifndef COMMUNITY
+if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+{
+										if(temptabeditorele->m_isedited != tabquerybuilder->m_isedited)
+										{
+											temptabeditorele->m_isedited = tabquerybuilder->m_isedited;
+											sqlitequery.Sprintf("UPDATE tabdetails set isedited = %d where Id = %d AND Tabid = %d",temptabeditorele->m_isedited,tempmdilist->m_id, temptabeditorele->m_tabid);
+											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										}
+										if(!temptabeditorele->m_isfile && tabquerybuilder->m_filename.GetLength() > 0)
+										{
+											temptabeditorele->m_isfile = wyTrue;
+											sqlitequery.Sprintf("UPDATE tabdetails set isfile = 1 where Id = %d AND Tabid = %d",tempmdilist->m_id,temptabeditorele->m_tabid);
+											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										}
+										if(!temptabeditorele->m_isfile || temptabeditorele->m_isedited )
+										{
+											testquery = new wyString;
+											tabquerybuilder->WriteToXMLbuffer(*testquery);
+											sqlitequery.Sprintf("UPDATE tabdetails set content = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
+											pGlobals->m_sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+											pGlobals->m_sqliteobj->SetText(&stmt, 1,  testquery->GetString());
+											delete testquery;
+											pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
+											pGlobals->m_sqliteobj->Finalize(&stmt);	
+										}
+}
+#endif
+									}
+									else
+									{
+#ifndef COMMUNITY
+if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+{
+										if(temptabeditorele->m_isedited != tabschemadesigner->m_isedited)
+										{
+											temptabeditorele->m_isedited = tabschemadesigner->m_isedited;
+											sqlitequery.Sprintf("UPDATE tabdetails set isedited = %d where Id = %d AND Tabid = %d",temptabeditorele->m_isedited,tempmdilist->m_id, temptabeditorele->m_tabid);
+											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										}
+										if(!temptabeditorele->m_isfile && tabschemadesigner->m_filename.GetLength() > 0)
+										{
+											temptabeditorele->m_isfile = wyTrue;
+											sqlitequery.Sprintf("UPDATE tabdetails set isfile = 1 where Id = %d AND Tabid = %d",tempmdilist->m_id,temptabeditorele->m_tabid);
+											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										}
+										if(!temptabeditorele->m_isfile || temptabeditorele->m_isedited )
+										{
+											testquery = new wyString;
+											tabschemadesigner->WriteToXMLbuffer(*testquery);
+											sqlitequery.Sprintf("UPDATE tabdetails set content = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
+											pGlobals->m_sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+											pGlobals->m_sqliteobj->SetText(&stmt, 1,  testquery->GetString());
+											delete testquery;
+											pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
+											pGlobals->m_sqliteobj->Finalize(&stmt);	
+										}
+}
+#endif
+									}
+								}
 								temptabeditorele = (tabeditorelem*)temptabeditorele->m_next;
 								//flag as new tab
 							}
@@ -9233,7 +9397,7 @@ FrameWindow::SaveConnectionDetails()
 								//save in list and sqlite
 								newqid = newqid + 1;
 								temptabeditorele = new tabeditorelem;
-								WriteTabDetailsToTable(temptabeditorele, quetabitem, newqid, k, tempmdilist->m_id, tabqueryactive,  wnd);
+								WriteTabDetailsToTable(temptabeditorele, quetabitem, newqid, k, tempmdilist->m_id, activetab,  wnd);
 
 								
 							}
@@ -9376,14 +9540,16 @@ ConnectFromList(wyString* failledconnections)
     wyInt32				focuspos,firstindex = 0;
     HANDLE				hfind;
     WIN32_FIND_DATAW	fdata;
-    wyString			directoryname;
+    wyString			directoryname,jobbuff;
 	wySQLite			*sqliteobj;
 	wyString			sqlitequery,sqliteerr;
 	sqlite3_stmt    *res;
 	tabdetailelem  *temptabdetail;
 	tabeditorelem  *temptabeditorele;
 	TabHistory *tabhistory;
-
+	TiXmlDocument		*doc;
+	TabQueryBuilder *tabquerybuilder;
+	TabSchemaDesigner	*tabschemadesigner;
 
 	if(pGlobals->m_configdirpath.GetLength())
 	{
@@ -9425,7 +9591,7 @@ ConnectFromList(wyString* failledconnections)
 	thread_handle_l=new HANDLE[totalcon];
 	my_arg = new MY_ARG[totalcon];
 
-	sqlitequery.SetAs("SELECT Id from conndetails");
+	sqlitequery.SetAs("SELECT Id FROM conndetails ORDER BY position");
 	sqliteobj->Prepare(&res, sqlitequery.GetString());
 
 	i = 0;
@@ -9513,10 +9679,58 @@ ConnectFromList(wyString* failledconnections)
 						{
 							//load file
 							CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd,  i);
+							if(temptabeditorele->m_iimage != IDI_QUERYBUILDER_16 && temptabeditorele->m_iimage != IDI_SCHEMADESIGNER_16)
+							{
 							temptabeditorele->m_pctabeditor->m_peditorbase->m_save = temptabeditorele->m_isedited ? wyFalse : wyTrue;
-							isfileopen = pcquerywnd->OpenSQLFile2(&temptabeditorele->m_tooltiptext,temptabeditorele->m_pctabeditor->m_peditorbase,wyFalse);
+							isfileopen = pcquerywnd->OpenSQLFile2(&temptabeditorele->m_tooltiptext,temptabeditorele->m_pctabeditor->m_peditorbase, wyFalse);
+							
+							}
+							else
+							if(temptabeditorele->m_iimage == IDI_QUERYBUILDER_16)
+							{
+#ifndef COMMUNITY
+							if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+							{
+								doc = new TiXmlDocument();
+								isfileopen = tabquerybuilder->HandleQueryBuilderfileOnrestore(temptabeditorele->m_tooltiptext.GetAsWideChar(), &jobbuff);
+								if(isfileopen && !temptabeditorele->m_isedited)
+								{
+									doc->Parse(jobbuff.GetString());
+									CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd,  i);
+									tabquerybuilder = (TabQueryBuilder*)temptabeditorele->m_tabptr;
+									//m_isautomated is set to wyTrue to automate the existing QB generation routines
+									tabquerybuilder->m_isautomated = wyTrue;
+									tabquerybuilder->LoadQueryXML(doc, &temptabeditorele->m_tooltiptext);
+									tabquerybuilder->m_isautomated = wyFalse;
+									//CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd,  i, 1);
+								}
+							}
+#endif
+							}
+							else
+							{
+#ifndef COMMUNITY
+							if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+							{
+								doc = new TiXmlDocument();
+								isfileopen = tabschemadesigner->HandleSchemaDesignfileOnrestore(temptabeditorele->m_tooltiptext.GetAsWideChar(), &jobbuff);
+								
+								if(isfileopen && !temptabeditorele->m_isedited)
+								{
+									doc->Parse(jobbuff.GetString());
+									CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd,  i);
+									tabschemadesigner = (TabSchemaDesigner*)temptabeditorele->m_tabptr;
+									//m_isautomated is set to wyTrue to automate the existing QB generation routines
+									tabschemadesigner->m_isedited = wyFalse;
+									tabschemadesigner->m_isautomated = wyTrue;
+									tabschemadesigner->CanvasLoadXML(doc, &temptabeditorele->m_tooltiptext);
+									tabschemadesigner->m_isautomated = wyFalse;
+								}
+							}
+#endif
+							}
 							if(isfileopen)
-								pcquerywnd->m_pctabmodule->SetTabName(temptabeditorele->m_tooltiptext.GetAsWideChar(),wyTrue,temptabeditorele->m_isedited);
+								pcquerywnd->m_pctabmodule->SetTabName(temptabeditorele->m_tooltiptext.GetAsWideChar(), wyFalse, temptabeditorele->m_isedited);
 							else
 							{
 								temptabdetail = (tabdetailelem*)temptabdetail->m_next;
@@ -9529,10 +9743,61 @@ ConnectFromList(wyString* failledconnections)
 								continue;
 							}
 						}
-						if(!temptabeditorele->m_isfile || temptabeditorele->m_isedited)
+						if((temptabeditorele->m_iimage != IDI_QUERYBUILDER_16 && temptabeditorele->m_iimage != IDI_SCHEMADESIGNER_16) && (!temptabeditorele->m_isfile || temptabeditorele->m_isedited))
 							SendMessage(temptabeditorele->m_pctabeditor->m_peditorbase->m_hwnd, SCI_SETTEXT, temptabdetail->m_content.GetLength(),(LPARAM)temptabdetail->m_content.GetString());
+						else
+						if(temptabeditorele->m_iimage == IDI_QUERYBUILDER_16 && (!temptabeditorele->m_isfile || temptabeditorele->m_isedited))
+							{
+#ifndef COMMUNITY
+							if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+							{
+								doc = new TiXmlDocument();
+								doc->Parse(temptabdetail->m_content.GetString());
+								CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd,  i);
+								tabquerybuilder = (TabQueryBuilder*)temptabeditorele->m_tabptr;
+								//m_isautomated is set to wyTrue to automate the existing QB generation routines
+								tabquerybuilder->m_isautomated = wyTrue;
+								tabquerybuilder->LoadQueryXML(doc, NULL, wyTrue);
+								tabquerybuilder->m_isautomated = wyFalse;
+								tabquerybuilder->m_isedited = temptabeditorele->m_isedited;
+								if(temptabeditorele->m_isfile)
+								{
+									tabquerybuilder->m_filename.SetAs(temptabeditorele->m_tooltiptext);
+									pcquerywnd->m_pctabmodule->SetTabName(temptabeditorele->m_tooltiptext.GetAsWideChar(),wyFalse,temptabeditorele->m_isedited);
+								}
+								//CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd,  i, 1);
+								pcquerywnd->SetDirtyTitle();
+							}
+#endif
+							}
+						else
+						if(temptabeditorele->m_iimage == IDI_SCHEMADESIGNER_16 && (!temptabeditorele->m_isfile || temptabeditorele->m_isedited))
+							{
+#ifndef COMMUNITY
+							if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
+							{
+								doc = new TiXmlDocument();
+								doc->Parse(temptabdetail->m_content.GetString());
+								CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd,  i);
+								tabschemadesigner = (TabSchemaDesigner*)temptabeditorele->m_tabptr;
+								//m_isautomated is set to wyTrue to automate the existing QB generation routines
+								tabschemadesigner->m_isautomated = wyTrue;
+								tabschemadesigner->m_isedited = wyTrue;
+								tabschemadesigner->CanvasLoadXML(doc, NULL, NULL, wyTrue);
+								tabschemadesigner->m_isautomated = wyFalse;
+								tabschemadesigner->m_isedited = temptabeditorele->m_isedited;
+								if(temptabeditorele->m_isfile)
+								{
+									tabschemadesigner->m_filename.SetAs(temptabeditorele->m_tooltiptext);
+									pcquerywnd->m_pctabmodule->SetTabName(temptabeditorele->m_tooltiptext.GetAsWideChar(), wyFalse, temptabeditorele->m_isedited);
+								}
 
-							temptabeditorele->m_pctabeditor->m_peditorbase->m_edit = temptabeditorele->m_isedited ? wyTrue : wyFalse;
+								pcquerywnd->SetDirtyTitle();
+							}
+#endif
+							}
+						if(temptabeditorele->m_iimage != IDI_QUERYBUILDER_16 && temptabeditorele->m_iimage != IDI_SCHEMADESIGNER_16)
+							temptabeditorele->m_pctabeditor->m_peditorbase->m_edit = temptabeditorele->m_isedited;
 						//set focus
 						if(temptabeditorele->m_isfocussed)
 						{
@@ -9564,6 +9829,7 @@ ConnectFromList(wyString* failledconnections)
 		//focussedconn = 0;
 		if(focussedconn >= 0)
 			CustomTab_SetCurSel(pGlobals->m_pcmainwin->m_hwndconntab, focussedconn, 1);
+		
 		pGlobals->m_conrestore = wyFalse;
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
 		return wyTrue;
@@ -9709,7 +9975,7 @@ sessionsavesproc(void *arg)
 	wyString			sqlitequery,sqliteerr;
 	//HANDLE					namedmutex;
 	//SECURITY_ATTRIBUTES		lpMutexAttributes;
-	wyBool				ismutexowned = wyFalse, ispurge = wyFalse, isvacuum = wyTrue;
+	wyBool				ismutexowned = wyFalse, ispurge = wyFalse, isvacuum = wyTrue, ret;
 	wyFile					plinklock;
 	sqlite3_stmt		*res;
 	/*lpMutexAttributes.bInheritHandle = TRUE;
@@ -9823,7 +10089,14 @@ sessionsavesproc(void *arg)
 	FindClose(hfind);
 
 	if(!IsConnectionRestore())
+	{
+		pGlobals->m_sessionrestore = wyFalse;
 		ispurge = wyTrue;
+	}
+	else
+	{
+		pGlobals->m_sessionrestore = wyTrue;
+	}
 
 	//mdiwindow and tabeditor pointers, can be deleted during save
 	//open db or create db if it does not exist
@@ -9849,7 +10122,7 @@ sessionsavesproc(void *arg)
 		//set timer event to non signalled
 		ResetEvent(pGlobals->m_pcmainwin->m_savetimerevent);
 
-		if(!IsConnectionRestore())
+		if(!pGlobals->m_sessionrestore)
 		{
 			pGlobals->m_issessionsaveactive = wyFalse;
 			
@@ -9908,7 +10181,11 @@ sessionsavesproc(void *arg)
 					isvacuum = wyFalse;
 				}
 				if(WaitForSingleObject(pGlobals->m_pcmainwin->m_sqlyogcloseevent, 0) == WAIT_OBJECT_0 )
-					pGlobals->m_pcmainwin->SaveConnectionDetails();
+				{
+					ret = pGlobals->m_pcmainwin->SaveConnectionDetails();
+					if(!ret && !pGlobals->m_pcmainwin->m_hwndconntab)
+						ispurge = wyTrue;
+				}
 			
 
 			}

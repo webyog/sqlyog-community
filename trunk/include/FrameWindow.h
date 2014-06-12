@@ -1632,7 +1632,7 @@ public:
 
 	wyBool				SaveConnectionDetails();
 
-	wyBool				WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id,TabEditor *tabqueryactive, MDIWindow *wnd);
+	wyBool				WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id,TabTypes *tabqueryactive, MDIWindow *wnd);
 
 
     //flag tells whether to close all the mdi windows

@@ -1828,6 +1828,10 @@ PreferenceBase::SetBoolProfileString(HWND hwnd, wyWChar *appname, wyWChar *keyna
         pGlobals->m_ishistoryunderquery = (status ? wyTrue : wyFalse);
         break;
 
+	case IDC_CONRESTORE:
+		pGlobals->m_sessionrestore = (status ? wyTrue : wyFalse);
+        break;
+
 	default:
 		return (status ? wyTrue : wyFalse);
 	}

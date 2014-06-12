@@ -713,6 +713,7 @@ typedef struct tagGlobals
 	wySQLite			*m_sqliteobj;
 	wyBool		m_issessionsaveactive;
 	HANDLE		m_sessionsavemutex;
+	wyBool		m_sessionrestore;
 } GLOBALS, *PGLOBALS;
 
 

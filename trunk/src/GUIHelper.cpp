@@ -9071,6 +9071,7 @@ wyBool GetTabDetailsFromTable(wyWChar* path, wyInt32 id, List* temptablist)
 	wyString			sqlitequery,sqliteerr;
 	sqlite3_stmt    *res;
 	const wyChar    *colval = NULL;
+	wyInt32				tabtype;
 	
 	tabdetailelem  *temptabdetail;
 
@@ -9109,20 +9110,34 @@ wyBool GetTabDetailsFromTable(wyWChar* path, wyInt32 id, List* temptablist)
 	{
 		//Id INTEGER ,Tabid INTEGER,position INTEGER, title TEXT,tooltip TEXT,isfile INTEGER, isfocussed INTEGER, content TEXT
 		//also add tabtype
+		colval = sqliteobj->GetText(&res , "Tabtype");
+		if(colval)
+		{
+			tabtype = sqliteobj->GetInt(&res , "Tabtype");
+			if(tabtype == IDI_QUERYBUILDER_16 || tabtype == IDI_SCHEMADESIGNER_16 )
+			{
+#ifdef COMMUNITY
+				continue;
+#endif
+			if(pGlobals->m_pcmainwin->m_connection->m_enttype == ENT_PRO )
+				continue;
+
+			}
+		}
+		else
+			//fail
+			tabtype = IDI_QUERY_16;
+		
 		temptabdetail = new tabdetailelem;
 		temptabdetail->m_id = id;
+		temptabdetail->m_iimage = tabtype;
 		 colval = sqliteobj->GetText(&res , "Tabid");
 		 if(colval)
 			 temptabdetail->m_tabid = sqliteobj->GetInt(&res , "Tabid");
 		 else
 			 //fail
 			 temptabdetail->m_tabid = 0;
-		 colval = sqliteobj->GetText(&res , "Tabtype");
-		 if(colval)
-			 temptabdetail->m_iimage = sqliteobj->GetInt(&res , "Tabtype");
-		 else
-			 //fail
-			 temptabdetail->m_iimage = IDI_QUERY_16;
+		 
 
 		 colval = sqliteobj->GetText(&res , "position");
 		 if(colval)
