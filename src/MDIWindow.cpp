@@ -2421,7 +2421,7 @@ MDIWindow::OpenSQLFile2(wyString *filename, EditorBase* peditorbase, wyBool isre
 
 	if(hfile == INVALID_HANDLE_VALUE)
 	{
-        DisplayErrorText(GetLastError(), _("Could not open file."), peditorbase->m_hwnd);
+       // DisplayErrorText(GetLastError(), _("Could not open file."), peditorbase->m_hwnd);
 		return wyFalse;
 	}
 	
@@ -2454,7 +2454,7 @@ MDIWindow::OpenSQLFile2(wyString *filename, EditorBase* peditorbase, wyBool isre
 	//{
 	//	peditorbase->m_save = wyTrue;
 	//	peditorbase->m_edit = wyFalse;
- //       SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
+        SendMessage(peditorbase->m_hwnd, SCI_SETSAVEPOINT, 0, 0);
 	//}
 		
     SetFocus(peditorbase->GetHWND());

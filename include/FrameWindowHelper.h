@@ -163,6 +163,9 @@
 #define		UM_QUERYCOMPLETED							WM_USER+127
 #define		UM_MDIGETACTIVE								WM_USER+128
 #define		UM_GETEDITORTEXT							WM_USER+129
+#define		UM_QBITEMFROM								WM_USER+130
+#define		UM_QBITEMTO									WM_USER+131
+
 
 // some column #defines for validation.
 
