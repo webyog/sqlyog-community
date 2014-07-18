@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3629">오픈 세션 세이브포인트...	Ctrl+Shift+O</string>
+	<string name="3630">세션을 저장...	Ctrl+Shift+S</string>
+	<string name="3631">세션을 다음 이름으로 저장...</string>
+	<string name="3632">세션을 종료	Ctrl+Shift+X</string>
+	<string name="3633">세션 세이브포인트의 백업이 다음에 생성됨:</string>
+	<string name="3634">참고: 다른 호스트로 복사를 원하시면, 파일 -> 새 연결을 사용해서 복수의 호스트에 연결하십시오. 연결 대상 드롭다운 메뉴에 모든 연결이 표시됩니다.</string>
+	<string name="3635">연결</string>
+	<string name="3636">현재 세션을 저장하시겠습니까?</string>
+	<string name="3637">구매</string>
+	<string name="3638">시도</string>
+	<string name="3639">일 재판 왼쪽</string>
+	<string name="3640">일 재판 왼쪽</string>
+</resources>

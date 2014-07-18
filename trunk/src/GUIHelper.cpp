@@ -519,7 +519,10 @@ ChangeFileMenuItem(HMENU hmenu)
 	else
 		EnableMenuItem(hmenu, ID_FILE_RENAMETAB, MF_GRAYED | MF_BYCOMMAND);
 
-
+	if(!pGlobals->m_pcmainwin->m_sessionfile.GetLength())
+			EnableMenuItem(hmenu, ID_CLOSESESSION, MF_GRAYED | MF_BYCOMMAND);
+		else
+			EnableMenuItem(hmenu, ID_CLOSESESSION, MF_ENABLED);
 
 	if(tabicon == IDI_DATASEARCH || tabicon == IDI_TABLEINDEX || tabicon == IDI_CREATETABLE || tabicon == IDI_ALTERTABLE)
     {
@@ -8075,7 +8078,7 @@ OnScintillaNotification(WPARAM wparam, LPARAM lparam, wyBool isquerytab)
             {
                 return 0;
             }
-
+			SetEvent(pGlobals->m_pcmainwin->m_sessionchangeevent);
             pscn = (SCNotification*)lparam;
 
             if(pscn->modificationType & SC_MOD_BEFOREINSERT || pscn->modificationType & SC_MOD_BEFOREDELETE)
@@ -9227,6 +9230,87 @@ wyBool GetHistoryDetailsFromTable(wyWChar* path, wyInt32 id, wyString *historyda
 	sqliteobj->Finalize(&res);
 	return wyTrue;
 }
+
+wyBool GetOBDetailsFromTable(wyWChar* path, wyInt32 id, wyString *obdb)
+{
+	wyString pathstr;
+	//wyBool isfocussed = wyFalse;
+    
+    HANDLE				hfind;
+    WIN32_FIND_DATAW	fdata;
+    wyString			directoryname;
+	wySQLite			*sqliteobj;
+	wyString			sqlitequery,sqliteerr;
+	sqlite3_stmt    *res;
+	const wyChar    *colval = NULL;
+	//wyInt32			 position = 0;
+	
+	pathstr.SetAs(path);
+	hfind = FindFirstFile(path, &fdata);			
+	directoryname.SetAs(path);
+	sqliteobj = new wySQLite;
+
+	if(hfind == INVALID_HANDLE_VALUE)
+	{
+		//no db found
+		//done
+		return wyFalse;
+	}
+	sqliteobj->Open(directoryname.GetString(), wyTrue);
+	sqlitequery.Sprintf("SELECT * from obdetails where Id = %d",id);
+	sqliteobj->Prepare(&res, sqlitequery.GetString());
+	if(sqliteobj->Step(&res, wyFalse) && sqliteobj->GetLastCode() == SQLITE_ROW)
+	{
+		colval = sqliteobj->GetText(&res , "obdb");
+		if(colval)
+			 obdb->SetAs(colval);
+	}
+	sqliteobj->Finalize(&res);
+	return wyTrue;
+}
+
+wyBool GetSessionfileDetailsFromTable(wyWChar* path, wyInt32 *isedited, wyString *obdb)
+{
+	wyString pathstr;
+	//wyBool isfocussed = wyFalse;
+    
+    HANDLE				hfind;
+    WIN32_FIND_DATAW	fdata;
+    wyString			directoryname;
+	wySQLite			*sqliteobj;
+	wyString			sqlitequery,sqliteerr;
+	sqlite3_stmt    *res;
+	const wyChar    *colval = NULL;
+	//wyInt32			 position = 0;
+	
+	pathstr.SetAs(path);
+	hfind = FindFirstFile(path, &fdata);			
+	directoryname.SetAs(path);
+	sqliteobj = new wySQLite;
+
+	if(hfind == INVALID_HANDLE_VALUE)
+	{
+		//no db found
+		//done
+		return wyFalse;
+	}
+	sqliteobj->Open(directoryname.GetString(), wyTrue);
+	sqlitequery.Sprintf("SELECT * from sessiondetails where Id = 1");
+	sqliteobj->Prepare(&res, sqlitequery.GetString());
+	if(sqliteobj->Step(&res, wyFalse) && sqliteobj->GetLastCode() == SQLITE_ROW)
+	{
+		colval = sqliteobj->GetText(&res , "filename");
+		if(colval)
+			 obdb->SetAs(colval);
+
+		colval = sqliteobj->GetText(&res , "isedited");
+		 if(colval)
+			 *isedited = sqliteobj->GetInt(&res , "isedited");
+	}
+	sqliteobj->Finalize(&res);
+	return wyTrue;
+}
+
 wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt32 id, MDIlist* tempmdilist)
 {
 	wyString pathstr;
@@ -9786,34 +9870,35 @@ WriteFullSectionToFile(FILE *out_stream, wyInt32 conno, ConnectionInfo *coninfo,
 //}
 
 wyBool	
-WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, ConnectionInfo *coninfo, const wyChar *title, wyBool isfocussed)
+WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, ConnectionInfo *coninfo, const wyChar *title, wyBool isfocussed,wySQLite	*ssnsqliteobj)
 {
 	wyString temp, pass, tempstr;
 	TUNNELAUTH *auth = NULL;
 	sqlite3_stmt*   stmt;
-
+	wySQLite	*sqliteobj;
+	sqliteobj = ssnsqliteobj ? ssnsqliteobj : pGlobals->m_sqliteobj;
 	sqlitequery->Sprintf("INSERT INTO conndetails (Id ,position ,ObjectbrowserBkcolor  ,ObjectbrowserFgcolor  ,isfocussed ,Name   ,Host   ,User   ,Password   ,Port  ,StorePassword  ,keep_alive  ,Database   ,compressedprotocol  ,defaulttimeout  ,waittimeoutvalue  ,Tunnel  ,Http   ,HTTPTime  ,HTTPuds  ,HTTPudsPath   , Is401  ,IsProxy  ,Proxy   , ProxyUser  , ProxyPwd   , ProxyPort   , User401 , Pwd401 , ContentType , HttpEncode  ,SSH  ,SshUser  ,SshPwd  ,SshHost  ,SshPort  ,SshForHost  ,SshPasswordRadio  ,SSHPrivateKeyPath  ,SshSavePassword  ,SslChecked  ,SshAuth  ,Client_Key  ,Client_Cert  ,CA  ,Cipher  ,sqlmode_global  ,sqlmode_value ,init_command ) VALUES \
 												  (?   ,?       ,?						,?						  ,?	     ,?       ,?       ,?       ,?       ,?       ,?           ,?          ,?          ,?			       ,?				       ,?			 ,?       ,?       ,?       ,?       ,?					,?       ,?       ,?       ,?		       ,?	       ,?	       ,?	       ,?	       ,?	       ,?       ,?       ,?       ,?       ,?       ,?       ,?				 ,?			       ,?			       ,?			       ,?		    ,?       ,?          ,?           ,?     ,?       ,?			  ,?			,?)");
 	
 	
-	pGlobals->m_sqliteobj->Prepare(&stmt,sqlitequery->GetString());
+	sqliteobj->Prepare(&stmt,sqlitequery->GetString());
 	
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 1, id);
+	sqliteobj->SetInt(&stmt, 1, id);
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 2, position);
+	sqliteobj->SetInt(&stmt, 2, position);
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 3, coninfo->m_rgbconn);
+	sqliteobj->SetInt(&stmt, 3, coninfo->m_rgbconn);
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 4, coninfo->m_rgbfgconn);
+	sqliteobj->SetInt(&stmt, 4, coninfo->m_rgbfgconn);
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 5, isfocussed);
+	sqliteobj->SetInt(&stmt, 5, isfocussed);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 6, title);
+	sqliteobj->SetText(&stmt, 6, title);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 7, coninfo->m_host.GetLength()?coninfo->m_host.GetString():"");
+	sqliteobj->SetText(&stmt, 7, coninfo->m_host.GetLength()?coninfo->m_host.GetString():"");
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 8, coninfo->m_user.GetLength()?coninfo->m_user.GetString():"");
+	sqliteobj->SetText(&stmt, 8, coninfo->m_user.GetLength()?coninfo->m_user.GetString():"");
 
 
 	if(coninfo->m_ishttp)
@@ -9826,34 +9911,34 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 	}
 	EncodePassword(pass);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 9, pass.GetLength()?pass.GetString():"");
+	sqliteobj->SetText(&stmt, 9, pass.GetLength()?pass.GetString():"");
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 10, coninfo->m_port);
+	sqliteobj->SetInt(&stmt, 10, coninfo->m_port);
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 11, coninfo->m_isstorepwd);
+	sqliteobj->SetInt(&stmt, 11, coninfo->m_isstorepwd);
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 12, coninfo->m_keepaliveinterval);
+	sqliteobj->SetInt(&stmt, 12, coninfo->m_keepaliveinterval);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 13, coninfo->m_db.GetLength()?coninfo->m_db.GetString():"");
+	sqliteobj->SetText(&stmt, 13, coninfo->m_db.GetLength()?coninfo->m_db.GetString():"");
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 14, coninfo->m_iscompress);
+	sqliteobj->SetInt(&stmt, 14, coninfo->m_iscompress);
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 15, coninfo->m_isdeftimeout);
+	sqliteobj->SetInt(&stmt, 15, coninfo->m_isdeftimeout);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 16, coninfo->m_strwaittimeout.GetLength()?coninfo->m_strwaittimeout.GetString():"");
+	sqliteobj->SetText(&stmt, 16, coninfo->m_strwaittimeout.GetLength()?coninfo->m_strwaittimeout.GetString():"");
 
 
 #ifndef COMMUNITY
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 17, coninfo->m_ishttp);
+	sqliteobj->SetInt(&stmt, 17, coninfo->m_ishttp);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 18, coninfo->m_url.GetLength()?coninfo->m_url.GetString():"");
+	sqliteobj->SetText(&stmt, 18, coninfo->m_url.GetLength()?coninfo->m_url.GetString():"");
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 19, coninfo->m_timeout);
+	sqliteobj->SetInt(&stmt, 19, coninfo->m_timeout);
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 20, coninfo->m_ishttpuds);
+	sqliteobj->SetInt(&stmt, 20, coninfo->m_ishttpuds);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 21, coninfo->m_httpudspath.GetLength()?coninfo->m_httpudspath.GetString():"");
+	sqliteobj->SetText(&stmt, 21, coninfo->m_httpudspath.GetLength()?coninfo->m_httpudspath.GetString():"");
 
 
 	auth = &pGlobals->m_pcmainwin->m_tunnelauth;
@@ -9862,66 +9947,66 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 	{
 		if(auth->ischallenge)
 			//sqlitequery->AddSprintf("1 ,");
-			pGlobals->m_sqliteobj->SetInt(&stmt, 22, 1);
+			sqliteobj->SetInt(&stmt, 22, 1);
 			//fputs("Is401=1\r\n", out_stream);
 		else
 			//sqlitequery->AddSprintf("0 ,");
-			pGlobals->m_sqliteobj->SetInt(&stmt, 22, 0);
+			sqliteobj->SetInt(&stmt, 22, 0);
 			//fputs("Is401=0\r\n", out_stream);
 		
 		if(auth->isproxy)
 			//sqlitequery->AddSprintf("1 ,");
-			pGlobals->m_sqliteobj->SetInt(&stmt, 23, 1);
+			sqliteobj->SetInt(&stmt, 23, 1);
 			//fputs("IsProxy=1\r\n", out_stream);
 		else
 			//sqlitequery->AddSprintf("0 ,");
-			pGlobals->m_sqliteobj->SetInt(&stmt, 23, 0);
+			sqliteobj->SetInt(&stmt, 23, 0);
 
 		
 		tempstr.SetAs(auth->proxy);
 
-		pGlobals->m_sqliteobj->SetText(&stmt, 24, tempstr.GetLength()? tempstr.GetString():"");
+		sqliteobj->SetText(&stmt, 24, tempstr.GetLength()? tempstr.GetString():"");
 
 
 		tempstr.SetAs(auth->proxyusername);
 
-		pGlobals->m_sqliteobj->SetText(&stmt, 25, tempstr.GetLength()? tempstr.GetString():"");
+		sqliteobj->SetText(&stmt, 25, tempstr.GetLength()? tempstr.GetString():"");
 
 		
 		tempstr.SetAs(auth->proxypwd);
 		if(tempstr.GetLength() != 0)
 				EncodePassword(tempstr);
 
-		pGlobals->m_sqliteobj->SetText(&stmt, 26, tempstr.GetLength()? tempstr.GetString():"");
+		sqliteobj->SetText(&stmt, 26, tempstr.GetLength()? tempstr.GetString():"");
 
 		
 		tempstr.Sprintf("%d", auth->proxyport);
 
-		pGlobals->m_sqliteobj->SetInt(&stmt, 27, auth->proxyport);
+		sqliteobj->SetInt(&stmt, 27, auth->proxyport);
 
 
 		tempstr.SetAs(auth->chalusername);
 
-		pGlobals->m_sqliteobj->SetText(&stmt, 28, tempstr.GetLength()? tempstr.GetString():"");
+		sqliteobj->SetText(&stmt, 28, tempstr.GetLength()? tempstr.GetString():"");
 
 		
 		tempstr.SetAs(auth->chalpwd);
 		if(tempstr.GetLength())
 			EncodePassword(tempstr);
-		pGlobals->m_sqliteobj->SetText(&stmt, 29, tempstr.GetLength()? tempstr.GetString():"");
+		sqliteobj->SetText(&stmt, 29, tempstr.GetLength()? tempstr.GetString():"");
 
 		tempstr.SetAs(auth->content_type);
 
-		pGlobals->m_sqliteobj->SetText(&stmt, 30, tempstr.GetLength()? tempstr.GetString():"");
+		sqliteobj->SetText(&stmt, 30, tempstr.GetLength()? tempstr.GetString():"");
 
-		pGlobals->m_sqliteobj->SetInt(&stmt, 31, auth->isbase64encode);
+		sqliteobj->SetInt(&stmt, 31, auth->isbase64encode);
 
 	}
 
 	//sqlitequery->AddSprintf("%d ,", coninfo->m_isssh);
-	pGlobals->m_sqliteobj->SetInt(&stmt, 32, coninfo->m_isssh);
+	sqliteobj->SetInt(&stmt, 32, coninfo->m_isssh);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 33, coninfo->m_sshuser.GetLength()?coninfo->m_sshuser.GetString():"");
+	sqliteobj->SetText(&stmt, 33, coninfo->m_sshuser.GetLength()?coninfo->m_sshuser.GetString():"");
 
 	tempstr.SetAs(coninfo->m_sshpwd);
 	if(tempstr.GetLength())
@@ -9929,44 +10014,44 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 		EncodePassword(tempstr);
 	}
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 34, tempstr.GetLength()? tempstr.GetString():"");
+	sqliteobj->SetText(&stmt, 34, tempstr.GetLength()? tempstr.GetString():"");
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 35, coninfo->m_sshhost.GetLength()?coninfo->m_sshhost.GetString():"");
+	sqliteobj->SetText(&stmt, 35, coninfo->m_sshhost.GetLength()?coninfo->m_sshhost.GetString():"");
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 36, coninfo->m_sshport);
+	sqliteobj->SetInt(&stmt, 36, coninfo->m_sshport);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 37, coninfo->m_forhost.GetLength()?coninfo->m_forhost.GetString():"");
+	sqliteobj->SetText(&stmt, 37, coninfo->m_forhost.GetLength()?coninfo->m_forhost.GetString():"");
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 38, coninfo->m_ispassword);
+	sqliteobj->SetInt(&stmt, 38, coninfo->m_ispassword);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 39, coninfo->m_privatekeypath.GetLength()?coninfo->m_privatekeypath.GetString():"");
+	sqliteobj->SetText(&stmt, 39, coninfo->m_privatekeypath.GetLength()?coninfo->m_privatekeypath.GetString():"");
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 40, coninfo->m_issshsavepassword);
+	sqliteobj->SetInt(&stmt, 40, coninfo->m_issshsavepassword);
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 41, coninfo->m_issslchecked);
+	sqliteobj->SetInt(&stmt, 41, coninfo->m_issslchecked);
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 42, coninfo->m_issslauthchecked);
+	sqliteobj->SetInt(&stmt, 42, coninfo->m_issslauthchecked);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 43, coninfo->m_clikey.GetLength()?coninfo->m_clikey.GetString():"");
+	sqliteobj->SetText(&stmt, 43, coninfo->m_clikey.GetLength()?coninfo->m_clikey.GetString():"");
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 44, coninfo->m_clicert.GetLength()?coninfo->m_clicert.GetString():"");
+	sqliteobj->SetText(&stmt, 44, coninfo->m_clicert.GetLength()?coninfo->m_clicert.GetString():"");
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 45, coninfo->m_cacert.GetLength()?coninfo->m_cacert.GetString():"");
+	sqliteobj->SetText(&stmt, 45, coninfo->m_cacert.GetLength()?coninfo->m_cacert.GetString():"");
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 46, coninfo->m_cipher.GetLength()?coninfo->m_cipher.GetString():"");
+	sqliteobj->SetText(&stmt, 46, coninfo->m_cipher.GetLength()?coninfo->m_cipher.GetString():"");
 
 
 #endif
 
 
-	pGlobals->m_sqliteobj->SetInt(&stmt, 47, coninfo->m_isglobalsqlmode);
+	sqliteobj->SetInt(&stmt, 47, coninfo->m_isglobalsqlmode);
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 48,  coninfo->m_sqlmode.GetLength()?coninfo->m_sqlmode.GetString():"");
+	sqliteobj->SetText(&stmt, 48,  coninfo->m_sqlmode.GetLength()?coninfo->m_sqlmode.GetString():"");
 
-	pGlobals->m_sqliteobj->SetText(&stmt, 49,  coninfo->m_initcommand.GetLength()?coninfo->m_initcommand.GetString():"");
+	sqliteobj->SetText(&stmt, 49,  coninfo->m_initcommand.GetLength()?coninfo->m_initcommand.GetString():"");
 
-	pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
-	pGlobals->m_sqliteobj->Finalize(&stmt);
+	sqliteobj->Step(&stmt, wyFalse);
+	sqliteobj->Finalize(&stmt);
 
 	return wyTrue;
 }

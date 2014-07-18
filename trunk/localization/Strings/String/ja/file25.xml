@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3629">公開セッションセーブポイント...	Ctrl+Shift+O</string>
+	<string name="3630">セッションを保存する...	Ctrl+Shift+S</string>
+	<string name="3631">としてセッションを保存する...</string>
+	<string name="3632">セッションを終了する	Ctrl+Shift+X</string>
+	<string name="3633">セッションのセーブポイントのバックアップをに作成しました</string>
+	<string name="3634">注記: 別のホストにコピーしたい場合は、ファイル -> 新しい接続 を使って複数のホストに接続してください。対象となる接続のドロップダウンリストに全ての接続が表示されます</string>
+	<string name="3635">接続</string>
+	<string name="3636">現在のセッションを保存しますか?</string>
+	<string name="3637">購入する</string>
+	<string name="3638">試す</string>
+	<string name="3639">お試し期間はあと</string>
+	<string name="3640">お試し期間はあと</string>
+</resources>

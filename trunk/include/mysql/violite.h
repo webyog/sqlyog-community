@@ -35,6 +35,13 @@
 #include <openssl/ssl.h>
 #endif
 
+enum enum_vio_io_event
+{
+  VIO_IO_EVENT_READ,
+  VIO_IO_EVENT_WRITE,
+  VIO_IO_EVENT_CONNECT
+};
+
 /* Simple vio interface in C;  The functions are implemented in violite.c */
 
 #ifdef	__cplusplus
@@ -138,6 +145,8 @@ struct st_vio
   int fcntl_mode; /* Buffered fcntl(sd,F_GETFL) */
   struct sockaddr_in local; /* Local internet address */
   struct sockaddr_in remote; /* Remote internet address */
+  struct mysql_async_context *async_context; /* For non-blocking API */
+
   enum enum_vio_type type; /* Type of connection */
   char desc[30]; /* String description */
 #ifdef HAVE_OPENSSL

@@ -78,6 +78,7 @@ CopyDatabase::CopyDatabase()
 
     m_selalltables = wyFalse;
 	m_isremdefiner = wyFalse;
+	m_iscreatedb = wyFalse;
 }
 
 CopyDatabase::~CopyDatabase()
@@ -143,6 +144,7 @@ CopyDatabase::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		pcd->m_p->Create("COPYDATABASE");
 		VERIFY(pcd->m_hwnddlg = hwnd);
 		VERIFY(pcd->m_hwndcombo = GetDlgItem(hwnd, IDC_SOURCEDB));
+		VERIFY(pcd->m_hwndcombodb = GetDlgItem(hwnd, IDC_SOURCEDB2));
 		pcd->CreateImageList();
 		pcd->AddInitData();		
 		break;
@@ -252,16 +254,16 @@ void
 CopyDatabase::OnUmCopydatabase(HWND hwnd)
 {
     wyBool       ret;
-    wyUInt32     thdid;
+    wyUInt32     thdid,index;
     COPYDBPARAM  copydbparam;
     COPYDB       evt;
 	HWND         hwndtree;
 	MDIWindow	*wnd = NULL;
 	wyString	msg;
 	HWND		hwndmsg = NULL;
-
+	wyWChar     buffer[SIZE_128];
 	VERIFY(wnd = GetActiveWin());
-
+	LPDIFFCOMBOITEM lpdiff;
 	m_ispromtstorepgrmmessage = wyFalse;
 	m_isstoredpgrms = wyFalse;
 
@@ -281,6 +283,28 @@ CopyDatabase::OnUmCopydatabase(HWND hwnd)
 		EnableDlgWindows(wyTrue);
         m_copying   = wyFalse;
 		return;
+	}
+	else
+	{ 
+		GetDlgItemText(m_hwnddlg, IDC_SOURCEDB2, buffer, SIZE_128 - 1);
+		m_targetdb.SetAs(buffer);
+		m_targetdb.RTrim();
+		index = SendMessage(m_hwndcombodb, CB_FINDSTRINGEXACT, -1,(LPARAM)m_targetdb.GetAsWideChar());
+		if(index != CB_ERR)
+		{
+			m_iscreatedb = wyFalse;
+		}
+		else
+		{
+			m_iscreatedb = wyTrue;
+		}
+		if(m_targetdb.GetLength() == 0)
+		{
+			yog_message(hwndtree, _(L"Please select a database or enter the name for new database"), pGlobals->m_appname.GetAsWideChar(),MB_OK|MB_ICONINFORMATION | MB_HELP);
+			EnableDlgWindows(wyTrue);
+			m_copying   = wyFalse;
+			return;
+		}
 	}
 
 	ret = GetTargetDatabase();
@@ -619,14 +643,14 @@ CopyDatabase::AddInitData()
 {
 	HWND				hwndtree = NULL;
 	DBListBuilder	    cdb;
-    wyInt32             ret;
+    wyInt32             ret,ncursel;
 	MDIWindow           *wnd = GetActiveWin();
-	wyString            activevalue, srcdetail;
+	wyString            activevalue,activevalue2, srcdetail;
 	wyBool              flag = wyFalse;
-
+	LPDIFFCOMBOITEM     lpdiff;
 	srcdetail.Sprintf("%s - %s", wnd->m_title.GetString(), m_srcdb.GetString());
 
-	cdb.GetDBs(m_hwndcombo);	
+	cdb.GetSVs(m_hwndcombo);	
 	SendMessage(GetDlgItem(m_hwnddlg, IDC_TARGETDB), WM_SETTEXT, 0,(LPARAM)srcdetail.GetAsWideChar());
 
 	m_p->Add(m_hwnddlg, IDC_DROP, "DropTable", "0", CHECKBOX);
@@ -643,19 +667,37 @@ CopyDatabase::AddInitData()
 	/* now we remove the the current db that is being exported from combobox so that we dont accidently
 		drop the data */
 	/* starting from 4.1 BETA 4 we use connection name for unique values */
-	activevalue.Sprintf("%s - %s", wnd->m_title.GetString(), m_srcdb.GetString());
 
-	ret = SendMessage(m_hwndcombo, CB_FINDSTRINGEXACT, -1,(LPARAM)activevalue.GetAsWideChar());
-	if(ret != CB_ERR)
-		SendMessage(m_hwndcombo, CB_DELETESTRING, ret, 0);
+	//if active connection is same as source connection then remove source db from databases combo
+	activevalue.Sprintf("%s", wnd->m_title.GetString());
+	activevalue2.Sprintf("%s", m_srcdb.GetString());
+	//populate dbs for first connection in the list
+	//ncursel = SendMessage(m_hwndcombo, CB_GETCURSEL, 0, 0);
+	ncursel = 0;
+	VERIFY(lpdiff =(LPDIFFCOMBOITEM)SendMessage(m_hwndcombo, CB_GETITEMDATA, ncursel, 0));
 
+	DBListBuilder::GetDBFromActiveWinscopydb(lpdiff->wnd->m_hwnd, (LPARAM)m_hwndcombodb);
+	if(lpdiff->wnd == wnd )
+	{
+		ret = SendMessage(m_hwndcombodb, CB_FINDSTRINGEXACT, -1,(LPARAM)activevalue2.GetAsWideChar());
+		if(ret != CB_ERR)
+			SendMessage(m_hwndcombodb, CB_DELETESTRING, ret, 0);
+	}
+	//delete lpdiff;
 	///If combo list is empty then disable the combo box
+	//11.52 we do not disable combo box on single connection since user can create a new db
 	ret = SendMessage(m_hwndcombo, CB_GETCOUNT, (WPARAM)0,(LPARAM)0);
 	if(!ret)
+	{
 		EnableWindow(m_hwndcombo, FALSE);
+		EnableWindow(m_hwndcombodb, FALSE);
+	}
 
 	else
+	{
 		EnableWindow(m_hwndcombo, TRUE);
+		EnableWindow(m_hwndcombodb, TRUE);
+	}
 
 	m_p->Add(m_hwnddlg, IDC_SOURCEDB, "Target", "", COMBOBOX_P);
 
@@ -685,8 +727,8 @@ CopyDatabase::AddInitData()
 		
 	//set the initial position of the dialog
 	SetWindowPositionFromINI(m_hwnddlg, COPYDATABASE_SECTION, 
-		m_wndrect.right - m_wndrect.left, 
-		m_wndrect.bottom - m_wndrect.top);
+	m_wndrect.right - m_wndrect.left, 
+	m_wndrect.bottom - m_wndrect.top);
 	
 	GetCtrlRects();
 	PositionCtrls();
@@ -1076,6 +1118,22 @@ CopyDatabase::FreeComboParam()
 	return wyTrue;
 }
 
+wyBool
+CopyDatabase::FreedbComboParam()
+{
+	LPDIFFCOMBOITEM     lpdiff;
+	wyInt32             count, i;
+
+	VERIFY((count = SendMessage(GetDlgItem(m_hwnddlg, IDC_SOURCEDB2), CB_GETCOUNT, 0, 0))!= CB_ERR);
+	
+	for(i = 0; i < count; i++)
+    {
+		VERIFY(lpdiff =(LPDIFFCOMBOITEM)SendMessage(m_hwndcombodb, CB_GETITEMDATA, i, 0));
+		delete lpdiff;
+	}
+	return wyTrue;
+}
+
 /* This is where the real game begins we start copying data */
 // Function creates a new instance to the target server
 // so that if the source and target are same we dont go out of sync
@@ -1084,14 +1142,19 @@ CopyDatabase::FreeComboParam()
 wyBool
 CopyDatabase::GetTargetDatabase()
 {
-	LPDIFFCOMBOITEM	lpdiff;
+	LPDIFFCOMBOITEM	lpdiff,lpdiff2;
 	wyInt32         index;
 
 	VERIFY((index = SendMessage(m_hwndcombo, CB_GETCURSEL, 0, 0))!= CB_ERR);
 
 	VERIFY(lpdiff =(LPDIFFCOMBOITEM)SendMessage(m_hwndcombo, CB_GETITEMDATA, index, 0));
-	
-    m_targetdb.SetAs(lpdiff->szDB);
+
+	//VERIFY((index = SendMessage(m_hwndcombodb, CB_GETCURSEL, 0, 0))!= CB_ERR);
+
+	//VERIFY(lpdiff2 =(LPDIFFCOMBOITEM)SendMessage(m_hwndcombodb, CB_GETITEMDATA, index, 0));
+
+
+   // m_targetdb.SetAs(lpdiff2->szDB);
 	VERIFY(m_targetmysql = lpdiff->mysql);
 	VERIFY(m_targettunnel = lpdiff->tunnel);
 	VERIFY(m_tgtinfo = lpdiff->info);
@@ -2232,10 +2295,119 @@ CopyDatabase::ChangeSourceDB()
 	return wyTrue;
 }
 
+/// Gets Charset and Collation for MySQL versions > 4.1
+wyBool					
+CopyDatabase::GetCharsetAndCollation(wyString *charset, wyString *collation)
+{
+	MDIWindow	    *wnd;
+	wyString	    query, dbname;
+	wyInt32		    fldindex;
+	wyBool		    ismysql41; 
+	//TableinfoElem*  ptabinfo;
+	MYSQL_RES*	    res;
+	MYSQL_ROW	    row;
+
+	VERIFY(wnd = GetActiveWin());
+
+    if(!wnd)
+        return wyFalse;
+
+	ismysql41 = IsMySQL41(m_srctunnel, m_srcmysql);
+    
+	//ptabinfo = (TableinfoElem*)m_list.GetFirst();
+
+	//if(!ptabinfo)
+		//return wyFalse;
+
+	dbname.SetAs(m_srcdb);
+
+	if(IsMySQL41(m_srctunnel, m_srcmysql) == wyTrue)
+	{
+		query.Sprintf("use `%s`", dbname.GetString());
+		res = ExecuteAndGetResult(wnd, m_srctunnel, m_srcmysql, query);
+
+        if(!res && m_srctunnel->mysql_affected_rows(*m_srcmysql) == -1)
+		{
+			return wyFalse;
+		}
+
+		// Charset
+		query.Sprintf("show variables like 'character_set_database'");
+		res = ExecuteAndGetResult(wnd, m_srctunnel, m_srcmysql, query);
+
+        if(!res && m_srctunnel->mysql_affected_rows(*m_srcmysql)== -1)
+		{
+			return wyFalse;
+		}
+
+		fldindex = GetFieldIndex(m_srctunnel, res, "Value"); 
+		row = m_srctunnel->mysql_fetch_row(res);
+
+        if(!row)
+			return wyFalse;
+		
+		charset->SetAs(row[fldindex], ismysql41);
+		m_srctunnel->mysql_free_result(res);
+        
+		// Collation
+		query.Sprintf("show variables like 'collation_database'");
+		res = ExecuteAndGetResult(wnd, m_srctunnel, m_srcmysql, query);
+
+        if(!res && m_srctunnel->mysql_affected_rows(*m_srcmysql)== -1)
+		{
+			return wyFalse;
+		}
+
+		fldindex = GetFieldIndex(m_srctunnel, res, "Value");
+		row = m_srctunnel->mysql_fetch_row(res);
+
+        if(!row)
+			return wyFalse;
+
+		collation->SetAs(row[fldindex], ismysql41);
+		m_srctunnel->mysql_free_result(res);
+	}
+	else
+		return wyFalse;
+
+	if(!collation->GetLength() || !charset->GetLength())
+		return wyFalse;
+
+	return wyTrue;
+}
+
+wyBool
+CopyDatabase::CreateTargetDB()
+{
+	wyString    query,charset,collation;
+    MYSQL_RES   *res;
+
+	if(m_iscreatedb)
+	{
+		query.Sprintf("CREATE DATABASE IF NOT EXISTS `%s` ", m_targetdb.GetString());
+		GetCharsetAndCollation(&charset, &collation);
+		if(charset.GetLength() != 0)
+		{
+			query.AddSprintf("character set %s ", charset.GetString());
+		}
+		if(collation.GetLength() != 0)
+		{
+			query.AddSprintf("collate %s", collation.GetString());
+		}
+		res = SjaExecuteAndGetResult(m_newtargettunnel, &m_newtargetmysql, query);
+
+		if(!res && m_newtargettunnel->mysql_affected_rows(m_newtargetmysql)== -1)
+		{
+			ShowMySQLError(m_hwnddlg, m_newtargettunnel, &m_newtargetmysql, query.GetString());
+			return wyFalse;
+		}
+	}
+	return wyTrue;
+}
 wyBool
 CopyDatabase::ChangeTargetDB()
 {
-	wyString    query;
+	wyString    query,charset,collation;
     MYSQL_RES   *res;
 
 	query.Sprintf("use `%s`", m_targetdb.GetString());
@@ -3124,11 +3296,14 @@ CopyDatabase::ExportTrigger(const wyChar *db, const wyChar *triggername)
 wyBool
 CopyDatabase::CheckTargetDB(HWND m_hwnddlg)
 {
-	LPDIFFCOMBOITEM	lpdiff;
-	wyInt32         index;
-
+	LPDIFFCOMBOITEM	lpdiff,lpdiff2;
+	wyInt32         index, i=0,ret;
+	wyWChar     buffer[SIZE_128];
+	wyString	activevalue;
+	MDIWindow           *wnd = GetActiveWin();
 	/*	fixed a bug #281. It might be that a user has only one connection with only one
 		db. this time, CB_ERR will be returned */
+	//11.52: one connection with only one db will be allowed! 
 	index = SendMessage(m_hwndcombo, CB_GETCURSEL, 0, 0);
 
 	if(index == CB_ERR)
@@ -3137,9 +3312,40 @@ CopyDatabase::CheckTargetDB(HWND m_hwnddlg)
 		DisableAll(m_hwnddlg);
 		return wyFalse;
 	}
-
 	VERIFY(lpdiff =(LPDIFFCOMBOITEM)SendMessage(m_hwndcombo, CB_GETITEMDATA, index, 0));
-	m_targetdb.SetAs(lpdiff->szDB);
+	SendMessage(m_hwndcombodb, CB_RESETCONTENT , 0, 0);
+	//SendMessage(m_hwndcombodb, CB_SETCURSEL , -1, 0);
+	//while(SendMessage(m_hwndcombodb, CB_DELETESTRING , i++, 0) != CB_ERR);
+	//index = SendMessage(m_hwndcombodb, CB_GETCURSEL, 0, 0);
+	//VERIFY(lpdiff2 =(LPDIFFCOMBOITEM)SendMessage(m_hwndcombodb, CB_GETITEMDATA, index, 0));
+	//11.52: Get target db from database combo
+	//targetdb could be NULL in 2 cases :
+	//case 1 : the only db is the source db during initialising the combos. 
+	//case 2 : user types the value in the combo.
+
+	//FreedbComboParam();
+	activevalue.Sprintf("%s", m_srcdb.GetString());
+	DBListBuilder::GetDBFromActiveWinscopydb(lpdiff->wnd->m_hwnd, (LPARAM)m_hwndcombodb);
+	if(lpdiff->wnd == wnd )
+	{
+		ret = SendMessage(m_hwndcombodb, CB_FINDSTRINGEXACT, -1,(LPARAM)activevalue.GetAsWideChar());
+		if(ret != CB_ERR)
+			SendMessage(m_hwndcombodb, CB_DELETESTRING, ret, 0);
+	}
+	//GetDlgItemText(m_hwnddlg, IDC_SOURCEDB2, buffer, SIZE_128 - 1);
+    //m_targetdb.SetAs(buffer);
+    //m_targetdb.RTrim();
+	//index = SendMessage(m_hwndcombodb, CB_FINDSTRINGEXACT, -1,(LPARAM)m_targetdb.GetAsWideChar());
+	//if(index != CB_ERR)
+	//{
+		//m_iscreatedb = wyFalse;
+	//}
+	//else
+	//{
+		//m_iscreatedb = wyTrue;
+	//}
+	
+	SendMessage(m_hwndcombodb, CB_SETCURSEL , 0, 0);
 	VERIFY(m_targetmysql = lpdiff->mysql);
 	VERIFY(m_targettunnel = lpdiff->tunnel);
 	VERIFY(m_tgtinfo = lpdiff->info);
@@ -3426,7 +3632,10 @@ CopyDatabase::GetCtrlRects()
         IDC_TREE, 1, 1,
         IDC_GROUP2, 1, 0,
         IDC_STATIC_NOTE, 1, 0,
+		IDC_STATIC_NOTE2, 1, 0,
+		IDC_STATIC_NOTE3, 1, 0,
         IDC_SOURCEDB, 1, 0,
+		IDC_SOURCEDB2, 1, 0,
         IDC_GROUP3, 1, 0,
         IDC_STRUCDATA, 0, 0,
         IDC_STRUC, 0, 0,
@@ -3526,6 +3735,9 @@ CopyDatabase::PositionCtrls()
 					break;
 
 				case IDC_STATIC_NOTE:
+				case IDC_STATIC_NOTE2:
+				case IDC_STATIC_NOTE3:
+				case IDC_SOURCEDB2:
 				case IDC_SOURCEDB:
 					x = (rect.right - rect.left)/2 + 8 ;
 					width = (rect.right - rect.left)/2 - rightpadding - 10;

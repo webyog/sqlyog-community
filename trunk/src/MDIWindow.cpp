@@ -193,14 +193,17 @@ MDIWindow::Create(wyBool iscon_res, ConnectionInfo* conninfo)
 	if(m_announcements)
 		m_isanncreate = wyTrue;
 	//title for  connection tab
+	if(pGlobals->m_pcmainwin->m_sessionname.GetLength())
+		title.Sprintf("%s-",pGlobals->m_pcmainwin->m_sessionname.GetString());
+
    if(m_filterdb.GetLength())
    {
-		title.Sprintf("%s/%s %s", m_title.GetString(), m_filterdb.GetString(),
+		title.AddSprintf("%s/%s %s", m_title.GetString(), m_filterdb.GetString(),
 						m_tunneltitle.GetString());
    }
 	else
 	{
-		title.Sprintf("%s %s", m_title.GetString(), m_tunneltitle.GetString());
+		title.AddSprintf("%s %s", m_title.GetString(), m_tunneltitle.GetString());
 	}
     
    	//tab interface, create a tab with new connection
@@ -291,10 +294,13 @@ MDIWindow::CreateQueryWindow(HWND hwnd, PMYSQL mysql)
 	}
 
 	//if user selected and database name, then add it to title
+	if(pGlobals->m_pcmainwin->m_sessionname.GetLength())
+		title.Sprintf("%s-",pGlobals->m_pcmainwin->m_sessionname.GetString());
+
 	if(m_filterdb.GetLength())
-		title.Sprintf("%s/%s %s", m_title.GetString(), m_filterdb.GetString(), m_tunneltitle.GetString());
+		title.AddSprintf("%s/%s %s", m_title.GetString(), m_filterdb.GetString(), m_tunneltitle.GetString());
 	else
-		title.Sprintf("%s %s", m_title.GetString(), m_tunneltitle.GetString());
+		title.AddSprintf("%s %s", m_title.GetString(), m_tunneltitle.GetString());
 
 	SetWindowText(hwndquery, title.GetAsWideChar());
 		
@@ -604,7 +610,10 @@ MDIWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 		break;
 		
 	case UM_REFRESHOBJECT:	
+		
 		pcquerywnd->OnRefreshObject();
+		if(pcquerywnd->m_pcqueryobject->m_seldatabase.GetLength())
+			pcquerywnd->m_pcqueryobject->OnComboChanged(pcquerywnd->m_pcqueryobject->m_seldatabase.GetAsWideChar());
 		break;
 
 	case UM_FOCUS:
@@ -1708,7 +1717,8 @@ MDIWindow::OnDlgProcColorStatic(WPARAM wparam, LPARAM lparam)
 		SetBkColor(hdc, bkcolor);
         SetDCBrushColor(hdc, bkcolor);
         SetTextColor(hdc, TreeView_GetTextColor(m_pcqueryobject->m_hwnd));
-        return (INT_PTR)CreateSolidBrush(bkcolor);//(wyInt32)GetStockObject(DC_BRUSH);
+		return (wyInt32)GetStockObject(DC_BRUSH);
+        //return (INT_PTR)CreateSolidBrush(bkcolor);//(wyInt32)GetStockObject(DC_BRUSH);
         
         /*if(wyTheme::GetBrush(BRUSH_MDICHILD, &hbr))
         {
@@ -3818,10 +3828,12 @@ MDIWindow::SetQueryWindowTitle()
 	}
 
     //if user selected and database name, then add it to title
+	if(pGlobals->m_pcmainwin->m_sessionname.GetLength())
+		mdititle.Sprintf("%s-",pGlobals->m_pcmainwin->m_sessionname.GetString());
 	if(m_pcqueryobject->m_seldatabase.GetLength())
-		mdititle.Sprintf("%s/%s %s", m_title.GetString(), m_pcqueryobject->m_seldatabase.GetString(), m_tunneltitle.GetString());
+		mdititle.AddSprintf("%s/%s %s", m_title.GetString(), m_pcqueryobject->m_seldatabase.GetString(), m_tunneltitle.GetString());
 	else
-		mdititle.Sprintf("%s %s", m_title.GetString(), m_tunneltitle.GetString());
+		mdititle.AddSprintf("%s %s", m_title.GetString(), m_tunneltitle.GetString());
 
 	// Setting the MDI window title
 	SetWindowText(m_hwnd, mdititle.GetAsWideChar());

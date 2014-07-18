@@ -364,13 +364,14 @@ typedef int	(*qsort_cmp)(const void *,const void *);
 #else
 #define qsort_t RETQSORTTYPE	/* Broken GCC cant handle typedef !!!! */
 #endif
-#ifdef HAVE_mit_thread
-#define size_socket socklen_t	/* Type of last arg to accept */
-#else
-#ifdef HAVE_SYS_SOCKET_H
-#include <sys/socket.h>
+typedef SOCKET_SIZE_TYPE size_socket;
+
+#ifndef SOCKOPT_OPTLEN_TYPE
+#define SOCKOPT_OPTLEN_TYPE size_socket
 #endif
 
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
 #endif
 
 #ifndef SOCKOPT_OPTLEN_TYPE
@@ -458,6 +459,7 @@ typedef int	(*qsort_cmp)(const void *,const void *);
 #ifdef _WIN32
 #define NO_DIR_LIBRARY		/* Not standar dir-library */
 #define USE_MY_STAT_STRUCT	/* For my_lib */
+typedef SSIZE_T ssize_t;
 #endif
 
 /* Some things that this system does have */
@@ -1083,6 +1085,22 @@ do { doubleget_union _tmp; \
 #if HAVE_DLERROR
 #define dlerror() ""
 #endif
+#endif
+
+#if SIZEOF_CHARP == SIZEOF_INT
+typedef unsigned int intptr;
+#elif SIZEOF_CHARP == SIZEOF_LONG
+typedef unsigned long intptr;
+#elif SIZEOF_CHARP == SIZEOF_LONG_LONG
+typedef unsigned long long intptr;
+#else
+#error sizeof(void *) is not sizeof(int, long or long long)
+#endif
+
+#ifdef _WIN32
+#define IF_WIN(A,B) A 
+#else
+#define IF_WIN(A,B) B 
 #endif
 
 #ifndef RTLD_NOW

@@ -20,6 +20,11 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
+
+/* unsupported macros (used by async) */
+#define DBUG_SWAP_CODE_STATE(a) {}
+#define DBUG_FREE_CODE_STATE(a) {}
+
 #if !defined(DBUG_OFF) && !defined(_lint)
 
 struct _db_stack_frame_ {
@@ -120,7 +125,6 @@ extern  const char* _db_get_func_(void);
 #endif
 
 #else						/* No debugger */
-
 #define DBUG_ENTER(a1)
 #define DBUG_END() {}
 #define DBUG_RETURN(a1) return(a1)

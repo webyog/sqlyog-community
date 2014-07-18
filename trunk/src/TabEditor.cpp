@@ -67,7 +67,7 @@ wyBool
 TabEditor::Create(MDIWindow *wnd , HTREEITEM hitem, wyBool iseditquery, wyString *strhitemname)
 {
 	CreateTabEditorSplitter(wnd);
-
+	SetEvent(pGlobals->m_pcmainwin->m_sessionchangeevent);
 	if(iseditquery == wyTrue)
 		CreateEditorQuery(wnd);	
 	else
@@ -434,7 +434,8 @@ TabEditor::OnWmCloseTab()
 					return 0;
 				break;
 		}
-	} 
+	}
+	SetEvent(pGlobals->m_pcmainwin->m_sessionchangeevent);
 	return 1;
 }
 

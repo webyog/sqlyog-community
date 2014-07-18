@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3629">Open Session Savepoint...	Ctrl+Shift+O</string>
+	<string name="3630">Save Session...	Ctrl+Shift+S</string>
+	<string name="3631">Save Session As...</string>
+	<string name="3632">End Session	Ctrl+Shift+X</string>
+	<string name="3633">The backup of Session Savepoint is created at</string>
+	<string name="3634">Note: If you want to copy to different host(s), connect to multiple host(s) using  File -> New Connection. The target connection dropdown would then list all connections.</string>
+	<string name="3635">Connection</string>
+	<string name="3636">Do you want to save the current session?</string>
+	<string name="3637">BUY</string>
+	<string name="3638">TRY</string>
+	<string name="3639">days trial left</string>
+	<string name="3640">day trial left</string>
+</resources>

@@ -714,6 +714,8 @@ typedef struct tagGlobals
 	wyBool		m_issessionsaveactive;
 	HANDLE		m_sessionsavemutex;
 	wyBool		m_sessionrestore;
+	wyString	m_database;
+	wyString	m_sessionbackup;
 } GLOBALS, *PGLOBALS;
 
 

@@ -340,7 +340,7 @@
 #define		SQLYOGFILEINDEX								12
 #define     PPKINDEX                                    13
 #define     CONMANINDEX                                 14
-
+#define     SESSIONINDEX                                15
 
 //#define		SQL										L"SQL Files(*.sql)\0*.sql;*.txt\0All Files(*.*)\0*.*\0"
 
@@ -361,7 +361,7 @@
 //#define     SQLYOG_FILES								L"SQLyog Files(*.sql; *.queryxml; *.schemaxml)\0*.sql;*.queryxml;*.schemaxml\0All Files(*.*)\0*.*\0"  
 #define		PPKFILE									    L"PuTTY Private Key Files(*.ppk)\0*.ppk\0All Files(*.*)\0*.*\0"
 #define     CONMANFILE                                  L"SQLyog Connection Settings(*.sycs)\0*.sycs;"
-
+#define		SESSIONFILE									L"SQLyog Session Savepoints(*.ysav)\0*.ysav;"
 #define     SQLYOG_FILES		L"SQLyog Files(*.sql; *.queryxml; *.schemaxml)\0*.sql;*.queryxml;*.schemaxml\0\
 SQL Files(*.sql)\0*.sql\0\
 QueryXML Files(*.queryxml)\0*.queryxml\0\

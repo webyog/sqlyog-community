@@ -33,6 +33,11 @@ public:
 	//getting databases from Mysql
 	static wyInt32 CALLBACK GetDBFromServers(HWND hwnd, LPARAM lparam);
 
+	static wyInt32 CALLBACK GetServers(HWND hwnd, LPARAM lparam);
+	static wyInt32 CALLBACK	GetDBFromActiveWinscopydb(HWND hwnd, LPARAM lParam);
+
+	//getting databases from Mysql
+	static wyInt32 CALLBACK GetDBFromServerscopydb(HWND hwnd, LPARAM lparam);
 	DBListBuilder();
 	~DBListBuilder();
 
@@ -43,6 +48,7 @@ public:
 	@return void
 	*/
 	void GetDBs(HWND hwndcombo, wyBool isrefresh = wyFalse);
+	void GetSVs(HWND hwndcombo);
 };
 
 

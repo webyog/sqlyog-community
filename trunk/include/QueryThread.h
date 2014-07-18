@@ -167,7 +167,7 @@ struct QUERYFINISHPARAMS
 
 */
 void        AddErrorOrMsg(wyInt32 errstastus, wyString &buffer, Tunnel *tunnel, PMYSQL mysql, const wyChar* query, 
-						  wyInt32 executestatus, wyUInt32 exectime, wyUInt32 transfertime = 0, wyUInt32 tottime = 0, wyBool isembedformat = wyFalse);
+						  wyInt32 executestatus, wyInt64 exectime, wyInt64 transfertime = 0, wyInt64 tottime = 0, wyBool isembedformat = wyFalse);
 
 /// Removes all the QueryResultElem from the list 
 /**

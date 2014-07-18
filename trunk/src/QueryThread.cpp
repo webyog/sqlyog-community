@@ -35,7 +35,7 @@ extern	PGLOBALS		 pGlobals;
 
 void
 AddErrorOrMsg(wyInt32 errstatus, wyString& buffer, Tunnel * tunnel, PMYSQL mysql, const wyChar* query, 
-				wyInt32 executestatus, wyUInt32 timetaken, wyUInt32 transfertime , wyUInt32 totaltime, wyBool isembedformat)
+				wyInt32 executestatus, wyInt64 timetaken, wyInt64 transfertime , wyInt64 totaltime, wyBool isembedformat)
 {
 	wyUInt32		errnum = 0, affectedrows = 0, warningcount = 0;
     wyString        msg, exectimestr, transfertimestr, totaltimestr, timestr, querystr, tempdump;
