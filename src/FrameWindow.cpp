@@ -88,9 +88,9 @@ extern	PGLOBALS		pGlobals;
 #define			DELIMITERCLOSE		"$$\r\n\r\nDELIMITER ;"
 #define			MAX_RECENT_FILES	9
 #define			RECENT_FILE_COUNT	10
-#define			RECENT_SQLFILE_SUBMENU			17
-#define         RECENT_QUERYBUILDER_SUBMENU     18
-#define			RECENT_SCHEMADESIGNS_SUBMENU	19
+#define			RECENT_SQLFILE_SUBMENU			22
+#define         RECENT_QUERYBUILDER_SUBMENU     23
+#define			RECENT_SCHEMADESIGNS_SUBMENU	24
 #define         WND_MNU_ITEMS       3
 #define         MNU_QUERYBUILDER    8
 #define         MNU_SCHEMADESIGNER				9
@@ -103,9 +103,9 @@ extern	PGLOBALS		pGlobals;
 #define			TABBED_INTERFACE_HEIGHT	25
 #define         TABBED_INTERFACE_TOP_PADDING    10
 
-#define			SCHEMA_DESCRIPTION "11.5"
+#define			SCHEMA_DESCRIPTION "11.52"
 #define			SCHEMA_MAJOR_VERSION "11"
-#define			SCHEMA_MINOR_VERSION "5"
+#define			SCHEMA_MINOR_VERSION "52"
 
 #define			CONSAVE_INTERVAL	10000
 /* some of the features are not available when you connect using tunneling feature */
@@ -125,6 +125,9 @@ extern	PGLOBALS		pGlobals;
 							Tabid INTEGER, Tabtype INTEGER DEFAULT 0, isedited INTEGER DEFAULT 0,position INTEGER, leftortoppercent  INTEGER, title TEXT,tooltip TEXT,isfile INTEGER, isfocussed INTEGER, content TEXT, \
 							FOREIGN KEY(Id) REFERENCES conndetails(Id) ON DELETE CASCADE ) "
 #define TABLE_HISTORYDETAILS "CREATE TABLE historydetails (Id INTEGER PRIMARY KEY  NOT NULL, historydata TEXT,FOREIGN KEY(Id) REFERENCES conndetails(Id) ON DELETE CASCADE ) "
+#define TABLE_OBDETAILS "CREATE TABLE obdetails (Id INTEGER PRIMARY KEY  NOT NULL, obdb TEXT,FOREIGN KEY(Id) REFERENCES conndetails(Id) ON DELETE CASCADE ) "
+#define TABLE_SESSIONDETAILS "CREATE TABLE sessiondetails (Id INTEGER, filename TEXT, isedited INTEGER) "
+
 
 void 
 log(const char * buff)
@@ -212,6 +215,11 @@ FrameWindow::FrameWindow(HINSTANCE hinstance)
 	m_sqlyogclosed = wyFalse;
 	m_sqlyogcloseevent = NULL;
 	m_sessionsaveevent = NULL;
+	m_sessionchangeevent = NULL;
+	//m_trialbuybrush = NULL;
+	m_trialtextfont = NULL;
+	m_trialbuyfont = NULL;
+	m_mouseoverbuy = wyFalse;
 #ifdef COMMUNITY
 	m_commribbon    =  NULL;
 #endif
@@ -238,7 +246,12 @@ FrameWindow::~FrameWindow()
 	if(m_commribbon)
 		VERIFY(delete m_commribbon);
 #endif
-
+	if(m_connection->m_enttype == ENT_TRIAL)
+	{
+		DeleteObject(m_trialbuyfont);
+		DeleteObject(m_trialtextfont);
+		//DeleteObject(m_trialbuybrush);
+	}
     VERIFY(delete m_connection);
 
 	if(m_conntab)
@@ -248,6 +261,10 @@ FrameWindow::~FrameWindow()
 
     delete m_statusbarmgmt;
     CloseL10n();
+
+
+		
+
 }
 
 wyBool
@@ -1017,6 +1034,147 @@ FrameWindow::MoveToInitPos(HWND hwnd)
 }
 
 wyBool
+FrameWindow::MoveToInitPosByrc(HWND hwnd, RECT	*rc)
+{
+	//RECT	    rc;
+	wyInt32     lstyle = 0;
+    wyWChar     *lpfileport=0;
+	wyWChar     directory[MAX_PATH + 1] = {0};
+	wyString	dirstr;
+	wyInt32	    screenwidth, width, screenheight, height;
+	wyInt32		virtx, virty;
+	wyInt32		diffht, diffwd;
+	wyInt32		xprim, yprim;
+
+   /* if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyFalse)
+    {
+		m_showwindowstyle = SW_NORMAL;
+        return wyFalse;
+    }*/
+	
+	//dirstr.SetAs(directory);
+
+
+    //rc.left = wyIni::IniGetInt(SECTION_NAME, "Left", 0, dirstr.GetString());
+	//rc.top	= wyIni::IniGetInt(SECTION_NAME, "Top", 0, dirstr.GetString());
+	//rc.right = wyIni::IniGetInt(SECTION_NAME, "Right", 600, dirstr.GetString());
+	//rc.bottom = wyIni::IniGetInt(SECTION_NAME, "Bottom", 600, dirstr.GetString());
+	
+	/*If change from extended monitor to single , 
+	its required if closed the SQLyog last time from 2nd monitor.
+	So we moved to Most Left
+	*/
+	screenwidth = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+	screenheight = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+	
+	virtx = GetSystemMetrics(SM_XVIRTUALSCREEN);
+	virty = GetSystemMetrics(SM_YVIRTUALSCREEN);
+		
+	xprim = GetSystemMetrics(SM_CXSCREEN);
+	yprim = GetSystemMetrics(SM_CYSCREEN);
+	
+	width = rc->right - rc->left;
+	height = rc->bottom - rc->top;
+
+	diffht = screenheight + virty;
+    diffwd = screenwidth + virtx; 
+				
+	//check whether the 2nd monitor is on corner or not before closing application
+	if(screenheight >= yprim && virtx >=0 && rc->left <= (virtx))
+	{
+		if(rc->top <= 0)
+		{
+			rc->left = 0;
+			rc->right = rc->left + width;
+
+			rc->top = 0;
+			rc->bottom = rc->top + height;
+		} 
+
+		else if(rc->top >= yprim) 
+		{
+			rc->left = 0;
+			rc->right = rc->left + width;
+			
+			rc->top = yprim - height;
+			rc->bottom = rc->top + height;
+		}
+	}
+
+	else if(screenheight >= yprim && virtx <= 0 && rc->left >= (xprim))
+	{
+		if(rc->top <= 0)
+		{
+			rc->left = xprim - width;
+			rc->right = rc->left + width;
+
+			rc->top = 0;
+			rc->bottom = rc->top + height;
+		}
+
+		else if(rc->top >= yprim)
+		{
+			rc->left = xprim - width;
+			rc->right = rc->left + width;
+
+			rc->top = yprim - height;
+			rc->bottom = rc->top + height;
+		}
+	}
+	
+
+	if(rc->left >= screenwidth) //if right side 
+	{
+		rc->left =  screenwidth - width;
+		rc->right = rc->left + width;
+	}
+
+	// If SQLyog was in 2nd monitor and moved 2nd monitor from right to left & open sqlyog 
+	else if(rc->left >= diffwd) 
+	{
+		rc->left =  diffwd - width;
+		rc->right = rc->left + width;
+	}
+
+	if(rc->right <= virtx) // lf left side
+	{
+		rc->left = 0;
+		rc->right = width;
+	}
+	
+	if(rc->top >= screenheight) //if down 
+	{
+		rc->top = screenheight - height;
+		rc->bottom = rc->top + height;		
+	}
+	
+	// If SQLyog was in 2nd monitor and moved 2nd monitor from bottom to top & open sqlyog 
+	else if(rc->top >= diffht)
+	{
+		rc->top = diffht - height;
+		rc->bottom = rc->top + height;
+	}
+
+	if(rc->bottom <= virty) // if top
+	{
+		rc->top = 0;
+		rc->bottom = height;
+	}
+	
+	MoveWindow(hwnd, rc->left, rc->top, rc->right-rc->left, rc->bottom-rc->top, FALSE);  
+
+
+	//lstyle = wyIni::IniGetInt(SECTION_NAME, "Maximize", 0, dirstr.GetString());
+
+    /*if(lstyle == 1)
+		m_showwindowstyle = SW_MAXIMIZE;
+	else
+		 m_showwindowstyle = SW_NORMAL;*/
+
+	return wyTrue;
+}
+
+wyBool
 FrameWindow::WriteInitPos(HWND hwnd)
 {
 	RECT        rc;
@@ -1217,6 +1375,19 @@ FrameWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 		{
             PostMessage(pcmainwin->m_hwndrestorestatus, UM_CLOSE_RESTORE_STATUS, 0, 0);
 			KillTimer(hwnd, CONRESTORE_TIMER);
+			if(pGlobals->m_pcquerywnd !=NULL)
+			{
+				if(pGlobals->m_database.GetLength())
+				{
+					pGlobals->m_pcquerywnd->m_pcqueryobject->m_seldatabase.SetAs(pGlobals->m_database);
+					pGlobals->m_pcquerywnd->m_pcqueryobject->SyncObjectDB(pGlobals->m_pcquerywnd);
+				}
+				else
+				{
+					pGlobals->m_pcquerywnd->m_database.SetAs("");
+					pGlobals->m_pcmainwin->AddTextInCombo(NODBSELECTED);
+				}
+			}
 			ShowWindow(hwnd, pcmainwin->m_showwindowstyle);
 			pcmainwin->m_showwindowstyle = SW_HIDE;
 			SetForegroundWindow(hwnd);
@@ -1535,7 +1706,10 @@ FrameWindow::CreateToolBarWindow()
 	HWND	 hwndtool;
 	wyUInt32 exstyle = NULL;
 	wyUInt32 style   = TBSTYLE_CUSTOMERASE | WS_CHILD | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_FLAT | TBSTYLE_TOOLTIPS | TBSTYLE_TRANSPARENT | CCS_NODIVIDER;
-	
+	WNDPROC wndproc;
+	wyUInt32 daysleft = 14;
+	static const char * (CDECL *pwine_get_version)(void);
+	HMODULE hntdll;
 	//Make sure destroy all toolbar resources during the chage of icon size
 	DestroyToolBarResources();
 		
@@ -1548,8 +1722,7 @@ FrameWindow::CreateToolBarWindow()
     //wndproc = (WNDPROC)SetWindowLongPtr(hwndtool, GWLP_WNDPROC, (LONG)FrameWindow::ToolbarWndProc);
     //SetWindowLongPtr(hwndtool, GWLP_USERDATA, (LONG)wndproc);
 
-    //wndproc = (WNDPROC)SetWindowLongPtr(m_hwndsecondtool, GWLP_WNDPROC, (LONG)FrameWindow::ToolbarWndProc);
-    //SetWindowLongPtr(m_hwndsecondtool, GWLP_USERDATA, (LONG)wndproc);
+    
 
 	// Set the class toolbar handle to newly created window.
 	SetToolHwnd(hwndtool);
@@ -1560,14 +1733,84 @@ FrameWindow::CreateToolBarWindow()
 
 	// Create the combo box which will hold the databases of the connections.
 	VERIFY(m_hwndtoolcombo = CreateToolCombo(hwndtool));
-
+	//create static text for trial no of days left
+	//create button for buy
 	SetToolCombo(m_hwndtoolcombo);
 
 	SetToolComboFont();
 	m_connection->SetToolComboImageList(this);
 	AddTextInCombo(NODBSELECTED);
-
+#ifndef COMMUNITY
+	if(pGlobals->m_pcmainwin->m_connection->m_enttype == ENT_TRIAL)
+	{
+		hntdll = GetModuleHandle(L"ntdll.dll");
+		if(hntdll)
+		{
+			//pwine_get_version = (void *)GetProcAddress(hntdll, "wine_get_version");
+			if(!GetProcAddress(hntdll, "wine_get_version"))
+			{
+				GetTimeDifference(&daysleft);
+				m_trialtext.Sprintf("%d ", daysleft);
+				if(daysleft > 1)
+				{
+					m_trialtext.AddSprintf(_("days trial left"));
+				}
+				else
+				{
+					m_trialtext.AddSprintf(_("day trial left"));
+				}
+				wndproc = (WNDPROC)SetWindowLongPtr(m_hwndsecondtool, GWLP_WNDPROC, (LONG_PTR)FrameWindow::ToolbarWndProc);
+				SetWindowLongPtr(m_hwndsecondtool, GWLP_USERDATA, (LONG_PTR)wndproc);
+				VERIFY(m_hwndtrialtext = CreateTrialText(hwndtool));
+				SetWindowText(m_hwndtrialtext, m_trialtext.GetAsWideChar());
+				EnableWindow(m_hwndtrialtext, TRUE);
+				ShowWindow(m_hwndtrialtext, TRUE);
+				VERIFY(m_hwndtrialbuy = CreateTrialBuy(hwndtool));
+				wndproc = (WNDPROC)SetWindowLongPtr(m_hwndtrialbuy, GWLP_WNDPROC, (LONG_PTR)FrameWindow::TrialbuyWndProc);
+				SetWindowLongPtr(m_hwndtrialbuy, GWLP_USERDATA, (LONG_PTR)wndproc);
+				EnableWindow(m_hwndtrialbuy, TRUE);
+			}
+		}
+	}
+#endif
 	return wyTrue;
+}
+
+LRESULT	CALLBACK
+FrameWindow::TrialbuyWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+{
+	WNDPROC wndproc = (WNDPROC)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	TRACKMOUSEEVENT te;
+	RECT rc;
+	switch (message)
+	{
+	case WM_MOUSEMOVE:	
+		if(!pGlobals->m_pcmainwin->m_mouseoverbuy)
+		{
+			pGlobals->m_pcmainwin->m_mouseoverbuy = wyTrue;
+			InvalidateRect(pGlobals->m_pcmainwin->m_hwndtrialbuy , NULL, TRUE);
+		}
+		te.cbSize    = sizeof(TRACKMOUSEEVENT);
+		te.dwFlags   = TME_LEAVE;
+		te.hwndTrack = pGlobals->m_pcmainwin->m_hwndtrialbuy;
+
+		TrackMouseEvent(&te);
+		return 0;
+	case WM_MOUSELEAVE:
+		if(pGlobals->m_pcmainwin->m_mouseoverbuy)
+		{
+			pGlobals->m_pcmainwin->m_mouseoverbuy = wyFalse;
+			InvalidateRect(pGlobals->m_pcmainwin->m_hwndtrialbuy , NULL, FALSE);
+		}
+		return 0;
+	case WM_LBUTTONUP:
+		ShellExecute(NULL, L"open", TEXT(BUYURL), NULL, NULL, SW_SHOWNORMAL);
+		return 0;
+
+
+
+	}
+	return CallWindowProc(wndproc, hwnd, message, wparam, lparam);
 }
 
 LRESULT	CALLBACK
@@ -1578,60 +1821,153 @@ FrameWindow::ToolbarWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpara
     RECT rcwnd, rcclient, rect;
     HBRUSH hbr;
     wyBool ret = wyFalse;
+	LPDRAWITEMSTRUCT lpdis;
+	RECT  textrect;
+	GRADIENT_RECT gRect;
+	TRIVERTEX vertex[2];
+	wyInt32  fontheight = 0;
+	HGDIOBJ prevobj;
+	COLORREF prevcolor;
+	wyInt32	prevbk;
+	
+	if(message == WM_CTLCOLORSTATIC)
+	{
+		if(pGlobals->m_pcmainwin->m_trialtextfont == NULL)
+		{
+			fontheight = -MulDiv(10, GetDeviceCaps((HDC)wparam, LOGPIXELSY), 72);
+			pGlobals->m_pcmainwin->m_trialtextfont = CreateFont(fontheight, 0, 0, 0, FW_NORMAL, 0, 0, 
+												        0, 0, 0, 0, 0, 0, L"Arial");
+		}
+		if((HWND)lparam == pGlobals->m_pcmainwin->m_hwndtrialtext)
+		{
+			SetBkMode((HDC)wparam, TRANSPARENT);
+			SelectObject((HDC)wparam, pGlobals->m_pcmainwin->m_trialtextfont);
+			SetTextColor((HDC)wparam, RGB(0, 0, 0));
+			return (BOOL)GetStockObject(HOLLOW_BRUSH);
+		}
+	}
+	else
+	if(message == WM_CTLCOLORBTN)
+	{
+		SetBkMode((HDC)wparam, TRANSPARENT);
+		return (BOOL)GetStockObject(HOLLOW_BRUSH);
+	}
+	else
+	if(message == WM_DRAWITEM )
+	{
+		lpdis = (LPDRAWITEMSTRUCT)lparam;
+		if(pGlobals->m_pcmainwin->m_trialbuyfont == NULL)
+		{
+			fontheight = -MulDiv(10, GetDeviceCaps(lpdis->hDC, LOGPIXELSY), 72);
+			pGlobals->m_pcmainwin->m_trialbuyfont = CreateFont(fontheight, 0, 0, 0, 1000, 0, 0, 
+												        0, 0, 0, 0, 0, 0, L"Arial");
+		}
+		
+		if(lpdis->hwndItem == pGlobals->m_pcmainwin->m_hwndtrialbuy)
+		{
+			//if(lpdis->itemState != ODS_HOTLIGHT)
+			if( pGlobals->m_pcmainwin->m_mouseoverbuy == wyFalse)
+			{
+				vertex[0].Red   = 0x6f00;
+				vertex[0].Green = 0xb500;
+				vertex[0].Blue  = 0x3600;
+				vertex[0].Alpha = 0x0000;
 
-    if(message == WM_NCPAINT)
-    {
-        if((ret = wyTheme::GetBrush(BRUSH_MAINTOOLBAR, &hbr)) == wyFalse)
-        {
-            hbr = CreateSolidBrush(GetSysColor(COLOR_BTNFACE));
-        }
+				vertex[1].Red   = 0x6000;
+				vertex[1].Green = 0xa300;
+				vertex[1].Blue  = 0x2a00;
+				vertex[1].Alpha = 0x0000;
+			}
+			else
+			{
+				vertex[0].Red   = 0x5900;
+				vertex[0].Green = 0x9d00;
+				vertex[0].Blue  = 0x2200;
+				vertex[0].Alpha = 0x0000;
 
-        hdc = GetWindowDC(hwnd);
-        GetWindowRect(hwnd, &rcwnd);
-        GetClientRect(hwnd, &rcclient);
-        MapWindowRect(hwnd, NULL, &rcclient);
-        
-        rect.left = rect.top = 0;
-        rect.bottom = rcclient.top - rcwnd.top;
-        rect.right = rcwnd.right - rcwnd.left;
+				vertex[1].Red   = 0x4300;
+				vertex[1].Green = 0x8100;
+				vertex[1].Blue  = 0x2a00;
+				vertex[1].Alpha = 0x0000;
+			}			
+			vertex[0].x     = lpdis->rcItem.left;
+			vertex[0].y     = lpdis->rcItem.top;
 
-        if(rect.right - rect.left && rect.bottom - rect.top)
-        {
-            FillRect(hdc, &rect, hbr);
-        }
+			vertex[1].x     = lpdis->rcItem.right;
+			vertex[1].y     = lpdis->rcItem.bottom; 
 
-        rect.top = rcclient.bottom - rcwnd.top;
-        rect.bottom = rect.top + (rcwnd.bottom - rcclient.bottom);
-        
-        if(rect.right - rect.left && rect.bottom - rect.top)
-        {
-            FillRect(hdc, &rect, hbr);
-        }
+			gRect.UpperLeft  = 0;
+			gRect.LowerRight = 1;
+			BeginPath(lpdis->hDC);
+			RoundRect(lpdis->hDC, lpdis->rcItem.left-1, lpdis->rcItem.top-1,  lpdis->rcItem.right+1, lpdis->rcItem.bottom+1, 10, 10);
+			EndPath(lpdis->hDC);
+			SelectClipPath(lpdis->hDC, RGN_COPY);
+			//FrameRect(lpdis->hDC, &lpdis->rcItem, (HBRUSH) GetStockObject(BLACK_BRUSH));
+			GradientFill(lpdis->hDC, vertex, 2, &gRect, 1, GRADIENT_FILL_RECT_V);
+			prevbk = SetBkMode(lpdis->hDC, TRANSPARENT);
+			prevobj = SelectObject(lpdis->hDC, pGlobals->m_pcmainwin->m_trialbuyfont);
+			SetTextColor(lpdis->hDC, RGB(255, 255, 255));
+			prevcolor = DrawText(lpdis->hDC, _(L"BUY"), -1, &lpdis->rcItem, DT_CENTER | DT_SINGLELINE | DT_VCENTER );
+			SelectObject(lpdis->hDC, prevobj);
+			SetBkMode(lpdis->hDC, prevbk);
+			SetTextColor(lpdis->hDC, prevcolor);
+		}
+	}
+	//
+	//HFONT		hfont = NULL;
+    //if(message == WM_NCPAINT)
+    //{
+    //    if((ret = wyTheme::GetBrush(BRUSH_MAINTOOLBAR, &hbr)) == wyFalse)
+    //    {
+    //        hbr = CreateSolidBrush(GetSysColor(COLOR_BTNFACE));
+    //    }
 
-        rect.top = 0;
-        rect.right = rcclient.left - rcwnd.left;
-        
-        if(rect.right - rect.left && rect.bottom - rect.top)
-        {
-            FillRect(hdc, &rect, hbr);
-        }
+    //    hdc = GetWindowDC(hwnd);
+    //    GetWindowRect(hwnd, &rcwnd);
+    //    GetClientRect(hwnd, &rcclient);
+    //    MapWindowRect(hwnd, NULL, &rcclient);
+    //    
+    //    rect.left = rect.top = 0;
+    //    rect.bottom = rcclient.top - rcwnd.top;
+    //    rect.right = rcwnd.right - rcwnd.left;
 
-        rect.left = rcclient.right - rcwnd.left;
-        rect.right = rect.left + (rcwnd.right - rcclient.right);
-        
-        if(rect.right - rect.left && rect.bottom - rect.top)
-        {
-            FillRect(hdc, &rect, hbr);
-        }
+    //    if(rect.right - rect.left && rect.bottom - rect.top)
+    //    {
+    //        FillRect(hdc, &rect, hbr);
+    //    }
 
-        if(ret == wyFalse)
-        {
-            DeleteBrush(hbr);
-        }
+    //    rect.top = rcclient.bottom - rcwnd.top;
+    //    rect.bottom = rect.top + (rcwnd.bottom - rcclient.bottom);
+    //    
+    //    if(rect.right - rect.left && rect.bottom - rect.top)
+    //    {
+    //        FillRect(hdc, &rect, hbr);
+    //    }
 
-        ReleaseDC(hwnd, hdc);
-        return 0;
-    }
+    //    rect.top = 0;
+    //    rect.right = rcclient.left - rcwnd.left;
+    //    
+    //    if(rect.right - rect.left && rect.bottom - rect.top)
+    //    {
+    //        FillRect(hdc, &rect, hbr);
+    //    }
+
+    //    rect.left = rcclient.right - rcwnd.left;
+    //    rect.right = rect.left + (rcwnd.right - rcclient.right);
+    //    
+    //    if(rect.right - rect.left && rect.bottom - rect.top)
+    //    {
+    //        FillRect(hdc, &rect, hbr);
+    //    }
+
+    //    if(ret == wyFalse)
+    //    {
+    //        DeleteBrush(hbr);
+    //    }
+
+    //    ReleaseDC(hwnd, hdc);
+    //    return 0;
+    //}
 
     return CallWindowProc(wndproc, hwnd, message, wparam, lparam);
 }
@@ -1698,6 +2034,33 @@ FrameWindow::CreateToolCombo(HWND hwndtool)
 												m_hwndtool,(HMENU)IDC_TOOLCOMBO,(HINSTANCE)GetHinstance(), NULL));
 	return hwndcombo;
 }
+
+HWND
+FrameWindow::CreateTrialText(HWND hwndtool)
+{
+	HWND        hwndtrialtext;
+	wyUInt32    style = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | SS_CENTER;
+		
+	VERIFY(hwndtrialtext = CreateWindowEx(0, WC_STATIC, TEXT(""), style, 700, 8, 120, 32,
+												m_hwndsecondtool,(HMENU)IDC_TRIALTEXT,(HINSTANCE)GetHinstance(), NULL));
+	return hwndtrialtext;
+}
+
+
+HWND
+FrameWindow::CreateTrialBuy(HWND hwndtool)
+{
+	HWND        hwndtrialbuy;
+	RECT rcmain;
+	GetClientRect((HWND)GetHwnd(), &rcmain);
+	wyUInt32    style = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | BS_TEXT | BS_CENTER | BS_OWNERDRAW  ;
+		
+	VERIFY(hwndtrialbuy = CreateWindowEx(0, WC_BUTTON, TEXT("BUY"), style, rcmain.right-84, 2, 64, 26,
+												m_hwndsecondtool,(HMENU)IDC_TRIALBUY,(HINSTANCE)GetHinstance(), NULL));
+	return hwndtrialbuy;
+}
+
+
 
 // Function to set the font of the combo box in the toolbar to ARIAL
 wyBool
@@ -1836,7 +2199,7 @@ FrameWindow::Resize(WPARAM wparam)
 void
 FrameWindow::ResizeToolBar()
 {
-	wyInt32	vpos, hpos, height, width, comboht = TOOLBAR_HEIGHT, tabheight = 0;
+	wyInt32	vpos, hpos, height, width, comboht = TOOLBAR_HEIGHT, tabheight = 0,sectoolx;
 	wyInt32 firsttoolextrawidth = 0, combovpos = 0, firsttoolbarheight = 0;
 	RECT	rc, rctool, rcttemp;
 
@@ -1897,9 +2260,22 @@ FrameWindow::ResizeToolBar()
 
 	VERIFY(MoveWindow((HWND)m_hwndsecondtool, hpos + TOOLBAR_COMBO_WIDTH, vpos, 
                                 (rc.right-rc.left) - (hpos + 150), height, TRUE));
-
+	if(pGlobals->m_pcmainwin->m_connection->m_enttype == ENT_TRIAL)
+	{
+		sectoolx = (rc.right-rc.left) - (hpos + 150);
+		if(sectoolx - 74 > (TOOLBAR_WIDTH + 80 + 120) )
+		VERIFY(MoveWindow((HWND)m_hwndtrialbuy, sectoolx - 74, 2, 
+									64, 26, TRUE));
+		//700, 5, 120, 32
+		if(sectoolx - 194 > (TOOLBAR_WIDTH + 80) )
+		VERIFY(MoveWindow((HWND)m_hwndtrialtext, sectoolx - 194, 5, 
+									120, 32, TRUE));
+		ShowWindow(m_hwndtrialtext, TRUE);
+		ShowWindow(m_hwndtrialbuy, TRUE);
+	}
 	ShowWindow(GetToolCombo(), TRUE);
 	ShowWindow(m_hwndsecondtool, TRUE);
+	
 
 	return;
 }
@@ -1997,7 +2373,10 @@ FrameWindow::AddTextInCombo(const wyWChar * text)
 		return wyFalse;
 	
 	seldb.SetAs(text);
-	title.Sprintf("%s/%s %s", wnd->m_title.GetString(), seldb.GetString(), wnd->m_tunneltitle.GetString());
+	if(pGlobals->m_pcmainwin->m_sessionname.GetLength())
+		title.Sprintf("%s-%s/%s %s",pGlobals->m_pcmainwin->m_sessionname.GetString(), wnd->m_title.GetString(), seldb.GetString(), wnd->m_tunneltitle.GetString());
+	else
+		title.Sprintf("%s/%s %s", wnd->m_title.GetString(), seldb.GetString(), wnd->m_tunneltitle.GetString());
 
 	SetWindowText(wnd->m_hwnd, title.GetAsWideChar());
 	
@@ -2055,6 +2434,7 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 	wyInt32			ptabimage;
 	CTCITEM quetabitem = {0};
 	TabEditor*		tabquery;
+	HMENU			hmenu;
 #ifndef COMMUNITY
 	TabDbSearch		*ptabdbsearch = NULL;
 #endif
@@ -2316,6 +2696,51 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 	case ID_FILE_RENAMETAB:
 		//pcquerywnd->m_pctabmodule->SetTabRename(L"abc1abc2abc3abc4abc5abc6", wyFalse);
 		conncolor.ShowRenameTabDlg(pcquerywnd->m_hwnd);
+		break;
+	case ID_SAVESESSIONAS:
+		if(SaveSessionFile(pGlobals->m_hwndclient, wyTrue))
+		{
+			ResetEvent(m_sessionchangeevent);
+		}
+		break;
+	case ACCEL_SAVESESSION:
+	case ID_SAVESESSION:
+		if(WaitForSingleObject(m_sessionchangeevent, 0) == WAIT_OBJECT_0 )
+		{
+			if(SaveSessionFile(pGlobals->m_hwndclient, wyFalse))
+			{
+				ResetEvent(m_sessionchangeevent);
+			}
+			break;
+		}
+		break;
+	case ACCEL_OPENSESSION:
+	case ID_OPENSESSION:
+		//Dialog to save current session
+		wyInt32 msgreturn;
+		if(hwndactive)
+			if(WaitForSingleObject(m_sessionchangeevent, 0) == WAIT_OBJECT_0)
+			{
+				msgreturn = MessageBox(pGlobals->m_hwndclient, _(TEXT("Do you want to save the current session?")), pGlobals->m_appname.GetAsWideChar(), MB_YESNOCANCEL | MB_ICONQUESTION | MB_DEFBUTTON1);
+				if(msgreturn == IDYES)
+				{
+					if(SaveSessionFile(pGlobals->m_hwndclient, wyFalse))
+						ResetEvent(m_sessionchangeevent);
+				}
+				else
+				if(msgreturn == IDCANCEL)
+					break;
+			}
+		OpenSessionFile();
+		break;
+	case ACCEL_ENDSESSION:
+	case ID_CLOSESESSION:
+		m_sessionfile.Clear();
+		m_sessionname.Clear();
+		VERIFY(hmenu = GetMenu(m_hwndmain));
+		EnableMenuItem(hmenu, ID_CLOSESESSION, MF_GRAYED | MF_BYCOMMAND);
+		if(hwndactive)
+			pcquerywnd->SetQueryWindowTitle();
 		break;
 	case ID_FILE_CLOSETAB:
 	case ACCEL_CLOSETAB:
@@ -4413,6 +4838,13 @@ FrameWindow::OnActiveConn()
 
 		//do not display execution time when connection is closed
         m_statusbarmgmt->ShowInformation(L"", 1);
+		//grey session save and save as
+		EnableMenuItem(hmenu, ID_SAVESESSION, MF_GRAYED | MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ID_SAVESESSIONAS, MF_GRAYED | MF_BYCOMMAND);
+		if(!m_sessionfile.GetLength())
+			EnableMenuItem(hmenu, ID_CLOSESESSION, MF_GRAYED | MF_BYCOMMAND);
+		else
+			EnableMenuItem(hmenu, ID_CLOSESESSION, MF_ENABLED);
 	}
 	else
 	{
@@ -4428,6 +4860,12 @@ FrameWindow::OnActiveConn()
 		for(itemcount=0; itemcount <= MAX_RECENT_FILES; itemcount++)
 			EnableMenuItem(hmenu, ID_SDLF_1 + itemcount, MF_ENABLED);
 
+		EnableMenuItem(hmenu, ID_SAVESESSION, MF_ENABLED);
+		EnableMenuItem(hmenu, ID_SAVESESSIONAS, MF_ENABLED);
+		if(!m_sessionfile.GetLength())
+			EnableMenuItem(hmenu, ID_CLOSESESSION, MF_GRAYED | MF_BYCOMMAND);
+		else
+			EnableMenuItem(hmenu, ID_CLOSESESSION, MF_ENABLED);
 		//EnableToolButtonsAndCombo(m_hwndtool, m_hwndsecondtool, m_hwndtoolcombo, wyTrue);
         PostMessage(m_hwndmain, UM_UPDATEMAINTOOLBAR, 0, 0);
 	}
@@ -8342,6 +8780,9 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 		if(failedconnections.GetLength())
 		{
 			failedconnections.Insert(0, _("Failed to restore following connections\r\n\r\n"));
+			failedconnections.Insert(0, _("\r\n\r\n"));
+			failedconnections.Insert(0, (wyChar*)pGlobals->m_sessionbackup.GetString());
+			failedconnections.Insert(0, _("The backup of Session Savepoint is created at\r\n\r\n"));
 			MessageBox(pGlobals->m_pcmainwin->m_hwndmain, failedconnections.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONINFORMATION | MB_OK);
 		}
 
@@ -8423,6 +8864,9 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 		m_savetimerevent = CreateEvent(NULL, TRUE, TRUE, NULL);
 		m_sqlyogcloseevent = CreateEvent(NULL, TRUE, TRUE, NULL);
 		m_sessionsaveevent = CreateEvent(NULL, TRUE, TRUE, NULL);
+		//pGlobals->m_pcmainwin->m_issessionedited
+		m_sessionchangeevent = CreateEvent(NULL, TRUE, m_issessionedited, NULL);
+		//SetEvent(m_sessionchangeevent);
 		SetTimer(pGlobals->m_pcmainwin->m_hwndmain, CONSAVE_TIMER, CONSAVE_INTERVAL, NULL);
 		savethread_handle = (HANDLE)_beginthreadex(NULL, 0, sessionsavesproc, NULL, 0, NULL);
 		m_savethread_handle = savethread_handle;
@@ -8552,7 +8996,6 @@ FrameWindow::EnableToolButtonsAndCombo(HWND hwndtool, HWND hwndsecondtool, HWND 
         }
 
         EnableWindow(hwndcombo, TRUE);
-		
         count = sizeof(tb1id)/sizeof(tb1id[0]);
 
         for(i = 0; i < count; ++i)
@@ -8901,11 +9344,13 @@ FrameWindow::ShowQueryExecToolTip(wyBool show)
 }
 
 wyBool
-FrameWindow::WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id, TabTypes *tabactive, MDIWindow *wnd)
+FrameWindow::WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id, TabTypes *tabactive, MDIWindow *wnd, wySQLite	*ssnsqliteobj)
 {
 	sqlite3_stmt*   stmt;
 	TabEditor		*tabquery;
 	wyString		testquery, sqlitequery;
+	wySQLite	*sqliteobj;
+	sqliteobj = ssnsqliteobj ? ssnsqliteobj : pGlobals->m_sqliteobj;
 #ifndef COMMUNITY
 //if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 	TabQueryBuilder		*tabquerybuilder;	
@@ -8991,42 +9436,42 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 	CustomTab_GetTitle(wnd->m_pctabmodule->m_hwnd, position, &temptabeditorele->m_psztext);
 	CustomTab_GetTooltip(wnd->m_pctabmodule->m_hwnd, position, &temptabeditorele->m_tooltiptext);
 
-	
-	wnd->m_listtabeditor->Insert(temptabeditorele);
+	if(!ssnsqliteobj)
+		wnd->m_listtabeditor->Insert(temptabeditorele);
 	
 	sqlitequery.Sprintf("INSERT INTO tabdetails (Id, Tabid,Tabtype, position,leftortoppercent,isedited, title, tooltip, isfile,isfocussed,content) VALUES \
-												(? , ?,?, ?, ?, ?, ?, ?, ?, ?, ?)");
+												(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-	pGlobals->m_sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+	sqliteobj->Prepare(&stmt, sqlitequery.GetString());
 
 	//sqlitequery.Sprintf("INSERT INTO tabdetails (Id, Tabid, position,leftortoppercent,isedited, title, tooltip, isfile,isfocussed,content) 
 	//VALUES (%d , %d, %d, %d, %d, \"%s\", \"%s\", %d, %d, \"%s\")",
 	//tempmdilist->m_id,temptabeditorele->m_tabid,temptabeditorele->m_position,temptabeditorele->m_leftortoppercent,temptabeditorele->m_isedited,temptabeditorele->m_psztext.GetString(),temptabeditorele->m_tooltiptext.GetString(),temptabeditorele->m_isfile,temptabeditorele->m_isfocussed,testquery.GetString());
-	pGlobals->m_sqliteobj->SetInt(&stmt, 1, id);
-	pGlobals->m_sqliteobj->SetInt(&stmt, 2, temptabeditorele->m_tabid);
-	pGlobals->m_sqliteobj->SetInt(&stmt, 3, quetabitem.m_iimage);
-	pGlobals->m_sqliteobj->SetInt(&stmt, 4, temptabeditorele->m_position);
-	pGlobals->m_sqliteobj->SetInt(&stmt, 5, temptabeditorele->m_leftortoppercent);
-	pGlobals->m_sqliteobj->SetInt(&stmt, 6, temptabeditorele->m_isedited);
-	pGlobals->m_sqliteobj->SetText(&stmt, 7, temptabeditorele->m_psztext.GetString());
-	pGlobals->m_sqliteobj->SetText(&stmt, 8,	temptabeditorele->m_tooltiptext.GetString());
-	pGlobals->m_sqliteobj->SetInt(&stmt, 9,	temptabeditorele->m_isfile);
-	pGlobals->m_sqliteobj->SetInt(&stmt, 10,	temptabeditorele->m_isfocussed);
-	pGlobals->m_sqliteobj->SetText(&stmt, 11,	testquery.GetString());
+	sqliteobj->SetInt(&stmt, 1, id);
+	sqliteobj->SetInt(&stmt, 2, temptabeditorele->m_tabid);
+	sqliteobj->SetInt(&stmt, 3, quetabitem.m_iimage);
+	sqliteobj->SetInt(&stmt, 4, temptabeditorele->m_position);
+	sqliteobj->SetInt(&stmt, 5, temptabeditorele->m_leftortoppercent);
+	sqliteobj->SetInt(&stmt, 6, temptabeditorele->m_isedited);
+	sqliteobj->SetText(&stmt, 7, temptabeditorele->m_psztext.GetString());
+	sqliteobj->SetText(&stmt, 8,	temptabeditorele->m_tooltiptext.GetString());
+	sqliteobj->SetInt(&stmt, 9,	temptabeditorele->m_isfile);
+	sqliteobj->SetInt(&stmt, 10,	temptabeditorele->m_isfocussed);
+	sqliteobj->SetText(&stmt, 11,	testquery.GetString());
 	
-	pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
-	pGlobals->m_sqliteobj->Finalize(&stmt);						
+	sqliteobj->Step(&stmt, wyFalse);
+	sqliteobj->Finalize(&stmt);						
 	return wyTrue;
 }
 
 wyBool
-FrameWindow::SaveConnectionDetails()
+FrameWindow::SaveConnectionDetails(wySQLite	*ssnsqliteobj)
 {
 	wyInt32 tabcount, i;
 	CTCITEM contabitem = {0}, quetabitem = {0};
 	contabitem.m_mask = CTBIF_LPARAM | CTBIF_COLOR;
 	MDIWindow	*wnd, *wndactive;
- 	wyBool isend = wyFalse, isendq = wyFalse;
+ 	wyBool isend = wyFalse, isendq = wyFalse,issessionedited = wyFalse;
 	
 	wyString	dirstr;
 	
@@ -9045,7 +9490,9 @@ FrameWindow::SaveConnectionDetails()
 	wyInt32				newid = 0,newqid = 0;
 	sqlite3_stmt*		stmt;
 	TabTypes			*activetab;
+	wySQLite			*sqliteobj;
 
+	sqliteobj = ssnsqliteobj ? ssnsqliteobj : pGlobals->m_sqliteobj;
 	
 	/*if(m_sqlyogclosed)
 		return wyTrue;*/
@@ -9056,9 +9503,49 @@ FrameWindow::SaveConnectionDetails()
 	{*/
 		//calculate next id for a new tab
 		sqlitequery.Sprintf("BEGIN IMMEDIATE");
-		pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
 		if(m_hwndconntab)
 		{
+			if(m_sessionfile.GetLength())
+			{
+				if(WaitForSingleObject(m_sessionchangeevent, 0) == WAIT_OBJECT_0)
+					issessionedited = wyTrue;
+				else
+					issessionedited = wyFalse;
+				
+				if(!m_previoussessionfile.GetLength())
+				{
+					m_previoussessionfile.SetAs(m_sessionfile);
+					sqlitequery.Sprintf("INSERT INTO sessiondetails (Id, filename, isedited) VALUES (?, ?, ?)");
+					sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+					sqliteobj->SetInt(&stmt, 1,	1);
+					sqliteobj->SetText(&stmt, 2,	m_sessionfile.GetString());
+					sqliteobj->SetInt(&stmt, 3,	issessionedited);
+					sqliteobj->Step(&stmt, wyFalse);
+					sqliteobj->Finalize(&stmt);
+				}
+				else
+				if(m_previoussessionfile.Compare(m_sessionfile) != 0)
+				{
+					sqlitequery.Sprintf("UPDATE sessiondetails set filename = ? where Id = 1");
+					sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+					sqliteobj->SetText(&stmt, 1,	m_sessionfile.GetString());
+					sqliteobj->Step(&stmt, wyFalse);
+					sqliteobj->Finalize(&stmt);
+					m_previoussessionfile.SetAs(m_sessionfile);
+					if((m_previoussessionedited && !issessionedited) || (!m_previoussessionedited && issessionedited))
+					{
+						sqlitequery.Sprintf("UPDATE sessiondetails set isedited = %d where Id = 1", issessionedited?1:0);
+						sqliteobj->Execute(&sqlitequery, &sqliteerr);
+					}
+				}
+			}
+			else
+			{
+				sqlitequery.Sprintf("DELETE FROM sessiondetails");
+				sqliteobj->Execute(&sqlitequery, &sqliteerr);
+				m_previoussessionfile.SetAs("");
+			}
 			tabcount = CustomTab_GetItemCount(m_hwndconntab);
 			totalconntabs = pGlobals->m_mdiwlist->GetCount();
 
@@ -9094,7 +9581,7 @@ FrameWindow::SaveConnectionDetails()
 						{
 							tempmdilist->m_position = i;//position change update to sqlite based on tempmdilist->m_id & update list
 							sqlitequery.Sprintf("UPDATE conndetails set position = %d where Id = %d", i, tempmdilist->m_id);
-							pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+							sqliteobj->Execute(&sqlitequery, &sqliteerr);
 						}
 						//else
 						isend = wyTrue;//end of loop matched mdi
@@ -9104,34 +9591,42 @@ FrameWindow::SaveConnectionDetails()
 							//update sqlite and list
 							tempmdilist->m_rgbconn = wnd->m_conninfo.m_rgbconn;
 							sqlitequery.Sprintf("UPDATE conndetails set ObjectbrowserBkcolor = %d where Id = %d", tempmdilist->m_rgbconn, tempmdilist->m_id);
-							pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+							sqliteobj->Execute(&sqlitequery, &sqliteerr);
 						}
 						if(wnd->m_conninfo.m_rgbfgconn != tempmdilist->m_rgbfgconn )
 						{
 							//update sqlite and list
 							tempmdilist->m_rgbfgconn = wnd->m_conninfo.m_rgbfgconn;
 							sqlitequery.Sprintf("UPDATE conndetails set ObjectbrowserFgcolor = %d where Id = %d", tempmdilist->m_rgbfgconn, tempmdilist->m_id);
-							pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+							sqliteobj->Execute(&sqlitequery, &sqliteerr);
 						}
 						if(wnd == wndactive && !tempmdilist->m_isfocussed)
 						{
 							tempmdilist->m_isfocussed = wyTrue;
 							sqlitequery.Sprintf("UPDATE conndetails set isfocussed = 1 where Id = %d", tempmdilist->m_id);
-							pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+							sqliteobj->Execute(&sqlitequery, &sqliteerr);
 						}
 						else
 						if(wnd != wndactive && tempmdilist->m_isfocussed)
 						{
 							tempmdilist->m_isfocussed = wyFalse;
 							sqlitequery.Sprintf("UPDATE conndetails set isfocussed = 0 where Id = %d", tempmdilist->m_id);
-							pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+							sqliteobj->Execute(&sqlitequery, &sqliteerr);
 						}
 
 						sqlitequery.Sprintf("UPDATE historydetails set historydata = ? where Id = %d",tempmdilist->m_id);
-						pGlobals->m_sqliteobj->Prepare(&stmt, sqlitequery.GetString());
-						pGlobals->m_sqliteobj->SetText(&stmt, 1,	historydata.GetString());
-						pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
-						pGlobals->m_sqliteobj->Finalize(&stmt);	
+						sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+						sqliteobj->SetText(&stmt, 1,	historydata.GetString());
+						sqliteobj->Step(&stmt, wyFalse);
+						sqliteobj->Finalize(&stmt);	
+
+						sqlitequery.Sprintf("UPDATE obdetails set obdb = ? where Id = %d", tempmdilist->m_id);
+						sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+						sqliteobj->SetText(&stmt, 1,	wnd->m_pcqueryobject->m_seldatabase.GetString());
+						sqliteobj->Step(&stmt, wyFalse);
+						sqliteobj->Finalize(&stmt);	
+						//sqliteobj->Execute(&sqlitequery, &sqliteerr);
+
 					}
 					if(!isend)
 						tempmdilist = (MDIlist*)tempmdilist->m_next;
@@ -9167,11 +9662,18 @@ FrameWindow::SaveConnectionDetails()
 					pGlobals->m_mdiwlist->Insert(tempmdilist);
 
 					sqlitequery.Sprintf("INSERT INTO historydetails (Id, historydata) VALUES (? , ?)");
-					pGlobals->m_sqliteobj->Prepare(&stmt, sqlitequery.GetString());
-					pGlobals->m_sqliteobj->SetInt(&stmt, 1,	tempmdilist->m_id);
-					pGlobals->m_sqliteobj->SetText(&stmt, 2,	historydata.GetString());
-					pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
-					pGlobals->m_sqliteobj->Finalize(&stmt);	
+					sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+					sqliteobj->SetInt(&stmt, 1,	tempmdilist->m_id);
+					sqliteobj->SetText(&stmt, 2,	historydata.GetString());
+					sqliteobj->Step(&stmt, wyFalse);
+					sqliteobj->Finalize(&stmt);	
+
+					sqlitequery.Sprintf("INSERT INTO obdetails (Id, obdb) VALUES (? , ?)");
+					sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+					sqliteobj->SetInt(&stmt, 1,	tempmdilist->m_id);
+					sqliteobj->SetText(&stmt, 2,	wnd->m_pcqueryobject->m_seldatabase.GetString());
+					sqliteobj->Step(&stmt, wyFalse);
+					sqliteobj->Finalize(&stmt);	
 
 					for(k = 0; k < subtabcount; k++)
 					{
@@ -9240,19 +9742,19 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 									{
 										temptabeditorele->m_position = k;//position change update to sqlite based on tempmdilist->m_id & update list
 										sqlitequery.Sprintf("UPDATE tabdetails SET position = %d WHERE Id = %d AND Tabid = %d", k,tempmdilist->m_id, temptabeditorele->m_tabid);
-										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										sqliteobj->Execute(&sqlitequery, &sqliteerr);
 									}
 									if(temptabeditorele->m_color != quetabitem.m_color)
 									{
 										temptabeditorele->m_color = quetabitem.m_color;
 										sqlitequery.Sprintf("UPDATE tabdetails set color = %d where Id = %d AND Tabid = %d",temptabeditorele->m_color,tempmdilist->m_id, temptabeditorele->m_tabid);
-										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										sqliteobj->Execute(&sqlitequery, &sqliteerr);
 									}
 									if(temptabeditorele->m_fgcolor != quetabitem.m_fgcolor)
 									{
 										temptabeditorele->m_fgcolor = quetabitem.m_fgcolor;
 										sqlitequery.Sprintf("UPDATE tabdetails set fgcolor = %d where Id = %d AND Tabid = %d",temptabeditorele->m_fgcolor,tempmdilist->m_id, temptabeditorele->m_tabid);
-										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										sqliteobj->Execute(&sqlitequery, &sqliteerr);
 									}
 									CustomTab_GetTitle(wnd->m_pctabmodule->m_hwnd, k, &tempstr);
 									if(temptabeditorele->m_psztext.Compare(tempstr.GetString()) != 0 )
@@ -9260,33 +9762,33 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 										temptabeditorele->m_psztext.SetAs(tempstr.GetString());
 										sqlitequery.Sprintf("UPDATE tabdetails set title = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
 
-										pGlobals->m_sqliteobj->Prepare(&stmt, sqlitequery.GetString());
-										pGlobals->m_sqliteobj->SetText(&stmt, 1,  temptabeditorele->m_psztext.GetString());
-										pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
-										pGlobals->m_sqliteobj->Finalize(&stmt);	
+										sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+										sqliteobj->SetText(&stmt, 1,  temptabeditorele->m_psztext.GetString());
+										sqliteobj->Step(&stmt, wyFalse);
+										sqliteobj->Finalize(&stmt);	
 									}
 										CustomTab_GetTooltip(wnd->m_pctabmodule->m_hwnd, k, &tempstr);
 									if(temptabeditorele->m_tooltiptext.Compare(tempstr.GetString()) != 0 )
 									{
 										temptabeditorele->m_tooltiptext.SetAs(tempstr.GetString());
 										sqlitequery.Sprintf("UPDATE tabdetails set tooltip = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
-										pGlobals->m_sqliteobj->Prepare(&stmt, sqlitequery.GetString());
-										pGlobals->m_sqliteobj->SetText(&stmt, 1,  temptabeditorele->m_tooltiptext.GetString());
-										pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
-										pGlobals->m_sqliteobj->Finalize(&stmt);	
+										sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+										sqliteobj->SetText(&stmt, 1,  temptabeditorele->m_tooltiptext.GetString());
+										sqliteobj->Step(&stmt, wyFalse);
+										sqliteobj->Finalize(&stmt);	
 									}
 									if((TabTypes*)quetabitem.m_lparam == activetab && !temptabeditorele->m_isfocussed)
 									{
 										temptabeditorele->m_isfocussed = wyTrue;
 										sqlitequery.Sprintf("UPDATE tabdetails set isfocussed = 1 where Id = %d AND Tabid = %d", tempmdilist->m_id, temptabeditorele->m_tabid );
-										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										sqliteobj->Execute(&sqlitequery, &sqliteerr);
 									}
 									else
 									if((TabTypes*)quetabitem.m_lparam != activetab && temptabeditorele->m_isfocussed)
 									{
 										temptabeditorele->m_isfocussed = wyFalse;
 										sqlitequery.Sprintf("UPDATE tabdetails set isfocussed = 0 where Id = %d AND Tabid = %d", tempmdilist->m_id, temptabeditorele->m_tabid );
-										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										sqliteobj->Execute(&sqlitequery, &sqliteerr);
 									}
 									if(quetabitem.m_iimage != IDI_QUERYBUILDER_16 && quetabitem.m_iimage != IDI_SCHEMADESIGNER_16)
 									{
@@ -9295,13 +9797,13 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 										{
 											temptabeditorele->m_isedited = temptabeditorele->m_pctabeditor->m_peditorbase->m_edit;
 											sqlitequery.Sprintf("UPDATE tabdetails set isedited = %d where Id = %d AND Tabid = %d",temptabeditorele->m_isedited,tempmdilist->m_id, temptabeditorele->m_tabid);
-											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+											sqliteobj->Execute(&sqlitequery, &sqliteerr);
 										}
 										if(!temptabeditorele->m_isfile && tabquery->m_peditorbase->m_filename.GetLength() > 0)
 										{
 											temptabeditorele->m_isfile = wyTrue;
 											sqlitequery.Sprintf("UPDATE tabdetails set isfile = 1 where Id = %d AND Tabid = %d",tempmdilist->m_id,temptabeditorele->m_tabid);
-											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+											sqliteobj->Execute(&sqlitequery, &sqliteerr);
 										}
 										
 	
@@ -9310,18 +9812,18 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 										testquery = new wyString;
 										temptabeditorele->m_pctabeditor->m_peditorbase->GetCompleteTextByPost(*testquery,wnd);
 										sqlitequery.Sprintf("UPDATE tabdetails set content = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
-										pGlobals->m_sqliteobj->Prepare(&stmt, sqlitequery.GetString());
-										pGlobals->m_sqliteobj->SetText(&stmt, 1,  testquery->GetString());
+										sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+										sqliteobj->SetText(&stmt, 1,  testquery->GetString());
 										delete testquery;
-										pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
-										pGlobals->m_sqliteobj->Finalize(&stmt);	
+										sqliteobj->Step(&stmt, wyFalse);
+										sqliteobj->Finalize(&stmt);	
 									}
 									//temptabeditorele->m_leftortoppercent = tabquery->m_pcetsplitter->GetLeftTopPercent();
 									if(temptabeditorele->m_leftortoppercent != tabquery->m_pcetsplitter->GetLeftTopPercent())
 									{
 										temptabeditorele->m_leftortoppercent = tabquery->m_pcetsplitter->GetLeftTopPercent();
 										sqlitequery.Sprintf("UPDATE tabdetails set leftortoppercent = %d where Id = %d AND Tabid = %d", temptabeditorele->m_leftortoppercent, tempmdilist->m_id, temptabeditorele->m_tabid );
-										pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+										sqliteobj->Execute(&sqlitequery, &sqliteerr);
 									}
 								}
 									else
@@ -9334,24 +9836,24 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 										{
 											temptabeditorele->m_isedited = tabquerybuilder->m_isedited;
 											sqlitequery.Sprintf("UPDATE tabdetails set isedited = %d where Id = %d AND Tabid = %d",temptabeditorele->m_isedited,tempmdilist->m_id, temptabeditorele->m_tabid);
-											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+											sqliteobj->Execute(&sqlitequery, &sqliteerr);
 										}
 										if(!temptabeditorele->m_isfile && tabquerybuilder->m_filename.GetLength() > 0)
 										{
 											temptabeditorele->m_isfile = wyTrue;
 											sqlitequery.Sprintf("UPDATE tabdetails set isfile = 1 where Id = %d AND Tabid = %d",tempmdilist->m_id,temptabeditorele->m_tabid);
-											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+											sqliteobj->Execute(&sqlitequery, &sqliteerr);
 										}
 										if(!temptabeditorele->m_isfile || temptabeditorele->m_isedited )
 										{
 											testquery = new wyString;
 											tabquerybuilder->WriteToXMLbuffer(*testquery);
 											sqlitequery.Sprintf("UPDATE tabdetails set content = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
-											pGlobals->m_sqliteobj->Prepare(&stmt, sqlitequery.GetString());
-											pGlobals->m_sqliteobj->SetText(&stmt, 1,  testquery->GetString());
+											sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+											sqliteobj->SetText(&stmt, 1,  testquery->GetString());
 											delete testquery;
-											pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
-											pGlobals->m_sqliteobj->Finalize(&stmt);	
+											sqliteobj->Step(&stmt, wyFalse);
+											sqliteobj->Finalize(&stmt);	
 										}
 }
 #endif
@@ -9365,24 +9867,24 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 										{
 											temptabeditorele->m_isedited = tabschemadesigner->m_isedited;
 											sqlitequery.Sprintf("UPDATE tabdetails set isedited = %d where Id = %d AND Tabid = %d",temptabeditorele->m_isedited,tempmdilist->m_id, temptabeditorele->m_tabid);
-											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+											sqliteobj->Execute(&sqlitequery, &sqliteerr);
 										}
 										if(!temptabeditorele->m_isfile && tabschemadesigner->m_filename.GetLength() > 0)
 										{
 											temptabeditorele->m_isfile = wyTrue;
 											sqlitequery.Sprintf("UPDATE tabdetails set isfile = 1 where Id = %d AND Tabid = %d",tempmdilist->m_id,temptabeditorele->m_tabid);
-											pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+											sqliteobj->Execute(&sqlitequery, &sqliteerr);
 										}
 										if(!temptabeditorele->m_isfile || temptabeditorele->m_isedited )
 										{
 											testquery = new wyString;
 											tabschemadesigner->WriteToXMLbuffer(*testquery);
 											sqlitequery.Sprintf("UPDATE tabdetails set content = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
-											pGlobals->m_sqliteobj->Prepare(&stmt, sqlitequery.GetString());
-											pGlobals->m_sqliteobj->SetText(&stmt, 1,  testquery->GetString());
+											sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+											sqliteobj->SetText(&stmt, 1,  testquery->GetString());
 											delete testquery;
-											pGlobals->m_sqliteobj->Step(&stmt, wyFalse);
-											pGlobals->m_sqliteobj->Finalize(&stmt);	
+											sqliteobj->Step(&stmt, wyFalse);
+											sqliteobj->Finalize(&stmt);	
 										}
 }
 #endif
@@ -9410,7 +9912,7 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 						{
 							//drop the row , dont process its query tabs
 							sqlitequery.Sprintf("DELETE FROM tabdetails WHERE Id = %d AND Tabid = %d",temptabeditorele->m_id, temptabeditorele->m_tabid);
-							pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+							sqliteobj->Execute(&sqlitequery, &sqliteerr);
 							deltabeditorele = temptabeditorele;
 							temptabeditorele = (tabeditorelem*)temptabeditorele->m_next;
 							wnd->m_listtabeditor->Remove(deltabeditorele);
@@ -9430,7 +9932,7 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 				{
 					//drop the row , dont process its query tabs
 					sqlitequery.Sprintf("DELETE FROM conndetails WHERE Id = %d",tempmdilist->m_id);
-					pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+					sqliteobj->Execute(&sqlitequery, &sqliteerr);
 					deltempmdilist = tempmdilist;
 					tempmdilist = (MDIlist*)tempmdilist->m_next;
 					pGlobals->m_mdiwlist->Remove(deltempmdilist);
@@ -9443,7 +9945,7 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 		else
 		{
 			sqlitequery.Sprintf("DELETE FROM conndetails");
-			pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+			sqliteobj->Execute(&sqlitequery, &sqliteerr);
 			tempmdilist = (MDIlist*)pGlobals->m_mdiwlist->GetFirst();
 			totalconntabs = pGlobals->m_mdiwlist->GetCount();
 			for(i = 0; i < totalconntabs; i++)
@@ -9455,11 +9957,328 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 
 		}
 		sqlitequery.Sprintf("COMMIT");
-		pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
 	/*}
 	else
 		return wyFalse;*/
 	
+	
+	return wyTrue;
+}
+
+
+wyBool
+FrameWindow::SaveConnectionDetails2(wySQLite	*ssnsqliteobj)
+{
+	wyInt32 tabcount, i;
+	CTCITEM contabitem = {0}, quetabitem = {0};
+	contabitem.m_mask = CTBIF_LPARAM | CTBIF_COLOR;
+	MDIWindow	*wnd, *wndactive;
+ 	wyBool isend = wyFalse, isendq = wyFalse;
+	
+	wyString	dirstr;
+	
+	tabeditorelem		*temptabeditorele, *deltabeditorele;
+	MDIlist				*tempmdilist, *deltempmdilist;
+	wyString			*testquery, historydata;
+	wyInt32				totalconntabs, j, k, l;
+	wyInt32				subtabcount, totalquetabs;
+	TabEditor			*tabquery,*tabqueryactive;
+	TabHistory			*tabhistory;	
+#ifndef COMMUNITY
+	TabQueryBuilder		*tabquerybuilder;	
+	TabSchemaDesigner	*tabschemadesigner;
+#endif
+	wyString			sqlitequery,sqliteerr,tempstr;
+	wyInt32				newid = 0,newqid = 0;
+	sqlite3_stmt*		stmt;
+	TabTypes			*activetab;
+	wySQLite			*sqliteobj;
+
+	sqliteobj = ssnsqliteobj;
+	
+	/*if(m_sqlyogclosed)
+		return wyTrue;*/
+	wndactive = GetActiveWinByPost();
+	if(!wndactive)
+		return wyFalse;
+	/*if(IsConnectionRestore())
+	{*/
+		//calculate next id for a new tab
+		sqlitequery.Sprintf("BEGIN IMMEDIATE");
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		if(m_hwndconntab)
+		{
+			tabcount = CustomTab_GetItemCount(m_hwndconntab);
+
+			for(i = 0; i < tabcount; i++)
+			{
+				contabitem.m_mask = contabitem.m_mask |CTBIF_LPARAM|CTBIF_IMAGE| CTBIF_COLOR; 
+				CustomTab_GetItem(m_hwndconntab, i, &contabitem);
+				wnd = (MDIWindow*)contabitem.m_lparam;
+
+				tabhistory = wnd->GetActiveHistoryTab();
+				tabhistory->GetCompleteTextByPost(historydata, wnd);
+
+				isend = wyFalse;
+
+				subtabcount = CustomTab_GetItemCount(wnd->m_pctabmodule->m_hwnd);
+				tabqueryactive = wnd->GetActiveTabEditor();
+				activetab = wnd->m_pctabmodule->GetActiveTabType();
+				/*if(!tabqueryactive)
+					tabquerybuilderactive = wnd->g*/
+				//if(j == totalconntabs && !isend)
+				//{
+					//write to sqlite connection attr which will not change throughout the entire session
+					//process all subtabs
+					//save all conn details, list and sqlite
+					newid = newid + 1;
+					tempmdilist = new MDIlist;
+					tempmdilist->m_id = newid;
+					tempmdilist->mdi = wnd;
+					tempmdilist->m_ispresent = wyTrue;
+					tempmdilist->m_position = i;
+					tempmdilist->m_rgbconn = wnd->m_conninfo.m_rgbconn;
+					tempmdilist->m_rgbfgconn = wnd->m_conninfo.m_rgbfgconn;
+					if(wnd == wndactive)
+						tempmdilist->m_isfocussed = wyTrue;
+					else
+						tempmdilist->m_isfocussed = wyFalse;
+					sqlitequery.SetAs("");
+					WriteFullSectionToTable(&sqlitequery, tempmdilist->m_id, tempmdilist->m_position, &wnd->m_conninfo, wnd->m_title.GetString(), tempmdilist->m_isfocussed, sqliteobj);
+					//write history
+					//pGlobals->m_mdiwlist->Insert(tempmdilist);
+
+					sqlitequery.Sprintf("INSERT INTO historydetails (Id, historydata) VALUES (? , ?)");
+					sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+					sqliteobj->SetInt(&stmt, 1,	tempmdilist->m_id);
+					sqliteobj->SetText(&stmt, 2,	historydata.GetString());
+					sqliteobj->Step(&stmt, wyFalse);
+					sqliteobj->Finalize(&stmt);	
+
+					sqlitequery.Sprintf("INSERT INTO obdetails (Id, obdb) VALUES (? , ?)");
+					sqliteobj->Prepare(&stmt, sqlitequery.GetString());
+					sqliteobj->SetInt(&stmt, 1,	tempmdilist->m_id);
+					sqliteobj->SetText(&stmt, 2,	wnd->m_pcqueryobject->m_seldatabase.GetString());
+					sqliteobj->Step(&stmt, wyFalse);
+					sqliteobj->Finalize(&stmt);	
+
+					for(k = 0; k < subtabcount; k++)
+					{
+						quetabitem.m_mask = quetabitem.m_mask |CTBIF_COLOR|CTBIF_LPARAM|CTBIF_IMAGE; 
+						CustomTab_GetItem(wnd->m_pctabmodule->m_hwnd, k, &quetabitem);
+						if(quetabitem.m_iimage == IDI_SCHEMADESIGNER_16 || quetabitem.m_iimage == IDI_QUERYBUILDER_16 || quetabitem.m_iimage == IDI_QUERY_16 || quetabitem.m_iimage == IDI_CREATEVIEW || quetabitem.m_iimage == IDI_CREATEEVENT|| quetabitem.m_iimage == IDI_CREATEPROCEDURE|| quetabitem.m_iimage == IDI_CREATEFUNCTION|| quetabitem.m_iimage == IDI_CREATETRIGGER || quetabitem.m_iimage == IDI_ALTERVIEW || quetabitem.m_iimage == IDI_ALTEREVENT || quetabitem.m_iimage == IDI_ALTERPROCEDURE || quetabitem.m_iimage == IDI_ALTERFUNCTION || quetabitem.m_iimage == IDI_ALTERTRIGGER )
+						{
+							
+							temptabeditorele = new tabeditorelem;
+							WriteTabDetailsToTable(temptabeditorele, quetabitem, k, k, tempmdilist->m_id, activetab,  wnd, sqliteobj);
+
+						}
+					}
+				}
+		}
+
+		sqlitequery.Sprintf("COMMIT");
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+	/*}
+	else
+		return wyFalse;*/
+	
+	
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::OpenSessionFile()
+{
+	
+	wyInt32			ret = 0, retcls = 0;
+    wyBool          retval = wyFalse;
+	wyWChar			openfilename[MAX_PATH + 1] = {0};
+	wyString		failedconnections, filename;
+	wyWChar			fname[MAX_PATH] = {0}, ext[MAX_PATH] = {0};
+	wyString		file, extn;
+	MDIWindow		*wnd;
+	HANDLE			hfile;
+	RECT        rc;
+	wyInt32     lstyle = 0;
+	//pause session save
+	SetEvent(m_savetimerevent);
+	ResetEvent(m_sqlyogcloseevent);
+	//Get File 'open' dialog
+	ret = InitOpenFile(pGlobals->m_hwndclient, openfilename, SESSIONINDEX, MAX_PATH);
+
+	if(!ret)
+		return wyFalse;
+	
+	filename.SetAs(openfilename);
+	hfile = CreateFile(filename.GetAsWideChar(), GENERIC_READ, 
+						FILE_SHARE_READ, NULL, 
+						OPEN_EXISTING, 
+						FILE_ATTRIBUTE_NORMAL, NULL);                     
+
+	if(hfile == INVALID_HANDLE_VALUE)
+	{
+        DisplayErrorText(GetLastError(), _("Could not open file."), pGlobals->m_hwndclient);
+		return wyFalse;
+	}
+	VERIFY (CloseHandle(hfile));
+	//wait for session save to pause
+	if(pGlobals->m_sessionrestore)
+	{
+		if(pGlobals->m_issessionsaveactive == wyTrue)
+		{
+			WaitForSingleObject (m_sessionsaveevent, INFINITE);
+			//restore connections
+		}
+	}
+
+	GetWindowRect(m_hwndmain, &rc);
+	
+	// bug if the window is in minimized position then wrong values are entered and you cannot 
+	// change the sizing...so we need to see that only correct values are entered
+    lstyle = GetWindowLongPtr(m_hwndmain, GWL_STYLE);
+
+	if(lstyle & WS_MINIMIZE)
+    {
+        rc.left     = 0;
+        rc.top      = 0;
+        rc.bottom   = 600;
+        rc.right    = 600;
+    }
+	if(lstyle & WS_MAXIMIZE)
+	{
+		m_showwindowstyle = SW_MAXIMIZE;
+	}
+	else
+	{
+		m_showwindowstyle = SW_NORMAL;
+	}
+
+	//purge autosessionsave db and the session lists
+	delete pGlobals->m_mdiwlist;
+	pGlobals->m_mdiwlist = new List();
+	//close all connections
+	m_iscloseallmdi = wyTrue;
+	SendMessage(m_hwndmain, WM_CLOSEALLWINDOW, 0,(LPARAM)&retcls);
+	//restore connections
+	//pGlobals->m_pcmainwin->m_showwindowstyle = SW_NORMAL;
+	ShowWindow(m_hwndmain, SW_HIDE);
+	SetTimer(m_hwndmain, CONRESTORE_TIMER, 500, NULL);
+	ConnectFromList(&failedconnections, &filename);
+	MoveToInitPosByrc(m_hwndmain, &rc);
+	//restart session save
+	SetEvent(m_sqlyogcloseevent);
+	m_iscloseallmdi = wyFalse;
+	m_sessionfile.SetAs(filename);
+	_wsplitpath(filename.GetAsWideChar(), NULL, NULL, fname, ext);
+	m_sessionname.SetAs(fname);
+	wnd = GetActiveWin();
+	if(wnd)
+		wnd->SetQueryWindowTitle();
+	if(failedconnections.GetLength())
+	{
+		failedconnections.Insert(0, _("Failed to restore following connections\r\n\r\n"));
+		MessageBox(m_hwndmain, failedconnections.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONINFORMATION | MB_OK);
+	}
+	return wyTrue;
+}
+
+wyBool
+FrameWindow::SaveSessionFile(HWND hwnd, wyBool issaveas)
+{
+	wyString    file;
+	wyWChar     filename[MAX_PATH+1] = {0};
+	wyString	buffer;
+	DWORD		dwbyteswritten;
+	HANDLE		hfile;
+	wyBool		ret;
+	wySQLite	*sqliteobj;
+	//#define  SIZE_8K		(8*1024)
+	buffer.SetAs("");
+	wyBool		isopened;
+	HANDLE				hfind;
+    WIN32_FIND_DATAW	fdata;
+	wyString			sqlitequery,sqliteerr;
+	wyWChar			fname[MAX_PATH] = {0}, ext[MAX_PATH] = {0};
+	MDIWindow *wnd;
+	
+	if(!m_sessionfile.GetLength() || issaveas == wyTrue)
+	{
+		if(InitFile(hwnd, filename, SESSIONINDEX, MAX_PATH))
+		{  
+			file.SetAs(filename);
+			if(file.GetLength() == 0)
+				return wyFalse;
+			m_sessionfile.SetAs(file);
+			_wsplitpath(filename, NULL, NULL, fname, ext);
+			m_sessionname.SetAs(fname);
+			//extn.SetAs(ext);
+		}
+		else
+			return wyFalse;
+	}
+	else
+		file.SetAs(m_sessionfile);
+
+	hfind = FindFirstFile(file.GetAsWideChar(), &fdata);
+	sqliteobj = new wySQLite;
+	isopened = sqliteobj->Open(file.GetString());
+	if(hfind != INVALID_HANDLE_VALUE && isopened)
+	{
+		sqlitequery.Sprintf("DROP TABLE IF EXISTS schema_version");
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		sqlitequery.Sprintf("DROP TABLE IF EXISTS conndetails");
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		sqlitequery.Sprintf("DROP TABLE IF EXISTS historydetails");
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		sqlitequery.Sprintf("DROP TABLE IF EXISTS obdetails");
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		sqlitequery.Sprintf("DROP TABLE IF EXISTS tabdetails");
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+	}
+	if(isopened)
+	{
+		//create tables
+		sqlitequery.Sprintf("PRAGMA foreign_keys = ON");
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		sqlitequery.Sprintf(TABLE_SCHEMADETAILS);
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		//insert schema_version values
+		sqlitequery.Sprintf(TABLE_CONNDETAILS);
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+
+		sqlitequery.Sprintf(TABLE_HISTORYDETAILS);
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+
+		sqlitequery.Sprintf(TABLE_OBDETAILS);
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		//Id, Tabid, position, title, tooltip, isfile,isfocussed,content && tabtype? also issaved?
+		sqlitequery.Sprintf(TABLE_TABDETAILS);
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		sqlitequery.Sprintf("INSERT INTO schema_version(description, major_version, minor_version) VALUES (\"%s\",\"%s\",\"%s\")",SCHEMA_DESCRIPTION, SCHEMA_MAJOR_VERSION, SCHEMA_MINOR_VERSION);
+		sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		//Saveconnectiondetails
+		ret = SaveConnectionDetails2(sqliteobj);
+		sqliteobj->Close();
+			
+		if(ret == wyFalse)
+		{
+			DisplayErrorText(GetLastError(), _("Error writing in file."));
+			//if(hfile)
+				//VERIFY (CloseHandle(hfile));
+			return wyFalse;
+		}
+		//VERIFY (CloseHandle(hfile));
+	}
+	else
+	{
+		DisplayErrorText(GetLastError(), _("Could not create file !"));
+		return wyFalse;
+	}
+
+	wnd = GetActiveWin();
+	wnd->SetQueryWindowTitle();
 	
 	return wyTrue;
 }
@@ -9519,7 +10338,7 @@ FrameWindow::RestoreStatusDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM
 
 
 wyBool
-ConnectFromList(wyString* failledconnections)
+ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 {
 	ConnectionInfo	conninfo;
 	MDIWindow		*pcquerywnd = NULL;
@@ -9536,11 +10355,11 @@ ConnectFromList(wyString* failledconnections)
 	
 	wyBool	isfileopen = wyTrue;
 	
-    wyWChar				directory[MAX_PATH+64] = {0};
+    wyWChar				directory[MAX_PATH+64] = {0},directorybackup[MAX_PATH+64] = {0};
     wyInt32				focuspos,firstindex = 0;
     HANDLE				hfind;
     WIN32_FIND_DATAW	fdata;
-    wyString			directoryname,jobbuff;
+    wyString			directoryname,directorynamebackup,jobbuff,seldatabase;
 	wySQLite			*sqliteobj;
 	wyString			sqlitequery,sqliteerr;
 	sqlite3_stmt    *res;
@@ -9550,33 +10369,49 @@ ConnectFromList(wyString* failledconnections)
 	TiXmlDocument		*doc;
 	TabQueryBuilder *tabquerybuilder;
 	TabSchemaDesigner	*tabschemadesigner;
+	HTREEITEM hitem;
+	const wyChar    *colval = NULL;
 
+	//if(sessionfile == NULL)
+	//{
 	if(pGlobals->m_configdirpath.GetLength())
 	{
 		wcscat(directory, pGlobals->m_configdirpath.GetAsWideChar());
 		wcscat(directory, L"\\connrestore.db");
+		wcscat(directorybackup, pGlobals->m_configdirpath.GetAsWideChar());
+		wcscat(directorybackup, L"\\connrestore_backup.ysav");
 	}
 	else
 	{
 		if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, directory)))
 		{
-			wcscat(directory, L"\\SQLyog\\");	
-			wcscat(directory, L"connrestore.db");
+			wcscat(directory, L"\\SQLyog\\");
+			wcscat(directorybackup, directory);
+			wcscat(directory, L"connrestore.db");	
+			wcscat(directorybackup, L"connrestore_backup.ysav");
 		}
 		else 
 			return wyFalse;
 	}
-
-	hfind = FindFirstFile(directory, &fdata);	
-	if(hfind == INVALID_HANDLE_VALUE)
-		{
-		//no db found
-		//done
-		//pGlobals->m_pcmainwin->CreateConnDialog();
-		return wyFalse;
-		}
-	directoryname.SetAs(directory);
-
+	if(sessionfile != NULL)
+	{
+		directoryname.SetAs(sessionfile->GetString());
+	}
+	else
+	{
+		hfind = FindFirstFile(directory, &fdata);	
+		if(hfind == INVALID_HANDLE_VALUE)
+			{
+			//no db found
+			//done
+			//pGlobals->m_pcmainwin->CreateConnDialog();
+			return wyFalse;
+			}
+		directoryname.SetAs(directory);
+		directorynamebackup.SetAs(directorybackup);
+	}
+	//}
+	
 	sqliteobj = new wySQLite;
 	//sqliteobj->Open(directoryname.GetString());
 	sqliteobj->Open(directoryname.GetString(), wyTrue);
@@ -9632,10 +10467,11 @@ ConnectFromList(wyString* failledconnections)
 		for(j=0;j<totalcon;j++)
 			{
 			WaitForSingleObject(thread_handle_l[j], INFINITE);
+			CloseHandle(thread_handle_l[j]);
 			PostMessage(pGlobals->m_pcmainwin->m_hwndrestorestatus, UM_UPDATE_PROGRESS, 0, 0);
 			if(!my_arg[j].conninfo.m_mysql )
 			{
-				failledconnections->AddSprintf("%s\r\n", my_arg[j].conninfo.m_title.GetString());
+				failedconnections->AddSprintf("%s\r\n", my_arg[j].conninfo.m_title.GetString());
 				pGlobals->m_mdiwlist->Insert(my_arg[j].tempmdilist);
 				continue;
 			}
@@ -9663,6 +10499,7 @@ ConnectFromList(wyString* failledconnections)
 				if(my_arg[j].isfocussed)
 				{	
 					focussedconn = j;
+					
 					pGlobals->m_pcquerywnd = pcquerywnd;
 				}
 				my_arg[j].tempmdilist->mdi=pcquerywnd;
@@ -9818,25 +10655,72 @@ ConnectFromList(wyString* failledconnections)
 					tabhistory->SetText(&my_arg[j].historydata);
 					//SendMessage(tabhistory->GetHwnd(), SCI_SETTEXT, (WPARAM)my_arg[j].historydata.GetLength(), (LPARAM)my_arg[j].historydata.GetString());
 					//SetFocus(hwndquery);
+					if(my_arg[j].obdb.GetLength())
+					{
+						pcquerywnd->m_pcqueryobject->m_seldatabase.SetAs(my_arg[j].obdb);
+						pcquerywnd->m_pcqueryobject->SyncObjectDB(pcquerywnd);
+					}
+					else
+					{
+						pcquerywnd->m_pcqueryobject->m_seldatabase.SetAs("");
+						pGlobals->m_pcmainwin->AddTextInCombo(NODBSELECTED);
+					}
+					if(my_arg[j].isfocussed)
+					{
+						//seldatabase.SetAs(pcquerywnd->m_pcqueryobject->m_seldatabase);
+						pGlobals->m_database.SetAs(pcquerywnd->m_pcqueryobject->m_seldatabase);
+					}
+					//pcquerywnd->m_database.SetAs(L"mysqlzzz");
 					CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd, focuspos, 1);
 				}
 				delete my_arg[j].tabdetails;
 			}
 		}
-		WaitForMultipleObjects(totalcon, thread_handle_l, TRUE, INFINITE);
+		//WaitForMultipleObjects(totalcon, thread_handle_l, TRUE, INFINITE);
+
+		//getsessionfilename
+		sqlitequery.Sprintf("SELECT * from sessiondetails where Id = 1");
+		sqliteobj->Prepare(&res, sqlitequery.GetString());
+		if(sqliteobj->Step(&res, wyFalse) && sqliteobj->GetLastCode() == SQLITE_ROW)
+		{
+			colval = sqliteobj->GetText(&res , "filename");
+			if(colval)
+				pGlobals->m_pcmainwin->m_sessionfile.SetAs(colval);
+
+			colval = sqliteobj->GetText(&res , "isedited");
+			if(colval)
+				pGlobals->m_pcmainwin->m_issessionedited = sqliteobj->GetInt(&res , "isedited")?wyTrue:wyFalse;
+		}
+		sqliteobj->Finalize(&res);
+		sqliteobj->Close();
+		//create a backup incase of failed connection
+		//close both the files first
+		if(failedconnections->GetLength() && sessionfile == NULL)
+		{
+			pGlobals->m_sessionbackup.SetAs(directorynamebackup);
+			CopyFile(directoryname.GetAsWideChar(), directorynamebackup.GetAsWideChar(), FALSE);
+		}
+		//if opening a session replace automatic sessionrestore db with the session file
+		if(sessionfile != NULL)
+		{
+			CopyFile(sessionfile->GetAsWideChar(), directory, FALSE);
+		}
 		delete[] thread_handle_l;
 		delete[] my_arg;
 		//focussedconn = 0;
 		if(focussedconn >= 0)
+		{
 			CustomTab_SetCurSel(pGlobals->m_pcmainwin->m_hwndconntab, focussedconn, 1);
-		
+			//if(seldatabase.GetLength())
+			//	pGlobals->m_pcmainwin->AddTextInCombo(seldatabase.GetAsWideChar());
+			//else
+			//	pGlobals->m_pcmainwin->AddTextInCombo(NODBSELECTED);
+		}
 		pGlobals->m_conrestore = wyFalse;
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
+		PostMessage(pGlobals->m_pcmainwin->m_hwndrestorestatus, UM_CLOSE_RESTORE_STATUS, 0, 0);
 		return wyTrue;
-		//inimgr.IniGetSectionDetailsFinalize();
-		//PostMessage(pGlobals->m_pcmainwin->m_hwndrestorestatus, UM_CLOSE_RESTORE_STATUS, 0, 0);
-
-	//}
+		
 }
 
 unsigned __stdcall  
@@ -9858,6 +10742,7 @@ ConnectFromList_mt(void* arg_list)
 		//get tabdetails
 		GetTabDetailsFromTable(pathstr.GetAsWideChar(),((MY_ARG*)arg_list)->id,((MY_ARG*)arg_list)->tabdetails);
 		GetHistoryDetailsFromTable(pathstr.GetAsWideChar(),((MY_ARG*)arg_list)->id,&((MY_ARG*)arg_list)->historydata);
+		GetOBDetailsFromTable(pathstr.GetAsWideChar(),((MY_ARG*)arg_list)->id,&((MY_ARG*)arg_list)->obdb);
 	}
     return 0;
 }
@@ -10019,15 +10904,33 @@ sessionsavesproc(void *arg)
 
 		sqlitequery.Sprintf(TABLE_HISTORYDETAILS);
 		pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+
+		sqlitequery.Sprintf(TABLE_OBDETAILS);
+		pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
 		//Id, Tabid, position, title, tooltip, isfile,isfocussed,content && tabtype? also issaved?
 		sqlitequery.Sprintf(TABLE_TABDETAILS);
 		pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+
+		sqlitequery.Sprintf(TABLE_SESSIONDETAILS);
+		pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+
 		sqlitequery.Sprintf("INSERT INTO schema_version(description, major_version, minor_version) VALUES (\"%s\",\"%s\",\"%s\")",SCHEMA_DESCRIPTION, SCHEMA_MAJOR_VERSION, SCHEMA_MINOR_VERSION);
 		pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
 			//return wyFalse;
 	}
 	else
 	{
+		sqlitequery.Sprintf("SELECT type FROM sqlite_master WHERE name='sessiondetails'");
+		pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());
+		if(!pGlobals->m_sqliteobj->Step(&res, wyFalse) || pGlobals->m_sqliteobj->GetLastCode() != SQLITE_ROW)
+		{
+			pGlobals->m_sqliteobj->Finalize(&res);
+			sqlitequery.Sprintf(TABLE_SESSIONDETAILS);
+			pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+		}
+		else
+			pGlobals->m_sqliteobj->Finalize(&res);	
+
 		sqlitequery.Sprintf("SELECT type FROM sqlite_master WHERE name='conndetails'");
 		pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());
 		if(!pGlobals->m_sqliteobj->Step(&res, wyFalse) || pGlobals->m_sqliteobj->GetLastCode() != SQLITE_ROW)
@@ -10071,6 +10974,26 @@ sessionsavesproc(void *arg)
 		else
 			pGlobals->m_sqliteobj->Finalize(&res);
 		
+		sqlitequery.Sprintf("SELECT type FROM sqlite_master WHERE name='obdetails'");
+		pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());
+		if(!pGlobals->m_sqliteobj->Step(&res, wyFalse) || pGlobals->m_sqliteobj->GetLastCode() != SQLITE_ROW)
+		{
+			pGlobals->m_sqliteobj->Finalize(&res);
+			sqlitequery.Sprintf(TABLE_OBDETAILS);
+			pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+			
+			sqlitequery.SetAs("SELECT Id from conndetails");
+			pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());
+			while(pGlobals->m_sqliteobj->Step(&res, wyFalse) && pGlobals->m_sqliteobj->GetLastCode() == SQLITE_ROW)
+			{
+				i = pGlobals->m_sqliteobj->GetInt(&res, 0);
+				sqlitequery.Sprintf("INSERT INTO obdetails (Id, obdb) VALUES (%d ,\"\")",i);
+				pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+			}
+			pGlobals->m_sqliteobj->Finalize(&res);
+		}
+		else
+			pGlobals->m_sqliteobj->Finalize(&res);
 
 		sqlitequery.Sprintf("SELECT type FROM sqlite_master WHERE name='schema_version'");
 		pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());

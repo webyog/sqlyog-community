@@ -128,7 +128,7 @@ public:
 	virtual	~FrameWindow();
 
     static	LRESULT			CALLBACK	ToolbarWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
-
+	static	LRESULT			CALLBACK	TrialbuyWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
 	static unsigned __stdcall		RestoreStatusThreadProc(LPVOID lpparam);
 
 	static INT_PTR CALLBACK		RestoreStatusDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
@@ -331,6 +331,7 @@ public:
     @return wyTrue on success, otherwise wyFalse
     */
 	wyBool					MoveToInitPos(HWND hwnd);
+	wyBool					MoveToInitPosByrc(HWND hwnd, RECT *rc);
 
     /// writes the initial window coordinates top file(.ini)
     /**
@@ -657,6 +658,12 @@ public:
     /// Handler to combo box
     HWND                    m_hwndtoolcombo;
 
+	/// Handler to static text for trial days left
+    HWND                    m_hwndtrialtext;
+
+	/// Handler to static text for trial buy
+    HWND                    m_hwndtrialbuy;
+
     /// Find dialog window HANDLE
     HWND                    m_finddlg;
 
@@ -865,6 +872,8 @@ public:
     @returns HWND, handle to the toolbar combo
     */
 	HWND					CreateToolCombo(HWND hwndtool);
+	HWND					CreateTrialText(HWND hwndtool);
+	HWND					CreateTrialBuy(HWND hwndtool);
 
     /// Initializes the favorites system
     /**
@@ -1630,11 +1639,20 @@ public:
     void                OnImportConnectionDetails();
 
 
-	wyBool				SaveConnectionDetails();
-
-	wyBool				WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id,TabTypes *tabqueryactive, MDIWindow *wnd);
-
-
+	wyBool				SaveConnectionDetails(wySQLite	*ssnsqliteobj = NULL);
+	wyBool				SaveConnectionDetails2(wySQLite	*ssnsqliteobj = NULL);
+	wyBool				SaveSessionFile(HWND hwnd, wyBool issaveas);
+	wyBool				OpenSessionFile();
+	wyString			m_sessionfile;
+	wyString			m_sessionname;
+	wyString			m_previoussessionfile;
+	wyBool				m_previoussessionedited;
+	wyBool				WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id,TabTypes *tabqueryactive, MDIWindow *wnd,wySQLite	*ssnsqliteobj = NULL);
+	wyBool				SetStatusParts2(HWND hwndstatus);
+	wyInt32				OnStatusBarWmCtlColorStatic(HWND hwnd, WPARAM wparam, LPARAM lparam);
+	HFONT			    m_trialtextfont;
+	HFONT			    m_trialbuyfont;
+	//HBRUSH				m_trialbuybrush;
     //flag tells whether to close all the mdi windows
     wyBool              m_iscloseallmdi;
 
@@ -1674,8 +1692,12 @@ public:
 	HANDLE				m_savetimerevent;
 	HANDLE				m_sqlyogcloseevent;
 	HANDLE				m_sessionsaveevent;
+	HANDLE				m_sessionchangeevent;
 	HANDLE				m_savethread_handle;
 	wyBool				m_sqlyogclosed;
+	wyBool				m_mouseoverbuy;
+	wyString			m_trialtext;
+	wyBool				m_issessionedited;
 
 };
 
@@ -1684,17 +1706,20 @@ public:
 */
 	typedef struct ConnectFromList_arg
 	{
-		wyString connstr;
-		wyString pathstr;
-		wyString historydata;
+		wyString		connstr;
+		wyString		pathstr;
+		wyString		historydata;
+		wyString		obdb;
 		ConnectionInfo	conninfo;
 		wyBool			isfocussed;
 		wyIni *inimgr;
 		List			*tabdetails;
 		MDIlist			*tempmdilist;
 		wyInt32			id;
+		wyString		sessionfile;
+		wyInt32			*issessionedited;
 	}MY_ARG;
-wyBool	ConnectFromList(wyString* failledconnections);
+wyBool	ConnectFromList(wyString* failedconnections, wyString* sessionfile = NULL);
 unsigned __stdcall  ConnectFromList_mt(void* arg_list);
 unsigned __stdcall  Htmlannouncementsproc(void* arg);
 unsigned __stdcall  sessionsavesproc(void* arg);

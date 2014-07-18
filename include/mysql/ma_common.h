@@ -31,12 +31,15 @@ typedef struct st_mariadb_db_driver
   void *buffer;
 } MARIADB_DB_DRIVER;
 
-struct st_mysql_options_extention {
+struct mysql_async_context;
+
+struct st_mysql_options_extension {
   char *plugin_dir;
   char *default_auth;
   char *ssl_crl;
   char *ssl_crlpath;
   char *server_public_key_path;
+  struct mysql_async_context *async_context;
   HASH connect_attrs;
   size_t connect_attrs_len;
   void (*report_progress)(const MYSQL *mysql,

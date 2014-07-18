@@ -112,6 +112,9 @@ Ctrl+Shift+Z		Revert selected changes
 
 Other
 F1			Help
+Ctrl+Shift+O		Open Session Savepoint
+Ctrl+Shift+S		Save Session
+Ctrl+Shift+X		End Session
 Ctrl+Shift+H		Open History Tab
 Ctrl+Shift+I		Open Info Tab
 Ctrl+C			Copy

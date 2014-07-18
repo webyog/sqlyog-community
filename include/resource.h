@@ -584,6 +584,7 @@
 #define IDC_SOURCEDB                    1193
 #define IDC_SQL                         1193
 #define IDC_CHECKBOX                    1194
+#define IDC_SOURCEDB2                   1194
 #define IDC_OBCHANGE                    1199
 #define IDC_STATIC1                     1200
 #define IDC_ADDCOLUMNS                  1201
@@ -835,11 +836,15 @@
 #define IDC_GROUP3                      1609
 #define IDC_GROUP4                      1610
 #define IDC_TEXT1                       1611
+#define IDC_STATIC_NOTE2                1611
 #define IDC_TEXT2                       1612
+#define IDC_GROUP6                      1612
+#define IDC_STATIC_NOTE3                1612
 #define IDC_TEXT3                       1613
 #define IDC_TEXT4                       1614
 #define IDC_GROUP                       1615
 #define IDC_ICON_EXP                    1616
+#define IDC_GROUP5                      1616
 #define IDC_DATETIMEPICKER2             1618
 #define IDC_HORZ2                       1620
 #define IDC_HORZBAR2                    1620
@@ -1546,13 +1551,24 @@
 #define IDC_INVISIBLE                   44116
 #define IDR_SAVEPROFILERMENU            44117
 #define ID_OPEN_SAVEPROFILER            44118
-#define IDR_TABMENU2					44119
+#define IDR_TABMENU2                    44119
 #define ID_FILE_RENAMETAB               44120
-#define IDR_TABMENU3					44121
-#define IDD_RENAMETAB					44122
-#define IDC_RENAMETAB					44123
+#define IDR_TABMENU3                    44121
+#define IDD_RENAMETAB                   44122
+#define IDC_RENAMETAB                   44123
 #define ACCEL_RENAMEQUERYTAB            44124
 #define IDI_RENAMEQUERY_16              44125
+#define ID_SAVESESSION                  44126
+#define ID_OPENSESSION                  44127
+#define ID_SAVESESSIONAS                44128
+#define ID_CLOSESESSION                 44129
+#define IDI_SAVESESSION_16              44130
+#define IDI_OPENSESSION_16              44131
+#define IDI_CLOSESESSION_16             44132
+#define ACCEL_OPENSESSION				44133
+#define ACCEL_SAVESESSION				44134
+#define ACCEL_ENDSESSION				44135
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED

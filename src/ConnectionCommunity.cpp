@@ -974,7 +974,9 @@ ConnectionCommunity::CreateIconList(HWND hwndmain, wyUInt32 *numicons)
     HMENU       menu;
     yogIcons    *icons; 
 
-	wyUInt32    ids[] = { 
+	wyUInt32    ids[] = {
+		ID_OPENSESSION,	ID_CLOSESESSION,
+		ID_SAVESESSION,	ID_SAVESESSIONAS, 
 		ID_FILE_RENAMETAB,
 		IDM_FILE_NEWCONNECTION,			IDM_FILE_CLOSECONNECTION, 
         IDM_FILE_CLOASEALL,				IDM_FILE_SAVESQL, 
@@ -1044,7 +1046,9 @@ ConnectionCommunity::CreateIconList(HWND hwndmain, wyUInt32 *numicons)
         ID_OPEN_SAVEHISTORY,            ID_VDDTOOL
 	};
 
-	wyUInt32    iconid[] = { 
+	wyUInt32    iconid[] = {
+		IDI_OPENSESSION_16, IDI_CLOSESESSION_16,
+		IDI_SAVESESSION_16, IDI_SAVESESSION_16, 
 		IDI_RENAMEQUERY_16,
 		IDI_CONNECT_16,		IDI_DISCON, 
 		IDI_DISCONALL,		IDI_SAVE, 
@@ -1231,7 +1235,10 @@ ConnectionCommunity::CreateTargetInstance(CopyDatabase *copydb)
 		ShowMySQLError(copydb->m_hwnddlg, copydb->m_newtargettunnel, &tempmysql, NULL, wyTrue);
 		return wyFalse;
 	}
-	
+
+	if(!copydb->CreateTargetDB())
+		return wyFalse;
+
 	if(UseDatabase(copydb->m_targetdb, newtargetmysql, copydb->m_newtargettunnel) == wyFalse)
 	{
 		ShowMySQLError(copydb->m_hwnddlg, copydb->m_newtargettunnel, &tempmysql, NULL, wyTrue);

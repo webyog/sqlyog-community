@@ -48,6 +48,7 @@ InitFile(HWND hwnd, wyWChar* filename, wyInt32 filter, wyInt32 bufsize, wyUInt32
 									(filter == LOGINDEX)?(LOG):
                                     (filter == QUERYXMLINDEX)?(QUERYXML):
                                     (filter == CONMANINDEX)?(CONMANFILE):
+									(filter == SESSIONINDEX)?(SESSIONFILE):
 									(filter == TEXTINDEX)?(TEXTFILE):(NULL);
                                     
 	openfilename.lpstrCustomFilter =(LPWSTR)NULL;
@@ -64,6 +65,7 @@ InitFile(HWND hwnd, wyWChar* filename, wyInt32 filter, wyInt32 bufsize, wyUInt32
 									(filter == LOGINDEX)?(L"log"):
                                     (filter == QUERYXMLINDEX)?(L"queryxml"):
                                     (filter == CONMANINDEX)?(L"sycs"):
+									(filter == SESSIONINDEX)?(L"ysav"):
 									(filter == TEXTINDEX)?(L"txt"):(NULL);
                                     
 	openfilename.Flags             = flags;
@@ -108,6 +110,7 @@ InitOpenFile(HWND hwnd, wyWChar *filename, wyInt32 filter, wyInt32 bufsize)
                                     (filter == QUERYXMLINDEX)?(QUERYXML):
 									(filter == SQLYOGFILEINDEX)?(SQLYOG_FILES):
 									(filter == EXCELINDEX)?(EXCELFILE):
+									(filter == SESSIONINDEX)?(SESSIONFILE):
                                     (filter == PPKINDEX)?(PPKFILE):(NULL);
 	
 	openfilename.lpstrCustomFilter =(LPWSTR)NULL;
@@ -124,6 +127,7 @@ InitOpenFile(HWND hwnd, wyWChar *filename, wyInt32 filter, wyInt32 bufsize)
 									(filter == TEXTINDEX)?(L"txt"):
 									(filter == ACCESSINDEX)?(L"mdb"):
                                     (filter == QUERYXMLINDEX)?(L"queryxml"):
+									(filter == SESSIONINDEX)?(L"ysav"):
 									(filter == EXCELINDEX)?(L"xls"):(NULL);
 
 	openfilename.Flags             = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST;

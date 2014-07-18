@@ -346,6 +346,7 @@ public:
     @param pcquerywnd    : Query window pointer.
     */
 	wyBool		SyncObjectDB(MDIWindow *pcquerywnd);
+	wyBool		SyncObjectDBNocombo(MDIWindow *pcquerywnd);
 
     /// Returns the index of the image of the selected node.
     /**

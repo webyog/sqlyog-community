@@ -1532,12 +1532,14 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo,
 
 wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt32 id, MDIlist* tempmdilist);
 wyBool GetHistoryDetailsFromTable(wyWChar* path, wyInt32 id, wyString* historydata);
+wyBool GetOBDetailsFromTable(wyWChar* path, wyInt32 id, wyString* obdb);
+wyBool GetSessionfileDetailsFromTable(wyWChar* path, wyInt32 *isedited, wyString* obdb);
 wyBool GetTabDetailsFromTable(wyWChar* path, wyInt32 id, List* temptablist);
 //wyBool WriteSessionDetails(wyChar* title, ConnectionInfo *conninfo, wyInt32 connectionno, wyBool isfocus);
 
 void WriteFullSectionToFile(FILE *fstream, wyInt32 conno, ConnectionInfo *coninfo, const wyChar *title, wyBool isfocussed);
 //Returns wyTrue on success
-wyBool WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, ConnectionInfo *coninfo, const wyChar *title, wyBool isfocussed);
+wyBool WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, ConnectionInfo *coninfo, const wyChar *title, wyBool isfocussed, wySQLite	*ssnsqliteobj = NULL);
 //wyBool WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem,wyInt32 tabid, wyInt32 position, TabEditor *tabqueryactive, MDIWindow *wnd);
 #endif
 

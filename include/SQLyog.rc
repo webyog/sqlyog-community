@@ -61,7 +61,7 @@ BEGIN
     "V",            ACCEL_CHANGEVIEW,       VIRTKEY, CONTROL, ALT, NOINVERT
     "W",            ACCEL_CLOSECONNECTION,  VIRTKEY, CONTROL, NOINVERT
     "L",            ACCEL_CLOSETAB,         VIRTKEY, ALT, NOINVERT
-	VK_F2,          ACCEL_RENAMEQUERYTAB,   VIRTKEY, ALT, NOINVERT
+    VK_F2,          ACCEL_RENAMEQUERYTAB,   VIRTKEY, ALT, NOINVERT
     "C",            ACCEL_COMMENT,          VIRTKEY, SHIFT, CONTROL, NOINVERT
     "D",            ACCEL_CREATEDB,         VIRTKEY, CONTROL, NOINVERT
     "D",            ACCEL_DATASEARCH,       VIRTKEY, SHIFT, CONTROL, NOINVERT
@@ -153,6 +153,9 @@ BEGIN
     "U",            ACCEL_UPDATE,           VIRTKEY, SHIFT, ALT, NOINVERT
     "U",            ACCEL_UPPERCASE,        VIRTKEY, SHIFT, CONTROL, NOINVERT
     "Q",            ACCEL_VDDTOOL,          VIRTKEY, CONTROL, ALT, NOINVERT
+	"O",            ACCEL_OPENSESSION,      VIRTKEY, SHIFT, CONTROL, NOINVERT
+	"S",            ACCEL_SAVESESSION,      VIRTKEY, SHIFT, CONTROL, NOINVERT
+	"X",            ACCEL_ENDSESSION,       VIRTKEY, SHIFT, CONTROL, NOINVERT
 END
 
 
@@ -379,7 +382,7 @@ BEGIN
     POPUP "Tab"
     BEGIN
         MENUITEM "&Close\tAlt+L",               ID_FILE_CLOSETAB
-		MENUITEM "&Rename\tAlt+F2",				ID_FILE_RENAMETAB
+        MENUITEM "&Rename\tAlt+F2",             ID_FILE_RENAMETAB
     END
 END
 
@@ -387,7 +390,7 @@ IDR_TABMENU3 MENU
 BEGIN
     POPUP "Tab"
     BEGIN
-		MENUITEM "&Rename",						ID_FILE_RENAMETAB
+        MENUITEM "&Rename",                     ID_FILE_RENAMETAB
     END
 END
 
@@ -452,13 +455,18 @@ BEGIN
         MENUITEM "New Data Searc&h\tCtrl+Shift+D", ID_DATASEARCH
         MENUITEM SEPARATOR
         MENUITEM "Close &Tab\tAlt+L",           ID_FILE_CLOSETAB
-		MENUITEM "&Rename Tab\tAlt+F2",			ID_FILE_RENAMETAB
+        MENUITEM "&Rename Tab\tAlt+F2",         ID_FILE_RENAMETAB
         MENUITEM "&Disconnect\tCtrl+F4/Ctrl+W", IDM_FILE_CLOSECONNECTION
         MENUITEM "Disconnect Al&l",             IDM_FILE_CLOASEALL
         MENUITEM SEPARATOR
         MENUITEM "Open...\tCtrl+O",             IDM_FILE_OPENSQLNEW
         MENUITEM "&Save...\tCtrl+S",            IDM_FILE_SAVESQL
         MENUITEM "S&ave As...",                 IDM_FILE_SAVEAS
+        MENUITEM SEPARATOR
+        MENUITEM "Open Session Savepoint...\tCtrl+Shift+O",          ID_OPENSESSION
+        MENUITEM "Save Session...\tCtrl+Shift+S",          ID_SAVESESSION
+        MENUITEM "Save Session As...",       ID_SAVESESSIONAS
+		MENUITEM "End Session\tCtrl+Shift+X",       		ID_CLOSESESSION
         MENUITEM SEPARATOR
         POPUP "&Recent Files"
         BEGIN
@@ -1303,35 +1311,38 @@ BEGIN
     LTEXT           "Static",IDC__EXPORTAS_GRIP,213,232,19,8
 END
 
-IDD_COPYDATABASE DIALOGEX 0, 0, 388, 246
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+IDD_COPYDATABASE DIALOGEX 0, 0, 388, 300
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU| WS_THICKFRAME
 CAPTION "Copy Database"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
-    ICON            IDI_EXPORTDATA,IDC_COPYTABLE_GRIP,9,9,21,20
+    ICON            IDI_EXPORTDATA,IDC_COPYTABLE_GRIP,9,9,20,20
     LTEXT           "This option copies object(s) between database/hosts.",IDC_STATIC,39,13,198,9
-    GROUPBOX        "Source {Connection - Database}",IDC_GROUP1,6,31,183,187
+    GROUPBOX        "Source {Connection - Database}",IDC_GROUP1,6,31,183,236
     LTEXT           "Name:",IDC_STATICTITLE2,11,42,23,8
     LTEXT           "",IDC_TARGETDB,36,42,142,8,SS_WORDELLIPSIS
     LTEXT           "&Object(s)",IDC_STATICTITLE3,11,56,29,8
-    CONTROL         "",IDC_TREE,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_CHECKBOXES | WS_BORDER | WS_HSCROLL | WS_TABSTOP,12,68,170,144
-    GROUPBOX        "Target {Connection - Database}",IDC_GROUP2,193,31,190,76
-    LTEXT           "Note: If you want to copy to different host(s), connect to multiple host(s) using  File -> New Connection. The target database dropdown would then list all databases for all connections.",IDC_STATIC_NOTE,201,43,176,31
-    COMBOBOX        IDC_SOURCEDB,200,84,178,85,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_SORT | CBS_HASSTRINGS | WS_VSCROLL | WS_GROUP | WS_TABSTOP
-    GROUPBOX        "",IDC_GROUP3,193,116,190,46
-    CONTROL         "S&tructure and data",IDC_STRUCDATA,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,200,130,78,9
-    CONTROL         "Str&ucture only",IDC_STRUC,"Button",BS_AUTORADIOBUTTON,200,145,64,8
-    GROUPBOX        "",IDC_GROUP4,193,171,190,47
-    CONTROL         "&Drop if exists in target",IDC_DROP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,200,179,86,10
-    CONTROL         "Use &bulk INSERT",IDC_CPY_BULKINSERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,200,192,73,10
-    CONTROL         "Ignore DEFINER",IDC_CPY_DEFINER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,200,205,73,10
-    PUSHBUTTON      "&Show Summary...",IDC_SUMMARY,209,227,66,14
-    PUSHBUTTON      "Invisible",IDC_INVISIBLE,284,166,6,6,NOT WS_VISIBLE
-    PUSHBUTTON      "&Copy",IDOK,279,227,50,14
-    PUSHBUTTON      "C&lose",IDCANCEL,333,227,50,14
-    PUSHBUTTON      "Do&ne",IDDONE,333,227,50,14,NOT WS_VISIBLE | WS_DISABLED
-    LTEXT           "",IDC_MESSAGE,8,227,196,8,SS_WORDELLIPSIS
-    LTEXT           "Grip",IDC_COPYDATA_GRIP,339,196,14,8
+    CONTROL         "",IDC_TREE,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_CHECKBOXES | WS_BORDER | WS_HSCROLL | WS_TABSTOP,12,68,170,193
+    GROUPBOX        "Target",IDC_GROUP2,193,31,190,127
+    LTEXT           "Note: If you want to copy to different host(s), connect to multiple host(s) using  File -> New Connection. The target connection dropdown would then list all connections.",IDC_STATIC_NOTE,201,43,176,31
+    COMBOBOX        IDC_SOURCEDB,200,94,178,85,CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_SORT | CBS_HASSTRINGS | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    COMBOBOX        IDC_SOURCEDB2,200,131,178,85,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_GROUP | WS_TABSTOP
+    GROUPBOX        "",IDC_GROUP3,193,166,190,46
+    CONTROL         "S&tructure and data",IDC_STRUCDATA,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,200,177,78,9
+    CONTROL         "Str&ucture only",IDC_STRUC,"Button",BS_AUTORADIOBUTTON,200,192,64,8
+    GROUPBOX        "",IDC_GROUP4,193,220,190,47
+    CONTROL         "&Drop if exists in target",IDC_DROP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,200,230,86,10
+    CONTROL         "Use &bulk INSERT",IDC_CPY_BULKINSERT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,200,243,73,10
+    CONTROL         "Ignore DEFINER",IDC_CPY_DEFINER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,200,256,73,10
+    PUSHBUTTON      "&Show Summary...",IDC_SUMMARY,209,276,66,14
+    PUSHBUTTON      "Invisible",IDC_INVISIBLE,283,212,6,6,NOT WS_VISIBLE
+    PUSHBUTTON      "&Copy",IDOK,279,276,50,14
+    PUSHBUTTON      "C&lose",IDCANCEL,333,276,50,14
+    PUSHBUTTON      "Do&ne",IDDONE,333,276,50,14,NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "",IDC_MESSAGE,8,276,196,8,SS_WORDELLIPSIS
+    LTEXT           "Grip",IDC_COPYDATA_GRIP,340,247,14,8
+    LTEXT           "Connection",IDC_STATIC_NOTE2,201,82,46,10
+    LTEXT           "Database",IDC_STATIC_NOTE3,201,119,46,10
 END
 
 IDD_SQLWHERE DIALOGEX 0, 0, 264, 161
@@ -1886,10 +1897,9 @@ IDD_RENAMETAB DIALOGEX 150, 150, 186, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Rename Tab"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
-//FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     LTEXT           "Name",IDC_STATIC,7,8,130,10
-	EDITTEXT        IDC_RENAMETAB,7,22,172,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_RENAMETAB,7,22,172,13,ES_AUTOHSCROLL
     DEFPUSHBUTTON   "&OK",IDOK,73,41,50,14
     PUSHBUTTON      "Cance&l",IDCANCEL,129,41,50,14
 END
@@ -2261,6 +2271,9 @@ IDI_EXPORTDATA_16       ICON                    "bitmaps\\export_data_16.ico"
 IDI_QUERYBUILDER_16     ICON                    "bitmaps\\querybuilder_16.ico"
 IDI_QUERY_16            ICON                    "bitmaps\\query_16.ico"
 IDI_RENAMEQUERY_16      ICON                    "bitmaps\\renamequery_16.ico"
+IDI_SAVESESSION_16      ICON                    "bitmaps\\session_save_all.ico"
+IDI_OPENSESSION_16      ICON                    "bitmaps\\session_open.ico"
+IDI_CLOSESESSION_16      ICON                   "bitmaps\\session_close.ico"
 IDI_SCHEMADESIGNER_16   ICON                    "bitmaps\\schemadesigner_16.ico"
 IDI_SCHDEXPORT_16       ICON                    "bitmaps\\schdexport_16.ico"
 IDI_NOTIFICATION_16     ICON                    "bitmaps\\notification_16.ico"
@@ -2405,6 +2418,7 @@ BEGIN
 
     IDD_COPYDATABASE, DIALOG
     BEGIN
+        BOTTOMMARGIN, 296
     END
 
     IDD_SQLWHERE, DIALOG
@@ -2582,12 +2596,10 @@ BEGIN
         BOTTOMMARGIN, 99
     END
 
-	IDD_RENAMETAB, DIALOG
+    IDD_RENAMETAB, DIALOG
     BEGIN
         LEFTMARGIN, 4
-        RIGHTMARGIN, 189
         TOPMARGIN, 7
-        BOTTOMMARGIN, 99
     END
 
     IDD_USERMANAGER, DIALOG

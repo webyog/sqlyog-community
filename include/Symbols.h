@@ -118,3 +118,5 @@
 #define ID_DELETE_LINE                  40384
 #define ID_FORMATCURRENTQUERY           41653
 #define IDC_HSPLITTER                   1015
+#define IDC_TRIALTEXT					51653
+#define IDC_TRIALBUY					51654

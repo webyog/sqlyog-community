@@ -130,6 +130,8 @@ public:
     */
     void        StopCopy();
 
+	wyBool		CreateTargetDB();
+
 	static	wyInt32 CALLBACK	TreeWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
 
     /// handles image list
@@ -144,6 +146,8 @@ public:
 
     /// handle to the combo box
     HWND            m_hwndcombo;
+	/// handle to the db combo box
+	HWND            m_hwndcombodb;
     
     /// source tunnel pointer
 	Tunnel			*m_srctunnel;
@@ -276,6 +280,8 @@ public:
 	
 	wyBool				m_dontnotify;
 
+	wyBool				m_iscreatedb;
+
 private:
 
 	//max allowed packet size
@@ -347,6 +353,7 @@ private:
     @returns wyBool, wyTrue is SUCCESS, otherwise wyFalse
     */
 	wyBool		FreeComboParam();
+	wyBool		FreedbComboParam();
 
     /// HAndles the UM_COPYDATABASE message
     /**
@@ -764,7 +771,7 @@ private:
 	void    Delete(List *list);
 	void    OnCBSelChange(HWND hwnd);
 	void    Remove5XRoutines(HTREEITEM htreeitem, HWND hwndtree);
-	
+	wyBool						GetCharsetAndCollation(wyString *charset, wyString *collation);
 	
 	// To disable bulkinsert when only structure is checked. 
 	/**
@@ -801,6 +808,7 @@ private:
         @returns void
         */
 			void OnPaint(HWND hwnd);
+
 
 };
 #endif

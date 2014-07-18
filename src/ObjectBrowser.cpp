@@ -5569,6 +5569,29 @@ CQueryObject::SyncObjectDB(MDIWindow* wnd)
 	return wyTrue;
 }
 
+wyBool
+CQueryObject::SyncObjectDBNocombo(MDIWindow* wnd)
+{
+	wyString  query;
+    MYSQL_RES *res;
+
+	if(strcmp(wnd->m_database.GetString(), m_seldatabase.GetString()) != 0)
+    {
+		if(m_seldatabase.GetLength() == 0)
+			return wyTrue;
+
+		query.Sprintf("use `%s`", m_seldatabase.GetString());
+        res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
+        if(res)
+            wnd->m_tunnel->mysql_free_result(res);
+
+		wnd->m_database.SetAs(m_seldatabase.GetString());
+	    //pGlobals->m_pcmainwin->AddTextInCombo(m_seldatabase.GetAsWideChar());
+	} 
+	
+	return wyTrue;
+}
+
 /* Function to drop all tables */
 wyInt32
 CQueryObject::DropTables(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *db)
