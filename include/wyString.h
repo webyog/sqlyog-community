@@ -341,6 +341,9 @@ public:
     // Gets the Ansi string
     wyChar*     GetAsAnsi();
 
+	// Gets the Ansi string as selected codepage/encoding
+    wyChar*     GetAsEncoding(wyInt32 encoding, wyInt32 *len);
+
 	/// Trims the blank space by one from right
     /**
 	@param rtrimcount : OUT how many spaces trimmed.
@@ -363,6 +366,7 @@ public:
 	@returns wyWChar resulting Wide character
 	*/
 	wyWChar* GetAsWideChar(wyUInt32 *len = NULL, wyBool isreadonly = wyFalse);
+	wyWChar* GetAsWideCharEnc(wyInt32 encoding, wyUInt32 *len);
 	///inserting a string into the another string at specified localtion.
 	/**
 	@param insertpos: IN position at which string to be insert.

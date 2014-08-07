@@ -507,6 +507,45 @@ wyString::GetAsWideChar(wyUInt32 *len, wyBool isreadonly)
 #endif
 }
 
+wyWChar*
+wyString::GetAsWideCharEnc(wyInt32 encoding, wyUInt32 *len)
+{	
+	wyInt32 widelen;
+
+	if(m_widecharbuffer)            // if somethin is there already? then free memory
+    {
+
+		free(m_widecharbuffer); 
+    }
+	
+	m_widecharbuffer = NULL;
+
+    // allocate
+	m_widecharbuffer = (wyWChar *)calloc(sizeof(wyWChar), (m_strsize + 1) * (sizeof(wyWChar)));
+	
+	if(m_widecharbuffer == NULL)
+	{	
+		WriteToLogFile(NOT_ENOUGH_MEMORY);
+		exit(0);
+	}
+		
+#ifdef _WIN32
+	
+	/*Function to get Wide character.
+	* Fills the Wide character buffer with converted 
+	* wide character data.*/
+
+	widelen = MultiByteToWideChar(encoding, 0, m_strdata, m_strsize, m_widecharbuffer, 
+						(m_strsize * sizeof(wyWChar)));
+	
+
+	if(len != NULL)
+		*len = widelen;
+	
+	return m_widecharbuffer;
+#endif
+}
+
 void 
 wyString::Init()
 {
@@ -951,6 +990,44 @@ wyString::GetAsAnsi()
     
     delete[] lpszw;
     return m_ansibuffer;
+#endif
+}
+
+wyChar*
+wyString::GetAsEncoding(wyInt32 encoding, wyInt32 *len)
+{
+    wyInt32 length;
+	wyWChar *lpszw = NULL;
+
+#ifdef _WIN32
+	length = MultiByteToWideChar(CP_UTF8, 0, m_strdata, m_strsize, NULL, NULL );
+    if(m_ansibuffer)
+        free(m_ansibuffer);
+	
+	m_ansibuffer = NULL;
+
+	lpszw = new wyWChar[length + 1];
+
+	//this step intended only to use WideCharToMultiByte
+	MultiByteToWideChar(CP_UTF8, 0, m_strdata, -1, lpszw, length);
+	//MultiByteToWideChar(encoding, 0, m_strdata, -1, lpszw, length);
+	lpszw[length] = '\0';
+
+	//Conversion to ANSI (CP_ACP)
+	//Conversion to specific encoding
+	length = WideCharToMultiByte(encoding, 0, lpszw, -1, m_ansibuffer, 0, NULL, NULL);
+	m_ansibuffer = (wyChar *)calloc(length + 1, sizeof(wyChar));
+	if(m_ansibuffer == NULL)
+	{
+		WriteToLogFile(NOT_ENOUGH_MEMORY);
+		exit(0);
+	}
+	WideCharToMultiByte(encoding, 0, lpszw, -1, m_ansibuffer, length, NULL, NULL);
+	//m_ansibuffer[length] = 0;
+	*len = length;
+	delete[] lpszw;
+	return m_ansibuffer;
+
 #endif
 }
 

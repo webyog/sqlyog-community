@@ -682,6 +682,38 @@ DataView::OnWMCommand(WPARAM wparam, LPARAM lparam)
             }
 
             break;
+		case ID_UNSORT:
+			//we have to make sure that we have valid sort and filter
+            if(m_data->m_psortfilter)
+            {
+                //get the current button imgage, second parameter will tell us whether it is the original image
+             /*   GetButtonImage(ID_RESETFILTER, &ret);*/
+
+                //if it is the original image and it is from a control, then we will open custom filter dialog
+				//if(m_data->m_psortfilter->m_isfilter == wyFalse && lparam)
+                //{
+                   // OnRightClickFilter(ID_FILTER_CUSTOMFILTER);
+                //}
+                //else
+                //{
+                    //reset filter values
+                    for(i = 0; i < m_data->m_psortfilter->m_sortcolumns; ++i)
+                    {
+                        m_data->m_psortfilter->m_sort[i].m_colindex = -1;
+                        m_data->m_psortfilter->m_sort[i].m_sorttype = ST_NONE;
+						m_data->m_psortfilter->m_sort[i].m_currcolindex = -1;
+                        m_data->m_psortfilter->m_sort[i].m_currsorttype = ST_NONE;
+                    }
+
+                    //execute reset filter
+					//m_data->m_psortfilter->BeginColoumnSort(wparam, wyTrue);
+                    //if(m_data->m_psortfilter->BeginFilter(0, NULL, 0, 0, m_hwndframe) == wyTrue)
+                    //{
+                    Execute(TA_REFRESH, wyTrue, wyTrue, LA_SORT);
+                    //}
+                //}
+            }
+			break;
     }
 }
 
@@ -7543,8 +7575,9 @@ DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
     HMENU       hmenu, htrackmenu;
     wyBool      iscolreadonly = wyTrue, iscolnullable = wyFalse, iscolhasdefault = wyFalse;
     wyString    column;
-    wyInt32     copymenupos = 12;
+    wyInt32     copymenupos = 14,i;
     HWND        hwndtoolbar;
+	wyBool		isunsort = wyFalse;
 
     //load menu, localize it and disable all the items
     hmenu = LoadMenu(GetModuleHandle(NULL), MAKEINTRESOURCE(IDR_QUERYLISTMENU));
@@ -7556,8 +7589,8 @@ DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
     //if the toolbar is not found, delete all the filter related menu items
     if(!GetToolBarFromID(ID_RESETFILTER))
     {
-        DeleteMenu(htrackmenu, 8, MF_BYPOSITION);
-        DeleteMenu(htrackmenu, 8, MF_BYPOSITION);
+        DeleteMenu(htrackmenu, 10, MF_BYPOSITION);
+        DeleteMenu(htrackmenu, 10, MF_BYPOSITION);
         copymenupos -= 2;
     }
 
@@ -7632,9 +7665,18 @@ DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
     if((hwndtoolbar = GetToolBarFromID(ID_RESETFILTER)) && 
         SendMessage(hwndtoolbar, TB_GETSTATE, ID_RESETFILTER, 0) == TBSTATE_ENABLED)
     {
-        SetFilterMenu(GetSubMenu(htrackmenu, 9), row, col);
+        SetFilterMenu(GetSubMenu(htrackmenu, 11), row, col);
     }
-
+	if(m_data && m_data->m_psortfilter)
+		for(i = 0; i < m_data->m_psortfilter->m_sortcolumns; ++i)
+		{
+			if(m_data->m_psortfilter->m_sort[i].m_currsorttype != ST_NONE)
+			{
+				isunsort = wyTrue;
+				i = m_data->m_psortfilter->m_sortcolumns;
+			}
+		}
+	EnableMenuItem(htrackmenu, ID_UNSORT, isunsort == wyFalse ? MF_GRAYED : MF_ENABLED);
     //set owner draw property and show menu
     m_htrackmenu = htrackmenu;
     wyTheme::SetMenuItemOwnerDraw(m_htrackmenu);
@@ -7953,6 +7995,8 @@ DataView::OnToolTipInfo(LPNMTTDISPINFO lpnmtt)
             }
 
             break;
+		case ID_UNSORT:
+			break;
 
         default:
             ishandled = wyFalse;

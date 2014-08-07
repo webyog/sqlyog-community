@@ -407,6 +407,19 @@ IsMySQL564MariaDB53(Tunnel *tunnel, PMYSQL mysql)
 		return wyFalse;
 }
 
+//DEFAULT, ON UPDATE clause for DATETIME 
+wyBool
+IsMySQL565MariaDB1001(Tunnel *tunnel, PMYSQL mysql)
+{
+    long me = mysql_get_server_version(*mysql);/* Only available from MySQLv4.1*/
+    const char *dbString = mysql_get_server_info(*mysql);
+
+	if((me >= 50605 && !strstr(dbString, "MariaDB")) || (me >= 100001 && strstr(dbString, "MariaDB")))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
 wyBool
 IsMySQL502(Tunnel * tunnel, PMYSQL mysql)
 {

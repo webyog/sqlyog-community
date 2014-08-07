@@ -40,8 +40,8 @@
 	<string name="3197">現在の &amp;クエリーを使ってビューを作成</string>
 	<string name="3198">テーブルメニュー</string>
 	<string name="3199">開く...	Ctrl+O</string>
-	<string name="3200">&amp;トリガーを作成...</string>
-	<string name="3201">&amp;イベントを作成...</string>
+	<string name="3200">&amp;トリガーを作成...	F4</string>
+	<string name="3201">&amp;イベントを作成...	F4</string>
 	<string name="3202">コネクションタブ</string>
 	<string name="3203">&amp;切断する	Ctrl+F4</string>
 	<string name="3204">ビュー</string>

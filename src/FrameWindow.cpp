@@ -845,9 +845,18 @@ FrameWindow::CreateMainWindow(HINSTANCE hinstance)
 	HWND	    hwnd;
 	wyBool		val;
 	wyWChar		*appname = NULL;
+	wyString tempstr;
+	tempstr.SetAs(pGlobals->m_appname.GetAsWideChar());
+#ifndef ENTERPRISE
 
-	appname = pGlobals->m_appname.GetAsWideChar();
-	    
+#ifdef _WIN64
+	tempstr.AddSprintf(" 64");
+#else
+	tempstr.AddSprintf(" 32");
+#endif
+
+#endif
+	appname = tempstr.GetAsWideChar();
 	// Create the main window.
 	VERIFY(hwnd	= CreateWindowEx(exstyle, MAIN_WINDOW_CLASS_NAME_STR, appname,
 								  style, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
@@ -888,8 +897,13 @@ FrameWindow::SetMainWindowTitle()
 	
 	if(pGlobals->m_entlicense.GetLength() == 0)
 		return;
-	
-	SetWindowText(m_hwndmain, pGlobals->m_appname.GetAsWideChar());
+	tempstr.SetAs(pGlobals->m_appname.GetAsWideChar());
+#ifdef _WIN64
+	tempstr.AddSprintf(" 64");
+#else
+	tempstr.AddSprintf(" 32");
+#endif	
+	SetWindowText(m_hwndmain, tempstr.GetAsWideChar());
 }
 
 wyBool
@@ -2515,6 +2529,9 @@ FrameWindow::OnWmCommand(WPARAM wParam)
     case ACCEL_ALTERTABLE:
         pcquerywnd->m_pcqueryobject->ProcessF6();
         break;
+	case ACCEL_CREATETABLE:
+		pcquerywnd->m_pcqueryobject->ProcessF4();
+		break;
 	case ACCEL_NEWCONN:
 	case IDM_FILE_NEWCONNECTION:
 		CreateConnDialog();

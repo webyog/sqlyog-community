@@ -28,7 +28,8 @@ extern	PGLOBALS pGlobals;
 
 #define FIND_STR_LEN	256
 
-#define		REGKEY			"Software\\{906D6D9F-AB51-429F-8816-8D33284204FF}"
+//#define		REGKEY			"Software\\{906D6D9F-AB51-429F-8816-8D33284204FF}"
+#define		REGKEY			"Software\\{BEE2684F-3781-4372-BA18-75ECC22C3B70}"
 #define		REGAPPID		"InU"
 /* window identifiers for all windows in both the connection dialog tabs */
 /* since we create everything by hand ( and not using the resource eidtor) 

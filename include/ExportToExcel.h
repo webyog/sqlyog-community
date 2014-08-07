@@ -376,6 +376,7 @@ public:
 	/// Destructor
 	~ExportToExcel();
 
+	wyInt32 m_charset;
 	/// Main function to start export
 	/**
 	@param exceldata	: IN ExportExcelData struct type

@@ -135,6 +135,9 @@ wyBool IsMySQL563(Tunnel * tunnel, PMYSQL mysql);
 //MySQL 5.6.4
 wyBool IsMySQL564MariaDB53(Tunnel * tunnel, PMYSQL mysql);
 
+//MySQL 5.6.5 
+wyBool IsMySQL565MariaDB1001(Tunnel * tunnel, PMYSQL mysql);
+
 //MySQL 5.6.5
 wyBool IsMySQL565(Tunnel * tunnel, PMYSQL mysql);
 

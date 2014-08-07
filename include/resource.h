@@ -1568,6 +1568,8 @@
 #define ACCEL_OPENSESSION				44133
 #define ACCEL_SAVESESSION				44134
 #define ACCEL_ENDSESSION				44135
+#define ACCEL_CREATETABLE				44136
+#define ID_UNSORT						44137
 
 // Next default values for new objects
 // 

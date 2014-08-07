@@ -40,8 +40,8 @@
 	<string name="3197">Create View Using Current &amp;Query</string>
 	<string name="3198">Tables Menu</string>
 	<string name="3199">Open...	Ctrl+O</string>
-	<string name="3200">Create &amp;Trigger...</string>
-	<string name="3201">Create &amp;Event...</string>
+	<string name="3200">Create &amp;Trigger...	F4</string>
+	<string name="3201">Create &amp;Event...	F4</string>
 	<string name="3202">Connection Tab</string>
 	<string name="3203">&amp;Disconnect	Ctrl+F4</string>
 	<string name="3204">View</string>
