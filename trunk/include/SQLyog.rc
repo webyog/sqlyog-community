@@ -57,6 +57,7 @@ BEGIN
     "F",            ACCEL_ADDFAVORITE,      VIRTKEY, SHIFT, CONTROL, NOINVERT
     "U",            ACCEL_ADDUSER,          VIRTKEY, CONTROL, NOINVERT
     VK_F6,          ACCEL_ALTERTABLE,       VIRTKEY, NOINVERT
+	VK_F4,          ACCEL_CREATETABLE,      VIRTKEY, NOINVERT
     "L",            ACCEL_CHANGELANGUAGE,   VIRTKEY, SHIFT, ALT, NOINVERT
     "V",            ACCEL_CHANGEVIEW,       VIRTKEY, CONTROL, ALT, NOINVERT
     "W",            ACCEL_CLOSECONNECTION,  VIRTKEY, CONTROL, NOINVERT
@@ -217,6 +218,8 @@ BEGIN
         MENUITEM "Set To NULL",                 1169
         MENUITEM "Set To Default",              IDC_SETDEF
         MENUITEM SEPARATOR
+		MENUITEM "Unsort"						ID_UNSORT
+		MENUITEM SEPARATOR
         POPUP "Filter"
         BEGIN
             MENUITEM "Field = Value",               ID_FILTER_FIELD_EQUALS
@@ -433,7 +436,7 @@ IDR_TABLESMENU MENU
 BEGIN
     POPUP "Tables Menu"
     BEGIN
-        MENUITEM "Create &Table",               ID_TABLE_MAKER
+        MENUITEM "Create &Table\tF4",               ID_TABLE_MAKER
         MENUITEM "&Copy Table(s) To Different Host/Database...", ID_OPEN_COPYTABLE
         MENUITEM "New Data Searc&h\tCtrl+Shift+D", ID_DATASEARCH
         MENUITEM SEPARATOR
@@ -587,7 +590,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Open Table\tF11",            ID_OBJECT_VIEWDATA
         MENUITEM "Open Table in &New Tab\tCtrl+F11", ID_TABLE_OPENINNEWTAB
-        MENUITEM "Create &Table",               ID_TABLE_MAKER
+        MENUITEM "Create &Table\tF4",               ID_TABLE_MAKER
         MENUITEM "&Alter Table\tF6",            ID_OBJECT_TABLEEDITOR
         MENUITEM "&Manage Indexes\tF7",         ID_OBJECT_MANINDEX
         MENUITEM "Re&lationships/Foreign Keys\tF10", IDM_TABLE_RELATION
@@ -629,7 +632,7 @@ BEGIN
         END
         POPUP "&Indexes"
         BEGIN
-            MENUITEM "Create &Index",               40382
+            MENUITEM "Create &Index\tF4",               40382
             MENUITEM "&Edit Index\tF6",             40383
             MENUITEM "&Drop Index...\tDel",         40384
             MENUITEM SEPARATOR
@@ -638,7 +641,7 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "&Views"
         BEGIN
-            MENUITEM "Create &View...",             ID_OBJECT_CREATEVIEW
+            MENUITEM "Create &View...\tF4",             ID_OBJECT_CREATEVIEW
             MENUITEM "&Alter View...\tF6",          ID_OBJECT_ALTERVIEW
             MENUITEM "&Drop View...\tDel",          ID_OBJECT_DROPVIEW
             MENUITEM SEPARATOR
@@ -648,19 +651,19 @@ BEGIN
         END
         POPUP "&Stored Procedures"
         BEGIN
-            MENUITEM "Create &Stored Procedure...", ID_OBJECT_CREATESTOREDPROCEDURE
+            MENUITEM "Create &Stored Procedure...\tF4", ID_OBJECT_CREATESTOREDPROCEDURE
             MENUITEM "&Alter Stored Procedure...\tF6", ID_OBJECT_ALTERSTOREDPROCEDURE
             MENUITEM "&Drop Stored Procedure...\tDel", ID_OBJECT_DROPSTOREDPROCEDURE
         END
         POPUP "&Functions"
         BEGIN
-            MENUITEM "Create &Function...",         ID_OBJECT_CREATEFUNCTION
+            MENUITEM "Create &Function...\tF4",         ID_OBJECT_CREATEFUNCTION
             MENUITEM "&Alter Function...\tF6",      ID_OBJECT_ALTERFUNCTION
             MENUITEM "&Drop Function...\tDel",      ID_OBJECT_DROPFUNCTION
         END
         POPUP "&Triggers"
         BEGIN
-            MENUITEM "Create &Trigger...",          ID_OBJECT_CREATETRIGGER
+            MENUITEM "Create &Trigger...\tF4",          ID_OBJECT_CREATETRIGGER
             MENUITEM "&Alter Trigger...\tF6",       ID_OBJECT_ALTERTRIGGER
             MENUITEM "&Drop Trigger...\tDel",       ID_OBJECT_DROPTRIGGER
             MENUITEM SEPARATOR
@@ -668,7 +671,7 @@ BEGIN
         END
         POPUP "&Events"
         BEGIN
-            MENUITEM "Create &Event...",            ID_OBJECT_CREATEEVENT
+            MENUITEM "Create &Event...\tF4",            ID_OBJECT_CREATEEVENT
             MENUITEM "&Alter Event...\tF6",         ID_OBJECT_ALTEREVENT
             MENUITEM "&Drop Event...\tDel",         ID_OBJECT_DROPEVENT
             MENUITEM SEPARATOR
@@ -1259,7 +1262,7 @@ BEGIN
     EDITTEXT        IDC_INFO,7,7,347,145,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
 END
 
-IDD_EXPORTRESULTSET DIALOGEX 0, 0, 396, 254
+IDD_EXPORTRESULTSET DIALOGEX 0, 0, 396, 284
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION " Export As "
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
@@ -1300,15 +1303,17 @@ BEGIN
     LISTBOX         IDC_COLUMNLIST,277,67,104,99,LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
     PUSHBUTTON      "&Select All",IDC_SELECTALL,276,173,50,14
     PUSHBUTTON      "&Deselect All",IDC_DESELECTALL,331,173,50,14
-    LTEXT           "Save to &file",IDC_TEXT1,7,211,44,8
-    EDITTEXT        IDC_EXPORTFILENAME,54,210,306,12,ES_AUTOHSCROLL
-    PUSHBUTTON      "...",IDC_EXPFILESELECT,373,210,16,12
-    DEFPUSHBUTTON   "&Export",IDOK,284,233,50,14
-    PUSHBUTTON      "C&lose",IDCANCEL,339,233,50,14
-    CONTROL         "",IDC_HORZBAR2,"Static",SS_BLACKFRAME | SS_SUNKEN,7,201,382,1
-    CONTROL         "",IDC_HORZBAR3,"Static",SS_BLACKFRAME | SS_SUNKEN,7,227,382,1
-    LTEXT           "",IDC_MESSAGE,7,239,144,8
-    LTEXT           "Static",IDC__EXPORTAS_GRIP,213,232,19,8
+    LTEXT           "Save to &file",IDC_TEXT1,7,241,44,8
+    EDITTEXT        IDC_EXPORTFILENAME,54,240,306,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_EXPFILESELECT,373,240,16,12
+    DEFPUSHBUTTON   "&Export",IDOK,284,263,50,14
+    PUSHBUTTON      "C&lose",IDCANCEL,339,263,50,14
+    CONTROL         "",IDC_HORZBAR2,"Static",SS_BLACKFRAME | SS_SUNKEN,7,231,382,1
+    CONTROL         "",IDC_HORZBAR3,"Static",SS_BLACKFRAME | SS_SUNKEN,7,257,382,1
+    LTEXT           "",IDC_MESSAGE,7,269,144,8
+    LTEXT           "Static",IDC__EXPORTAS_GRIP,213,262,19,8
+	GROUPBOX        "Charset",IDC_GROUP4,7,195,129,30
+	COMBOBOX        IDC_CHARSETCOMBO,13,206,117,30, CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_COPYDATABASE DIALOGEX 0, 0, 388, 300

@@ -5017,6 +5017,79 @@ CQueryObject::ProcessF6()
     }
 	return wyTrue;
 }
+
+// The function is called when a user presses F4 in ObjectBrowser.
+// We check on which type of node it is pressed and then process accordingly.
+wyBool
+CQueryObject::ProcessF4()
+{	
+	wyInt32		image;
+	MDIWindow	*wnd;
+	
+	VERIFY(wnd = GetActiveWin());
+	image = GetSelectionImage();
+    
+	switch(image)
+	{
+	case NDATABASE:
+		wnd->m_pctabmodule->CreateTableTabInterface(wnd);
+		break;
+
+	case NCOLUMN:
+		wnd->m_pctabmodule->CreateTableTabInterface(wnd);
+		break;
+	case NPRIMARYKEY:
+        wnd->m_pctabmodule->CreateTableTabInterface(wnd);
+        break;
+	case NTABLES:
+	case NTABLE:
+		wnd->m_pctabmodule->CreateTableTabInterface(wnd);
+		break;
+	
+	case NFOLDER:
+        //{
+        //    wyWChar         item[SIZE_512] = {0};
+        //    wyString        itemstr("");
+
+        //    GetNodeText(m_hwnd, TreeView_GetSelection(m_hwnd), item, SIZE_512 - 1);
+
+        //    if(item)
+        //        itemstr.SetAs(item);
+
+        //    if(itemstr.CompareI(_("Columns")) == 0)
+        //        wnd->m_pctabmodule->CreateTableTabInterface(wnd, wyTrue, 0);
+        //}
+		//break;
+		wnd->m_pctabmodule->CreateTableTabInterface(wnd);
+		break;
+	case NVIEWS:
+	case NVIEWSITEM:
+		pGlobals->m_pcmainwin->OnCreateView(wnd->m_hwnd, wnd);
+		break;	
+	case NSP:
+	case NSPITEM:
+		pGlobals->m_pcmainwin->OnCreateProcedure(wnd->m_hwnd, wnd);
+		break;
+	case NFUNC:
+	case NFUNCITEM:
+		pGlobals->m_pcmainwin->OnCreateFunction(wnd->m_hwnd, wnd);
+		break;
+	case NTRIGGER:
+	case NTRIGGERITEM:
+		pGlobals->m_pcmainwin->OnCreateTrigger(wnd->m_hwnd, wnd);
+		break;
+	case NEVENTS:
+	case NEVENTITEM:
+		pGlobals->m_pcmainwin->OnCreateEvent(wnd->m_hwnd, wnd);
+		break;
+	case NINDEX:
+	case NPRIMARYINDEX:
+		wnd->m_pctabmodule->CreateTableTabInterface(wnd, wyTrue, TABINDEXES);
+		break;
+		//wnd->m_pctabmodule->CreateTableTabInterface(wnd);
+    }
+	return wyTrue;
+}
 // The function is called when a user Enter Delete in ObjectBrowser.
 // We check on whcih type of node it is pressed and also whether SHIFT is pressed 
 // and then process accordingly.

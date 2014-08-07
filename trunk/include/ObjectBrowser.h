@@ -382,6 +382,7 @@ public:
 	*/
 	wyBool		ProcessF6();
 
+	wyBool		ProcessF4();
     /// The function is called when a user enter in ObjectBrowser.
     /**
     @param uisshiftpressed : Check for shift press

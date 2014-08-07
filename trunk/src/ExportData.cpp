@@ -1201,6 +1201,9 @@ CExportResultSet::OnWmInitDlgValues(HWND hwnd)
 
 	VERIFY(m_hwndselall = GetDlgItem(hwnd, IDC_SELECTALL));
 	VERIFY(m_hwnddeselall = GetDlgItem(hwnd, IDC_DESELECTALL));
+	//Get handle for combo
+	VERIFY(m_hwndcpcombo = GetDlgItem(hwnd, IDC_CHARSETCOMBO));
+	
 
     SendMessage(m_hwndbloblimit, WM_SETTEXT, 0,(LPARAM)L"10");
     SendMessage(m_hwnddecimal, WM_SETTEXT, 0,(LPARAM)L"2");
@@ -1246,7 +1249,10 @@ CExportResultSet::OnWmInitDlgValues(HWND hwnd)
 
 	SetStaticText();
 	FillColumnList();
-
+	//InitExpCodePageCombo
+	//Set it to default always!
+	InitExpCodePageCombo(hwnd, IDC_CHARSETCOMBO);
+	
     if(m_isenablesqlexport == wyFalse)
     {
         EnableWindow(m_hwndsql, FALSE);
@@ -1265,6 +1271,78 @@ CExportResultSet::OnWmInitDlgValues(HWND hwnd)
 
     return;
 }
+
+void 
+CExportResultSet::InitExpCodePageCombo(HWND hdlg, wyInt32 ctrl_id)
+{
+	HWND hcpcombo  = GetDlgItem(hdlg, ctrl_id);
+	wyInt32 count = SendMessage(hcpcombo , CB_GETCOUNT, 0, 0), itemcount;
+
+	// Removes the contents in the combo 
+	for(itemcount = 0; itemcount < count; itemcount++)
+		SendMessage(hcpcombo , CB_DELETESTRING, 0, 0);
+
+
+	SendMessage(hcpcombo , CB_INSERTSTRING, 0,(LPARAM)L"ascii");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 0, CPI_ASCII);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 1,(LPARAM)L"big5");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 1, CPI_BIG5);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 2,(LPARAM)L"cp1250");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 2, CPI_CP1250);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 3,(LPARAM)L"cp1251");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 3, CPI_CP1251);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 4,(LPARAM)L"cp1256");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 4, CPI_CP1256);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 5,(LPARAM)L"cp1257");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 5, CPI_CP1257);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 6,(LPARAM)L"cp850");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 6, CPI_CP850);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 7,(LPARAM)L"cp852");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 7, CPI_CP852);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 8,(LPARAM)L"cp866");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 8, CPI_CP866);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 9,(LPARAM)L"cp932");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 9, CPI_CP932);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 10,(LPARAM)L"euckr");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 10, CPI_EUCKR);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 11,(LPARAM)L"gb2312");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 11, CPI_GB2312);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 12,(LPARAM)L"greek");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 12, CPI_GREEK);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 13,(LPARAM)L"hebrew");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 13, CPI_HEBREW);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 14,(LPARAM)L"keybcs2");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 14, CPI_KEYBCS2);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 15,(LPARAM)L"koi8r");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 15, CPI_KOI8R);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 16,(LPARAM)L"koi8u");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 16, CPI_KOI8U);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 17,(LPARAM)L"latin1");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 17, CPI_LATIN1);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 18,(LPARAM)L"latin2");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 18, CPI_LATIN2);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 19,(LPARAM)L"latin5");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 19, CPI_LATIN5);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 20,(LPARAM)L"latin7");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 20, CPI_LATIN7);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 21,(LPARAM)L"macce");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 21, CPI_MACCE);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 22,(LPARAM)L"macroman");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 22, CPI_MACROMAN);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 23,(LPARAM)L"sjis");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 23, CPI_SJIS);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 24,(LPARAM)L"swe7");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 24, CPI_SWE7);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 25,(LPARAM)L"tis620");//thai
+	SendMessage(hcpcombo, CB_SETITEMDATA, 25, CPI_TIS620);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 26,(LPARAM)L"ujis");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 26, CPI_UJIS);
+	SendMessage(hcpcombo , CB_INSERTSTRING, 27,(LPARAM)L"utf8");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 27, CPI_UTF8);
+
+	SendMessage(hcpcombo , CB_SELECTSTRING, -1,(LPARAM)L"utf8");
+}
+
 
 void 
 CExportResultSet::FillColumnList()
@@ -1437,6 +1515,7 @@ CExportResultSet::OnSQLCheck(HWND hwnd)
 	DisableExcelOptions();
 	DisableCSVOptions();
     ChangeFileExtension();
+	EnableWindow(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), FALSE);
 }
 
 VOID
@@ -1455,6 +1534,7 @@ CExportResultSet::OnXMLCheck()
 	DisableCSVOptions();
 	DisableSQLOptions();
     ChangeFileExtension();
+	EnableWindow(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), FALSE);
 }
 
 VOID
@@ -1464,6 +1544,7 @@ CExportResultSet::OnHTMLCheck()
 	DisableCSVOptions();
 	DisableSQLOptions();
 	ChangeFileExtension();
+	EnableWindow(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), FALSE);
 }
 
 VOID
@@ -1544,7 +1625,7 @@ CExportResultSet::EnableExcelOptions()
     EnableWindow(GetDlgItem(m_hwnd, IDC_BLOBTEXT), TRUE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_DECIMAL), TRUE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_DECIMALTEXT), TRUE);
-
+	EnableWindow(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), TRUE);
     return wyTrue;
 }
 
@@ -1578,7 +1659,7 @@ CExportResultSet::DisableExcelOptions()
     EnableWindow(GetDlgItem(m_hwnd, IDC_BLOBTEXT), FALSE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_DECIMAL), FALSE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_DECIMALTEXT), FALSE);
-
+	//EnableWindow(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), FALSE);
     return wyTrue;
 }
 
@@ -1599,7 +1680,7 @@ CExportResultSet::EnableCSVOptions()
     EnableWindow(GetDlgItem(m_hwnd, IDC_LINESTITLE), TRUE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_LINESCHAR), TRUE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_CHANGE), TRUE);
-    
+    EnableWindow(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), TRUE);
     return wyTrue;
 }
 
@@ -1620,6 +1701,7 @@ CExportResultSet::DisableCSVOptions()
     EnableWindow(GetDlgItem(m_hwnd, IDC_LINESTITLE), FALSE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_LINESCHAR), FALSE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_CHANGE), FALSE);
+	//EnableWindow(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), FALSE);
     return wyTrue;
 }
 
@@ -2152,7 +2234,7 @@ CExportResultSet::SaveDataAsEXCEL(wyBool multisheet, wyWChar *textlimit, wyWChar
     ExportToExcel   exp;
     ExportExcelData data;
     wyBool          retval;
-    
+    wyInt32			comboindex = -1;
     data.m_fields       = m_field;
     data.m_filename     = m_hfile;
     data.m_result       = m_res;
@@ -2166,6 +2248,10 @@ CExportResultSet::SaveDataAsEXCEL(wyBool multisheet, wyWChar *textlimit, wyWChar
 
     data.m_textlimit.SetAs(textlimit);
     data.m_decimal.SetAs(decimalplaces);
+
+	comboindex = SendMessage(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), CB_GETCURSEL, 0, 0);
+	if(comboindex != CB_ERR)
+		exp.m_charset = SendMessage(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), CB_GETITEMDATA, comboindex, 0);
 
     retval = exp.PrintToExcel(&data);
 
@@ -2423,15 +2509,16 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
     DWORD           dwbytesread;
 	MYSQL_ROWEX	    *tmp = NULL;
 	MYSQL_ROWS		*rowswalker = NULL;
-    wyInt32         messagecount = 0, rescount = 0, rowptr = 0;
+    wyInt32         messagecount = 0, rescount = 0, rowptr = 0, charset = 0, comboindex = -1;
 	wyString        messbuff, myrowstr, buffer(SIZE_8K);
-	
+	wyInt32			lenptr = 0;
 	MYSQL_RES		*myres;
 	MYSQL_FIELD		*fields;
 	MYSQL_ROW		myrow;
-
+	wyChar			*encbuffer;
+	//wyWChar		    *wencbuffer;
 	VERIFY(myres	= m_res);
-	
+	//wyUInt32		widelen = 0;
 	// process the escaping characters.
 	m_cesv.ProcessEscChar(m_cesv.m_esch.m_enclosed);
 	m_cesv.ProcessEscChar(m_cesv.m_esch.m_escape);
@@ -2454,6 +2541,10 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
 	if((SendMessage(GetDlgItem(m_hwnd, IDC_ADDCOLUMNS), BM_GETCHECK, 0, 0)) == BST_CHECKED)
 		AddColumnName(&buffer, m_cesv.m_esch.m_fescape, m_cesv.m_esch.m_lescape);
 
+	//Get the charset encoding
+	comboindex = SendMessage(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), CB_GETCURSEL, 0, 0);
+	if(comboindex != CB_ERR)
+		charset = SendMessage(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), CB_GETITEMDATA, comboindex, 0);
     /*if(m_ptr->m_rowarray)
 		tmp = m_ptr->m_rowarray[0]; */
 		
@@ -2557,7 +2648,17 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
 		//Check buffer size and write in file
 		if(buffer.GetLength() >= SIZE_8K)
 		{
-			ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbytesread, NULL);
+			//convert buffer encoding to users selected encoding
+			//write converted string to the file
+			if(charset != CPI_UTF8)
+			{
+				encbuffer =  buffer.GetAsEncoding(charset, &lenptr);
+				ret = WriteFile(hfile, encbuffer, lenptr, &dwbytesread, NULL);
+			}
+			else
+			{
+				ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbytesread, NULL);
+			}
 			buffer.Clear();
 			if(!ret)
 			{
@@ -2581,7 +2682,16 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
 	//If the buffer is not empty, then write the data to file
 	if(buffer.GetLength() != 0)
 	{
-		ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbytesread, NULL);
+
+		if(charset != CPI_UTF8)
+		{
+				encbuffer =  buffer.GetAsEncoding(charset, &lenptr);
+				ret = WriteFile(hfile, encbuffer, lenptr, &dwbytesread, NULL);
+		}
+		else
+		{
+				ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbytesread, NULL);
+		}
 		buffer.Clear();
 
 		if(!ret)

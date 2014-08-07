@@ -67,6 +67,7 @@ Ctrl+Shift+3		Show/Hide Query Window
 
 Database/Table
 Ctrl+D			Create Database
+F4			Create Table/Index/View/Store Proc/Function/Trigger/Event
 F6			Alter Database/Table Structure/Index/View/Store Proc/Function/Trigger/Event
 F2			Rename Table/View/Trigger/Event
 Shift+Del			Truncate Database/Table

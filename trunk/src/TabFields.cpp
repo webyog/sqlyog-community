@@ -734,8 +734,11 @@ TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres)
 				m_autoinccheck = wyTrue;
 				m_autoinccol.SetAs(myfieldrow[CNAME], m_ismysql41);
 			}
-            if(datatype.CompareI("timestamp")== 0 && myrowstr.FindI("on update CURRENT_TIMESTAMP") != -1)
-            {
+			//also check for datetime - 5.6.5
+			// on update cannont be true for other datatypes!
+            //if((datatype.CompareI("timestamp")== 0 || (datatype.CompareI("datetime") == 0 && IsMySQL565MariaDB1001(m_mdiwnd->m_tunnel,&m_mdiwnd->m_mysql))) && myrowstr.FindI("on update CURRENT_TIMESTAMP") != -1)
+            if((datatype.CompareI("timestamp")== 0 || (datatype.CompareI("datetime") == 0 && IsMySQL565MariaDB1001(m_mdiwnd->m_tunnel,&m_mdiwnd->m_mysql))) && myrowstr.FindI("on update CURRENT_TIMESTAMP") != -1)
+			{
                 fieldattr->m_onupdate = wyTrue;
             }
 		}
@@ -886,6 +889,7 @@ TabFields::FillInitData()
         CustomGrid_SetText(m_hgridfields, rowno, COMMENT_, temp->m_comment.GetString());
         CustomGrid_SetBoolValue(m_hgridfields, rowno, NOTNULL + addcol, temp->m_notnull ? GV_TRUE : GV_FALSE);
         CustomGrid_SetBoolValue(m_hgridfields, rowno, AUTOINCR + addcol, temp->m_autoincr ? GV_TRUE : GV_FALSE);
+		CustomGrid_SetBoolValue(m_hgridfields, rowno, ONUPDATECT, temp->m_onupdate ? GV_TRUE : GV_FALSE);
 
         if(temp->m_autoincr)
         {
@@ -937,19 +941,19 @@ TabFields::InitGrid()
     
 	// grid headers
 	wyChar		    *heading[] = {_("Column Name"), _("Data Type"), _("Length"), _("Default"),  _("PK?"), _("Binary?"), _("Not Null?"), 
-		                          _("Unsigned?"), _("Auto Incr?"), _("Zerofill?"), _("Charset"), _("Collation"), _("Comment")};			
+		                          _("Unsigned?"), _("Auto Incr?"), _("Zerofill?"), _("Charset"), _("Collation"), _("On Update"), _("Comment")};			
 	
 	VOID		    *listtype[] = {NULL, (VOID*)type, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
 
 	wyInt32			elemsize[] = {  0, sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 	wyInt32			elemcount[] = {0, sizeof(type)/sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0};
 	wyInt32			mask[] = {GVIF_TEXT, GVIF_LIST, GVIF_TEXT, GVIF_TEXT,  GVIF_BOOL, GVIF_BOOL, GVIF_BOOL, GVIF_BOOL, 
-		                      GVIF_BOOL, GVIF_BOOL, GVIF_LIST, GVIF_LIST, GVIF_TEXT};
+		                      GVIF_BOOL, GVIF_BOOL, GVIF_LIST, GVIF_LIST, GVIF_BOOL, GVIF_TEXT};
 	
-    wyInt32			cx[] = { 125, 95, 40, 80, 40, 60, 70, 70, 75, 70,  90, 140, 150	};//default/min col width
+    wyInt32			cx[] = { 125, 95, 40, 80, 40, 60, 70, 70, 75, 70,  90, 140, 80, 150	};//default/min col width
 
 	wyInt32			format[] = { GVIF_LEFT, GVIF_LEFT, GVIF_LEFT, GVIF_LEFT, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, 
-		                         GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_LEFT, GVIF_LEFT, GVIF_CENTER };
+		                         GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_LEFT, GVIF_CENTER };
 
 	wyInt32			width = 0;
 	wyString		colname, dbname(RETAINWIDTH_DBNAME), tblname("__create_table");
@@ -1539,7 +1543,7 @@ TabFields::GetColumnDefinition(FieldStructWrapper* cwrapobj, wyString &coldef, w
 		((fieldattr->m_binary) && (!m_ismysql41)?("BINARY "):(""))
         );
 
-    if(fieldattr->m_default.GetLength())
+    if(fieldattr->m_default.GetLength() || fieldattr->m_onupdate )
         newcolumns.AddSprintf("%s ", defvalue.GetString());
 
     newcolumns.AddSprintf("%s%s", 
@@ -1611,44 +1615,65 @@ TabFields::GetDefaultValue(wyString& query, FieldStructWrapper* cwrapobj)
 
     defval.SetAs(fieldattr->m_default);
     datatype.SetAs(fieldattr->m_datatype);
+	//onupdate.SetAs(fieldattr->m_onupdatestr);
 
-    if(defval.GetLength() == 0)
-        return;
+    if(defval.GetLength() != 0)
+	{
+			//return;
 
-    // first get the default value.
-    if((cwrapobj->m_oldval) && (datatype.CompareI("timestamp")== 0) && (fieldattr->m_onupdate))
-		onupdate.SetAs("on update CURRENT_TIMESTAMP");
+		// first get the default value.
+		//if((cwrapobj->m_oldval) && (datatype.CompareI("timestamp")== 0) && (fieldattr->m_onupdate))
+			//onupdate.SetAs("on update CURRENT_TIMESTAMP");
 
-    query.Add("DEFAULT ");
 
-    /// If datatype is numeric
-    if(IsDatatypeNumeric(datatype))
-    {
-        query.AddSprintf("%s ", defval.GetString());
-    }
-    /// If datatype is timestamp
-	else if((datatype.CompareI("timestamp") == 0 || (datatype.CompareI("datetime") == 0 && IsMySQL565(m_mdiwnd->m_tunnel,&m_mdiwnd->m_mysql) )) && 
-            (defval.CompareI(CURRENT_TIMESTAMP) == 0 || defval.CompareI("0") == 0 || defval.CompareI("NULL") == 0 || defval.CompareI("NOW()") == 0))
-    {
-        query.AddSprintf("%s %s ", defval.GetString(), onupdate.GetString());
-    }
-    else if(defval.Compare("''") == 0)
-    {
-        query.Add("'' ");
-    }
-    else
-    {
-        if(defval.GetCharAt(0) == '`' && defval.GetCharAt(defval.GetLength() - 1) == '`' 
-            && defval.GetLength() == MAXLENWITHBACKTICKS)
-        {
-            if(defval.Find("''", 1))
-                defval.SetAs("''");
-        }
-        tbuff = GetEscapedValue(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), defval.GetString());
-        defval.Sprintf("'%s' %s", tbuff, onupdate.GetString());
+
+		query.Add("DEFAULT ");
+
+		/// If datatype is numeric
+		if(IsDatatypeNumeric(datatype))
+		{
+			query.AddSprintf("%s ", defval.GetString());
+		}
+		/// If datatype is timestamp
+		else if((datatype.CompareI("timestamp") == 0 || (datatype.CompareI("datetime") == 0 && IsMySQL565MariaDB1001(m_mdiwnd->m_tunnel,&m_mdiwnd->m_mysql) )) && 
+				(defval.CompareI(CURRENT_TIMESTAMP) == 0 || defval.CompareI("0") == 0 || defval.CompareI("NULL") == 0 || defval.CompareI("NOW()") == 0))
+		{
+			query.AddSprintf("%s ", defval.GetString());
+		}
+		else if(defval.Compare("''") == 0)
+		{
+			query.Add("'' ");
+		}
+		else
+		{
+			if(defval.GetCharAt(0) == '`' && defval.GetCharAt(defval.GetLength() - 1) == '`' 
+				&& defval.GetLength() == MAXLENWITHBACKTICKS)
+			{
+				if(defval.Find("''", 1))
+					defval.SetAs("''");
+			}
+			tbuff = GetEscapedValue(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), defval.GetString());
+			defval.Sprintf("'%s'", tbuff);
         
-        query.AddSprintf("%s ", defval.GetString());
-    }
+			query.AddSprintf("%s ", defval.GetString());
+		}
+	}
+
+
+	//onupdate
+
+	if(fieldattr->m_onupdate)
+	{
+		// on update cannont be true for other datatypes!
+		//if(((datatype.CompareI("timestamp")== 0) || (datatype.CompareI("datetime") == 0 && IsMySQL565MariaDB1001(m_mdiwnd->m_tunnel,&m_mdiwnd->m_mysql) )))
+			//onupdate.SetAs("ON UPDATE CURRENT_TIMESTAMP");
+			query.AddSprintf("ON UPDATE CURRENT_TIMESTAMP");
+		/*if((datatype.CompareI("timestamp") == 0 || (datatype.CompareI("datetime") == 0 && IsMySQL565MariaDB1001(m_mdiwnd->m_tunnel,&m_mdiwnd->m_mysql) )))
+		{
+			query.AddSprintf("%s ", onupdate.GetString());
+		}*/
+
+	}
 }
 /*
 wyBool
@@ -2620,6 +2645,17 @@ TabFields::SetValueToStructure(wyUInt32 row, wyUInt32 col, wyChar* data)
     {
         cwrap->m_newval->m_default.SetAs(data);
     }
+	else if(col == ONUPDATECT)
+    {
+        if(stricmp(data, GV_TRUE)== 0) 
+        {
+            cwrap->m_newval->m_onupdate = wyTrue;
+        }
+        else
+        {
+            cwrap->m_newval->m_onupdate = wyFalse;
+        }
+    }
     else if(col == PRIMARY)
     {
         if(stricmp(data, GV_TRUE)== 0) 
@@ -2771,6 +2807,10 @@ TabFields::ScanEntireRow(wyUInt32  currentrow, wyInt32 currentcol, wyString& cur
             origtext.SetAs(fldattr->m_default);
             newtext.SetAs(cwrapobj->m_newval->m_default);
             break;
+		case ONUPDATECT:
+			origtext.SetAs(fldattr->m_onupdate ? GV_TRUE : GV_FALSE);
+            newtext.SetAs(cwrapobj->m_newval->m_onupdate ? GV_TRUE : GV_FALSE);
+			break;
 
         case PRIMARY:
             continue;
@@ -2907,6 +2947,8 @@ TabFields::HandleTinyIntValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &inde
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyFalse);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
     CustomGrid_SetText(hwndgrid, row, CHARSET, "");
     CustomGrid_SetText(hwndgrid, row, COLLATION, "");
 
@@ -2921,6 +2963,7 @@ TabFields::HandleTinyIntValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &inde
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
+		cwrapobj->m_newval->m_onupdate = wyFalse;
 
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
@@ -2940,7 +2983,8 @@ TabFields::HandleBitValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, UNSIGNED+ index, wyTrue);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyTrue);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyTrue);
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
     CustomGrid_SetBoolValue(hwndgrid, row, AUTOINCR + index, GV_FALSE);
     if(m_autoincrowid == row)
         m_autoincrowid = -1;
@@ -2960,7 +3004,7 @@ TabFields::HandleBitValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
         cwrapobj->m_newval->m_autoincr = wyFalse;
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
     }
@@ -2984,7 +3028,8 @@ TabFields::HandleBoolAndBooleanValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt3
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyFalse);
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(m_ismysql41 == wyFalse)
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
@@ -2999,7 +3044,7 @@ TabFields::HandleBoolAndBooleanValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt3
         cwrapobj->m_newval->m_collation.Clear();
         cwrapobj->m_newval->m_unsigned = wyFalse;
         cwrapobj->m_newval->m_len.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
     }
@@ -3021,6 +3066,8 @@ TabFields::HandleSmallIntValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &ind
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyFalse);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(m_ismysql41 == wyFalse)
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
@@ -3032,7 +3079,7 @@ TabFields::HandleSmallIntValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &ind
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
     }
@@ -3054,6 +3101,8 @@ TabFields::HandleMediumIntValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &in
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyFalse);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(m_ismysql41 == wyFalse)
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
@@ -3065,7 +3114,7 @@ TabFields::HandleMediumIntValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &in
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
     }
@@ -3087,6 +3136,8 @@ TabFields::HandleIntValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyFalse);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(m_ismysql41 == wyFalse)
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
@@ -3098,7 +3149,7 @@ TabFields::HandleIntValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
     }
@@ -3120,6 +3171,8 @@ TabFields::HandleIntegerValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &inde
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyFalse);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(m_ismysql41 == wyFalse)
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
@@ -3131,7 +3184,7 @@ TabFields::HandleIntegerValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &inde
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
     }
@@ -3153,7 +3206,8 @@ TabFields::HandleBigIntValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyFalse);
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(m_ismysql41 == wyFalse)
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
@@ -3165,7 +3219,7 @@ TabFields::HandleBigIntValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
     }
@@ -3187,7 +3241,8 @@ TabFields::HandleFloatValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyFalse);
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(m_ismysql41 == wyFalse)
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
@@ -3199,7 +3254,7 @@ TabFields::HandleFloatValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
     }
@@ -3221,7 +3276,8 @@ TabFields::HandleDoubleValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyFalse);
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(m_ismysql41 == wyFalse)
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
@@ -3233,7 +3289,7 @@ TabFields::HandleDoubleValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
     }
@@ -3255,7 +3311,8 @@ TabFields::HandleRealValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyFalse);
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(m_ismysql41 == wyFalse)
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
@@ -3270,7 +3327,7 @@ TabFields::HandleRealValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
 
@@ -3295,7 +3352,8 @@ TabFields::HandleDecimalValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &inde
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, UNSIGNED+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(m_ismysql41 == wyFalse)
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
@@ -3313,7 +3371,7 @@ TabFields::HandleDecimalValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &inde
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
 
@@ -3336,7 +3394,8 @@ TabFields::HandleNumericValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &inde
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, PRIMARY, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyFalse);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse);
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(m_ismysql41 == wyFalse)
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
@@ -3356,7 +3415,7 @@ TabFields::HandleNumericValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &inde
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         if(m_ismysql41 == wyFalse)
             cwrapobj->m_newval->m_binary = wyFalse;
 
@@ -3396,7 +3455,8 @@ TabFields::HandleDateValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
 	CustomGrid_SetBoolValue     (hwndgrid, row, ZEROFILL+ index, GV_FALSE);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue);
 	CustomGrid_SetText			(hwndgrid, row, LENGTH, "");
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
     if(m_autoincrowid == row)
         m_autoincrowid = -1;
 
@@ -3405,7 +3465,7 @@ TabFields::HandleDateValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         cwrapobj->m_newval->m_unsigned = wyFalse;
         cwrapobj->m_newval->m_autoincr = wyFalse;
         cwrapobj->m_newval->m_zerofill = wyFalse;
@@ -3420,6 +3480,7 @@ TabFields::HandleDateValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
 wyBool
 TabFields::HandleDataTypeValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
 {
+	wyBool mysql565 = wyFalse;
     FieldStructWrapper *cwrapobj = NULL;
 
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, CHARSET, wyTrue);
@@ -3440,6 +3501,16 @@ TabFields::HandleDataTypeValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &ind
 	CustomGrid_SetBoolValue     (hwndgrid, row, AUTOINCR+ index, GV_FALSE);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyTrue);
 	CustomGrid_SetBoolValue     (hwndgrid, row, ZEROFILL+ index, GV_FALSE);
+	if(IsMySQL565MariaDB1001(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql))
+	{
+		mysql565 = wyTrue;
+		CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyFalse);
+	}
+	else
+	{
+		CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+		CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
+	}
 	if(!IsMySQL564MariaDB53(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql))
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue);
@@ -3461,7 +3532,8 @@ TabFields::HandleDataTypeValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &ind
         {
             cwrapobj->m_newval->m_binary = wyFalse;
         }
-
+		if(!mysql565)
+			cwrapobj->m_newval->m_onupdate = wyFalse;
         cwrapobj->m_newval->m_unsigned = wyFalse;
         cwrapobj->m_newval->m_autoincr = wyFalse;
         cwrapobj->m_newval->m_zerofill = wyFalse;
@@ -3496,6 +3568,7 @@ TabFields::HandleTimeStampValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &in
 	CustomGrid_SetBoolValue     (hwndgrid, row, AUTOINCR+ index, GV_FALSE);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyTrue);
 	CustomGrid_SetBoolValue     (hwndgrid, row, ZEROFILL+ index, GV_FALSE);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyFalse);
 	if(!IsMySQL564MariaDB53(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql))
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue);
@@ -3549,6 +3622,8 @@ TabFields::HandleTimeValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
 	CustomGrid_SetBoolValue     (hwndgrid, row, AUTOINCR+ index, GV_FALSE);
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyTrue);
 	CustomGrid_SetBoolValue     (hwndgrid, row, ZEROFILL+ index, GV_FALSE);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
 	if(!IsMySQL564MariaDB53(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql))
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue);
@@ -3564,7 +3639,7 @@ TabFields::HandleTimeValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
     {    
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-        
+        cwrapobj->m_newval->m_onupdate = wyFalse;
         cwrapobj->m_newval->m_unsigned = wyFalse;
         cwrapobj->m_newval->m_autoincr = wyFalse;
         cwrapobj->m_newval->m_zerofill = wyFalse;
@@ -3600,7 +3675,8 @@ TabFields::HandleYearValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
 
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyTrue);
 	CustomGrid_SetBoolValue     (hwndgrid, row, AUTOINCR+ index, GV_FALSE);
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
     if(m_autoincrowid == row)
         m_autoincrowid = -1;
 
@@ -3611,7 +3687,7 @@ TabFields::HandleYearValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
     {
         cwrapobj->m_newval->m_charset.Clear();
         cwrapobj->m_newval->m_collation.Clear();
-        
+        cwrapobj->m_newval->m_onupdate = wyFalse;
         cwrapobj->m_newval->m_unsigned = wyFalse;
         cwrapobj->m_newval->m_autoincr = wyFalse;
         cwrapobj->m_newval->m_zerofill = wyFalse;
@@ -3650,7 +3726,8 @@ TabFields::HandleCharAndBinaryValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32
 
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyTrue );
 	CustomGrid_SetBoolValue     (hwndgrid, row, AUTOINCR+ index, GV_FALSE );
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
     if(m_autoincrowid == row)
         m_autoincrowid = -1;
 
@@ -3667,6 +3744,7 @@ TabFields::HandleCharAndBinaryValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32
         cwrapobj->m_newval->m_unsigned = wyFalse;
         cwrapobj->m_newval->m_autoincr = wyFalse;
         cwrapobj->m_newval->m_zerofill = wyFalse;
+		cwrapobj->m_newval->m_onupdate = wyFalse;
     }
 
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse );
@@ -3702,7 +3780,8 @@ TabFields::HandleVarCharAndVarbinaryValidation(HWND &hwndgrid, wyUInt32 &row, wy
     
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR+ index, wyTrue );
 	CustomGrid_SetBoolValue     (hwndgrid, row, AUTOINCR+ index, GV_FALSE );
-    
+    CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
     if(m_autoincrowid == row)
         m_autoincrowid = -1;
 
@@ -3716,7 +3795,7 @@ TabFields::HandleVarCharAndVarbinaryValidation(HWND &hwndgrid, wyUInt32 &row, wy
             cwrapobj->m_newval->m_charset.Clear();
             cwrapobj->m_newval->m_collation.Clear();
         }
-
+		cwrapobj->m_newval->m_onupdate = wyFalse;
         cwrapobj->m_newval->m_unsigned = wyFalse;
         cwrapobj->m_newval->m_autoincr = wyFalse;
         cwrapobj->m_newval->m_zerofill = wyFalse;
@@ -3761,7 +3840,8 @@ TabFields::HandleAllBlobTextValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &
 	CustomGrid_SetBoolValue     (hwndgrid, row, ZEROFILL+ index, GV_FALSE );
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue );
 	CustomGrid_SetText			(hwndgrid, row, LENGTH, "" );
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
     if(m_autoincrowid == row)
         m_autoincrowid = -1;
 
@@ -3782,6 +3862,7 @@ TabFields::HandleAllBlobTextValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &
         cwrapobj->m_newval->m_autoincr = wyFalse;
         cwrapobj->m_newval->m_zerofill = wyFalse;
         cwrapobj->m_newval->m_len.Clear();
+		cwrapobj->m_newval->m_onupdate = wyFalse;
     }
 	return wyTrue;
 }
@@ -3820,7 +3901,8 @@ TabFields::HandleBlobTextValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &ind
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyTrue );
 	CustomGrid_SetBoolValue     (hwndgrid, row, ZEROFILL+ index, GV_FALSE );
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse );
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
     if(m_autoincrowid == row)
         m_autoincrowid = -1;
 
@@ -3841,6 +3923,7 @@ TabFields::HandleBlobTextValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &ind
         cwrapobj->m_newval->m_autoincr = wyFalse;
         cwrapobj->m_newval->m_zerofill = wyFalse;
         cwrapobj->m_newval->m_len.Clear();
+		cwrapobj->m_newval->m_onupdate = wyFalse;
     }
 
 	return wyTrue;
@@ -3868,7 +3951,8 @@ TabFields::HandleSetEnumValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &inde
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL+ index, wyTrue );
 	CustomGrid_SetBoolValue     (hwndgrid, row, ZEROFILL+ index, GV_FALSE );
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyFalse );
-
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
     if(m_autoincrowid == row)
         m_autoincrowid = -1;
 
@@ -3882,6 +3966,7 @@ TabFields::HandleSetEnumValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &inde
         cwrapobj->m_newval->m_unsigned = wyFalse;
         cwrapobj->m_newval->m_autoincr = wyFalse;
         cwrapobj->m_newval->m_zerofill = wyFalse;
+		cwrapobj->m_newval->m_onupdate = wyFalse;
     }
 	//m_isenumorset = wyTrue;
 

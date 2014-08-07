@@ -869,7 +869,7 @@ public:
 	/**
 	*/
 	void	FillColumnList();
-
+	void	InitExpCodePageCombo(HWND hdlg, wyInt32 ctrl_id);
 	/// Adds all the selected column to the array
 	wyBool	AddSelColumn();
 
@@ -1097,6 +1097,8 @@ public:
 	RECT				m_wndrect;
 
     wyBool              m_isenablesqlexport;
+
+	HWND				m_hwndcpcombo;
 
 };
 

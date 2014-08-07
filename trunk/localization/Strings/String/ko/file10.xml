@@ -40,8 +40,8 @@
 	<string name="3197">현재 &amp;쿼리를 시용해 뷰 생성</string>
 	<string name="3198">테이블 메뉴</string>
 	<string name="3199">열기...	Ctrl+O</string>
-	<string name="3200">생성 &amp;트리거...</string>
-	<string name="3201">생성 &amp;이벤트...</string>
+	<string name="3200">생성 &amp;트리거...	F4</string>
+	<string name="3201">생성 &amp;이벤트...	F4</string>
 	<string name="3202">접속 탭</string>
 	<string name="3203">&amp;연결 끊기	Ctrl+F4</string>
 	<string name="3204">뷰</string>

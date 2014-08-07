@@ -72,6 +72,41 @@
 #define  WAIT_TIMEOUT_SERVER  "28800"
 #define  PROCEDURE_FUNC_ERRMSG _("Unable to retrieve information. Please check your privileges. For routines (stored procedures and functions) you need SELECT privilege to mysql.proc if you are not the owner of the routines.")
 
+#define  CPI_BIG5   950
+#define  CPI_CP850  850
+#define  CPI_KOI8R 20866
+#define  CPI_LATIN1 1252
+#define  CPI_LATIN2 28592
+#define  CPI_SWE7  20107
+#define  CPI_ASCII 20127
+#define  CPI_UJIS  51932 
+#define  CPI_SJIS  932 
+#define  CPI_HEBREW 28598
+#define  CPI_TIS620  874
+#define  CPI_EUCKR  51949
+#define  CPI_KOI8U 21866
+#define  CPI_GB2312 936
+#define  CPI_GREEK 28597
+#define  CPI_CP1250 1250
+#define  CPI_LATIN5 28599
+#define  CPI_UTF8 65001
+#define  CPI_CP866 866
+#define  CPI_KEYBCS2 895
+#define  CPI_MACCE  10029
+#define  CPI_MACROMAN 10000
+#define  CPI_CP852    852
+#define  CPI_LATIN7  28603
+//#define  CPI_UTF8MB4 65001
+#define  CPI_CP1251   1251
+#define  CPI_UTF16LE  1200
+#define  CPI_UTF16BE  1201
+#define  CPI_CP1256 1256
+#define  CPI_CP1257 1257
+//#define  CPI_UTF32  12000
+
+#define  CPI_CP932 932
+
+
 typedef struct ForeignKey
 {
 	wyString    m_fkey;

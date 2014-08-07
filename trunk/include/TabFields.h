@@ -37,7 +37,8 @@
 #define		ZEROFILL                8
 #define     CHARSET                 9
 #define     COLLATION               10
-#define		COMMENT_                11
+#define		ONUPDATECT              11
+#define		COMMENT_                12
 #define     CHARSETCOL              9
 #define     COLLATIONCOL            10
 

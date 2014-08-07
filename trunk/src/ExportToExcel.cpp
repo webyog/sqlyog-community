@@ -33,7 +33,7 @@ ExportToExcel::ExportToExcel()
     m_datatype.m_exceltype.SetAs("");
 	m_datatype.m_mysqltype.SetAs("");
 	m_buffer.SetAs("");
-
+	m_charset = 0;
 	m_resultfromquery = wyFalse;
 }
 
@@ -80,7 +80,10 @@ ExportToExcel::PrintTableToFile(ExportExcelData *exceldata)
 	DWORD		dwbyteswritten;
 	wyInt32		ret	= 0;
 	wyString	error;
-	
+	wyChar*		encbuffer;
+	wyInt32		lenptr = 0;
+	//wyWChar		    *wencbuffer;
+	//wyUInt32		widelen = 0;
 	//first add in a buffer and then write to file
 	if(WriteExcelHeaders() == wyFalse)
         return wyFalse;
@@ -118,7 +121,16 @@ ExportToExcel::PrintTableToFile(ExportExcelData *exceldata)
 	//if buffer is not empty then write the data to the file
 	if(m_buffer.GetLength() != 0)
 	{
-		ret = WriteFile(m_filename, m_buffer.GetString(), m_buffer.GetLength(), &dwbyteswritten, NULL);
+		if(m_charset != CPI_UTF8)
+		{
+			encbuffer =  m_buffer.GetAsEncoding(m_charset, &lenptr);
+			ret = WriteFile(m_filename, encbuffer, lenptr, &dwbyteswritten, NULL);
+		}
+		else
+		{
+			ret = WriteFile(m_filename, m_buffer.GetString(), m_buffer.GetLength(), &dwbyteswritten, NULL);
+		}
+		//ret = WriteFile(m_filename, m_buffer.GetString(), m_buffer.GetLength(), &dwbyteswritten, NULL);
 		m_buffer.Clear();
 		
 		if(!ret)
@@ -943,9 +955,12 @@ ExportToExcel::WriteToFile(wyString &value, wyBool isdata)
     DWORD		dwbyteswritten;
 	wyInt32		ret	= 0;
 	wyString	error;
-
+	wyChar*		encbuffer;
+	wyInt32		lenptr = 0;
 	if(!m_filename)
 		return wyFalse;
+	//wyWChar		    *wencbuffer;
+	//wyUInt32		widelen = 0;
 
 	//add data to a class level buffer and then to a file
 	if(isdata == wyTrue)
@@ -959,7 +974,16 @@ ExportToExcel::WriteToFile(wyString &value, wyBool isdata)
 	//if size of buffer is more
 	if(m_buffer.GetLength() >= SIZE_8K)
 	{
-		ret = WriteFile(m_filename, m_buffer.GetString(), m_buffer.GetLength(), &dwbyteswritten, NULL);
+		if(m_charset != CPI_UTF8)
+		{
+			encbuffer =  m_buffer.GetAsEncoding(m_charset, &lenptr);
+			ret = WriteFile(m_filename, encbuffer, lenptr, &dwbyteswritten, NULL);
+		}
+		else
+		{
+			ret = WriteFile(m_filename, m_buffer.GetString(), m_buffer.GetLength(), &dwbyteswritten, NULL);
+		}
+		//ret = WriteFile(m_filename, m_buffer.GetString(), m_buffer.GetLength(), &dwbyteswritten, NULL);
 		m_buffer.Clear();
 
 		if(!ret)

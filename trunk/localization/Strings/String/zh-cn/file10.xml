@@ -40,8 +40,8 @@
 	<string name="3197">使用当前查询新建视图</string>
 	<string name="3198">目录菜单</string>
 	<string name="3199">打开...	Ctrl+O</string>
-	<string name="3200">创建触发器...</string>
-	<string name="3201">创建活动</string>
+	<string name="3200">创建触发器...	F4</string>
+	<string name="3201">创建活动	F4</string>
 	<string name="3202">连接选项卡</string>
 	<string name="3203">断开	Ctrl+F4</string>
 	<string name="3204">视图</string>
