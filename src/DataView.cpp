@@ -4732,7 +4732,7 @@ DataView::OnTBDropDownCopy(NMTOOLBAR *tbh, HWND hwndgrid, wyInt32 selectedrows)
     LocalizeMenu(hmenu);
 
     htrackmenu = GetSubMenu(hmenu, 0);
-    hsubmenu = GetSubMenu(htrackmenu, 12);
+    hsubmenu = GetSubMenu(htrackmenu, 14);
     
     //now find the location where the button is. we will place the menu just under that to get dropdown effect
     SendMessage(tbh->hdr.hwndFrom, TB_GETRECT,(WPARAM)tbh->iItem,(LPARAM)&rc);
