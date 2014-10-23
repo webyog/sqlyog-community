@@ -85,6 +85,10 @@ ExportToExcel::PrintTableToFile(ExportExcelData *exceldata)
 	//wyWChar		    *wencbuffer;
 	//wyUInt32		widelen = 0;
 	//first add in a buffer and then write to file
+	unsigned char Header[3]; //unicode text file header
+	Header[0] = 0xEF;
+	Header[1] = 0xBB;
+	Header[2] = 0xBF;
 	if(WriteExcelHeaders() == wyFalse)
         return wyFalse;
 
@@ -123,8 +127,19 @@ ExportToExcel::PrintTableToFile(ExportExcelData *exceldata)
 	{
 		if(m_charset != CPI_UTF8)
 		{
+
+			if(m_charset==CPI_UTF8B)
+			{
+			ret = WriteFile(m_filename, Header, 3, &dwbyteswritten, NULL);
+			ret = WriteFile(m_filename, m_buffer.GetString(), m_buffer.GetLength(), &dwbyteswritten, NULL);
+			
+			}
+			else
+			{
+
 			encbuffer =  m_buffer.GetAsEncoding(m_charset, &lenptr);
 			ret = WriteFile(m_filename, encbuffer, lenptr, &dwbyteswritten, NULL);
+			}
 		}
 		else
 		{

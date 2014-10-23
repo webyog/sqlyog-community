@@ -1630,7 +1630,7 @@ ObjectInfo::ShowAllProcedures(MDIWindow *pcquerywnd,const wyChar *db, OBJECT obj
 	}
 
 	if(iscollate)
-		query.Sprintf("show procedure status where Db = '%s' COLLATE utf8_bin", db);
+		query.Sprintf("show procedure status where BINARY Db = '%s'", db);
 	else
 		query.Sprintf("show procedure status where Db = '%s'", db);
 
@@ -1695,7 +1695,7 @@ ObjectInfo::ShowAllFunctions(MDIWindow *pcquerywnd,const wyChar *db, OBJECT obj)
 	}
 	
 	if(iscollate)
-		query.Sprintf("show function status where Db='%s' COLLATE utf8_bin", db);
+		query.Sprintf("show function status where BINARY Db='%s'", db);
 	else
 		query.Sprintf("show function status where Db='%s'", db);
 
@@ -1812,7 +1812,7 @@ ObjectInfo::ShowAllEvents(MDIWindow *pcquerywnd,const wyChar *db, OBJECT obj)
 
 	SendMessage(m_hwnd, SCI_APPENDTEXT, 2, (LPARAM)"\r\n");	
 	if(iscollate)
-		query.Sprintf("Select `Event_name`,`Definer`,`Event_type`,`Execute_at`,`Interval_value`,`Interval_field`,`Starts`,`Ends`,`Status` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s' COLLATE utf8_bin",db);
+		query.Sprintf("Select `Event_name`,`Definer`,`Event_type`,`Execute_at`,`Interval_value`,`Interval_field`,`Starts`,`Ends`,`Status` from `INFORMATION_SCHEMA`.`EVENTS` where BINARY `EVENT_SCHEMA` = '%s'",db);
 	else
 		query.Sprintf("Select `Event_name`,`Definer`,`Event_type`,`Execute_at`,`Interval_value`,`Interval_field`,`Starts`,`Ends`,`Status` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s'",db);
 

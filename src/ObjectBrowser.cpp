@@ -6565,7 +6565,7 @@ CQueryObject::EndRenameEvent(LPNMTVDISPINFO ptvdi)
 	renameevent.SetAs(ptvdi->item.pszText);
 
 	if(iscollate)
-		query.Sprintf("show events where db= '%s' COLLATE utf8_bin and name = '%s'", m_seldatabase.GetString(), 
+		query.Sprintf("show events where BINARY db= '%s' and name = '%s'", m_seldatabase.GetString(), 
 															 renameevent.GetString());
 	else
 		query.Sprintf("show events where db= '%s' and name = '%s'", m_seldatabase.GetString(), 

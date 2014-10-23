@@ -1339,7 +1339,12 @@ CExportResultSet::InitExpCodePageCombo(HWND hdlg, wyInt32 ctrl_id)
 	SendMessage(hcpcombo, CB_SETITEMDATA, 26, CPI_UJIS);
 	SendMessage(hcpcombo , CB_INSERTSTRING, 27,(LPARAM)L"utf8");
 	SendMessage(hcpcombo, CB_SETITEMDATA, 27, CPI_UTF8);
-
+	SendMessage(hcpcombo , CB_INSERTSTRING, 28,(LPARAM)L"utf8 with BOM");
+	SendMessage(hcpcombo, CB_SETITEMDATA, 28, CPI_UTF8B);
+	//SendMessage(hcpcombo , CB_INSERTSTRING, 29,(LPARAM)L"utf16le");
+	//SendMessage(hcpcombo, CB_SETITEMDATA, 29, CPI_UTF16LE);
+	//SendMessage(hcpcombo , CB_INSERTSTRING, 30,(LPARAM)L"utf16be");
+	//SendMessage(hcpcombo, CB_SETITEMDATA, 30, CPI_UTF16BE);
 	SendMessage(hcpcombo , CB_SELECTSTRING, -1,(LPARAM)L"utf8");
 }
 
@@ -2516,8 +2521,25 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
 	MYSQL_FIELD		*fields;
 	MYSQL_ROW		myrow;
 	wyChar			*encbuffer;
-	//wyWChar		    *wencbuffer;
+	wyWChar		    *wencbuffer;
+	wyUInt32		wlenptr = 0;
 	VERIFY(myres	= m_res);
+	wyBool			iswritten = wyFalse;
+	unsigned char Header[3]; //unicode text file header
+	Header[0] = 0xEF;
+	Header[1] = 0xBB;
+	Header[2] = 0xBF;
+
+	//unsigned char Headerle[2]; //unicode text file header
+	//Headerle[0] = 0xFF;
+	//Headerle[1] = 0xFE;
+
+
+	//unsigned char Headerbe[2]; //unicode text file header
+	//Headerbe[0] = 0xFE;
+	//Headerbe[1] = 0xFF;
+
+
 	//wyUInt32		widelen = 0;
 	// process the escaping characters.
 	m_cesv.ProcessEscChar(m_cesv.m_esch.m_enclosed);
@@ -2650,21 +2672,39 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
 		{
 			//convert buffer encoding to users selected encoding
 			//write converted string to the file
-			if(charset != CPI_UTF8)
+			if(iswritten == wyFalse && (charset == CPI_UTF8B) )
 			{
+				if(charset == CPI_UTF8B)
+					ret = WriteFile(hfile, Header, 3, &dwbytesread, NULL);
+				/*if(charset == CPI_UTF16LE)
+					ret = WriteFile(hfile, Headerle, 2, &dwbytesread, NULL);
+				if(charset == CPI_UTF16BE)
+					ret = WriteFile(hfile, Headerbe, 2, &dwbytesread, NULL);*/
+				iswritten = wyTrue;
+			}
+		
+		if(charset != CPI_UTF8 && charset != CPI_UTF8B )
+		{
 				encbuffer =  buffer.GetAsEncoding(charset, &lenptr);
 				ret = WriteFile(hfile, encbuffer, lenptr, &dwbytesread, NULL);
-			}
-			else
-			{
+		}
+		/*else
+		if(charset == CPI_UTF16LE || charset == CPI_UTF16BE)
+		{
+			wencbuffer =  buffer.GetAsWideChar(&wlenptr);
+			ret = WriteFile(hfile, wencbuffer, wlenptr * sizeof(wyWChar), &dwbytesread, NULL);
+		}*/
+		else
+		{
 				ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbytesread, NULL);
-			}
-			buffer.Clear();
-			if(!ret)
-			{
-				DisplayErrorText(GetLastError(), _("Could not write into file !"));
-			    return wyFalse;
-			}
+		}
+		buffer.Clear();
+
+		if(!ret)
+		{
+			DisplayErrorText(GetLastError(), _("Could not write into file !"));
+			return wyFalse;
+		}
 		}		
 		
 		messbuff.Sprintf(_("  %d Rows Exported"), ++messagecount);
@@ -2682,12 +2722,28 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
 	//If the buffer is not empty, then write the data to file
 	if(buffer.GetLength() != 0)
 	{
-
-		if(charset != CPI_UTF8)
+		if(iswritten == wyFalse && (charset == CPI_UTF8B ) )
+			{
+				if(charset == CPI_UTF8B)
+					ret = WriteFile(hfile, Header, 3, &dwbytesread, NULL);
+				/*if(charset == CPI_UTF16LE)
+					ret = WriteFile(hfile, Headerle, 2, &dwbytesread, NULL);
+				if(charset == CPI_UTF16BE)
+					ret = WriteFile(hfile, Headerbe, 2, &dwbytesread, NULL);*/
+				iswritten = wyTrue;
+			}
+		
+		if(charset != CPI_UTF8 && charset != CPI_UTF8B )
 		{
 				encbuffer =  buffer.GetAsEncoding(charset, &lenptr);
 				ret = WriteFile(hfile, encbuffer, lenptr, &dwbytesread, NULL);
 		}
+		/*else
+		if(charset == CPI_UTF16LE || charset == CPI_UTF16BE)
+		{
+			wencbuffer =  buffer.GetAsWideChar(&wlenptr);
+			ret = WriteFile(hfile, wencbuffer, wlenptr * sizeof(wyWChar), &dwbytesread, NULL);
+		}*/
 		else
 		{
 				ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbytesread, NULL);
