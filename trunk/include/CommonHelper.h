@@ -98,8 +98,9 @@
 #define  CPI_LATIN7  28603
 //#define  CPI_UTF8MB4 65001
 #define  CPI_CP1251   1251
-#define  CPI_UTF16LE  1200
-#define  CPI_UTF16BE  1201
+#define  CPI_UTF8B	  0
+#define  CPI_UTF16LE  91
+#define  CPI_UTF16BE  92
 #define  CPI_CP1256 1256
 #define  CPI_CP1257 1257
 //#define  CPI_UTF32  12000

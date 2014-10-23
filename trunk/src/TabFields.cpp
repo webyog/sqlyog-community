@@ -1605,7 +1605,7 @@ void
 TabFields::GetDefaultValue(wyString& query, FieldStructWrapper* cwrapobj)
 {
     FIELDATTRIBS    *fieldattr = NULL;
-    wyString	defval, datatype, onupdate;
+    wyString	defval, datatype, onupdate,len;
     wyChar      *tbuff =  NULL;
     
     if(!cwrapobj || !cwrapobj->m_newval)
@@ -1615,6 +1615,7 @@ TabFields::GetDefaultValue(wyString& query, FieldStructWrapper* cwrapobj)
 
     defval.SetAs(fieldattr->m_default);
     datatype.SetAs(fieldattr->m_datatype);
+	len.SetAs(fieldattr->m_len);
 	//onupdate.SetAs(fieldattr->m_onupdatestr);
 
     if(defval.GetLength() != 0)
@@ -1636,7 +1637,7 @@ TabFields::GetDefaultValue(wyString& query, FieldStructWrapper* cwrapobj)
 		}
 		/// If datatype is timestamp
 		else if((datatype.CompareI("timestamp") == 0 || (datatype.CompareI("datetime") == 0 && IsMySQL565MariaDB1001(m_mdiwnd->m_tunnel,&m_mdiwnd->m_mysql) )) && 
-				(defval.CompareI(CURRENT_TIMESTAMP) == 0 || defval.CompareI("0") == 0 || defval.CompareI("NULL") == 0 || defval.CompareI("NOW()") == 0))
+				(defval.FindI("CURRENT_TIMESTAMP") != -1 || defval.FindI("NOW") != -1))
 		{
 			query.AddSprintf("%s ", defval.GetString());
 		}
@@ -1667,12 +1668,20 @@ TabFields::GetDefaultValue(wyString& query, FieldStructWrapper* cwrapobj)
 		// on update cannont be true for other datatypes!
 		//if(((datatype.CompareI("timestamp")== 0) || (datatype.CompareI("datetime") == 0 && IsMySQL565MariaDB1001(m_mdiwnd->m_tunnel,&m_mdiwnd->m_mysql) )))
 			//onupdate.SetAs("ON UPDATE CURRENT_TIMESTAMP");
-			query.AddSprintf("ON UPDATE CURRENT_TIMESTAMP");
-		/*if((datatype.CompareI("timestamp") == 0 || (datatype.CompareI("datetime") == 0 && IsMySQL565MariaDB1001(m_mdiwnd->m_tunnel,&m_mdiwnd->m_mysql) )))
+		//bud fix-if datatype is timestamp or datetime consider length field also
+		
+		if((datatype.CompareI("timestamp")== 0) || (datatype.CompareI("datetime") == 0 && IsMySQL565MariaDB1001(m_mdiwnd->m_tunnel,&m_mdiwnd->m_mysql) ))
+			
 		{
-			query.AddSprintf("%s ", onupdate.GetString());
-		}*/
-
+			if(len.GetLength()!=0)
+				query.AddSprintf("%s(%s)","ON UPDATE CURRENT_TIMESTAMP",len.GetString());
+			else 
+			query.AddSprintf("ON UPDATE CURRENT_TIMESTAMP");
+		
+		}
+		
+			
+		
 	}
 }
 /*

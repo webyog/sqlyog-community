@@ -5546,7 +5546,7 @@ FrameWindow::HandleCreateEvent(HWND hwnd, MDIWindow *pcquerywnd, wyWChar *eventn
 	}
 
 	if(iscollate)
-		query.Sprintf("show events where db = '%s' COLLATE utf8_bin and name = '%s'", db.GetString(), eventnamestr.GetString());
+		query.Sprintf("show events where BINARY db = '%s' and name = '%s'", db.GetString(), eventnamestr.GetString());
 	else
 		query.Sprintf("show events where db = '%s' and name = '%s'", db.GetString(), eventnamestr.GetString());
 	
@@ -5602,7 +5602,7 @@ FrameWindow::HandleCreateProcedure(HWND hwnd, MDIWindow *pcquerywnd, wyWChar *pr
 	//to trim empty spaces from right, to avoid mysql errors
 	procedurenamestr.RTrim();
 	if(iscollate)
-		query.Sprintf("show procedure status where db = '%s' COLLATE utf8_bin and name = '%s'", db.GetString(), procedurenamestr.GetString());
+		query.Sprintf("show procedure status where BINARY db = '%s' and name = '%s'", db.GetString(), procedurenamestr.GetString());
 	else
 		query.Sprintf("show procedure status where db = '%s' and name = '%s'", db.GetString(), procedurenamestr.GetString());
     res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
@@ -5656,7 +5656,7 @@ FrameWindow::HandleCreateFunction(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *fun
 	//to trim empty spaces from right, to avoid mysql errors
 	functionnamestr.RTrim();
 	if(iscollate)
-		query.Sprintf("show function status where db = '%s' COLLATE utf8_bin and name = '%s'", db.GetString(), functionnamestr.GetString());
+		query.Sprintf("show function status where BINARY db = '%s' and name = '%s'", db.GetString(), functionnamestr.GetString());
 	else
 	query.Sprintf("show function status where db = '%s' and name = '%s'", db.GetString(), functionnamestr.GetString());
 

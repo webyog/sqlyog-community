@@ -1588,7 +1588,7 @@ CopyDatabase::ExportEventsOnParentNotExpanded(HWND hwndtree)
 	//fetching list from server
 	m_gui_routine((void*)m_gui_lparam, "events", 0, wyFalse, FETCHCOPYDATA);
 	if(iscollate)
-		query.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s' COLLATE utf8_bin", 
+		query.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where BINARY `EVENT_SCHEMA` = '%s'", 
 					m_srcdb.GetString());
 	else
 		query.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where `EVENT_SCHEMA` = '%s' ", 
@@ -1872,7 +1872,7 @@ CopyDatabase::HandleProcedureFunOnParentNotExpanded(HWND hwndtree, wyBool isproc
 	{
 		m_gui_routine((void*)m_gui_lparam, "procedures", 0, wyFalse, FETCHCOPYDATA);
 		if(iscollate)
-			query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'PROCEDURE'",m_srcdb.GetString());
+			query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where BINARY `ROUTINE_SCHEMA` = '%s' and ROUTINE_TYPE = 'PROCEDURE'",m_srcdb.GetString());
 		else
 			query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' and ROUTINE_TYPE = 'PROCEDURE'",m_srcdb.GetString());
 	}
@@ -1881,7 +1881,7 @@ CopyDatabase::HandleProcedureFunOnParentNotExpanded(HWND hwndtree, wyBool isproc
 	{
 		m_gui_routine((void*)m_gui_lparam, "functions", 0, wyFalse, FETCHCOPYDATA);	
 		if(iscollate)
-			query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' COLLATE utf8_bin and ROUTINE_TYPE = 'FUNCTION'",m_srcdb.GetString());	
+			query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where BINARY  `ROUTINE_SCHEMA` = '%s' and ROUTINE_TYPE = 'FUNCTION'",m_srcdb.GetString());	
 		else
 			query.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s' and ROUTINE_TYPE = 'FUNCTION'",m_srcdb.GetString());	
 	}
