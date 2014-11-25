@@ -677,9 +677,7 @@ void
 MDIWindow::OnMDIActivate(HWND hwnd, WPARAM wparam, LPARAM lparam)
 {
 	wyInt32   index;
-    
-	/// Change the content of the combo box.
-
+	
     pGlobals->m_pcmainwin->AddTextInCombo(m_database.GetAsWideChar());
 	pGlobals->m_pcmainwin->AddTextInStatusBar(m_statusbartext.GetAsWideChar());
 
@@ -1026,6 +1024,7 @@ MDIWindow::OnWmNotify(HWND hwnd, WPARAM wparam, LPARAM lparam)
         
 		if(m_executing == wyTrue /*|| m_pingexecuting == wyTrue*/)
         {
+			
             FrameWindow::ShowQueryExecToolTip(wyTrue);
 			return 0;
         }
