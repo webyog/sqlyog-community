@@ -3127,8 +3127,8 @@ StartTransaction(Tunnel *tunnel, MYSQL *mysql)
 {
 	wyString query;
 	MYSQL_RES *res;
-	
-	query.Sprintf("set autocommit = 0");
+	//abhishek--use transaction instead of autocommit=0
+	query.Sprintf("SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;START TRANSACTION;");
 	res = SjaExecuteAndGetResult(tunnel, &mysql, query);
 
 	if(!res && mysql->affected_rows == -1)
