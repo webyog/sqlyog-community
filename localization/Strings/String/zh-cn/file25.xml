@@ -12,4 +12,10 @@
 	<string name="3638">试用</string>
 	<string name="3639">天试用离开</string>
 	<string name="3640">天试用离开</string>
+	<string name="3641">与复制关联的触发器</string>
+	<string name="3642">你是否想保存当前布局？</string>
+	<string name="3643">保存选项</string>
+	<string name="3644">保存当前布局到任务文件中以作以后使用。</string>
+	<string name="3645">您希望在保存当前配置到作业文件后运行，还是不保存就运行？</string>
+	<string name="3646">指定作业文件：</string>
 </resources>

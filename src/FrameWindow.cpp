@@ -10370,7 +10370,7 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 	wyIni inimgr;
 	
 	
-	wyBool	isfileopen = wyTrue;
+	wyBool	isfileopen = wyTrue, isinitfired=wyFalse;
 	
     wyWChar				directory[MAX_PATH+64] = {0},directorybackup[MAX_PATH+64] = {0};
     wyInt32				focuspos,firstindex = 0;
@@ -10485,12 +10485,23 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 			{
 			WaitForSingleObject(thread_handle_l[j], INFINITE);
 			CloseHandle(thread_handle_l[j]);
+			
 			PostMessage(pGlobals->m_pcmainwin->m_hwndrestorestatus, UM_UPDATE_PROGRESS, 0, 0);
 			if(!my_arg[j].conninfo.m_mysql )
 			{
 				failedconnections->AddSprintf("%s\r\n", my_arg[j].conninfo.m_title.GetString());
 				pGlobals->m_mdiwlist->Insert(my_arg[j].tempmdilist);
 				continue;
+			}
+			else
+			{
+				
+				if(isinitfired==wyFalse)
+				{Tunnel	*tunnel = my_arg[j].conninfo.m_tunnel;
+				VERIFY( tunnel->mysql_init((MYSQL*)0));
+				isinitfired=wyTrue;
+				}
+				
 			}
 			if(pGlobals->m_pcmainwin->m_hwndconntab == NULL)
 			{

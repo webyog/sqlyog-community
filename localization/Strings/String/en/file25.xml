@@ -12,4 +12,11 @@
 	<string name="3638">TRY</string>
 	<string name="3639">days trial left</string>
 	<string name="3640">day trial left</string>
+	<string name="3641">Copy associated triggers</string>
+	<string name="3642">Do you want to save current Configuration?</string>
+	<string name="3643">&Saving options</string>
+	<string name="3644"> Save current configuration in a jobfile for future use.</string>
+	<string name="3645">Do you want to run after saving current configuration in a job file or run without saving?</string>
+	<string name="3646">Specify Job File:</string>
+	
 </resources>

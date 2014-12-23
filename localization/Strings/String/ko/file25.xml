@@ -12,4 +12,10 @@
 	<string name="3638">시도</string>
 	<string name="3639">일 재판 왼쪽</string>
 	<string name="3640">일 재판 왼쪽</string>
+	<string name="3641">관련 트리거 복사</string>
+	<string name="3642">현재 설정상태를 저장하시겠습니까?</string>
+	<string name="3643">저장 옵션</string>
+	<string name="3644">현재 설정을 추후에 사용하기 위해 작업파일로 저장하기.</string>
+	<string name="3645">현재 설정내용을 작업 파일에 저장하고 계속 하시겠습니까 아니면 저장하지 않으시겠습니까?</string>
+	<string name="3646">작업 파일 지정:</string>
 </resources>

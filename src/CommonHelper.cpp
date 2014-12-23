@@ -20,6 +20,8 @@
 #include <shlobj.h>
 #include <mlang.h>
 #include <Tlhelp32.h>
+#else
+ #include <unistd.h>
 #endif
 
 #include <string>
@@ -3662,7 +3664,7 @@ SetMySQLOptions(ConnectionInfo *conn, Tunnel *tunnel, PMYSQL pmysql, wyBool isse
 {
 	wyString		strtimeout, sqlmode;
 	wyInt32		timeout = 0;
-
+	
 	if(!conn || !tunnel)
 		return;
     
@@ -3676,10 +3678,28 @@ SetMySQLOptions(ConnectionInfo *conn, Tunnel *tunnel, PMYSQL pmysql, wyBool isse
 		mysql_options(*pmysql, MYSQL_OPT_COMPRESS, 0);
 
 	//set pwd cleartext
-	/*if(conn->m_ispwdcleartext == wyTrue)
-		mysql_options(*pmysql, MYSQL_ENABLE_CLEARTEXT_PLUGIN, (const char *)"true");*/
+	/*if(conn->m_ispwdcleartext == wyTrue)*/
+#ifdef _WIN32
+	TCHAR curdir[MAX_PATH];
+	wyString wyDir;
 
+	GetCurrentDirectory(MAX_PATH-1, curdir);
+	wyDir.SetAs(curdir);
+	wyDir.Add("\\");
+	mysql_options(*pmysql,MYSQL_PLUGIN_DIR ,wyDir.GetString());
+#else
+
+   
+	char cwd[1024];
+	int len = strlen(getcwd(cwd, sizeof(cwd)-2));
+	if (getcwd(cwd, sizeof(cwd)) != NULL) 
+	{
+		cwd[len]='/';
+		cwd[len+1] = '\0';
+	}
 	
+	mysql_options(*pmysql,MYSQL_PLUGIN_DIR ,cwd);
+#endif
     //mysql_options(*pmysql, MYSQL_OPT_LOCAL_INFILE, NULL);
 	//unsigned int read_timeout = 10;
     //mysql_options(*pmysql, MYSQL_OPT_READ_TIMEOUT, reinterpret_cast<const char*>(&read_timeout));
