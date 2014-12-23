@@ -719,6 +719,7 @@
 #define IDC_TRANSACTIONENABLE           1467
 #define IDC_CPY_BULKINSERT              1467
 #define IDC_CPY_DEFINER                 1468
+#define IDC_CPY_ASCTRIGGERS             1401
 #define IDC_POWERTOOLSRESTOREALL        1469
 #define IDC_OTHERSRESTOREALL            1469
 #define IDC_NOTNOW                      1488

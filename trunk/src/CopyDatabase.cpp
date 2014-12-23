@@ -79,6 +79,7 @@ CopyDatabase::CopyDatabase()
     m_selalltables = wyFalse;
 	m_isremdefiner = wyFalse;
 	m_iscreatedb = wyFalse;
+	m_iscopytrigger=wyFalse;
 }
 
 CopyDatabase::~CopyDatabase()
@@ -103,6 +104,7 @@ CopyDatabase::Create(HWND hwndparent, Tunnel * tunnel, PMYSQL umysql, wyChar *db
 	m_srcmysql			= umysql;
 	m_srctunnel			= tunnel;
 	m_dontnotify		= wyFalse;
+	m_iscopytrigger      =wyFalse;
     //if table is valid, then set m_table
     if(table)
 	    m_table.SetAs(table);
@@ -146,7 +148,7 @@ CopyDatabase::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		VERIFY(pcd->m_hwndcombo = GetDlgItem(hwnd, IDC_SOURCEDB));
 		VERIFY(pcd->m_hwndcombodb = GetDlgItem(hwnd, IDC_SOURCEDB2));
 		pcd->CreateImageList();
-		pcd->AddInitData();		
+		pcd->AddInitData();	
 		break;
 
 	case WM_HELP:
@@ -171,11 +173,76 @@ CopyDatabase::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_NOTIFY:
+		{
 		if(lpnm->idFrom == IDC_TREE && lpnm->code == NM_CLICK)
+			{
 			HandleTreeViewItem(lParam, wParam);
+			if(pcd->m_iscopytrigger==wyTrue)
+			{
+				SetCursor(LoadCursor(NULL, IDC_WAIT));
+				HWND htree;
+				TVITEM		        tvi;
+				wyWChar             temptext[SIZE_1024] = {0};
+				VERIFY(htree=GetDlgItem(hwnd, IDC_TREE));
+				ZeroMemory(&tvi, sizeof(TVITEM));
+				tvi.mask       = TVIF_IMAGE | TVIF_TEXT;
+				tvi.pszText    = temptext;
+				tvi.cchTextMax = SIZE_1024;
+				tvi.hItem      = TreeView_GetSelection(htree);
+				wyString table_name;
+				TreeView_GetItem(htree, &tvi);	
+				if(tvi.iImage==NTABLE)
+				{
+					if(TreeView_GetCheckState(htree, tvi.hItem)==0)
+					{
+						table_name.SetAs(tvi.pszText);
+						pcd->FindTrigerAndCheck(htree,&table_name,wyFalse);
+					}
+
+					else
+					{
+						table_name.SetAs(tvi.pszText);
+						pcd->FindTrigerAndCheck(htree,&table_name,wyTrue);
+					}
+				}	
+			SetCursor(LoadCursor(NULL, IDC_ARROW));
+			}
+		}
 		if((ptvkd->hdr.idFrom == IDC_TREE) && ptvkd->wVKey == VK_SPACE)
-			HandleTreeViewItem(lParam, wParam, wyTrue);
-				
+		{HandleTreeViewItem(lParam, wParam, wyTrue);
+		if(pcd->m_iscopytrigger==wyTrue){
+				SetCursor(LoadCursor(NULL, IDC_WAIT));
+				HWND htree;
+				TVITEM		        tvi;
+				wyWChar             temptext[SIZE_1024] = {0};
+				VERIFY(htree=GetDlgItem(hwnd, IDC_TREE));
+				ZeroMemory(&tvi, sizeof(TVITEM));
+				tvi.mask       = TVIF_IMAGE | TVIF_TEXT;
+				tvi.pszText    = temptext;
+				tvi.cchTextMax = SIZE_1024;
+				tvi.hItem      = TreeView_GetSelection(htree);
+				wyString table_name;
+				TreeView_GetItem(htree, &tvi);	
+				if(tvi.iImage==NTABLE)
+				{
+					if(TreeView_GetCheckState(htree, tvi.hItem)==0)
+					{
+						table_name.SetAs(tvi.pszText);
+						pcd->FindTrigerAndCheck(htree,&table_name,wyFalse);
+					}
+
+					else
+					{
+						table_name.SetAs(tvi.pszText);
+						pcd->FindTrigerAndCheck(htree,&table_name,wyTrue);
+					}
+				}	
+			SetCursor(LoadCursor(NULL, IDC_ARROW));
+			}
+		
+		
+		}
+		
 		if(lpnm->code == TVN_ITEMEXPANDING )
 		{
 			if(treeview->itemNew.iImage == NTABLES)
@@ -185,7 +252,7 @@ CopyDatabase::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			return pcd->OnItemExpandingHelper(lpnm->hwndFrom, (LPNMTREEVIEW)lParam);			
 		}
-
+		}
 		break;
 	case WM_COMMAND:
 		pcd->OnWmCommand(hwnd, wParam);
@@ -596,6 +663,17 @@ CopyDatabase::OnWmCommand(HWND hwnd, WPARAM wparam)
 			m_isremdefiner = wyFalse;
 		//m_isremdefiner = m_isremdefiner?wyFalse:wyTrue;
 		break;
+    case IDC_CPY_ASCTRIGGERS:
+		if(SendMessage(GetDlgItem(hwnd, IDC_CPY_ASCTRIGGERS), BM_GETCHECK, 0, 0) == BST_CHECKED)
+		{
+		m_iscopytrigger=wyTrue;
+		SetCursor(LoadCursor(NULL, IDC_WAIT));
+		ExpandAndFillTriggers(hwnd);
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
+		}
+		else
+          m_iscopytrigger=wyFalse;
+		break;
 	case IDC_SOURCEDB:
 		if(HIWORD(wparam) == CBN_SELCHANGE)
 			OnCBSelChange(hwnd);
@@ -636,6 +714,161 @@ CopyDatabase::OnCBSelChange(HWND hwnd)
 	SetCursor(LoadCursor(NULL, IDC_ARROW));
 	VERIFY(SendMessage(GetDlgItem(hwnd, IDC_TREE), WM_SETREDRAW, TRUE, 0));
 }
+void CopyDatabase::ExpandAndFillTriggers(HWND hwnd)
+{
+	HWND htree;
+	HTREEITEM hrootitem;
+
+	VERIFY(htree = GetDlgItem(hwnd, IDC_TREE));
+	hrootitem = GetObjectsHtreeItem(htree, TXT_TRIGGERS);
+	
+	if(m_selalltables==wyTrue)
+	{
+		
+		TreeView_SetCheckState(htree, hrootitem, 1);
+		CheckAllChilds(htree,hrootitem,wyTrue);
+		TreeView_Expand(htree, hrootitem, TVE_EXPAND);
+
+	}
+	else
+	{
+	TreeView_Expand(htree, hrootitem, TVE_EXPAND);
+	Filltriggers(htree);
+	
+	}
+}
+
+void CopyDatabase::CheckAllChilds(HWND htreeitem,HTREEITEM hrootitem,wyBool check)
+{
+HTREEITEM hti;
+
+for(hti	= TreeView_GetChild(htreeitem,hrootitem); hti; hti = TreeView_GetNextSibling(htreeitem, hti))
+	{
+		if(check==wyTrue)
+		{TreeView_SetCheckState(htreeitem, hti, 1);}
+		else
+		{ TreeView_SetCheckState(htreeitem, hti, 0);}
+     
+
+}
+
+
+
+}
+
+void CopyDatabase::Filltriggers(HWND htree)
+{
+
+HTREEITEM htable,hti;
+TVITEM		tvi = {0};
+	wyWChar     temptext[SIZE_512] = {0};
+	wyInt32     checkstate = 0;
+	wyString    table_name;
+htable = TreeView_GetRoot(htree);
+
+for(hti	= TreeView_GetChild(htree,htable); hti; hti = TreeView_GetNextSibling(htree, hti))
+	{
+		// first see whether the item is checked or not.
+		checkstate = TreeView_GetCheckState(htree, hti);
+		if(!checkstate)
+       		continue;
+	
+		tvi.mask		= TVIF_PARAM |TVIF_HANDLE | TVIF_TEXT;
+		tvi.hItem		= hti;
+		tvi.pszText		= temptext;
+		tvi.cchTextMax	= 512 - 1;
+
+		TreeView_GetItem(htree, &tvi);
+		//now find all triggers and check them in GUI
+		table_name.SetAs(tvi.pszText);
+		FindTrigerAndCheck(htree,&table_name,wyFalse);
+		
+	}
+
+
+
+}
+
+void CopyDatabase::FindTrigerAndCheck(HWND htree, wyString *tablename, wyBool remove)
+{
+
+	wyString    myrowstr, query;
+	MYSQL_RES	*myres = NULL;
+	MYSQL_ROW	myrow;
+	wyBool		ismysql41 = ((GetActiveWin())->m_ismysql41), ret;
+	MDIWindow   *wnd;
+	wyBool		iscollate = wyFalse;
+	VERIFY(wnd = GetActiveWin());
+	if(!wnd)
+		return;
+
+	//we use collate utf8_bin only if lower_case_table_names is 0 and lower_case_file_system is OFF
+	if(GetmySQLCaseVariable(wnd) == 0)
+		if(!IsLowercaseFS(wnd))
+			iscollate = wyTrue;
+	
+	if(iscollate)
+		/*query.Sprintf("select `EVENT_NAME` from `INFORMATION_SCHEMA`.`EVENTS` where BINARY `EVENT_SCHEMA` = '%s'", 
+					m_srcdb.GetString());*/
+	query.Sprintf("SELECT TRIGGER_NAME FROM information_schema.`TRIGGERS` WHERE BINARY EVENT_OBJECT_SCHEMA='%s' AND BINARY EVENT_OBJECT_TABLE='%s'", 
+					m_srcdb.GetString(), tablename->GetString());
+	else
+		query.Sprintf("SELECT TRIGGER_NAME FROM information_schema.`TRIGGERS` WHERE EVENT_OBJECT_SCHEMA='%s' AND EVENT_OBJECT_TABLE='%s'", 
+					m_srcdb.GetString(),tablename->GetString());
+	myres = ExecuteAndGetResult(wnd, m_srctunnel, m_srcmysql, query);
+	if(!myres)
+	{
+		ShowMySQLError(m_hwnddlg, m_srctunnel, m_srcmysql, query.GetString());
+		return;
+	}
+
+	while(myrow = m_srctunnel->mysql_fetch_row(myres))
+	{
+
+		myrowstr.SetAs(myrow[0], ismysql41);
+		 checkcurrenttrigger(htree,&myrowstr, remove);
+		
+
+	}
+			
+
+	m_srctunnel->mysql_free_result(myres);
+
+}
+void CopyDatabase:: checkcurrenttrigger(HWND htreeitem, wyString *triggername, wyBool remove)
+{
+   HTREEITEM htrigger,hti;
+   
+    TVITEM		tvi = {0};
+	wyWChar     temptext[SIZE_512] = {0};
+	wyString    table_name;
+
+htrigger = GetObjectsHtreeItem(htreeitem, TXT_TRIGGERS);
+for(hti	= TreeView_GetChild(htreeitem,htrigger); hti; hti = TreeView_GetNextSibling(htreeitem, hti))
+	{
+		//add or remove triggers one by one.
+	
+		tvi.mask		= TVIF_PARAM |TVIF_HANDLE | TVIF_TEXT;
+		tvi.hItem		= hti;
+		tvi.pszText		= temptext;
+		tvi.cchTextMax	= 512 - 1;
+
+		TreeView_GetItem(htreeitem, &tvi);
+		//now find all triggers and check them in GUI
+		if(wcscmp(temptext, triggername->GetAsWideChar()) == 0)
+		{
+		if(remove==wyFalse)
+		{TreeView_SetCheckState(htreeitem, hti, true);}
+		else
+		{ TreeView_SetCheckState(htreeitem, hti, false );}
+		
+		}
+		
+	}
+
+
+
+}
 
 // Function fills up the combo with diff database from diff connection.
 wyBool
@@ -658,6 +891,7 @@ CopyDatabase::AddInitData()
 	m_p->Add(m_hwnddlg, IDC_STRUC, "StrucOnly", "0", CHECKBOX);
 	m_p->Add(m_hwnddlg, IDC_CPY_BULKINSERT, "CpyBulkInsert", "1", CHECKBOX);
 	m_p->Add(m_hwnddlg, IDC_CPY_DEFINER, "RemoveDefiner", "0", CHECKBOX);
+	m_p->Add(m_hwnddlg, IDC_CPY_ASCTRIGGERS, "Coppyasctriggers", "0", CHECKBOX);
     if(wnd)
         m_srcinfo = &wnd->m_conninfo;
 	
@@ -719,6 +953,8 @@ CopyDatabase::AddInitData()
 		m_isremdefiner = wyTrue;
 	else
 		m_isremdefiner = wyFalse;
+	SendMessage(GetDlgItem(m_hwnddlg, IDC_CPY_ASCTRIGGERS), BM_SETCHECK, BST_UNCHECKED, 0);
+	m_iscopytrigger=wyFalse;
 	//Initialise the treeview
 	InitializeTree(m_hwnddlg, m_srcdb.GetString(), flag);
 
@@ -1174,7 +1410,7 @@ CopyDatabase::GetObjectsHtreeItem(HWND hwnd, wyWChar *object, wyBool isfindroot)
 	{
 		// first see whether the item is checked or not.
 		checkstate = TreeView_GetCheckState(hwnd, hrootitem);
-		if(!checkstate && (isfindroot == wyFalse))
+		if(!checkstate && (isfindroot == wyFalse) && (m_iscopytrigger==wyFalse))
        		continue;
 	
 		tvi.mask		= TVIF_PARAM |TVIF_HANDLE | TVIF_TEXT;
@@ -3480,7 +3716,7 @@ CopyDatabase::EnableDlgWindows(wyBool enable)
     EnableWindow(GetDlgItem(m_hwnddlg, IDC_STRUC), state);
 	EnableWindow(GetDlgItem(m_hwnddlg, IDC_CPY_BULKINSERT), state);
 	EnableWindow(GetDlgItem(m_hwnddlg, IDC_CPY_DEFINER), state);
-
+	EnableWindow(GetDlgItem(m_hwnddlg, IDC_CPY_ASCTRIGGERS), state);
     if(m_is5xobjects == wyTrue)
         EnableWindow(GetDlgItem(m_hwnddlg, IDC_CHK_DROPOBJECTS), state);
     
@@ -3643,6 +3879,7 @@ CopyDatabase::GetCtrlRects()
         IDC_DROP, 0, 0,
         IDC_CPY_BULKINSERT, 0, 0,
 		IDC_CPY_DEFINER, 0, 0,
+		IDC_CPY_ASCTRIGGERS, 0, 0,
         IDC_SUMMARY, 0, 0,
 		IDC_INVISIBLE, 0, 0,
         IDOK, 0, 0,
@@ -3703,6 +3940,7 @@ CopyDatabase::PositionCtrls()
 				case IDC_DROP:
 				case IDC_CPY_BULKINSERT:
 				case IDC_CPY_DEFINER:
+			    case IDC_CPY_ASCTRIGGERS:
 					x = (rect.right - rect.left)/2 + 8 ;
 					break;
 				case IDC_SUMMARY:
@@ -3800,8 +4038,8 @@ CopyDatabase::OnWMSizeInfo(LPARAM lparam)
 {
     MINMAXINFO* pminmax = (MINMAXINFO*)lparam;
 
-    pminmax->ptMinTrackSize.x = m_wndrect.right - m_wndrect.left;
-    pminmax->ptMinTrackSize.y = m_wndrect.bottom - m_wndrect.top;
+    pminmax->ptMinTrackSize.x = m_wndrect.right - m_wndrect.left+20;
+    pminmax->ptMinTrackSize.y = m_wndrect.bottom - m_wndrect.top+20;
 }
 
 void

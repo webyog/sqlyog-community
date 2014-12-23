@@ -264,6 +264,8 @@ public:
     wyBool          m_selalltables;
 
 	wyBool          m_isremdefiner;
+	//flag to tell whether copy triggers with tables
+	wyBool           m_iscopytrigger;
 	/// List to store the dialogbox component values
 	
 	List				m_controllist;
@@ -770,8 +772,13 @@ private:
 	*/
 	void    Delete(List *list);
 	void    OnCBSelChange(HWND hwnd);
+	void    ExpandAndFillTriggers(HWND hwnd);
+	void    Filltriggers(HWND htreeitem);
+	void    FindTrigerAndCheck(HWND htreeitem, wyString *tablename, wyBool remove);
+	void    checkcurrenttrigger(HWND htreeitem, wyString *triggername, wyBool remove);
 	void    Remove5XRoutines(HTREEITEM htreeitem, HWND hwndtree);
-	wyBool						GetCharsetAndCollation(wyString *charset, wyString *collation);
+	wyBool	GetCharsetAndCollation(wyString *charset, wyString *collation);
+	void  CheckAllChilds(HWND htreeitem,HTREEITEM hrootitem,wyBool check);
 	
 	// To disable bulkinsert when only structure is checked. 
 	/**
