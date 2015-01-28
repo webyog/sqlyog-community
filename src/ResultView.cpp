@@ -1326,7 +1326,7 @@ ResultView::SelectTableComboItem(wyInt32 i)
 void 
 ResultView::ShowHelpFile()
 {
-    ShowHelp("Results%20Tab%20for%20SQLyog%20MySQL%20Tool.htm");
+    ShowHelp("http://sqlyogkb.webyog.com/article/193-result-tab");
 }
 
 //function to get auto incrment column index

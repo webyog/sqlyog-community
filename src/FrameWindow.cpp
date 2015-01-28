@@ -1342,27 +1342,27 @@ FrameWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 			VERIFY(wnd = GetActiveWin());
 
 			if(!wnd)
-				ShowHelp("Getting%20started%20SQLyog%20GUI%20for%20MySQL.htm");
+				ShowHelp("http://sqlyogkb.webyog.com/category/149-getting-started");
 			else
 			{
 				tabimageid = wnd->m_pctabmodule->GetActiveTabImage();
 
 				//If user presses Help in dialog of SchemaDesigner
 				if(tabimageid == IDI_SCHEMADESIGNER_16)
-					ShowHelp("SchemaDesigner%20Introduction%20SQLyog%20MySQL%20GUI.html");
+					ShowHelp("http://sqlyogkb.webyog.com/article/267-the-sqlyog-schema-designer");
 			
 				//If user presses Help in dialog of QueryBuilder
 				else if(tabimageid == IDI_QUERYBUILDER_16)
-					ShowHelp("Query%20Builder%20for%20SQLyog%20MySQL%20Management%20Tool.htm");
+					ShowHelp("http://sqlyogkb.webyog.com/article/186-the-sqlyog-query-builder");
 				else
 				{
 					//Spatial data type err dialog is present,if user preeses the Help in that dialog
 					if(pcmainwin->m_iserrdlg == wyTrue)
-						ShowHelp("Data%20Manipulations%20in%20SQLyog%20MySQL%20GUI.html");
+						ShowHelp("http://sqlyogkb.webyog.com/article/218-data-manipulation");
                     else if(pcmainwin->m_isredindexhelp == wyTrue)
-                        ShowHelp("Redundant%20Indexes%20for%20SQLyog%20MySQL%20Client.htm");
+                        ShowHelp("http://sqlyogkb.webyog.com/article/209-redundant-index-analyzer");
 					else
-						ShowHelp("Getting%20started%20SQLyog%20GUI%20for%20MySQL.htm");
+						ShowHelp("http://sqlyogkb.webyog.com/category/149-getting-started");
 				}	
 			}
 			return wyTrue;
@@ -3411,7 +3411,7 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 		return 0;
 
 	case IDM_HELP_HELP:
-		ShowHelp("What%20is%20SQLyog%20SQLyog%20MySQL%20GUI.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/");
 		break;
 
 	case ACCEL_KEYSHORT:
@@ -9122,27 +9122,27 @@ FrameWindow::OnCreateObjectWmHelp(HWND hwnd, wyChar *object)
 	
 	if(stricmp(object, "createdb") == 0)
 	{
-		ShowHelp("Create%20Database%20SQLyog%20MySQL%20Manager.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/230-create-database");
 	}
 	else if(stricmp(object, "CreateView")== 0 )
 	{
-		ShowHelp("Views%20in%20SQLyog%20MySQL%20Management%20Tool.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/255-views");
 	}
 	else if(stricmp(object, "CreateProcedure")== 0 )
 	{
-		ShowHelp("Stored%20Procedures%20in%20SQLyog%20MySQL%20GUI.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/262-stored-procedures");
 	}
 	else if(stricmp(object, "CreateFunction")== 0 )
 	{
-		ShowHelp("Functions%20in%20SQLyog%20GUI%20for%20MySQL.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/263-functions");
 	}
 	else if(stricmp(object, "CreateEvent")== 0 )
 	{
-		ShowHelp("Event%20in%20SQLyog%20MySQL%20Client.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/265-events");
 	}
 	else if(stricmp(object, "CreateTrigger")== 0 )
 	{
-		ShowHelp("Triggers%20in%20SQLyog%20MySQL%20Client.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/264-triggers");
 	}	
 }
 

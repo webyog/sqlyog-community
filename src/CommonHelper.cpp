@@ -1038,7 +1038,25 @@ CheckForOnUpdate(wyString &strcreate, wyInt32 fieldpos)
 	free(create);
 	return find;
 }
+wyBool GetExpressionValue(wyChar * currentrow, wyString * expression)
+{
+wyChar * find="AS";
+wyBool found=wyFalse;
+const char *ptr = strstr(currentrow,find);
+if(ptr) {
+	found=wyTrue;
+  int index = ptr - currentrow+2;
+   while(currentrow[index]!='P'&& currentrow[index]!='V' )
+   {
+	   expression->AddSprintf("%c",currentrow[index]);
+   
+     index++;
+   }
+}
 
+return found;
+
+}
 wyInt32
 GetBitFieldColumnWidth(wyString &strcreate, wyInt32 fieldpos)
 {

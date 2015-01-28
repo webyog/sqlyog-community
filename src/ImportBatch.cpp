@@ -96,7 +96,7 @@ ImportBatch::DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("Restore%20Database%20from%20a%20Batch%20File%20SQLyog%20MySQL%20GUI.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/235-excute-sql-script");
 		return wyTrue;
 
 	case WM_COMMAND:
@@ -773,7 +773,7 @@ CImportError::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("Restore%20Database%20from%20a%20Batch%20File%20SQLyog%20MySQL%20GUI.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/235-excute-sql-script");
 		return wyTrue;
 
 	case WM_COMMAND:

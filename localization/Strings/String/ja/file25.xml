@@ -18,4 +18,6 @@
 	<string name="3644"> 現在の設定をジョブファイルに保存して後で利用する</string>
 	<string name="3645">現在の設定ジョブファイルにを保存した後実行しますか? または保存しないで実行しますか?</string>
 	<string name="3646">ジョブファイルを指定してください:</string>
+	<string name="3647">  仮想性  </string>
+	<string name="3648">  表現  </string>
 </resources>

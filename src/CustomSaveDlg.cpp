@@ -50,13 +50,9 @@ CustomSaveDlg::Create()
 {
     HGLOBAL     hglobal;
     wyInt32     ret, fontsize;
-    LOGFONT     lf;
     wyString    fontname;
-    HKEY        hkey;
-    DWORD       size = 0, regtype = REG_BINARY;
-    BYTE*       pfontdata;
-    wyBool      failflag = wyFalse;
-    HDC         hdc = GetDC(m_hwndparent);
+    HDC         hdc;
+	NONCLIENTMETRICS    ncm = {0};
 
     //alocate the memory for template
     hglobal = GlobalAlloc(GMEM_ZEROINIT, 1024);
@@ -64,54 +60,12 @@ CustomSaveDlg::Create()
     if (!hglobal)
         return -1;
 
-    //open the registry to find the current message box font
-    if(RegOpenKeyEx(HKEY_CURRENT_USER, L"Control Panel\\Desktop\\WindowMetrics", 0, KEY_READ, &hkey) == ERROR_SUCCESS)
-    {
-        //determine the size of the data to be read
-        if(RegQueryValueEx(hkey, L"MessageFont", NULL, &regtype, NULL, &size) == ERROR_SUCCESS)
-        {
-            //alocate the data
-            if((pfontdata = new(std::nothrow)BYTE[size]))
-            {
-                //read the data
-                RegQueryValueEx(hkey, L"MessageFont", NULL, &regtype, pfontdata, &size);
-
-                //cast the binary data to LOGFONT type and create the font with the read data
-                m_hfont = CreateFontIndirect((LOGFONT*)pfontdata);
-
-                delete[] pfontdata;
-            }
-            else
-            {
-                //set the flag to indicate the use of default font
-                failflag = wyTrue;
-            }
-        }
-        else
-        {
-            //set the flag to indicate the use of default font
-            failflag = wyTrue;
-        }
-
-        //close the key
-        RegCloseKey(hkey);
-    }
-    else
-    {
-        //set the flag to use the default font
-        failflag = wyTrue;
-    }
-
-    //on failure to read the key, use the default GUI font
-    if(failflag == wyTrue)
-    {
-        m_hfont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
-    }
-
-    //get the font name and size
-    GetObject(m_hfont, sizeof(LOGFONT), &lf);
-    fontname.SetAs(lf.lfFaceName);
-    fontsize = -MulDiv(lf.lfHeight, 72, GetDeviceCaps(hdc, LOGPIXELSY));
+	ncm.cbSize = sizeof(NONCLIENTMETRICS);
+    SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
+	m_hfont = CreateFontIndirect(&ncm.lfMessageFont);
+	hdc = GetDC(m_hwndparent);
+	fontname.SetAs(ncm.lfMessageFont.lfFaceName);
+    fontsize = -MulDiv(ncm.lfMessageFont.lfHeight, 72, GetDeviceCaps(hdc, LOGPIXELSY));
     ReleaseDC(m_hwndparent, hdc);
 
     //detect the os version and set the style

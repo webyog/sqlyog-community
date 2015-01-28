@@ -867,7 +867,7 @@ CQueryObject::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 			break;
 		
 		case WM_HELP:
-			ShowHelp("Object%20Browser%20SQLyog%20MySQL%20GUI.htm");
+			ShowHelp("http://sqlyogkb.webyog.com/article/164-object-browser");
 			return 1;
 
 		case WM_KEYDOWN:
@@ -1107,7 +1107,7 @@ CQueryObject::RefreshObjectBrowser(Tunnel * tunnel, PMYSQL mysql)
     { 
 		if(wnd->m_conninfo.m_isssh)
         {
-			server.Sprintf("%s@%s", (*mysql)->user, wnd->m_conninfo.m_localhost.GetString());
+			server.Sprintf("%s@%s", (*mysql)->user, wnd->m_conninfo.m_sshhost.GetString());
 		} 
 		else 
         {

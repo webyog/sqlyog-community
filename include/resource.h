@@ -675,6 +675,7 @@
 #define IDC_TREE                        1385
 #define IDC_STATICIMG                   1398
 #define IDC_OPENFILE                    1399
+#define IDC_CPY_ASCTRIGGERS             1401
 #define IDC_WHERETITLE                  1406
 #define IDC_STRINGS                     1408
 #define IDC_FUNCTIONS                   1409
@@ -719,7 +720,6 @@
 #define IDC_TRANSACTIONENABLE           1467
 #define IDC_CPY_BULKINSERT              1467
 #define IDC_CPY_DEFINER                 1468
-#define IDC_CPY_ASCTRIGGERS             1401
 #define IDC_POWERTOOLSRESTOREALL        1469
 #define IDC_OTHERSRESTOREALL            1469
 #define IDC_NOTNOW                      1488
@@ -867,6 +867,7 @@
 #define IDC__EXPORTAS_GRIP              1644
 #define IDC_TABLEDIAG_GRIP              1645
 #define IDC_EXPDAT_GRIP                 1646
+#define IDC_LINK_PAID                   2901
 #define IDC_COPYDATA_GRIP               1647
 #define IDC_BTNUP                       1649
 #define IDC_BTNDOWN                     1650
@@ -1566,11 +1567,11 @@
 #define IDI_SAVESESSION_16              44130
 #define IDI_OPENSESSION_16              44131
 #define IDI_CLOSESESSION_16             44132
-#define ACCEL_OPENSESSION				44133
-#define ACCEL_SAVESESSION				44134
-#define ACCEL_ENDSESSION				44135
-#define ACCEL_CREATETABLE				44136
-#define ID_UNSORT						44137
+#define ACCEL_OPENSESSION               44133
+#define ACCEL_SAVESESSION               44134
+#define ACCEL_ENDSESSION                44135
+#define ACCEL_CREATETABLE               44136
+#define ID_UNSORT                       44137
 
 // Next default values for new objects
 // 

@@ -116,14 +116,15 @@ TabFields::TabFields(HWND hwnd, TableTabInterfaceTabMgmt* ptabmgmt)
     m_hgridfields       =   NULL;
     m_hchkboxhidelanguageoptions    =   NULL;
     m_wporighidelangopt =   NULL;
-
     m_charsetres        =   NULL;
+	
     m_lastclick         =   -1;
     m_autoincrowid      =   -1;
     m_autoinccol.Clear();
 
     m_mdiwnd            =   GetActiveWin();
     m_ismysql41         =   IsMySQL41(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
+	m_ismariadb52       =   IsMariaDB52(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
     
     m_p = new Persist;
 	m_p->Create("TabbedInterface");
@@ -619,15 +620,15 @@ TabFields::HandleDefaults(MYSQL_ROW myfieldrow, MYSQL_RES *myfieldres, wyString 
 }
 
 wyBool 
-TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres)
+TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres,wyString createtable)
 {
     wyInt32			ret, tempcount, count, fieldno = 0, index = 0, addcol = 0;
     wyInt32         typeindex, fieldindex, charindex;
     wyInt32         i = -1;
     FIELDATTRIBS    *fieldattr = NULL;
     FieldStructWrapper *cwrapobj = NULL,*cwrapobj2 = NULL;
-    wyChar          *tempstr = NULL;
-	wyString        strcreate, query;
+    wyChar          *tempstr = NULL,*currentrowstr=NULL,*wholecreatestring=NULL;
+	wyString        strcreate, query, expressionvalue;
     MYSQL_ROW		myfieldrow;
 	wyString		rowname, datatype;
 	wyString		myrowstr, isnullstr, defaultstr;
@@ -641,7 +642,12 @@ TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres)
 		index = 1;
     else
         addcol = 1;
-
+	if(m_ismariadb52)
+	{
+	wholecreatestring = (wyChar*)strdup(createtable.GetString());
+	currentrowstr=strtok(wholecreatestring,"\n");
+	currentrowstr=strtok(NULL,"\n");
+	}
 	/// Extracting and storing all column values
 	while(myfieldrow = m_mdiwnd->m_tunnel->mysql_fetch_row(myfieldres))
 	{
@@ -734,6 +740,37 @@ TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres)
 				m_autoinccheck = wyTrue;
 				m_autoinccol.SetAs(myfieldrow[CNAME], m_ismysql41);
 			}
+			//adding option for virtaul/persistent columns
+			if(m_ismariadb52)
+			{
+			if(strstr(myrowstr.GetString(), "VIRTUAL"))
+			{
+				fieldattr->m_virtuality.SetAs("VIRTUAL");
+				//for expression value we have to parse createtable string
+				if(expressionvalue.GetLength()!=0)
+					expressionvalue.Clear();
+				if(GetExpressionValue(currentrowstr,&expressionvalue))
+				{
+					fieldattr->m_expression.SetAs(expressionvalue.GetString());
+				
+				}
+			}
+			else if(strstr(myrowstr.GetString(), "PERSISTENT"))
+			{
+				fieldattr->m_virtuality.SetAs("PERSISTENT");
+				if(expressionvalue.GetLength()!=0)
+					expressionvalue.Clear();
+				if(GetExpressionValue(currentrowstr,&expressionvalue))
+				{
+					fieldattr->m_expression.SetAs(expressionvalue.GetString());
+				
+				}
+			}
+			else
+			{
+			fieldattr->m_virtuality.SetAs("(none)");
+			}
+			}
 			//also check for datetime - 5.6.5
 			// on update cannont be true for other datatypes!
             //if((datatype.CompareI("timestamp")== 0 || (datatype.CompareI("datetime") == 0 && IsMySQL565MariaDB1001(m_mdiwnd->m_tunnel,&m_mdiwnd->m_mysql))) && myrowstr.FindI("on update CURRENT_TIMESTAMP") != -1)
@@ -786,14 +823,53 @@ TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres)
 		cwrapobj2 = new FieldStructWrapper(fieldattr, wyFalse);
         m_listwrapperstruct.Insert(cwrapobj);
 		m_listwrapperstruct_2.Insert(cwrapobj2);
+		
+		currentrowstr=strtok(NULL,"\n");
 	}
     return wyTrue;
 }
-
+//function to get expression value from create table statement added in 12.05
+//void
+//TabFields::setExpression(wyString *atrrinbute, wyString *createstring)
+//{
+//wyInt32			regexret = 0;
+//SQLFormatter    formatter;
+//wyString		pattern, res,expression;
+////pattern to find out statring of expression
+//pattern.SetAs("AS[\\s]*\\(");
+////pattern.SetAs("AS");
+//
+////this step will five the substring string from pattern
+//regexret = formatter.MatchStringAndGetResult(createstring->GetString(),
+//					(wyChar*)pattern.GetString(),PCRE_COMPLIE_OPTIONS, &res,
+//					wyTrue, wyTrue);
+////now we will get the current expression of virtual/persistent cloumn
+//if(regexret == -1)
+//		return;
+//
+//else
+//{
+//int i=0;
+//wyChar value;
+////copy everything after AS and befrore VIRTUAL/PERSISTENT in attribute.
+//while(((value=res.GetCharAt(i))!='V')&&(res.GetCharAt(i)!='P'))
+//{
+//expression.SetCharAt(i,value);
+//
+//i++;
+//}
+//atrrinbute->SetAs(expression);
+////now we don't need current expression, we will look into remaining part of create table statement
+//createstring->SetAs(res.GetString()+i);
+//}    
+//
+//
+//}
 wyBool
 TabFields::FetchInitData()
 {
-	MYSQL_RES		*myfieldres;
+	MYSQL_RES		*myfieldres,*myfieldresmariadb;
+	MYSQL_ROW		myfieldrow;
 	wyString        strcreate, query;
 	wyString        tblname(""), dbname("");
 
@@ -813,11 +889,36 @@ TabFields::FetchInitData()
 	    ShowMySQLError(m_hwnd, m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), query.GetString());
 		return wyFalse;
     }
-
-    /// Extracting all field values
-    TraverseEachFieldRow(myfieldres);
-	m_mdiwnd->m_tunnel->mysql_free_result(myfieldres);
+	//getting expression for virtual/persistent coloumn
+	if(m_ismariadb52)
+	{
+		query.Clear();
+		query.Sprintf("show create table %s.%s",dbname.GetString(), tblname.GetString());
+		myfieldresmariadb = ExecuteAndGetResult(m_mdiwnd, m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), query);
 	
+    if(!myfieldresmariadb)
+    {
+	    ShowMySQLError(m_hwnd, m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), query.GetString());
+		return wyFalse;
+    }
+	else
+	{
+	myfieldrow = m_mdiwnd->m_tunnel->mysql_fetch_row(myfieldresmariadb);
+
+	TraverseEachFieldRow(myfieldres,myfieldrow[1]);	
+	 m_mdiwnd->m_tunnel->mysql_free_result(myfieldresmariadb);
+	}
+	
+	
+	
+	}
+    /// Extracting all field values
+	else
+	{
+    TraverseEachFieldRow(myfieldres,"");
+	}
+	m_mdiwnd->m_tunnel->mysql_free_result(myfieldres);
+   
 	return wyTrue;
 }
 
@@ -882,7 +983,13 @@ TabFields::FillInitData()
             CustomGrid_SetText(m_hgridfields, rowno, COLLATION, temp->m_collation.GetString());
             CustomGrid_SetText(m_hgridfields, rowno, CHARSET, temp->m_charset.GetString());
         }
-
+		//filling virtual/Persistent combo box.
+		if(m_ismariadb52)
+		{
+		CustomGrid_SetText(m_hgridfields, rowno, VIRTUALITY , temp->m_virtuality.GetString());
+        SetValidation(rowno, (wyChar*) temp->m_virtuality.GetString());
+		CustomGrid_SetText(m_hgridfields, rowno, EXPRESSION , temp->m_expression.GetString());
+		}
         CustomGrid_SetBoolValue(m_hgridfields, rowno, UNSIGNED + addcol, temp->m_unsigned ? GV_TRUE : GV_FALSE);
         CustomGrid_SetBoolValue(m_hgridfields, rowno, BINARY, temp->m_binary ? GV_TRUE : GV_FALSE);
         CustomGrid_SetBoolValue(m_hgridfields, rowno, ZEROFILL + addcol, temp->m_zerofill ? GV_TRUE : GV_FALSE);
@@ -937,23 +1044,24 @@ TabFields::InitGrid()
 	wyWChar			type[][20] =	{	L"tinyint", L"smallint", L"mediumint", L"int", L"bigint", L"real", L"bit", L"bool", L"boolean",
 										L"float", L"double", L"decimal", L"date", L"datetime", L"timestamp", L"numeric",  L"time", L"year", L"char", 
 										L"varchar", L"tinyblob", L"tinytext", L"text",L"blob", L"mediumblob", L"mediumtext", L"longblob", L"longtext", 
-										L"enum", L"set", L"binary", L"varbinary" };    
+										L"enum", L"set", L"binary", L"varbinary" };  
+	wyWChar virtuallity[][20]= {  L"(none)", L"VIRTUAL",  L"PERSISTENT"};
     
 	// grid headers
 	wyChar		    *heading[] = {_("Column Name"), _("Data Type"), _("Length"), _("Default"),  _("PK?"), _("Binary?"), _("Not Null?"), 
-		                          _("Unsigned?"), _("Auto Incr?"), _("Zerofill?"), _("Charset"), _("Collation"), _("On Update"), _("Comment")};			
+		                          _("Unsigned?"), _("Auto Incr?"), _("Zerofill?"), _("Charset"), _("Collation"), _("On Update"), _("Comment"),  _("Virtuality"),_("Expression")};			
 	
-	VOID		    *listtype[] = {NULL, (VOID*)type, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL};
+	VOID		    *listtype[] = {NULL, (VOID*)type, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, (void*)virtuallity,NULL};
 
-	wyInt32			elemsize[] = {  0, sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	wyInt32			elemcount[] = {0, sizeof(type)/sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0};
+	wyInt32			elemsize[] = {  0, sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,sizeof(virtuallity[0]),0};
+	wyInt32			elemcount[] = {0, sizeof(type)/sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, sizeof(virtuallity)/sizeof(virtuallity[0]),0};
 	wyInt32			mask[] = {GVIF_TEXT, GVIF_LIST, GVIF_TEXT, GVIF_TEXT,  GVIF_BOOL, GVIF_BOOL, GVIF_BOOL, GVIF_BOOL, 
-		                      GVIF_BOOL, GVIF_BOOL, GVIF_LIST, GVIF_LIST, GVIF_BOOL, GVIF_TEXT};
+		                      GVIF_BOOL, GVIF_BOOL, GVIF_LIST, GVIF_LIST, GVIF_BOOL, GVIF_TEXT,GVIF_LIST,GVIF_TEXT};
 	
-    wyInt32			cx[] = { 125, 95, 40, 80, 40, 60, 70, 70, 75, 70,  90, 140, 80, 150	};//default/min col width
+    wyInt32			cx[] = { 125, 95, 40, 80, 40, 60, 70, 70, 75, 70,  90, 140, 80, 150,20,95};//default/min col width
 
 	wyInt32			format[] = { GVIF_LEFT, GVIF_LEFT, GVIF_LEFT, GVIF_LEFT, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, 
-		                         GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_LEFT, GVIF_CENTER };
+		                         GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_CENTER, GVIF_LEFT, GVIF_CENTER,GVIF_LEFT,GVIF_LEFT};
 
 	wyInt32			width = 0;
 	wyString		colname, dbname(RETAINWIDTH_DBNAME), tblname("__create_table");
@@ -993,7 +1101,11 @@ TabFields::InitGrid()
         {
 			continue;
         }
-
+		if((counter ==  VIRTUALITY +1 || counter == EXPRESSION+1) && !m_ismariadb52)
+		{
+		continue;
+		
+		}
 		// if the column being entered is last and the mysql version is < 4.1, then
 		// we exit as the last column is for column level comments which is only supported
 		// in v4.1
@@ -1096,6 +1208,7 @@ TabFields::GenerateCreateQuery(wyString& str)
         /// concatinating extra and default values
         GetExtraValues(query, pfieldattribs);
         GetDefaultValue(query, cwrapobj);
+		GetVirtualOrPersistentValue( query, cwrapobj);
 
         if(m_ismysql41)
         {
@@ -1305,6 +1418,7 @@ TabFields::GetNewAndModifiedColumns(wyString &columnsstr)
 
 
         reorderstr.Clear();
+
         if(!cwrapobj->m_oldval)     //..if field is newly added
         {
             GetColumnDefinition(cwrapobj, columnsstr, wyTrue);
@@ -1328,6 +1442,7 @@ TabFields::GetNewAndModifiedColumns(wyString &columnsstr)
             coldef.Clear();
             
             /// Getting the column defintion
+			
             GetColumnDefinition(cwrapobj, coldef, wyFalse);
 
             /// Checking whether the column is re-ordered?
@@ -1447,158 +1562,205 @@ TabFields::GetNewAndModifiedColumns(wyString &columnsstr)
 }
 
 void
-TabFields::GetColumnDefinition(FieldStructWrapper* cwrapobj, wyString &coldef, wyBool isnew)
+	TabFields::GetColumnDefinition(FieldStructWrapper* cwrapobj, wyString &coldef, wyBool isnew)
 {
-    wyString        newcolumns("");
-    wyString        colnamestr;
-    FIELDATTRIBS    *fieldattr = NULL;
-    wyString        defvalue(""), onupdate("");
-    wyString        _comment("");
+	wyString        newcolumns("");
+	wyString        colnamestr;
+	FIELDATTRIBS    *fieldattr = NULL;
+	wyString        defvalue(""), onupdate(""),onvirtualpersitentcolumns("");
+	wyString        _comment("");
+	wyBool skip=wyFalse, dropandrecreate=wyFalse;
+	//we can not add other attributes if we are adding VIRTUAL/PERSIATENT 
+	if(m_ismariadb52 && ((cwrapobj->m_newval->m_virtuality.GetLength()>6)&&(cwrapobj->m_newval->m_expression.GetLength()!=0)))
+		skip=wyTrue;
+	//Altering a Virtual/persuatent column is not allowed we must drop and recreate 
+	dropandrecreate=IsDropAndRecreateRequired(cwrapobj,isnew);
+	fieldattr = cwrapobj->m_newval;
+	if(!fieldattr)
+		return;
 
-    fieldattr = cwrapobj->m_newval;
-    if(!fieldattr)
-        return;
+	/// Checking which clause to use for column-definition
+	if(isnew || dropandrecreate )
+	{ //dropping and recreating 
+		if(dropandrecreate)
+		{
+			newcolumns.AddSprintf("\r\n  DROP COLUMN `%s` ,",fieldattr->m_name.GetString() );
+			newcolumns.Add("\r\n  add column ");
+		}
+		else
+		{
+			newcolumns.Add("\r\n  add column ");
+		}
+	}
+	else
+	{
+		if(!cwrapobj->m_oldval)
+			return;
+		colnamestr.SetAs(cwrapobj->m_oldval->m_name);
+		colnamestr.FindAndReplace("`", "``");
+		newcolumns.AddSprintf("\r\n  change `%s` ", colnamestr.GetString());
+	}
 
-    /// Checking which clause to use for column-definition
-    if(isnew)
-    {
-        newcolumns.Add("\r\n  add column ");
-    }
-    else
-    {
-        if(!cwrapobj->m_oldval)
-            return;
-        colnamestr.SetAs(cwrapobj->m_oldval->m_name);
-        colnamestr.FindAndReplace("`", "``");
-        newcolumns.AddSprintf("\r\n  change `%s` ", colnamestr.GetString());
-    }
-    
-    colnamestr.SetAs(fieldattr->m_name);
-    colnamestr.FindAndReplace("`", "``");
+	colnamestr.SetAs(fieldattr->m_name);
+	colnamestr.FindAndReplace("`", "``");
 
-    newcolumns.AddSprintf("`%s` %s", colnamestr.GetString(), fieldattr->m_datatype.GetString());
+	newcolumns.AddSprintf("`%s` %s", colnamestr.GetString(), fieldattr->m_datatype.GetString());
 
-    if(fieldattr->m_len.GetLength())
-        newcolumns.AddSprintf("(%s) ", fieldattr->m_len.GetString());
-    else
-        newcolumns.Add(" ");
-    
-    if(m_ismysql41)
-    {
-        /// adding charset and collation if the user has specified
-        if(fieldattr->m_charset.GetLength() && fieldattr->m_charset.CompareI(STR_DEFAULT) != 0)
+	if(fieldattr->m_len.GetLength())
+		newcolumns.AddSprintf("(%s) ", fieldattr->m_len.GetString());
+	else
+		newcolumns.Add(" ");
+
+	if(m_ismysql41 && !skip)
+	{
+		/// adding charset and collation if the user has specified
+		if(fieldattr->m_charset.GetLength() && fieldattr->m_charset.CompareI(STR_DEFAULT) != 0)
 			newcolumns.AddSprintf("CHARSET %s ", fieldattr->m_charset.GetString());
 
-        if(fieldattr->m_collation.GetLength() && fieldattr->m_collation.CompareI(STR_DEFAULT) != 0)
+		if(fieldattr->m_collation.GetLength() && fieldattr->m_collation.CompareI(STR_DEFAULT) != 0)
 			newcolumns.AddSprintf("COLLATE %s ", fieldattr->m_collation.GetString());
-    }
+	}
 
-    // first get the default value.
-    if((cwrapobj->m_oldval) && (fieldattr->m_datatype.CompareI("timestamp")== 0) && (fieldattr->m_onupdate))
+	// first get the default value.
+	if((cwrapobj->m_oldval) && (fieldattr->m_datatype.CompareI("timestamp")== 0) && (fieldattr->m_onupdate))
 		onupdate.SetAs(" on update CURRENT_TIMESTAMP");
 
-    GetDefaultValue(defvalue, cwrapobj);
-    /*
-    if(fieldattr->m_default.GetLength())
-    {
-        if(fieldattr->m_notnull && (fieldattr->m_default.CompareI("NULL") == 0))
-		{
-			defvalue.Sprintf("");
-		}
+	GetDefaultValue(defvalue, cwrapobj);
 
-		//If the datatype is timestamp and default string is 0, NULL or CURRENT_TIMESTAMP, then no need to add quotes
-        else if((fieldattr->m_default.CompareI(CURRENT_TIMESTAMP) == 0
-            || (((fieldattr->m_datatype.CompareI("timestamp")) == 0) && ((fieldattr->m_default.CompareI("0")) == 0)))
-            )
-		{
-			defvalue.Sprintf("DEFAULT %s ", fieldattr->m_default.GetString());
-		}
-        /// add default value without quote if the datatype is numeric
-        else if(IsDatatypeNumeric(fieldattr->m_datatype))
-        {
-            defvalue.Sprintf("DEFAULT %s ", fieldattr->m_default.GetString());
-        }
-		else
-        {
-            if(fieldattr->m_default.Compare("''") != 0)
-            {
-                // First Search for `` pattern
-                if(fieldattr->m_default.GetCharAt(0) == '`' && fieldattr->m_default.GetCharAt(fieldattr->m_default.GetLength() - 1) == '`' 
-                    && fieldattr->m_default.GetLength() == MAXLENWITHBACKTICKS)
-                {
-                    if(fieldattr->m_default.Find("''", 1))
-				        fieldattr->m_default.SetAs("''");
-                }
-                wyChar *tbuff = GetEscapedValue(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), fieldattr->m_default.GetString());
-                defvalue.Sprintf("default '%s'%s", tbuff, onupdate.GetString());
-            }
-            else
-                defvalue.Sprintf("default ''%s", onupdate.GetString());
-        }
-    }
-    */
-    newcolumns.AddSprintf("%s%s%s", 
+	/*
+	if(fieldattr->m_default.GetLength())
+	{
+	if(fieldattr->m_notnull && (fieldattr->m_default.CompareI("NULL") == 0))
+	{
+	defvalue.Sprintf("");
+	}
+
+	//If the datatype is timestamp and default string is 0, NULL or CURRENT_TIMESTAMP, then no need to add quotes
+	else if((fieldattr->m_default.CompareI(CURRENT_TIMESTAMP) == 0
+	|| (((fieldattr->m_datatype.CompareI("timestamp")) == 0) && ((fieldattr->m_default.CompareI("0")) == 0)))
+	)
+	{
+	defvalue.Sprintf("DEFAULT %s ", fieldattr->m_default.GetString());
+	}
+	/// add default value without quote if the datatype is numeric
+	else if(IsDatatypeNumeric(fieldattr->m_datatype))
+	{
+	defvalue.Sprintf("DEFAULT %s ", fieldattr->m_default.GetString());
+	}
+	else
+	{
+	if(fieldattr->m_default.Compare("''") != 0)
+	{
+	// First Search for `` pattern
+	if(fieldattr->m_default.GetCharAt(0) == '`' && fieldattr->m_default.GetCharAt(fieldattr->m_default.GetLength() - 1) == '`' 
+	&& fieldattr->m_default.GetLength() == MAXLENWITHBACKTICKS)
+	{
+	if(fieldattr->m_default.Find("''", 1))
+	fieldattr->m_default.SetAs("''");
+	}
+	wyChar *tbuff = GetEscapedValue(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), fieldattr->m_default.GetString());
+	defvalue.Sprintf("default '%s'%s", tbuff, onupdate.GetString());
+	}
+	else
+	defvalue.Sprintf("default ''%s", onupdate.GetString());
+	}
+	}
+	*/
+	newcolumns.AddSprintf("%s%s%s", 
 		((fieldattr->m_unsigned)?("UNSIGNED "):("")),
 		((fieldattr->m_zerofill)?("ZEROFILL "):("")),
 		((fieldattr->m_binary) && (!m_ismysql41)?("BINARY "):(""))
-        );
+		);
 
-    if(fieldattr->m_default.GetLength() || fieldattr->m_onupdate )
-        newcolumns.AddSprintf("%s ", defvalue.GetString());
+	if(fieldattr->m_default.GetLength() || fieldattr->m_onupdate )
+		newcolumns.AddSprintf("%s ", defvalue.GetString());
+	if(!skip)
+	{
+		newcolumns.AddSprintf("%s%s", 
+			((fieldattr->m_notnull)?("NOT NULL "):("NULL ")),
+			((fieldattr->m_autoincr)?("Auto_increment ") :(""))
+			);
+	}
+	if(skip)
+	{
+		
+			newcolumns.AddSprintf("AS (%s)", cwrapobj->m_newval->m_expression.GetString());
+			if(cwrapobj->m_newval->m_virtuality.GetLength()!=0)
+				newcolumns.AddSprintf("%s", cwrapobj->m_newval->m_virtuality.GetString());
+			
 
-    newcolumns.AddSprintf("%s%s", 
-        ((fieldattr->m_notnull)?("NOT NULL "):("NULL ")),
-        ((fieldattr->m_autoincr)?("Auto_increment ") :(""))
-        );
+	}
+	newcolumns.AddSprintf(" %s", onvirtualpersitentcolumns.GetString());
+	GetCommentValue(_comment, fieldattr);
 
-    GetCommentValue(_comment, fieldattr);
+	if(_comment.GetLength())
+		newcolumns.AddSprintf(" %s", _comment.GetString());
 
-    if(_comment.GetLength())
-        newcolumns.AddSprintf(" %s", _comment.GetString());
+	newcolumns.RTrim();
+	coldef.Add(newcolumns.GetString());
+}
+wyBool     TabFields::IsDropAndRecreateRequired(FieldStructWrapper* cwrapobj, wyBool isnew)
+{
 
-    newcolumns.RTrim();
-    coldef.Add(newcolumns.GetString());
+if(!isnew && m_ismariadb52)
+{
+ if((cwrapobj->m_newval->m_virtuality.CompareI("(none)")!=0)&&(cwrapobj->m_oldval->m_virtuality.CompareI(cwrapobj->m_newval->m_virtuality.GetString())!=0)&&(cwrapobj->m_newval->m_expression.GetLength()!=0))
+   {
+	return wyTrue;
+	}
+ else if((cwrapobj->m_oldval->m_virtuality.CompareI(cwrapobj->m_newval->m_virtuality.GetString())==0)&&(cwrapobj->m_newval->m_expression.GetLength()!=0))
+	 return wyTrue;
+ else
+     return wyFalse;
+
+
+}
+else
+{
+	return wyFalse;
 }
 
+
+}
 void        
-TabFields::GetCommentValue(wyString& query, FIELDATTRIBS*   pfieldattribs)
+	TabFields::GetCommentValue(wyString& query, FIELDATTRIBS*   pfieldattribs)
 {
 	wyString		dbdefaultvalstr;
 
-    // get comments but we will need to real_escape as somebody can put ' in a comment
-    if(pfieldattribs->m_comment.GetLength())
+	// get comments but we will need to real_escape as somebody can put ' in a comment
+	if(pfieldattribs->m_comment.GetLength())
 	{
 		wyChar * commentbuff = GetEscapedValue(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), pfieldattribs->m_comment.GetString());
-        query.AddSprintf("COMMENT '%s'", commentbuff);
-        free(commentbuff);
+		query.AddSprintf("COMMENT '%s'", commentbuff);
+		free(commentbuff);
 		return;
 	}
 }
 
 void        
-TabFields::GetExtraValues(wyString& query, FIELDATTRIBS*   pfieldattribs)
+	TabFields::GetExtraValues(wyString& query, FIELDATTRIBS*   pfieldattribs)
 {
 
-    // Add the extra values like NOT NULL, AUTOINCREMENT etc.
-    // Customgrid sends BOOL value as GV_TRU
+	// Add the extra values like NOT NULL, AUTOINCREMENT etc.
+	// Customgrid sends BOOL value as GV_TRU
 	wyString		dbdefaultvalstr;
-    
-    if(pfieldattribs->m_unsigned)
-        query.Add("UNSIGNED ");
 
-    if(pfieldattribs->m_zerofill)
-        query.Add("ZEROFILL ");
+	if(pfieldattribs->m_unsigned)
+		query.Add("UNSIGNED ");
 
-    if(pfieldattribs->m_binary)
+	if(pfieldattribs->m_zerofill)
+		query.Add("ZEROFILL ");
+
+	if(pfieldattribs->m_binary)
 		query.Add("BINARY ");
 
-    if(pfieldattribs->m_notnull)
-        query.Add("NOT NULL ");
+	if(pfieldattribs->m_notnull)
+		query.Add("NOT NULL ");
 
-    if(pfieldattribs->m_autoincr)
-    {
+	if(pfieldattribs->m_autoincr)
+	{
 		query.Add("AUTO_INCREMENT ");
-    }
+	}
 }
 
 void
@@ -1683,6 +1845,32 @@ TabFields::GetDefaultValue(wyString& query, FieldStructWrapper* cwrapobj)
 			
 		
 	}
+}
+//function for adding expression and VIRTUAL/PERSIATENT in the query
+void TabFields::GetVirtualOrPersistentValue(wyString& query, FieldStructWrapper* cwrapobj)
+{
+   FIELDATTRIBS    *fieldattr = NULL;
+    wyString	virtuality, expression;
+    wyChar      *tbuff =  NULL;
+	
+    if(!cwrapobj || !cwrapobj->m_newval)
+        return;
+
+    fieldattr = cwrapobj->m_newval;
+	virtuality.SetAs(fieldattr->m_virtuality);
+	expression.SetAs(fieldattr->m_expression);
+	if(!(m_ismariadb52 && (expression.GetLength()!=0) && (virtuality.GetLength()!=0)&& (virtuality.CompareI("(none)")!=0)))
+	{return;}
+	if(expression.GetLength()!=0)
+	{
+		query.AddSprintf("AS ( %s )",expression.GetString());
+	
+	}
+	if(virtuality.GetLength()!=0)
+	{
+	query.AddSprintf(" %s ",virtuality.GetString());
+	}
+
 }
 /*
 wyBool
@@ -2143,6 +2331,11 @@ TabFields::ValidateOnBeginLabelEdit(wyUInt32 row, wyUInt32 col)
             if(CustomGrid_GetBoolValue(m_hgridfields, row, PRIMARY) == wyTrue)
                 return wyFalse;
         }
+		if(m_ismariadb52)
+			 { //if cloumn is virtual or persitent than don't allow it to be NULL from 12.05
+				 if(CustomGrid_GetItemTextLength(m_hgridfields, row, VIRTUALITY)>6)
+                return wyFalse;
+        }
         break;
 
     case UNSIGNED:
@@ -2152,7 +2345,49 @@ TabFields::ValidateOnBeginLabelEdit(wyUInt32 row, wyUInt32 col)
                 return wyFalse;
         }
         break;
-        
+	case PRIMARY:
+		if(m_ismariadb52)
+			 { //if cloumn is virtual or persitent than don't allow it to be primary key from 12.05
+				 if(CustomGrid_GetItemTextLength(m_hgridfields, row, VIRTUALITY)>6)
+                return wyFalse;
+        }
+		break;
+		case DEFVALUE:
+		if(m_ismariadb52)
+			 { //if cloumn is virtual or persitent than don't allow it to be Default value from 12.05
+				 if(CustomGrid_GetItemTextLength(m_hgridfields, row, VIRTUALITY)>6)
+                return wyFalse;
+        }
+		break;
+		case AUTOINCR:
+		if(m_ismariadb52)
+			 { //if cloumn is virtual or persitent than don't allow it to be autoincrement from 12.05
+				 if(CustomGrid_GetItemTextLength(m_hgridfields, row, VIRTUALITY)>6)
+                return wyFalse;
+        }
+		break;
+		//expreesion is not allowed if virtuality is not given
+     case EXPRESSION:
+		   if(m_ismariadb52)
+			 { //if cloumn is virtual or persitent than don't allow it to be primary key from 12.05
+				 if(CustomGrid_GetItemTextLength(m_hgridfields, row, VIRTUALITY)<=6)
+                return wyFalse;
+        }
+		break;
+		 case CHARSETCOL:
+		   if(m_ismariadb52)
+			 { //if cloumn is virtual or persitent than don't allow it to be charset from 12.05
+				 if(CustomGrid_GetItemTextLength(m_hgridfields, row, VIRTUALITY)>6)
+                return wyFalse;
+        }
+		break;
+		 case COLLATIONCOL:
+		   if(m_ismariadb52)
+			 { //if cloumn is virtual or persitent than don't allow it to be colliation from 12.05
+				 if(CustomGrid_GetItemTextLength(m_hgridfields, row, VIRTUALITY)>6)
+                return wyFalse;
+        }
+		break;
 	default:
         break;
 	}
@@ -2206,8 +2441,11 @@ TabFields::ValidateOnEndLabelEdit(WPARAM wParam, LPARAM lParam)
 		if(stricmp((wyChar*)lParam, GV_TRUE)== 0) 
 		{
             // user has checked PRIMARY KEY.
+			
+			
 			CustomGrid_SetBoolValue(hwndgrid, row, NOTNULL + addcol, GV_TRUE);
 			CustomGrid_SetColumnReadOnly(hwndgrid, row, NOTNULL + addcol, wyTrue);
+			
 		} 
 		else if (stricmp((CHAR*)lParam, GV_FALSE) == 0 || stricmp((CHAR*)lParam, "") == 0 )
 		{
@@ -2268,6 +2506,37 @@ TabFields::ValidateOnEndLabelEdit(WPARAM wParam, LPARAM lParam)
         }
 		else
 			CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR + addcol, wyFalse);
+	}
+	if(col==VIRTUALITY && m_ismariadb52)
+	{
+	
+	if(strlen((wyChar*)lParam) >  6)
+	{//we will uncheck every checkbox not required and set them read only if column is VIRTUAL/PERSISTENT
+	CustomGrid_SetBoolValue(hwndgrid, row, AUTOINCR + addcol, GV_FALSE);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR + addcol, wyTrue);
+	//CustomGrid_SetBoolValue(hwndgrid, row, DEFVALUE + addcol, GV_FALSE);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, DEFVALUE + addcol,wyTrue);
+	CustomGrid_SetBoolValue(hwndgrid, row, PRIMARY + addcol, GV_FALSE);
+	 /// Changing the PRIMARY index
+		m_ptabmgmt->m_tabindexes->HandlePrimaryKeyIndex();
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, PRIMARY + addcol, wyTrue);
+	CustomGrid_SetBoolValue(hwndgrid, row, NOTNULL + addcol,GV_FALSE);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, NOTNULL + addcol, wyTrue);
+	////CustomGrid_SetBoolValue(hwndgrid, row, UNSIGNED + addcol, GV_FALSE);
+	//CustomGrid_SetColumnReadOnly(hwndgrid, row, UNSIGNED   + addcol, wyTrue);
+	////CustomGrid_SetBoolValue(hwndgrid, row, ZEROFILL + addcol, GV_FALSE);
+	//CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL   + addcol, wyTrue);
+	CustomGrid_SetBoolValue(hwndgrid, row, ONUPDATECT  + addcol, GV_FALSE);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT   + addcol, wyTrue);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row,  EXPRESSION  + addcol, wyFalse);
+	
+	}
+	else
+	{
+    
+	CustomGrid_SetColumnReadOnly(hwndgrid, row,  EXPRESSION  + addcol, wyTrue);
+	
+	}
 	}
     return wyTrue;
 }
@@ -2345,8 +2614,20 @@ TabFields::OnGVNEndLabelEdit(WPARAM wParam, LPARAM lParam)
     col = HIWORD(wParam);
 
     /// To avoid CustomGrid right-click Issue
-    if(!(col >= 0 && col <= 13))
+
+	if(m_ismariadb52)
+    { //for virtual/persistent columns go till coloumn 14
+		if(!(col >= 0 && col <= 14))
         return 1;
+	}
+	else
+
+	{
+	
+	if(!(col >= 0 && col <= 13))
+        return 1;
+	
+	}
 
     if(!(row >= 0 && row <= CustomGrid_GetRowCount(m_hgridfields)))
         return 1;
@@ -2626,6 +2907,8 @@ TabFields::GetDuplicateFieldAttribsStruct(FIELDATTRIBS* original)
     newstruct->m_charset.SetAs(original->m_charset);
     newstruct->m_collation.SetAs(original->m_collation);
     newstruct->m_comment.SetAs(original->m_comment);
+	newstruct->m_virtuality.SetAs(original->m_virtuality);
+	newstruct->m_expression.SetAs(original->m_expression);
     newstruct->m_next = NULL;
 
     return newstruct;
@@ -2745,6 +3028,7 @@ TabFields::SetValueToStructure(wyUInt32 row, wyUInt32 col, wyChar* data)
                 cwrap->m_newval->m_zerofill = wyFalse;
         }
     }
+	
     if(m_ismysql41 && data)
     {
         switch(col)
@@ -2762,6 +3046,23 @@ TabFields::SetValueToStructure(wyUInt32 row, wyUInt32 col, wyChar* data)
             break;
         }
     }
+	if(m_ismariadb52 && data)
+	{
+	
+	 switch(col)
+        {
+        case VIRTUALITY:
+            cwrap->m_newval->m_virtuality.SetAs(data);
+            break;
+        
+        case EXPRESSION:
+			{cwrap->m_newval->m_expression.SetAs(data);
+			/*cwrap->m_oldval->m_virtuality.SetAs(cwrap->m_oldval->m_virtuality.GetString());*/
+			}
+            break;
+        }
+	}
+	
 }
 
 wyBool
@@ -2921,6 +3222,14 @@ TabFields::ScanEntireRow(wyUInt32  currentrow, wyInt32 currentcol, wyString& cur
         case COMMENT_:
             origtext.SetAs(fldattr->m_comment);
             newtext.SetAs(cwrapobj->m_newval->m_comment);
+            break;
+		case VIRTUALITY:
+			origtext.SetAs(fldattr->m_virtuality);
+            newtext.SetAs(cwrapobj->m_newval->m_virtuality);
+            break;
+		case EXPRESSION:
+			origtext.SetAs(fldattr->m_expression);
+            newtext.SetAs(cwrapobj->m_newval->m_expression);
             break;
         }
 

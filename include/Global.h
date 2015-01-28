@@ -630,7 +630,7 @@ typedef struct tagGlobals
 	HINSTANCE	m_hinstance;
     PSQLITENODE	m_psqlite;
 
-    wyChar      m_helpfile[MAX_PATH+1];
+   // wyChar      m_helpfile[MAX_PATH+1];
 	wyString	m_filename;
     wyString    m_appname;
 

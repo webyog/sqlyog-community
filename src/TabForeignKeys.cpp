@@ -133,6 +133,7 @@ TabForeignKeys::TabForeignKeys(HWND hwnd, TableTabInterfaceTabMgmt *ptabmgmt)
     m_hdlggrid          =   NULL;
     m_mdiwnd            =   GetActiveWin();
     m_ismysql41         =   m_mdiwnd->m_ismysql41;
+	m_ismariadb52           =   IsMySQL564MariaDB53(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
     m_prevtgtdb.SetAs("");
 
     m_lastclickfkgrid   =   -1;
@@ -2403,10 +2404,13 @@ TabForeignKeys::FillSrcColsDlgGrid(HWND hwnd)
             if(!tmpsrccol)
             {
                 //..Inserting into grid if it's not already inserted
+				if(!(m_ismariadb52 && cfieldswrapobj->m_newval->m_virtuality.CompareI("VIRTUAL")==0) )
+				{
                 newrow = CustomGrid_InsertRow(m_hdlggrid);
                 CustomGrid_SetText(m_hdlggrid, newrow, 0, (wyChar*)cfieldswrapobj->m_newval->m_name.GetString());
                 CustomGrid_SetText(m_hdlggrid, newrow, 1, (wyChar*)cfieldswrapobj->m_newval->m_datatype.GetString());
                 CustomGrid_SetRowLongData(m_hdlggrid, newrow, (LONG) cfieldswrapobj);
+				}
             }
         }
         cfieldswrapobj = (FieldStructWrapper*)cfieldswrapobj->m_next;
@@ -2577,6 +2581,7 @@ TabForeignKeys::FillTgtColsDlgGrid(HWND hwnd)
             ///Looping through the Target-columns in the list
             while(tmptgtcol)
             {
+				
                 newrow = CustomGrid_InsertRow(m_hdlggrid);
 
                 if(tmptgtcol->m_selected)
@@ -2662,7 +2667,7 @@ TabForeignKeys::SrcColsDlgWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM
 
     case WM_HELP:
         {
-            ShowHelp("Foreign%20Key%20In%20SQLyog%20MySQL%20GUI.htm");
+            ShowHelp("http://sqlyogkb.webyog.com/article/249-fk-in-mysql-and-sqlyog");
         }
         return 1;
 
@@ -2739,7 +2744,7 @@ TabForeignKeys::TgtColsDlgWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM
 
     case WM_HELP:
         {
-            ShowHelp("Foreign%20Key%20In%20SQLyog%20MySQL%20GUI.htm");
+            ShowHelp("http://sqlyogkb.webyog.com/article/249-fk-in-mysql-and-sqlyog");
         }
         return 1;
 

@@ -159,10 +159,10 @@ wyInt32 WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance,
 		VERIFY(FreeLibrary(hsci));
 		return 0;
 	}
-
-#ifndef _DEBUG
-	VERIFY(LoadHelpFile());
-#endif
+//Removing offline helpfile from version 12.05
+//#ifndef _DEBUG
+//	VERIFY(LoadHelpFile());
+//#endif
     
 	pGlobals->m_findreplace	= wyFalse;
     CreateCustomTabIconList();

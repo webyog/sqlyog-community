@@ -1282,7 +1282,7 @@ UserManager::EnableChildren(HWND hwnd, LPARAM lparam)
 void
 UserManager::HandleHelp(wyBool ishelpclicked)
 {
-    ShowHelp("User%20Management%20for%20SQLyog%20MySQL%20Manager.htm");
+    ShowHelp("http://sqlyogkb.webyog.com/category/325-user-management");
 }
 
 //handler function for CBN_CHANGE. this is an import function as this alone triggers all the other functions to populate the user details

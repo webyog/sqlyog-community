@@ -41,6 +41,8 @@
 #define		COMMENT_                12
 #define     CHARSETCOL              9
 #define     COLLATIONCOL            10
+#define     VIRTUALITY              13
+#define     EXPRESSION              14
 
 #define     MAXLENWITHBACKTICKS                         4
 #define		DEFAULTNUMROWS								6
@@ -69,6 +71,8 @@ struct FIELDATTRIBS
     wyString                m_charset;                  /// column charset
     wyString                m_collation;                /// column collation
     wyString                m_comment;                  /// column comment
+	wyString                m_virtuality;               //for mariadb virtual/persistent columns
+	wyString                m_expression;               //expression for virtual coloumn.
     struct FIELDATTRIBS*    m_next;                     /// pointer to the next FIELDATTRIBS struct elem
 };
 
@@ -139,6 +143,8 @@ public:
     
     //  Is mysql41
     wyBool                      m_ismysql41;
+	//is mariadb version>=5.2
+	wyBool                     m_ismariadb52;
 
     /// Flag used to check one auto increment field selected
 	wyBool			            m_autoincrpresent;
@@ -159,6 +165,7 @@ public:
 	
 	/// Flag used to check whether auto increment field is present in the table
 	wyBool			            m_autoinccheck;
+
 
     /// Keeps the name of the row having auto_increment key
 	wyString			        m_autorowname;
@@ -599,6 +606,7 @@ public:
     */
 
     void                        GetDefaultValue(wyString& query, FieldStructWrapper* cwrapobj);
+	void                        GetVirtualOrPersistentValue(wyString& query, FieldStructWrapper* cwrapobj);
 
     void				        HandleDefaults(MYSQL_ROW myfieldrow, MYSQL_RES *myres, wyString &datatype, wyInt32 &ret, wyString& defaultstr);
 
@@ -626,9 +634,10 @@ public:
     @param mykeyres			: IN MYSQL key res
     @returns wyBool, wyTrue if success, otherwise wyFalse
     */
-    wyBool                      TraverseEachFieldRow(MYSQL_RES *myfieldres);
+    wyBool                      TraverseEachFieldRow(MYSQL_RES *myfieldres, wyString createtable);
 
     void                        InitFieldAttribs(FIELDATTRIBS *newrowlongvalue);
+	//void                        setExpression(wyString *atrrinbute, wyString *createstring);
 
     /// Process to delete selected rows
     /**
@@ -768,6 +777,9 @@ public:
     @returns void
     */
     void                        GetColumnDefinition(FieldStructWrapper* cwrapobj, wyString &coldef, wyBool isnew);
+	//function to findout whethr to generate drop or recreate or not
+
+	wyBool                    IsDropAndRecreateRequired(FieldStructWrapper* cwrapobj,wyBool isnew);
 
     /// rotates through all grid rows, finds the wrapper from the column name
     /*

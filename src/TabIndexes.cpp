@@ -132,6 +132,7 @@ TabIndexes::TabIndexes(HWND hwnd, TableTabInterfaceTabMgmt* ptabmgmt)
     m_mdiwnd                =   GetActiveWin();
     m_ptabmgmt              =   ptabmgmt;
     m_ismysql41             =   IsMySQL41(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
+	m_ismariadb52           =   IsMySQL564MariaDB53(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
     
     m_automatedindexrow		=	-1;
     m_lastclickindgrid      =   -1;
@@ -548,9 +549,9 @@ TabIndexes::GridWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     case GVN_HELP:
         {
             if(ptabind->m_ptabmgmt->m_tabinterfaceptr->m_isaltertable)
-                ShowHelp("Alter%20Index%20in%20SQLyog%20MySQL%20Tool.htm");
+                ShowHelp("http://sqlyogkb.webyog.com/article/246-alter-index");
             else
-                ShowHelp("Create%20Index%20for%20SQLyog%20MySQL%20Tool.htm");
+                ShowHelp("http://sqlyogkb.webyog.com/article/245-create-index");
         }
     }
     return 1;
@@ -1433,6 +1434,7 @@ TabIndexes::FillColumnsGrid(HWND hwnd)
         {
             if(tmpindcols->m_pcwrapobj->m_newval)
             {
+				
                 newrow = CustomGrid_InsertRow(m_hdlggrid);
                 CustomGrid_SetRowCheckState(m_hdlggrid, newrow, wyTrue);
                 CustomGrid_SetText(m_hdlggrid, newrow, 0, (wyChar*)tmpindcols->m_pcwrapobj->m_newval->m_name.GetString());
@@ -1459,7 +1461,7 @@ TabIndexes::FillColumnsGrid(HWND hwnd)
         if(cfieldswrapobj->m_newval)
         {
             tmpindcols = indcols;
-
+			
             while(tmpindcols)
             {
                 if(tmpindcols->m_pcwrapobj == cfieldswrapobj)
@@ -1468,10 +1470,14 @@ TabIndexes::FillColumnsGrid(HWND hwnd)
             }
             if(!tmpindcols)
             {
-                newrow = CustomGrid_InsertRow(m_hdlggrid);
+				//add only thoes columns for index which are not virtual
+				if(!(m_ismariadb52 && cfieldswrapobj->m_newval->m_virtuality.CompareI("VIRTUAL")==0) )
+               { 
+				  newrow = CustomGrid_InsertRow(m_hdlggrid);
                 CustomGrid_SetText(m_hdlggrid, newrow, 0, (wyChar*)cfieldswrapobj->m_newval->m_name.GetString());
                 CustomGrid_SetText(m_hdlggrid, newrow, 1, (wyChar*)cfieldswrapobj->m_newval->m_datatype.GetString());
                 CustomGrid_SetRowLongData(m_hdlggrid, newrow, (LONG) cfieldswrapobj);
+				}
             }
         }
         cfieldswrapobj = (FieldStructWrapper*)cfieldswrapobj->m_next;
@@ -1829,9 +1835,9 @@ TabIndexes::ColDlgWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
     case WM_HELP:
         {
             if(ptabind->m_ptabmgmt->m_tabinterfaceptr->m_isaltertable)
-                ShowHelp("Alter%20Index%20in%20SQLyog%20MySQL%20Tool.htm");
+                ShowHelp("http://sqlyogkb.webyog.com/article/246-alter-index");
             else
-                ShowHelp("Create%20Index%20for%20SQLyog%20MySQL%20Tool.htm");
+                   ShowHelp("http://sqlyogkb.webyog.com/article/245-create-index");
         }
         return 1;
 

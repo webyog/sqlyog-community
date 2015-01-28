@@ -158,7 +158,7 @@ SortAndFilter::FilterWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
 
         //show filter help
 	    case WM_HELP:
-		    ShowHelp("Filter%20and%20Sort%20for%20SQLyog%20MySQL%20GUI.htm");
+		    ShowHelp("http://sqlyogkb.webyog.com/article/213-gui-filtering-and-sorting-of-data");
 		    return TRUE;
 	}
 

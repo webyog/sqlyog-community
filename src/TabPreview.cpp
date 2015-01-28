@@ -153,7 +153,7 @@ TabPreview::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
     case WM_HELP:
         {
-            ShowHelp("Preview%20in%20SQLyog%20MySQL%20GUI.htm");
+            ShowHelp("http://sqlyogkb.webyog.com/article/253-preview");
         }
         return 1;
         break;

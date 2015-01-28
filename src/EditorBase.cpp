@@ -945,7 +945,7 @@ EditorBase::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 	switch(message)	
 	{
 	    case WM_HELP:
-            ShowHelp("SQL%20Window%20SQLyog%20for%20MySQL%20Administration.htm");
+            ShowHelp("http://sqlyogkb.webyog.com/article/170-sql-window");
 		    return wyTrue;
 
 	    case WM_CONTEXTMENU:

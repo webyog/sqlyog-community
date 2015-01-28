@@ -720,24 +720,24 @@ ConnectionCommunity::OnWmCommandConnDialog(HWND hwnd, WPARAM wparam, LPARAM lpar
 		break;
 
 	case IDC_TUNNELHELP:
-		ShowHelp("HTTP%20Tunneling%20SQLyog%20MySQL%20Client.html");
+		ShowHelp("http://sqlyogkb.webyog.com/article/155-connecting-using-http-tunneling");
 		break;
 
     case IDC_INITCOMMANDHELP:
-        ShowHelp("Advanced%20Connection%20SQLyog%20MySQL%20Manager.htm");
+       ShowHelp("http://sqlyogkb.webyog.com/article/158-advanced-connection-settings");
         break;
 
 	case IDC_SSHHELP:
-		ShowHelp("SSH%20Tunneling%20SQLyog%20MySQL%20Client.html");
+		ShowHelp("http://sqlyogkb.webyog.com/article/154-connecting-using-ssh-tunneling");
 		break;
 
     case IDC_SSLHELP:
-        ShowHelp("SSL%20encryption%20SQLyog%20MySQL%20Client.html");
+        ShowHelp("http://sqlyogkb.webyog.com/article/157-connecting-using-ssl-encryption");
 		break;
 
 	case IDC_TIMEOUTHELP:
 	case IDC_COMPRESSHELP:
-		 ShowHelp("Direct%20Connection%20SQLyog%20MySQL%20Front%20End.htm");
+		 ShowHelp("http://sqlyogkb.webyog.com/article/153-direct-connection-using-mysql-c-api");
 		 break;
 	}
 }
@@ -1494,19 +1494,19 @@ ConnectionCommunity::OnWmConnectionHelp(HWND hwnd)
 	switch(tab)
 	{
 	case 0:
-		ShowHelp("Getting%20started%20SQLyog%20GUI%20for%20MySQL.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/151-getting-started");
 		break;
 	case 1:
-		ShowHelp("HTTP%20Tunneling%20SQLyog%20MySQL%20Client.html");
+		ShowHelp("http://sqlyogkb.webyog.com/article/155-connecting-using-http-tunneling");
 		break;
 	case 2:	
-		ShowHelp("SSH%20Tunneling%20SQLyog%20MySQL%20Client.html");
+		ShowHelp("http://sqlyogkb.webyog.com/article/154-connecting-using-ssh-tunneling");
 		break;
 	case 3:
-		ShowHelp("SSL%20encryption%20SQLyog%20MySQL%20Client.html");
+		ShowHelp("http://sqlyogkb.webyog.com/article/157-connecting-using-ssl-encryption");
 		break;
 	case 4:
-		ShowHelp("Advanced%20Connection%20SQLyog%20MySQL%20Manager.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/252-advanced-tab");
 		break;
 	}
     return;

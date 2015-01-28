@@ -525,6 +525,14 @@ void    GetFieldInfoString(Tunnel *tunnel, MYSQL_RES *myres,
 */
 wyBool CheckForOnUpdate(wyString &strcreate, wyInt32 fieldpos);
 
+//get the expreeion value by parsing the current row definition
+/**
+@param currentrow    : FIELD definiton in create table statement
+@param expression     : Value of expression used
+@returns wyTrue on success else wyFalse
+*/
+wyBool GetExpressionValue(wyChar * currentrow, wyString * expression);
+
 wyInt32 GetBitFieldColumnWidth(wyString &strcreate, wyInt32 fieldpos);
 
 /// Gets the module filename length.

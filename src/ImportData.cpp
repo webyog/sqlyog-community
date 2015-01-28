@@ -96,7 +96,7 @@ ExportMultiFormat::DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
 		break;
 
 	case WM_HELP:
-		ShowHelp("Import%20Data%20From%20Csv%20from%20SQLyog%20MySQL%20Manager.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/217-import-csv-data-using-load-local");
 		return TRUE;
 
 	case WM_COMMAND:
@@ -782,7 +782,7 @@ CRestore::DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("Restore%20Database.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/235-excute-sql-script");
 		return 1;
 
 	case WM_COMMAND:

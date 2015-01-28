@@ -137,6 +137,7 @@ public:
 	//PMYSQL		                    m_mysql;
 
     wyBool                          m_ismysql41;
+	wyBool                          m_ismariadb52;
 
 	/// Tunnel pointer
 	//Tunnel		                    *m_tunnel;

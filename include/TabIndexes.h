@@ -77,6 +77,7 @@ public:
     wyString                        m_celldataprevval;
 
     wyBool                          m_ismysql41;
+	wyBool                          m_ismariadb52;
 
     // used for Shift+Click functionality
     wyInt32                         m_lastclickindgrid;

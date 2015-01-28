@@ -485,7 +485,7 @@ TableView::GetFieldResultIndexOfColumn(wyInt32 col)
 void
 TableView::ShowHelpFile()
 {
-    ShowHelp("Data%20Manipulations%20in%20SQLyog%20MySQL%20GUI.html");
+    ShowHelp("http://sqlyogkb.webyog.com/article/218-data-manipulation");
 }
 
 //get the database name
