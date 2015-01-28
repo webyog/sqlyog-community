@@ -57,7 +57,7 @@ BEGIN
     "F",            ACCEL_ADDFAVORITE,      VIRTKEY, SHIFT, CONTROL, NOINVERT
     "U",            ACCEL_ADDUSER,          VIRTKEY, CONTROL, NOINVERT
     VK_F6,          ACCEL_ALTERTABLE,       VIRTKEY, NOINVERT
-	VK_F4,          ACCEL_CREATETABLE,      VIRTKEY, NOINVERT
+    VK_F4,          ACCEL_CREATETABLE,      VIRTKEY, NOINVERT
     "L",            ACCEL_CHANGELANGUAGE,   VIRTKEY, SHIFT, ALT, NOINVERT
     "V",            ACCEL_CHANGEVIEW,       VIRTKEY, CONTROL, ALT, NOINVERT
     "W",            ACCEL_CLOSECONNECTION,  VIRTKEY, CONTROL, NOINVERT
@@ -154,9 +154,9 @@ BEGIN
     "U",            ACCEL_UPDATE,           VIRTKEY, SHIFT, ALT, NOINVERT
     "U",            ACCEL_UPPERCASE,        VIRTKEY, SHIFT, CONTROL, NOINVERT
     "Q",            ACCEL_VDDTOOL,          VIRTKEY, CONTROL, ALT, NOINVERT
-	"O",            ACCEL_OPENSESSION,      VIRTKEY, SHIFT, CONTROL, NOINVERT
-	"S",            ACCEL_SAVESESSION,      VIRTKEY, SHIFT, CONTROL, NOINVERT
-	"X",            ACCEL_ENDSESSION,       VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "O",            ACCEL_OPENSESSION,      VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "S",            ACCEL_SAVESESSION,      VIRTKEY, SHIFT, CONTROL, NOINVERT
+    "X",            ACCEL_ENDSESSION,       VIRTKEY, SHIFT, CONTROL, NOINVERT
 END
 
 
@@ -218,8 +218,8 @@ BEGIN
         MENUITEM "Set To NULL",                 1169
         MENUITEM "Set To Default",              IDC_SETDEF
         MENUITEM SEPARATOR
-		MENUITEM "Unsort"						ID_UNSORT
-		MENUITEM SEPARATOR
+        MENUITEM "Unsort",                      ID_UNSORT
+        MENUITEM SEPARATOR
         POPUP "Filter"
         BEGIN
             MENUITEM "Field = Value",               ID_FILTER_FIELD_EQUALS
@@ -436,7 +436,7 @@ IDR_TABLESMENU MENU
 BEGIN
     POPUP "Tables Menu"
     BEGIN
-        MENUITEM "Create &Table\tF4",               ID_TABLE_MAKER
+        MENUITEM "Create &Table\tF4",           ID_TABLE_MAKER
         MENUITEM "&Copy Table(s) To Different Host/Database...", ID_OPEN_COPYTABLE
         MENUITEM "New Data Searc&h\tCtrl+Shift+D", ID_DATASEARCH
         MENUITEM SEPARATOR
@@ -466,10 +466,10 @@ BEGIN
         MENUITEM "&Save...\tCtrl+S",            IDM_FILE_SAVESQL
         MENUITEM "S&ave As...",                 IDM_FILE_SAVEAS
         MENUITEM SEPARATOR
-        MENUITEM "Open Session Savepoint...\tCtrl+Shift+O",          ID_OPENSESSION
-        MENUITEM "Save Session...\tCtrl+Shift+S",          ID_SAVESESSION
-        MENUITEM "Save Session As...",       ID_SAVESESSIONAS
-		MENUITEM "End Session\tCtrl+Shift+X",       		ID_CLOSESESSION
+        MENUITEM "Open Session Savepoint...\tCtrl+Shift+O", ID_OPENSESSION
+        MENUITEM "Save Session...\tCtrl+Shift+S", ID_SAVESESSION
+        MENUITEM "Save Session As...",          ID_SAVESESSIONAS
+        MENUITEM "End Session\tCtrl+Shift+X",   ID_CLOSESESSION
         MENUITEM SEPARATOR
         POPUP "&Recent Files"
         BEGIN
@@ -590,7 +590,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Open Table\tF11",            ID_OBJECT_VIEWDATA
         MENUITEM "Open Table in &New Tab\tCtrl+F11", ID_TABLE_OPENINNEWTAB
-        MENUITEM "Create &Table\tF4",               ID_TABLE_MAKER
+        MENUITEM "Create &Table\tF4",           ID_TABLE_MAKER
         MENUITEM "&Alter Table\tF6",            ID_OBJECT_TABLEEDITOR
         MENUITEM "&Manage Indexes\tF7",         ID_OBJECT_MANINDEX
         MENUITEM "Re&lationships/Foreign Keys\tF10", IDM_TABLE_RELATION
@@ -632,7 +632,7 @@ BEGIN
         END
         POPUP "&Indexes"
         BEGIN
-            MENUITEM "Create &Index\tF4",               40382
+            MENUITEM "Create &Index\tF4",           40382
             MENUITEM "&Edit Index\tF6",             40383
             MENUITEM "&Drop Index...\tDel",         40384
             MENUITEM SEPARATOR
@@ -641,7 +641,7 @@ BEGIN
         MENUITEM SEPARATOR
         POPUP "&Views"
         BEGIN
-            MENUITEM "Create &View...\tF4",             ID_OBJECT_CREATEVIEW
+            MENUITEM "Create &View...\tF4",         ID_OBJECT_CREATEVIEW
             MENUITEM "&Alter View...\tF6",          ID_OBJECT_ALTERVIEW
             MENUITEM "&Drop View...\tDel",          ID_OBJECT_DROPVIEW
             MENUITEM SEPARATOR
@@ -657,13 +657,13 @@ BEGIN
         END
         POPUP "&Functions"
         BEGIN
-            MENUITEM "Create &Function...\tF4",         ID_OBJECT_CREATEFUNCTION
+            MENUITEM "Create &Function...\tF4",     ID_OBJECT_CREATEFUNCTION
             MENUITEM "&Alter Function...\tF6",      ID_OBJECT_ALTERFUNCTION
             MENUITEM "&Drop Function...\tDel",      ID_OBJECT_DROPFUNCTION
         END
         POPUP "&Triggers"
         BEGIN
-            MENUITEM "Create &Trigger...\tF4",          ID_OBJECT_CREATETRIGGER
+            MENUITEM "Create &Trigger...\tF4",      ID_OBJECT_CREATETRIGGER
             MENUITEM "&Alter Trigger...\tF6",       ID_OBJECT_ALTERTRIGGER
             MENUITEM "&Drop Trigger...\tDel",       ID_OBJECT_DROPTRIGGER
             MENUITEM SEPARATOR
@@ -671,7 +671,7 @@ BEGIN
         END
         POPUP "&Events"
         BEGIN
-            MENUITEM "Create &Event...\tF4",            ID_OBJECT_CREATEEVENT
+            MENUITEM "Create &Event...\tF4",        ID_OBJECT_CREATEEVENT
             MENUITEM "&Alter Event...\tF6",         ID_OBJECT_ALTEREVENT
             MENUITEM "&Drop Event...\tDel",         ID_OBJECT_DROPEVENT
             MENUITEM SEPARATOR
@@ -918,7 +918,7 @@ BEGIN
 END
 
 IDD_EXPORTDATA DIALOGEX 150, 50, 391, 282
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU| WS_THICKFRAME
 CAPTION " SQL Dump"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -1312,12 +1312,12 @@ BEGIN
     CONTROL         "",IDC_HORZBAR3,"Static",SS_BLACKFRAME | SS_SUNKEN,7,257,382,1
     LTEXT           "",IDC_MESSAGE,7,269,144,8
     LTEXT           "Static",IDC__EXPORTAS_GRIP,213,262,19,8
-	GROUPBOX        "Charset",IDC_GROUP4,7,195,129,30
-	COMBOBOX        IDC_CHARSETCOMBO,13,206,117,30, CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Charset",IDC_GROUP4,7,195,129,30
+    COMBOBOX        IDC_CHARSETCOMBO,13,206,117,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
 END
 
 IDD_COPYDATABASE DIALOGEX 0, 0, 388, 300
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU| WS_THICKFRAME
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
 CAPTION "Copy Database"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
@@ -2279,7 +2279,7 @@ IDI_QUERY_16            ICON                    "bitmaps\\query_16.ico"
 IDI_RENAMEQUERY_16      ICON                    "bitmaps\\renamequery_16.ico"
 IDI_SAVESESSION_16      ICON                    "bitmaps\\session_save_all.ico"
 IDI_OPENSESSION_16      ICON                    "bitmaps\\session_open.ico"
-IDI_CLOSESESSION_16      ICON                   "bitmaps\\session_close.ico"
+IDI_CLOSESESSION_16     ICON                    "bitmaps\\session_close.ico"
 IDI_SCHEMADESIGNER_16   ICON                    "bitmaps\\schemadesigner_16.ico"
 IDI_SCHDEXPORT_16       ICON                    "bitmaps\\schdexport_16.ico"
 IDI_NOTIFICATION_16     ICON                    "bitmaps\\notification_16.ico"
@@ -3237,7 +3237,7 @@ BEGIN
     IDS_COMMUNITY_AD_20     "Automate database comparisons"
     IDS_COMMUNITY_AD_21     "Save hours of tedious work and eliminate manual scripting errors"
     IDS_COMMUNITY_AD_22     "Generate schema synchronization scripts"
-    IDS_COMMUNITY_AD_23     "Take database snapshots and compare them – useful for audit trails"
+    IDS_COMMUNITY_AD_23     "Take database snapshots and compare them â€“ useful for audit trails"
     IDS_COMMUNITY_AD_24     "Generate schema change histories, ideal for database versioning"
     IDS_COMMUNITY_AD_25     "Apply schema changes from development MySQL to test MySQL to production MySQL"
     IDS_COMMUNITY_AD_26     "Schema Sync tool brings two or more schemas in complete sync"

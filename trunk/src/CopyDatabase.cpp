@@ -152,7 +152,7 @@ CopyDatabase::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("Copy%20Database%20to%20Different%20Host%20SQLyog%20MySQL%20GUI.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/232-copy-database-to-different-host-db");
 		return TRUE;
 
 	case UM_COPYDATABASE:

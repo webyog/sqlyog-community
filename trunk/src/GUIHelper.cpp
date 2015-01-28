@@ -1759,10 +1759,11 @@ wyBool
 ShowHelp(wyChar *helpid)
 {
 	wyString helplink;
-
-	helplink.Sprintf("%s::/%s", pGlobals->m_helpfile, helpid);
-	HtmlHelp(::GetDesktopWindow(), helplink.GetAsWideChar(), HH_DISPLAY_TOPIC, NULL);
-
+	//removing offline helpfile from version 12.05
+	/*helplink.Sprintf("%s::/%s", pGlobals->m_helpfile, helpid);
+	HtmlHelp(::GetDesktopWindow(), helplink.GetAsWideChar(), HH_DISPLAY_TOPIC, NULL);*/
+	helplink.Sprintf("%s", helpid);
+	ShellExecute(NULL, L"open", helplink.GetAsWideChar(), NULL, NULL, SW_SHOWNORMAL);
 	return wyTrue;
 }
 

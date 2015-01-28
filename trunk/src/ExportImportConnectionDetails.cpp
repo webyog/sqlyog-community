@@ -1481,11 +1481,11 @@ ExportImportConnection::HandleHelp(wyBool ishelpclicked)
 {
     if(m_isimport)
     {
-        ShowHelp("Export%20Import%20Connections%20SQLyog%20MySQL%20GUI.htm#Import");
+        ShowHelp("http://sqlyogkb.webyog.com/article/160-export-import-connection-details");
     }
     else
     {
-        ShowHelp("Export%20Import%20Connections%20SQLyog%20MySQL%20GUI.htm#Export");
+        ShowHelp("http://sqlyogkb.webyog.com/article/160-export-import-connection-details");
     }
     
 }

@@ -18,5 +18,7 @@
 	<string name="3644"> Save current configuration in a jobfile for future use.</string>
 	<string name="3645">Do you want to run after saving current configuration in a job file or run without saving?</string>
 	<string name="3646">Specify Job File:</string>
+	<string name="3647">Virtuality</string>
+	<string name="3648">Expression</string>
 	
 </resources>

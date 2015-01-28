@@ -1362,22 +1362,23 @@ IsWindowMaximised()
 }
 
 /* Help file operation functions */
-wyBool 
-LoadHelpFile()
-{
-	wyInt32     ret;
-	wyWChar      directory[MAX_PATH+1]={0}, *lpfileport=0;
-        wyString directorystr; 
-	// open up the sqlyog.chm.. it is located in the executable directory of SQLyog
-	ret = SearchPath(NULL, L"sqlyog", L".chm", MAX_PATH, directory, &lpfileport);
-
-	if(ret == 0)
-		return wyFalse;
-	directorystr.SetAs(directory);
-	strcpy(pGlobals->m_helpfile, directorystr.GetString());
-
-	return wyTrue;
-}
+//removing helpfile from version 12.05, now will use online docs instead
+//wyBool 
+//LoadHelpFile()
+//{
+//	wyInt32     ret;
+//	wyWChar      directory[MAX_PATH+1]={0}, *lpfileport=0;
+//        wyString directorystr; 
+//	// open up the sqlyog.chm.. it is located in the executable directory of SQLyog
+//	ret = SearchPath(NULL, L"sqlyog", L".chm", MAX_PATH, directory, &lpfileport);
+//
+//	if(ret == 0)
+//		return wyFalse;
+//	directorystr.SetAs(directory);
+//	strcpy(pGlobals->m_helpfile, directorystr.GetString());
+//
+//	return wyTrue;
+//}
 
 /* functions to maintain the state of current active database for the connection */
 const wyChar *
@@ -2717,7 +2718,7 @@ InitGlobals(PGLOBALS pg)
     pg->m_conncount = 0;
     pg->m_entinst = NULL;
     pg->m_findreplace = wyFalse;
-    pg->m_helpfile[0] = '\0';
+   // pg->m_helpfile[0] = '\0';//removing offline helpfile from version 12.05
     pg->m_hinstance = NULL;
     pg->m_hmapfile = NULL;
     pg->m_hwndclient = NULL;

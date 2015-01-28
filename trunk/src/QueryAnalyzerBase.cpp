@@ -221,7 +221,7 @@ QueryAnalyzerBase::PQAHtmlWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
     switch(message)
     {		
     case WM_HELP:
-	    ShowHelp("Query%20Profiler%20for%20SQLyog%20MySQL%20Manager.htm");
+	    ShowHelp("http://sqlyogkb.webyog.com/article/203-query-profiler");
 	    return 1;//On clicking help, profiler page should open			
     }
 

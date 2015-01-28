@@ -774,7 +774,7 @@ BackUp::DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("Back%20Up%20Database.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/234-backup-database-as-sql-dump");
 		return TRUE;
 
 	case UM_BACKUPTABLE:
@@ -1164,7 +1164,7 @@ CExportResultSet::DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("Export%20Data%20for%20SQLyog%20GUI%20for%20MySQL.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/215-export-data");
 		return 1;
 
 	case WM_COMMAND:

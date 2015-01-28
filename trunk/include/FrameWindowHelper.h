@@ -1007,7 +1007,7 @@ WCHAR*      GetWideString(const wyChar *strtoconv);
 /**
 @returns wyTrue on success else wyFalse
 */
-wyBool      LoadHelpFile();
+//wyBool      LoadHelpFile();//not needed anymore, removing helpfile from version 12.05
 
 /// Initializes the custom control grid and tab.
 /**

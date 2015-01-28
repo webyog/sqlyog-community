@@ -420,6 +420,18 @@ IsMySQL565MariaDB1001(Tunnel *tunnel, PMYSQL mysql)
 		return wyFalse;
 }
 
+wyBool IsMariaDB52(Tunnel * tunnel, PMYSQL mysql)
+{
+	long me = mysql_get_server_version(*mysql);
+	const char *dbString = mysql_get_server_info(*mysql);
+	
+	if(me >= 50002 && strstr(dbString, "MariaDB"))
+		return wyTrue;
+	else
+		return wyFalse;
+
+
+}
 wyBool
 IsMySQL502(Tunnel * tunnel, PMYSQL mysql)
 {

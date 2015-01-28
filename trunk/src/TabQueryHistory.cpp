@@ -162,7 +162,7 @@ TabQueryHistory::EditProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 	        break;
 
         case WM_HELP:
-	        ShowHelp("History%20Tab%20for%20SQLyog%20MySQL%20Management%20Tool.htm");
+	        ShowHelp("http://sqlyogkb.webyog.com/article/211-history-tab");
 	        return 1;
 
         case WM_SETFOCUS:

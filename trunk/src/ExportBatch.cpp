@@ -145,7 +145,7 @@ ExportBatch::ExpDataDlgProc	(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 		break;
 
 	case WM_HELP:
-		ShowHelp("Export%20Database%20as%20Batch%20Script%20SQLyog%20MySQL%20GUI.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/234-backup-database-as-sql-dump");
 		return TRUE;
 
 	case WM_MOUSEMOVE:
@@ -193,6 +193,7 @@ ExportBatch::OnWmInitDialog(HWND hwnd, LPARAM lparam)
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
 	IntializeTree(hwnd, m_db.GetString());
 	SetCursor(LoadCursor(NULL, IDC_ARROW));
+		
 
 	GetClientRect(m_hwnd, &m_dlgrect);
 	GetWindowRect(m_hwnd, &m_wndrect);
@@ -204,6 +205,9 @@ ExportBatch::OnWmInitDialog(HWND hwnd, LPARAM lparam)
 	
 	GetCtrlRects();
 	PositionCtrls();
+	
+
+
 
 }
 
@@ -713,8 +717,7 @@ ExportBatch::ExportData2()
 	/* disable the button and other windows */
 	EnableDlgWindows(false);
 	EnableWindow(GetDlgItem(m_hwnd, IDDONE ), false);
-	EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DROPEVENTS), false); 
-
+	EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DROPEVENTS), false);
 	SetFocus(GetDlgItem(m_hwnd, IDC_PROGRESS));
 
 	ChangeOKButtonText(_(L"S&top"));

@@ -140,7 +140,8 @@ wyBool IsMySQL565MariaDB1001(Tunnel * tunnel, PMYSQL mysql);
 
 //MySQL 5.6.5
 wyBool IsMySQL565(Tunnel * tunnel, PMYSQL mysql);
-
+//mariadb 5.2 for Virtual/Persistent
+wyBool IsMariaDB52(Tunnel * tunnel, PMYSQL mysql);
 /// Checks the server version is greater than or equal to mySQL5.0.2
 /**
 @param tunnel: IN tunnel pointer

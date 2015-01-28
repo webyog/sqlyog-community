@@ -580,7 +580,7 @@ MDIWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("Getting%20started%20SQLyog%20GUI%20for%20MySQL.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/151-getting-started");
 		break;
 
 	case UM_TAGFILE_UPDATE_START:
@@ -3146,7 +3146,7 @@ MDIWindow::FlushWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("Flush%20in%20SQLyog%20MySQL%20Tool.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/333-flush");
 		return wyTrue;	
 
 	case WM_DESTROY:
@@ -3515,7 +3515,7 @@ MDIWindow::TemplateWndProc(HWND hwnd, UINT pMessage, WPARAM wparam, LPARAM lpara
 			break;
 
 		case WM_HELP:
-			ShowHelp("SQL%20Templates%20SQLyog%20MySQL%20Front%20End.htm");
+			ShowHelp("http://sqlyogkb.webyog.com/article/181-sql-templates");
 			return wyTrue;
 
 		case WM_DESTROY:

@@ -189,7 +189,7 @@ PreferenceBase::GeneralPrefDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARA
 		break;
 
 	case WM_HELP:
-		ShowHelp("Preferences%20in%20SQLyog%20GUI%20for%20MySQL.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/337-preferences");
 		return TRUE;
 
 	case WM_NOTIFY:
@@ -219,7 +219,7 @@ PreferenceBase::ACPrefDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 		return TRUE;
 
 	case WM_HELP:
-		ShowHelp("Preferences%20in%20SQLyog%20GUI%20for%20MySQL.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/337-preferences");
 		return TRUE;
 
 	case WM_NOTIFY:
@@ -249,7 +249,7 @@ PreferenceBase::FormatterPrefDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPA
 		return TRUE;
 
 	case WM_HELP:
-		ShowHelp("Preferences%20in%20SQLyog%20GUI%20for%20MySQL.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/337-preferences");
 		return TRUE;
 
 	case WM_NOTIFY:
@@ -355,7 +355,7 @@ PreferenceBase::FontPrefDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM l
 		break;
 
 	case WM_HELP:
-		ShowHelp("Preferences%20in%20SQLyog%20GUI%20for%20MySQL.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/337-preferences");
 		return TRUE;
 
 	case WM_NOTIFY:
@@ -1021,7 +1021,7 @@ PreferenceBase::OthersPrefDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
 		break;
 
 	case WM_HELP:
-		ShowHelp("Preferences%20in%20SQLyog%20GUI%20for%20MySQL.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/337-preferences");
 		return TRUE;
 
 	case WM_NOTIFY:

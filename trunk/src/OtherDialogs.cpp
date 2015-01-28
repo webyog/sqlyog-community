@@ -168,7 +168,7 @@ CAdvProp::AdvPropDialogProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPARAM l
 		return wyTrue;
 		
 	case WM_HELP:
-		ShowHelp("Advaced%20Properties%20for%20SQLyog%20MySQL%20Manager.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/224-advanced-properties");
 		return wyTrue;
 
 	case WM_INITDLGVALUES:
@@ -427,7 +427,7 @@ CShowValue::ShowValueDialogProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPAR
 		break;
 
 	case WM_HELP:
-		ShowHelp("MySQL%20Environment%20Variables%20for%20SQLyog%20GUI%20for%20MySQL.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/331-environment-variables");
 		return 1;		
 	
 	case WM_CONTEXTMENU:
@@ -871,7 +871,7 @@ CSchema::SchemaDialogProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPARAM lpa
 		break;
 
 	case WM_HELP:
-		ShowHelp("Database%20Schema%20for%20SQLyog%20MySQL%20Manager.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/238-database-schema");
 		return wyTrue;
 
 	case UM_CREATESCHEMA:
@@ -1679,7 +1679,7 @@ CCopyTable::CopyTableDialogProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPAR
 		break;
 
 	case WM_HELP:
-		ShowHelp("Copy%20Table%20for%20SQLyog%20MySQL%20GUI.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/221-copy-table-to-different-host");
 		return wyTrue;
 
 	case WM_COMMAND:
@@ -2751,7 +2751,7 @@ TableDiag::TableDlgProc(HWND phwnd, wyUInt32 pmessage, WPARAM pwparam, LPARAM pl
 		break;
 
 	case WM_HELP:
-		ShowHelp("Table%20Diagnostics%20for%20SQLyog%20MySQL%20Client.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/335-table-diagnostics");
 		return wyTrue;		
 
 	case WM_COMMAND:
@@ -3434,7 +3434,7 @@ CShowInfo::DlgProc(HWND hwnd, wyUInt32 message, WPARAM wParam, LPARAM lparam)
 	
 	case WM_HELP:
 		if(csi->m_res)
-			ShowHelp("m_mysql%20Environment.htm");
+			ShowHelp("http://sqlyogkb.webyog.com/article/331-environment-variables");
 		return wyTrue;
 
 	case WM_COMMAND:
@@ -3690,7 +3690,7 @@ CShowWarning::WndProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPARAM lparam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("Import%20Data%20From%20Csv%20from%20SQLyog%20MySQL%20Manager.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/217-import-csv-data-using-load-local");
 		return wyTrue;
 
 	case WM_COMMAND:
@@ -4234,7 +4234,7 @@ EmptyDB::EmptyDBDialogProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPARAM lp
 		return wyTrue;
 		
 	case WM_HELP:
-		ShowHelp("Empty%20database%20for%20SQLyog%20MySQL%20Client.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/237-empty-database");
 		return wyTrue;
 
 	case WM_INITDLGVALUES:
@@ -5376,7 +5376,7 @@ ConnColorDlg::ConnColorDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lp
 		break;
 
 	case WM_HELP:
-		ShowHelp("Advanced%20Connection%20SQLyog%20MySQL%20Manager.htm");
+		ShowHelp("http://sqlyogkb.webyog.com/article/158-advanced-connection-settings");
 		return 1;
 
 		

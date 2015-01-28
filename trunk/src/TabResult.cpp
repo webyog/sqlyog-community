@@ -31,6 +31,7 @@ extern	PGLOBALS		pGlobals;
 TabResult::TabResult(MDIWindow* wnd, HWND hwndparent, ResultView* presultview) : TabQueryTypes(wnd, hwndparent)
 {
     m_presultview = presultview;
+	pctabmgmt=wnd->m_pctabmodule->GetActiveTabEditor()->m_pctabmgmt;
     m_data = NULL;
 }
 
@@ -80,7 +81,8 @@ TabResult::Resize()
 void
 TabResult::UpdateStatusBar(StatusBarMgmt* pmgmt)
 {
-    pmgmt->AddTickCount(m_data->m_pmdi->m_tunnel, m_data->m_exectime, m_data->m_totaltime);
+	
+	pmgmt->AddTickCount(m_data->m_pmdi->m_tunnel, pctabmgmt->m_pcquerymessageedit->m_sumofexectime,pctabmgmt->m_pcquerymessageedit->m_sumoftotaltime);
     pmgmt->AddNumRows(m_data ? m_data->GetSavedRowCount() : 0);
 }
 

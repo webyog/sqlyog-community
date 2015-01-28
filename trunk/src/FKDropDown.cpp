@@ -552,7 +552,7 @@ FKDropDown::DlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
             break;
 
         case WM_HELP:
-            ShowHelp("Foreign%20Key%20Dropdown%20for%20SQLyog%20MySQL%20GUI.htm");
+            ShowHelp("http://sqlyogkb.webyog.com/article/219-looking-up-constraints-for-a-value");
 		    break;
 
         default:

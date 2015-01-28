@@ -45,6 +45,8 @@ public:
 
     ResultView* m_presultview;
     MySQLResultDataEx* m_data;
+	TabMgmt				*pctabmgmt;
+	
 
     //FindAndReplace  *m_findreplace;
 };

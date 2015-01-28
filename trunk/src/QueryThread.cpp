@@ -336,9 +336,12 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query)
     if(param->m_iseditor == wyTrue)
     {
         //show execution time and total time on query execution
-        param->wnd->m_pcquerystatus->AddTickCount(param->wnd->m_tunnel, exectime, totaltime);
+        
         param->wnd->m_pctabmodule->GetActiveTabEditor()->m_pctabmgmt->m_pcquerymessageedit->m_sumofexectime += exectime;
         param->wnd->m_pctabmodule->GetActiveTabEditor()->m_pctabmgmt->m_pcquerymessageedit->m_sumoftotaltime += totaltime;
+		//if multiple queries exexuted then display total execute and total display time in status bar.
+		param->wnd->m_pcquerystatus->AddTickCount(param->wnd->m_tunnel,param->wnd->m_pctabmodule->GetActiveTabEditor()->m_pctabmgmt->m_pcquerymessageedit->m_sumofexectime,
+			param->wnd->m_pctabmodule->GetActiveTabEditor()->m_pctabmgmt->m_pcquerymessageedit->m_sumoftotaltime);
     }
 
 	return ret;

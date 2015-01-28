@@ -1591,9 +1591,9 @@ TableTabInterface::TableTabInterfaceWndProc(HWND hwnd, UINT message, WPARAM wPar
     case WM_HELP:
         {
             if(tabint->m_isaltertable)
-                ShowHelp("Alter%20Table%20in%20SQLyog%20MySQL%20GUI.htm");
+                ShowHelp("http://sqlyogkb.webyog.com/article/244-alter-table-in-database");
             else
-                ShowHelp("Create%20Table%20for%20SQLyog%20MySQL%20Client.htm");
+                ShowHelp("http://sqlyogkb.webyog.com/article/241-create-table");
             return 1;
         }
         break;

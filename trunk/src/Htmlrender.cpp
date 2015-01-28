@@ -39,11 +39,11 @@ HandleClickEventOnLink(HWND hwndLayout, HELEMENT helem, const wchar_t *url)
 
 		if(!wcsicmp(url, L"optimizer_help "))
         {
-			ShowHelp("Schema%20Optimizer%20SQLyog%20MySQL%20GUI.htm");
+			ShowHelp("http://sqlyogkb.webyog.com/article/208-schema-optimiser");
         }
         else if(!wcsicmp(url, L"redundantindexes_help "))
         {
-            ShowHelp("Redundant%20Indexes%20for%20SQLyog%20MySQL%20Client.htm");
+            ShowHelp("http://sqlyogkb.webyog.com/article/209-redundant-index-analyzer");
         }
 		else if(!wcsicmp(url, L"pref_others ")) 
 		{
