@@ -18,6 +18,9 @@
 	<string name="3644">保存当前布局到任务文件中以作以后使用。</string>
 	<string name="3645">您希望在保存当前配置到作业文件后运行，还是不保存就运行？</string>
 	<string name="3646">指定作业文件：</string>
-	<string name="3647">  虚拟  </string>
-	<string name="3648">  表达  </string>
+	<string name="3647">虚拟    </string>
+	<string name="3648">表达    </string>
+	<string name="3649">高级选项</string>
+	<string name="3650">含时间戳的前缀</string>
+	<string name="3651">每个对象的文件</string>
 </resources>

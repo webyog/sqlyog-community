@@ -205,7 +205,11 @@ ExportBatch::OnWmInitDialog(HWND hwnd, LPARAM lparam)
 	
 	GetCtrlRects();
 	PositionCtrls();
-	
+#ifdef COMMUNITY
+                EnableWindow(GetDlgItem(m_hwnd, IDC_FILE_TABLE), FALSE);
+				EnableWindow(GetDlgItem(m_hwnd, IDC_TIMESTAMP_PREFIX), FALSE);
+
+#endif
 
 
 
@@ -344,6 +348,9 @@ ExportBatch::OnWmCommand(HWND hwnd, WPARAM wparam)
 	case IDC_EXPFILESELECT:
 		pexp->SetExpFileName( hwnd);
 		break;
+	case IDC_FILE_TABLE:
+		pexp->IsDirectory( hwnd);
+		break;
 
 	case IDC_EXPORT_DBCOMBO:
 	{
@@ -438,11 +445,21 @@ ExportBatch::SetExpFileName(HWND hwnd)
 	openfilename.Flags             = OFN_HIDEREADONLY;
 	openfilename.lpfnHook          =(LPOFNHOOKPROC)(FARPROC)NULL;
 	openfilename.lpTemplateName    =(LPWSTR)NULL;
-	
-	if(GetSaveFileName(&openfilename))
+	if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd,IDC_FILE_TABLE), BM_GETCHECK, 0, 0))
 	{
+		if(GetDirectoryFromUser(hwnd, file, L"Select a folder where you want to backup the database"))
+    {
 		SendMessage(hwndfile, WM_SETTEXT, 0,(LPARAM)file);
-		return;
+    	return ;
+    }
+	}
+	else{
+
+		if(GetSaveFileName(&openfilename))
+		{
+			SendMessage(hwndfile, WM_SETTEXT, 0,(LPARAM)file);
+			return;
+		}
 	}
 
 	return;
@@ -1327,7 +1344,7 @@ ExportBatch::SetOtherValues(MySQLDump *dump)
     wyWChar     file[MAX_PATH+1] = {0};
 	wyString	filename;
     wyString    charset, query;
-	wyBool		ischunkinsert;
+	wyBool		ischunkinsert,isprifixtimestamp=wyFalse;
 
     dump->SetDatabase(m_db.GetString());
 	dump->SetAllTables(m_alltables);
@@ -1402,6 +1419,21 @@ ExportBatch::SetOtherValues(MySQLDump *dump)
 	if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd, IDC_SETUNIQUE), BM_GETCHECK, 0, 0))
 		dump->SetFKChecks(wyTrue);
 
+	/*if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd,IDC_ZIP), BM_GETCHECK, 0, 0))
+		dump->SetToCompress(wyTrue);*/
+	//timestamp as prefix 
+	if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd,IDC_TIMESTAMP_PREFIX), BM_GETCHECK, 0, 0))
+		{
+			dump->SetTimeStampMode(wyTrue);
+			   isprifixtimestamp=wyTrue;
+	    }
+	else
+		{
+			dump->SetTimeStampMode(wyFalse);
+			isprifixtimestamp=wyFalse;
+	}
+	
+
 	if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd, IDC_BULKINSERT), BM_GETCHECK, 0, 0))
 	{
 		dump->SetBulkInsert(wyTrue);
@@ -1421,8 +1453,16 @@ ExportBatch::SetOtherValues(MySQLDump *dump)
 	GetWindowText(GetDlgItem(m_hwnd, IDC_EXPORTFILENAME), file, MAX_PATH);
 	
 	filename.SetAs(file);
-
+	//file per table option
+	if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd,IDC_FILE_TABLE), BM_GETCHECK, 0, 0))
+	{
+		dump->SetExpFilePath((wyChar*)filename.GetString(),isprifixtimestamp,wyFalse);
+	 
+	}
+	else
+	{
 	dump->SetExpFile(filename.GetString());
+	}
 
 }
 
@@ -1788,6 +1828,9 @@ ExportBatch::GetCtrlRects()
 		IDC_BULKINSERT, 0, 0,
 		IDC_CHK_DROPOBJECT, 0, 0,
 		IDC_CHK_DEFINER, 0, 0,
+		IDC_GROUP4, 0, 0,
+        IDC_TIMESTAMP_PREFIX, 0, 0,
+        IDC_FILE_TABLE, 0, 0,
 		IDC_PROGRESS, 1, 0,
 		IDC_MESSAGE2, 1, 0,
 		IDOK, 0, 0,
@@ -1949,4 +1992,21 @@ ExportBatch::OnPaint(HWND hwnd)
     GetClientRect(hwndstat, &temp);
     DrawFrameControl(hdc, &temp, DFC_SCROLL, DFCS_SCROLLSIZEGRIP);
     EndPaint(hwnd, &ps);
+}
+void ExportBatch::IsDirectory(HWND hwnd)
+{
+	TCHAR buff[1024];
+    
+
+	if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd,IDC_FILE_TABLE), BM_GETCHECK, 0, 0))
+	{
+	GetWindowText(GetDlgItem(hwnd,IDC_EXPORTFILENAME), buff, 1024);
+	if(GetFileAttributes(buff)!=FILE_ATTRIBUTE_DIRECTORY)
+	{
+	  yog_message(hwnd, _(L"Path specified is not a directory, Please select a directory"), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_HELP | MB_ICONINFORMATION);
+	  SetFocus(GetDlgItem(hwnd,IDC_EXPORTFILENAME));
+	}
+	
+	}
+
 }

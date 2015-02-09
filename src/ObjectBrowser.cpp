@@ -6611,7 +6611,7 @@ CQueryObject::EndRenameTrigger(LPNMTVDISPINFO ptvdi)
 	wyString		mytemprow1, mytemprow2, mytemprow3, mytemprow4, myrowstr;
     wyBool			restore = wyFalse;
 	MYSQL_RES		*res;
-	MYSQL_ROW		myrow;
+	MYSQL_ROW		myrow,myrow1;
 	wyString		myrow0str, myrow1str, myrow2str, myrow3str, myrow4str, myrow5str;
 
 	MDIWindow*		wnd = (MDIWindow*)GetWindowLongPtr(m_hwndparent, GWLP_USERDATA);
@@ -6653,15 +6653,21 @@ CQueryObject::EndRenameTrigger(LPNMTVDISPINFO ptvdi)
 	//query.Sprintf("select `TRIGGER_NAME` from `INFORMATION_SCHEMA`.`TRIGGERS` where `TRIGGER_SCHEMA` = '%s' and TRIGGER_NAME = '%s'",
 		//m_seldatabase.GetString(), temptextstr.GetString());
 	query.Sprintf("SHOW TRIGGERS FROM `%s` WHERE `Trigger`='%s'", m_seldatabase.GetString(), temptextstr.GetString());
- 
+	/*query1.Sprintf("show create trigger `%s`. `%s`", m_seldatabase.GetString(), temptextstr.GetString());*/
     res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
-
+	////bug http://bugs.mysql.com/bug.php?id=75685. We have to fire show create trigger to get the body of trigger
+	//res1=ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query1);
 	if(!res && wnd->m_tunnel->mysql_affected_rows(wnd->m_mysql)== -1)
 	{
 		ShowMySQLError(m_hwnd, wnd->m_tunnel, &wnd->m_mysql);
 		return wyFalse;
 	}
-
+	/*if(!res1 && wnd->m_tunnel->mysql_affected_rows(wnd->m_mysql)== -1)
+	{
+		ShowMySQLError(m_hwnd, wnd->m_tunnel, &wnd->m_mysql);
+		return wyFalse;
+	}
+*/
 	if(wnd->m_tunnel->mysql_num_rows(res)> 0)
 	{
 		msg.Sprintf("Trigger '%s' already exists!", temptextstr.GetString());
@@ -6704,6 +6710,10 @@ CQueryObject::EndRenameTrigger(LPNMTVDISPINFO ptvdi)
 			break;
 
 	} while(1);
+	//myrow1=wnd->m_tunnel->mysql_fetch_row(res1);
+	//	//body of trigger
+	//bodyoftrigger.SetAs(myrow1[2]);
+	//GetBodyOfTrigger(&bodyoftrigger);
 
 	/*	Create new view */
 	myrow0str.SetAs(myrow[0], ismysql41);

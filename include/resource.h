@@ -494,6 +494,9 @@
 #define IDC_SETUNIQUE                   1093
 #define IDC_BULKINSERT                  1094
 #define IDC_CHK_DEFINER                 1095
+#define IDC_ZIP                         1750
+#define IDC_TIMESTAMP_PREFIX            1751
+#define IDC_FILE_TABLE                  1752
 #define IDC_NULLREPLACEBY               1098
 #define IDC_OBFONT                      1099
 #define IDC_NULLCHAR                    1099

@@ -2549,9 +2549,9 @@ GetGUICreateTableString(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyC
 	else
 	{
 		if(db)
-			query.Sprintf("show create table %s.%s", db, tbl);
+			query.Sprintf("show create table `%s`.`%s`", db, tbl);
 		else
-			query.Sprintf("show create table %s", tbl);
+			query.Sprintf("show create table `%s`", tbl);
 	}
 													
 	res = ExecuteAndGetResult(wnd, tunnel, mysql, query);//, wyFalse);

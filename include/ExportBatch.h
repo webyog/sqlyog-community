@@ -194,6 +194,8 @@ public:
 	@returns void
 	*/
 	void    SetExpFileName(HWND hwnd);
+	//this function verifies that given path in select file is directory
+	void    IsDirectory(HWND hwnd);
 
 	///This function is used to select the database name from the combo box
 	/**
