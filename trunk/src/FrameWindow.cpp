@@ -10370,7 +10370,7 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 	wyIni inimgr;
 	
 	
-	wyBool	isfileopen = wyTrue, isinitfired=wyFalse;
+	wyBool	isfileopen = wyTrue/*, isinitfired=wyFalse*/;
 	
     wyWChar				directory[MAX_PATH+64] = {0},directorybackup[MAX_PATH+64] = {0};
     wyInt32				focuspos,firstindex = 0;
@@ -10493,16 +10493,16 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 				pGlobals->m_mdiwlist->Insert(my_arg[j].tempmdilist);
 				continue;
 			}
-			else
+			/*else
 			{
 				
 				if(isinitfired==wyFalse)
-				{Tunnel	*tunnel = my_arg[j].conninfo.m_tunnel;
-				VERIFY( tunnel->mysql_init((MYSQL*)0));
+				{
+				mysql_init((MYSQL*)0);
 				isinitfired=wyTrue;
 				}
 				
-			}
+			}*/
 			if(pGlobals->m_pcmainwin->m_hwndconntab == NULL)
 			{
 				//create connection tab
@@ -10772,6 +10772,8 @@ ConnectFromList_mt(void* arg_list)
 		GetHistoryDetailsFromTable(pathstr.GetAsWideChar(),((MY_ARG*)arg_list)->id,&((MY_ARG*)arg_list)->historydata);
 		GetOBDetailsFromTable(pathstr.GetAsWideChar(),((MY_ARG*)arg_list)->id,&((MY_ARG*)arg_list)->obdb);
 	}
+	//fire mysql_thread_end in the end of thread
+	mysql_thread_end();
     return 0;
 }
 

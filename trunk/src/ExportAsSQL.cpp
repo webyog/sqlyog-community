@@ -1336,9 +1336,9 @@ MySQLDump::DumpEvents(wyString * buffer, const wyChar *db)
 wyBool
 MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trigger, wyInt32 * fileerr)
 {
-	MYSQL_RES	      *res = NULL;
-	MYSQL_ROW 	      row = NULL;
-	wyString	      query, def, definer, deftemp;
+	MYSQL_RES	      *res = NULL,*res1=NULL;
+	MYSQL_ROW 	      row = NULL,row1;
+	wyString	      query, def, definer, deftemp,query1,bodyoftrigger;
 	wyChar			  *ch = NULL;
 	wyInt32			  pos;
 	wyBool			  ismysql5017;
@@ -1359,8 +1359,10 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 			return wyFalse;
 	}	
 	query.Sprintf("show triggers from `%s` where `trigger` = '%s'", m_db.GetString(), trigger);
+	query1.Sprintf("show create trigger `%s`. `%s`", m_db.GetString(), trigger);
 
 	res = SjaExecuteAndGetResult(m_tunnel, &m_mysql, query); 
+
 	if(!res)
 		return OnError();
 
@@ -1369,14 +1371,21 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 	sja_mysql_free_result(m_tunnel,res);
 
     res = ExecuteQuery(query);
+	res1= ExecuteQuery(query1);
 
 	if(!res)
 		return OnError();
+	if(!res1)
+		return OnError();
 	row	= sja_mysql_fetch_row(m_tunnel, res);
-
+	//bug http://bugs.mysql.com/bug.php?id=75685. We have to fire show create trigger to get the body of trigger
+	row1=sja_mysql_fetch_row(m_tunnel, res1);
 	if(!row)
 		return OnError();
-		
+	//body of trigger
+	bodyoftrigger.SetAs(row1[2]);
+	GetBodyOfTrigger(&bodyoftrigger);	
+
 	//Definer
 	if(!m_isremdefiner)
 		if(ismysql5017 == wyTrue)
@@ -1426,7 +1435,7 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 						row[4], /* Timing */
 						row[1], /* Event */
 						row[2], /* table */
-						row[3], /*  Statement */
+						bodyoftrigger.GetString(), /*  Statement */
                         m_strnewline.GetString(),
                         m_strnewline.GetString());
 	else
@@ -1437,13 +1446,14 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 						row[4], /* Timing */
 						row[1], /* Event */
 						row[2], /* table */
-						row[3], /*  Statement */
+							bodyoftrigger.GetString(), /*  Statement */
                         m_strnewline.GetString(),
                         m_strnewline.GetString());
 
 	buffer->AddSprintf("%sDELIMITER ;%s", m_strnewline.GetString(), m_strnewline.GetString());
 	
 	sja_mysql_free_result(m_tunnel, res);
+	sja_mysql_free_result(m_tunnel, res1);
 
 	if(m_flushmaster == wyTrue) 
         OnFlushMaster();	

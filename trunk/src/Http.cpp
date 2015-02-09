@@ -27,7 +27,9 @@
 #include "Verify.h"
 
 #define		IGNORE_CERT         SECURITY_FLAG_IGNORE_UNKNOWN_CA | SECURITY_FLAG_IGNORE_CERT_CN_INVALID | SECURITY_FLAG_IGNORE_CERT_DATE_INVALID
-#define		USER_AGENT			"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)"
+//#define		USER_AGENT			"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)"
+//changing user agent to IE11 running in windows 8.1 in SQLyog version 12.08
+#define		USER_AGENT			   "Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0;  rv:11.0) like Gecko"
 
 void httplog(char * buff)
 {/*
@@ -449,7 +451,10 @@ CHttp::AllocHandles ( bool isbase64, int *status, bool checkauth)
 	if (!HttpAddRequestHeaders(m_HttpOpenRequest, contenttypestr.GetAsWideChar () , (DWORD)-1, HTTP_ADDREQ_FLAG_ADD | HTTP_ADDREQ_FLAG_REPLACE ) )
 		return false;
 				
-	if (!HttpAddRequestHeaders(m_HttpOpenRequest, L"HTTP_USER_AGENT: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0\r\n", (DWORD)-1, HTTP_ADDREQ_FLAG_ADD | HTTP_ADDREQ_FLAG_REPLACE ) )
+	/*if (!HttpAddRequestHeaders(m_HttpOpenRequest, L"HTTP_USER_AGENT: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.5) Gecko/20041107 Firefox/1.0\r\n", (DWORD)-1, HTTP_ADDREQ_FLAG_ADD | HTTP_ADDREQ_FLAG_REPLACE ) )
+		return false;*/
+	//changing user string for avoid update your browser bug
+	if (!HttpAddRequestHeaders(m_HttpOpenRequest, L"HTTP_USER_AGENT: Mozilla/5.0 (Windows; U;Windows NT 6.3; en-US; rv:36.0) Gecko/20100101 Firefox/36.0\r\n", (DWORD)-1, HTTP_ADDREQ_FLAG_ADD | HTTP_ADDREQ_FLAG_REPLACE ) )
 		return false;
 
 	if (isbase64 ) {

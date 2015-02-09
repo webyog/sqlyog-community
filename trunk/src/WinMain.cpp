@@ -64,7 +64,11 @@ wyInt32 WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance,
     
     _ASSERT(pGlobals != NULL);
 	//DEBUG_ENTER("WinMain");
-
+	//call mysql_library_init to avoid crash
+	if (mysql_library_init(0, NULL, NULL)) {
+    DisplayErrorText(1, _("could not initialize MySQL library"));
+    return 0;
+  }
 	// First clear every stuff in the pglobals variable.
 	InitGlobals(pGlobals);
 

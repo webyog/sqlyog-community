@@ -893,7 +893,7 @@ TabFields::FetchInitData()
 	if(m_ismariadb52)
 	{
 		query.Clear();
-		query.Sprintf("show create table %s.%s",dbname.GetString(), tblname.GetString());
+		query.Sprintf("show create table `%s`.`%s`",dbname.GetString(), tblname.GetString());
 		myfieldresmariadb = ExecuteAndGetResult(m_mdiwnd, m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), query);
 	
     if(!myfieldresmariadb)

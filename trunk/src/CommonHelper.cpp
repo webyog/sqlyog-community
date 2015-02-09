@@ -639,16 +639,27 @@ GetFieldIndex(Tunnel *tunnel, MYSQL_RES * result, wyChar * colname)
     
 	return -1;
 }
-
+wyInt32 GetBodyOfTrigger(wyString *body )
+{
+int index;
+wyString result;
+//Find the index of string "for each row"
+index=body->FindI("for each row");
+//now body will be statrting of string+index+lenght of "for each row"+1
+result.SetAs(body->GetString()+index+13);
+body->Clear();
+body->SetAs(result);
+return 1;
+}
 #ifdef _WIN32
 wyBool 
 GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *trigger, wyString &strtrigger, wyString &strmsg, wyBool isdefiner)
 {
 	wyInt32		pos;
 	wyChar		*ch = NULL;
-	wyString    deftemp, def, query, definer;
-	MYSQL_RES	*myres;
-	MYSQL_ROW	myrow;
+	wyString    deftemp, def, query,query1, definer,bodyoftrigger;
+	MYSQL_RES	*myres,*myres1;
+	MYSQL_ROW	myrow,myrow1;
 	wyInt32		coldefiner = -1; 
 	wyInt32		coltablename = -1;
 	wyInt32		colevent = -1;
@@ -660,8 +671,10 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 
 	query.Sprintf("show triggers from `%s` where `trigger` = '%s'", db, trigger);
     myres = SjaExecuteAndGetResult(tunnel, mysql, query);
-			
-	if(!myres)
+	//bug http://bugs.mysql.com/bug.php?id=75685. We have to fire show create trigger to get the body of trigger
+	query1.Sprintf("show create trigger `%s`. `%s`", db, trigger);
+	myres1 = SjaExecuteAndGetResult(tunnel, mysql, query1);
+	if(!myres && !myres1)
 	{
 		GetError(tunnel, mysql, strmsg);
 		return wyFalse;
@@ -675,7 +688,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	}
 
 	myrow = sja_mysql_fetch_row(tunnel, myres);
-
+	myrow1= sja_mysql_fetch_row(tunnel, myres1);
 	if(!myrow || !myrow[0])
 	{
 		strmsg.SetAs(_("Unable to retrieve information. Please check your permission."));
@@ -683,8 +696,11 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
         return wyFalse;		
 	}
 			
-	
-	//Trigger Definer
+	//body of trigger
+	bodyoftrigger.SetAs(myrow1[2]);
+	GetBodyOfTrigger(&bodyoftrigger);
+
+//	Trigger Definer
 	if(!isdefiner)
 		if(ismysql5017 == wyTrue) 
 		{
@@ -769,12 +785,14 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 			FMT_SPACE_4, def.GetString(), FMT_SPACE_4,db, myrow[0], myrow[4], myrow[1], db, table, FMT_SPACE_4, myrow[3]);*/
 		/*strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
 			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, myrow[0], myrow[4], myrow[1], table, FMT_SPACE_4, myrow[3]);*/
+
 		if(isdefiner)
 			strtrigger.Sprintf("CREATE\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
-			FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, myrow[colstmt]);
+			FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, bodyoftrigger.GetString());
 		else
 			strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
-			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, myrow[colstmt]);
+			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, bodyoftrigger.GetString());
+		
     }
     else
     {
@@ -782,6 +800,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
         return wyFalse;
     }
 	sja_mysql_free_result(tunnel, myres);
+	sja_mysql_free_result(tunnel, myres1);
 
 	return wyTrue;
 }

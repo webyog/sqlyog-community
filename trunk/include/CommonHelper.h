@@ -289,6 +289,8 @@ wyInt32 CopyTableFromNewToOld(Tunnel * tunnel, PMYSQL mysql, Tunnel * newtargett
 @param colname      : IN Column name
 */
 wyInt32 GetFieldIndex(Tunnel *tunnel, MYSQL_RES * result, wyChar * colname);
+//function was written as a patch for bug--http://bugs.mysql.com/bug.php?id=75685.
+wyInt32 GetBodyOfTrigger(wyString *body );
 #ifdef _WIN32
 /// Gets the CREATE TRIGGER string
 /**

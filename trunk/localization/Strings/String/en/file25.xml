@@ -20,5 +20,8 @@
 	<string name="3646">Specify Job File:</string>
 	<string name="3647">Virtuality</string>
 	<string name="3648">Expression</string>
+	<string name="3649">Advance options</string>
+	<string name="3650">Prefix with Timestamp</string>
+	<string name="3651">File per object</string>
 	
 </resources>

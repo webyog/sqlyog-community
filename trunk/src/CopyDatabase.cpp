@@ -3467,9 +3467,9 @@ CopyDatabase::ExportEvent(const wyChar *db, const wyChar *event)
 wyBool 
 CopyDatabase::ExportTrigger(const wyChar *db, const wyChar *triggername)
 {
-	MYSQL_RES	*res = NULL, *tgtres = NULL;
-	MYSQL_ROW	 myrow;
-	wyString    query, row0str, row1str, trigger, row3str, row4str;
+	MYSQL_RES	*res = NULL, *tgtres = NULL,*myres1=NULL;
+	MYSQL_ROW	 myrow,myrow1;
+	wyString    query,query1, row0str, row1str, trigger, row3str, row4str,bodyoftrigger;
 	
 	 if(m_dropobjects)
 	 {
@@ -3485,9 +3485,17 @@ CopyDatabase::ExportTrigger(const wyChar *db, const wyChar *triggername)
 	query.Sprintf("show triggers from `%s` where `trigger` = '%s'", db, triggername);
     res = SjaExecuteAndGetResult(m_newsrctunnel, &m_newsrcmysql, query);
 	trigger.SetAs(triggername);
+	//bug http://bugs.mysql.com/bug.php?id=75685. We have to fire show create trigger to get the body of trigger
+	query1.Sprintf("show create trigger `%s`. `%s`", db, triggername);
+	myres1 = SjaExecuteAndGetResult(m_newsrctunnel,  &m_newsrcmysql, query1);
 	if(!res)
 	{
 		ShowMySQLError(m_hwnddlg, m_newsrctunnel, &m_newsrcmysql, query.GetString());
+		return wyFalse;
+	}
+	if(!myres1)
+	{
+		ShowMySQLError(m_hwnddlg, m_newsrctunnel, &m_newsrcmysql, query1.GetString());
 		return wyFalse;
 	}
 	if(m_newsrctunnel->mysql_num_rows(res) == 0)
@@ -3497,11 +3505,15 @@ CopyDatabase::ExportTrigger(const wyChar *db, const wyChar *triggername)
 	}
 	
 	myrow = m_newsrctunnel->mysql_fetch_row(res);
+	myrow1=m_newsrctunnel->mysql_fetch_row(myres1);
+		//body of trigger
+	bodyoftrigger.SetAs(myrow1[2]);
+	GetBodyOfTrigger(&bodyoftrigger);
 
 	if(myrow && myrow[0] && myrow[1] && myrow[3]&& myrow[2] && myrow[4])
     {
        		query.Sprintf("CREATE TRIGGER `%s` %s %s ON `%s`.`%s` FOR EACH ROW %s", 
-			 trigger.GetString(), myrow[4], myrow[1], m_targetdb.GetString(),  myrow[2], myrow[3]);
+				trigger.GetString(), myrow[4], myrow[1], m_targetdb.GetString(),  myrow[2], bodyoftrigger.GetString());
 			
     }
     else
@@ -3524,6 +3536,7 @@ CopyDatabase::ExportTrigger(const wyChar *db, const wyChar *triggername)
 	m_gui_routine((void*)m_gui_lparam, (wyChar*)triggername, 0, wyFalse, TRIGGERCOPIED);	
 	
 	m_newsrctunnel->mysql_free_result(res);
+	m_newsrctunnel->mysql_free_result(myres1);
 
 	return wyTrue;
 }
