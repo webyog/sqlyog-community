@@ -41,14 +41,12 @@
 	<string name="1036">이 접속 상세를 정말 삭제하시겠습니까?</string>
 	<string name="1037">접속 성공!
 MySQL 버전: %s</string>
-	<string name="1038">접속 정보</string>
-	<string name="1039">새로운 창을 초기화하지 못했습니다</string>
-	<string name="1040">이 기능은 HTTP 터널을 이용하여 접속할 경우에만 가능합니다.</string>
-	<string name="1041">&amp;복구</string>
-	<string name="1042">HTTP 오류 번호 %d
-%s</string>
-	<string name="1043">오류 번호 %d
-%s</string>
+	<<string name="1038">접속 정보</string>
+ 	<string name="1039">새로운 창을 초기화하지 못했습니다</string>
+ 	<string name="1040">이 기능은 HTTP 터널을 이용하여 접속할 경우에만 가능합니다.</string>
+	<string name="1041">복구(&amp;R)</string>
+ 	<string name="1042">HTTP 오류 번호 %d %s</string>
+	<string name="1043">오류 번호 %d %s</string>
 	<string name="1044">접속: %d</string>
 	<string name="1045">태그 파일 빌드하기</string>
 	<string name="1046">태그 파일 리빌드하기</string>
@@ -63,9 +61,9 @@ MySQL 버전: %s</string>
 	<string name="1055">새로운 이벤트 이름 입력하기</string>
 	<string name="1056">새로운 트리거 이름 입력하기</string>
 	<string name="1057">라인 수 입력</string>
-	<string name="1058">&amp; 이동</string>
+	<string name="1058">이동(&amp;G)</string> 
 	<string name="1059">데이터베이스 변경</string>
-	<string name="1060">&amp;변경</string>
+	<string name="1060">변경(&amp;A)</string>
 	<string name="1061">유효한 데이터베이스 이름을 입력하십시오.</string>
 	<string name="1062">데이터베이스가 성공적으로 변경되었습니다</string>
 	<string name="1063">유효한 보기 이름을 입력하십시오</string>
@@ -89,15 +87,15 @@ MySQL 버전: %s</string>
 	<string name="1079">파일이 비었습니다</string>
 	<string name="1080">참조된 파일을 열 수 없습니다.</string>
 	<string name="1081">참조된 파일에 쓸 수 없습니다.</string>
-	<string name="1082">&amp;SQl 선언 붙여넣기</string>
+	<string name="1082">SQl 문 붙여넣기(&amp;P)</string>
 	<string name="1083">%s를 찾지 못하거나  오류가 생겼습니다.
 %s를 다시 설치하십시오.</string>
 	<string name="1084">(값에 대한 필터는 이미 입력되었습니다)</string>
 	<string name="1085">1개 이상의 저장된 프로그램이나 보기가 복사되었습니다.
 SQL 참조하는 &lt;source> 데이터베이스 이름을 포함하거나 수동 조절을 필요로 할 것입니다.</string>
 	<string name="1086">최소 하나의 객체를 선택하십시오.</string>
-	<string name="1087">소스 서버로 접속하는 중</string>
-	<string name="1088">목표 서버로 접속 중</string>
+	<string name="1087">원본 서버로 접속하는 중</string>
+	<string name="1088">대상 서버로 접속 중</string>
 	<string name="1089">성공적으로 복사됨</string>
 	<string name="1090">복사될 것이 없습니다</string>
 	<string name="1091">복사 중 오류 발생</string>
@@ -116,8 +114,8 @@ SQL 참조하는 &lt;source> 데이터베이스 이름을 포함하거나 수동
 	<string name="1104">트리거 &apos;%s&apos; 복사됨</string>
 	<string name="1105">이벤트 &apos;%s&apos; 복사됨</string>
 	<string name="1106">%d %s 복사됨</string>
-	<string name="1107">&amp;복사</string>
-	<string name="1108">&amp;정지</string>
+	<string name="1107">복사(&amp;C)</string>
+	<string name="1108">정지(&amp;S)</string>
 	<string name="1109">스키마 파일을 열 수 없습니다.</string>
 	<string name="1110">파일이 에디터로 열기에 너무 큽니다. 대신 도구-> SQL 덤프로부터 복구를 사용해보십시오.</string>
 	<string name="1111">쿼리</string>
@@ -151,18 +149,18 @@ SQL 참조하는 &lt;source> 데이터베이스 이름을 포함하거나 수동
 	<string name="1133">선택된 열을 지우시겠습니까?</string>
 	<string name="1134">현재 선택된 열을 삭제하시겠습니까?</string>
 	<string name="1135">클립보드에 데이터를 복사하지 못했습니다.</string>
-	<string name="1136">공간 데이터 타입의 삽입 혹은 업데이트를 지원하지 않습니다.</string>
+	<string name="1136">공간 데이터 타입의 SELECT 혹은 UPDATE를 지원하지 않습니다.</string>
 	<string name="1137">초기화 필터</string>
-	<string name="1138">우연적인 손상으로부터 데이터를 보호하려면 SQLyog는 업데이트가 끝난 지점에서 데이터베이스 컨텍스를 확인할 것입니다. 
-이 결과 세트의 데이터는 현재 선택된 데이터베이스로부터 생성된 것이 아닙니다.
+	<string name="1138">우연적인 손상으로부터 데이터를 보호하려면 SQLyog는 UPDATE가 끝난 지점에서 데이터베이스 컨텍스를 확인할 것입니다. 
+ 이 결과 세트의 데이터는 현재 선택된 데이터베이스로부터 생성된 것이 아닙니다.
 
-업데이트를 수행하기 위해서 먼저 이 결과를 생성할 곳으로부터 데이터를 선택해야 합니다. 그 후 SQLyog는 이 결과 세트로부터 업데이트 가능한 데이터베이스에서 테이블을 보여줄 것입니다.</string>
+업데이트를 수행하기 위해서 먼저 이 결과를 생성할 곳으로부터 데이터를 선택해야 합니다. 그 후 SQLyog는 이 결과 세트로부터 UPDATE 가능한 데이터베이스에서 테이블을 보여줄 것입니다.</string>
 	<string name="1139">이 결과 세트는 이 객체 브라우저에서 현재 선택된 데이터베이스로부터 생성된 것이 아닙니다. 이 결과를 수정하는 것은 데이터 컨텍스트가 잘못 되었을 경우 데이터 오류를 불러올 수 있습니다. 작업을 수행하고자하는 곳에서 데이터베이스를 선택하였는지 확인하십시오. 
 계속하시겠습니까?</string>
 	<string name="1140">열 제한하기</string>
 	<string name="1141">첫째 열:</string>
 	<string name="1142">열 갯수:</string>
-	<string name="1143">새로고침</string>
+	<string name="1143">새로 고침</string>
 	<string name="1144">다른 이름으로 내보내기... (Ctrl+Shift+E)</string>
 	<string name="1145">데이터 복사하기</string>
 	<string name="1146">선택된 열의 데이터를 클립보드에 복사하기</string>
@@ -200,7 +198,7 @@ SQL 참조하는 &lt;source> 데이터베이스 이름을 포함하거나 수동
 	<string name="1173">파일에 쓰기 오류</string>
 	<string name="1174">데이터베이스가 선택되지 않았습니다. 드롭다운 메뉴에서 데이터베이스를 선택하십시오.</string>
 	<string name="1175">다른이름으로 저장</string>
-	<string name="1176">S&amp;맨 위</string>
+	<string name="1176">중지(&amp;T)</string>
 	<string name="1177">내보내기 성공</string>
 	<string name="1178">덤프 파일을 생성할 수 없습니다.
 덤프 파일을 확인하십시오 -
@@ -210,7 +208,7 @@ SQL 참조하는 &lt;source> 데이터베이스 이름을 포함하거나 수동
 	<string name="1179">오류 번호.: %d
 %s</string>
 	<string name="1180">내보내기가 성공하지 못함</string>
-	<string name="1181">&amp;내보내기</string>
+	<string name="1181">내보내기(&amp;ㄸ)</string>
 	<string name="1182">오직 테이블만 데이터를 가질 수 있습니다. 덤핑을 위해 하나의 테이블만 선택하십시오 - 데이터 전용.</string>
 	<string name="1183">오직 테이블만 데이터를 갖습니다. 덤핑을 위해 최소 1개 이상의 테이블을 선택하십시오 - 데이터 전용</string>
 	<string name="1184">최소 1개의 객체를 선택하십시오</string>
@@ -223,10 +221,10 @@ SQL 참조하는 &lt;source> 데이터베이스 이름을 포함하거나 수동
 	<string name="1191">트리거 내보내기: %s</string>
 	<string name="1192">테이블 내보내는 중: %s 
 내보낸 열: %d</string>
-	<string name="1193">SQL 선언의 가장 간결한 형식으로 데이터를 저장합니다.
-추가적인 테이블 정보 (인덱스, 캐릭터세트, 코멘트 등)은 저장되지 않습니다.
-
-데이터를 백업하고자한다면 &apos;SQL 덤프로 테이블 백업&apos;을 사용하십시오.</string>
+	<string name="1193">SQL 문을 가장 간결한 형식으로 데이터를 저장합니다.
++추가적인 테이블 정보 (인덱스, 문자 인코딩, 코멘트 등)은 저장되지 않습니다.
+ 
+ 데이터를 백업하고자한다면 &apos;SQL 덤프로 테이블 백업&apos;을 사용하십시오.</string>
 	<string name="1194">폴더를 지정하십시오</string>
 	<string name="1195">최소 하나의 테이블을 선택하십시오</string>
 	<string name="1196">데이터베이스를 백업하고자하는 폴더를 선택하기</string>
@@ -269,11 +267,11 @@ SQL 참조하는 &lt;source> 데이터베이스 이름을 포함하거나 수동
 	<string name="1230">모두 교체하기</string>
 	<string name="1231">찾기</string>
 	<string name="1232">필터 텍스트를 여기 입력하십시오...</string>
-	<string name="1233">새로고침</string>
+	<string name="1233">새로 고침(&amp;S)</string>
 	<string name="1234">부모 테이블 열을 검색하기 위한 검색을 중지하십시오</string>
-	<string name="1235">&amp;컬럼</string>
-	<string name="1236">테이블</string>
-	<string name="1237">&amp; 데이터베이스</string>
+	<string name="1235">컬럼(&amp;C)</string>
+	<string name="1236">테이블(&amp;A)</string>
+	<string name="1237">데이터베이스(&amp;D)</string>
 	<string name="1238">SQLyog 재접속됨</string>
 	<string name="1239">SQLyog 재접속 실패</string>
 </resources>

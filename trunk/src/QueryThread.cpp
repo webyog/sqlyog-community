@@ -22,6 +22,7 @@
 #include "CommonHelper.h"
 #include "pcre.h"
 #include "SQLFormatter.h"
+#include "Global.h"
 
 #ifndef COMMUNITY
 #include "HelperEnt.h"
@@ -157,7 +158,7 @@ AddErrorOrMsg(wyInt32 errstatus, wyString& buffer, Tunnel * tunnel, PMYSQL mysql
 
 /* executes query, initialisez the correct structure and adds it to the query list */
 wyInt32		
-HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query)
+HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query,wyBool ismultiplequeries)
 {
 	wyUInt32        len;
 	wyInt32         ret;
@@ -180,7 +181,7 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query)
 		&& param->m_iseditor == wyTrue
 		&& param->isprofile == wyTrue 
 		&& param->wnd->m_isselectquery == wyFalse &&
-        param->isadvedit == wyFalse)
+        param->isadvedit == wyFalse && ismultiplequeries==wyFalse)//if there are multiple queries don't use profiler.
 
 	{
 		SetPQABeforeExecutionOptions(param, param->wnd, query);
@@ -377,20 +378,20 @@ FreeList(QueryResultList * queryresult, wyInt32 freeparam /*= false*/)
 void		
 ExecuteQuery(QUERYTHREADPARAMS * param)
 {	
-	const wyChar        *token;
+	const wyChar        *token,*tokentemp;
 	wyChar              *selquery = NULL, *dump1 = NULL, *dump2;
-	wyChar              delimiter[256] = {0};
+	wyChar              delimiter[256] = {0},delimitertemp[256]={0};
 	const wyChar        *query;
-	wyInt32             isdel = 0;
-	wyUInt32		    length = 0, numquery = 0;
-	wyUInt32		    len = 0, linenum = 0;
-	SQLTokenizer		*tok;
+	wyInt32             isdel = 0,isdeltemp=0;
+	wyUInt32		    length = 0, numquery = 0,numberofqueries=0;
+	wyUInt32		    len = 0, linenum = 0,lentemp=0,linenumbertemp=0;
+	SQLTokenizer		*tok,*toktemp;
 	wyString			tempdump;
     wyInt32             querycount = 0;// used to implement the single query execution even if tyhe cursor is outside the query
     wyUInt32            sumoftotaltime = 0, sumofexectime = 0;
     wyString            explainQuery;
 	wyChar *			querystr;
-
+	wyBool              ismultiplequeries=wyFalse;
 	querystr = (wyChar *)param->query->GetString();
 
 #ifndef COMMUNITY
@@ -424,7 +425,7 @@ ExecuteQuery(QUERYTHREADPARAMS * param)
 	}
 
 	tok = new SQLTokenizer(param->tunnel, param->mysql, SRC_BUFFER, (void*)query, length);
-
+	toktemp= new SQLTokenizer(param->tunnel, param->mysql, SRC_BUFFER, (void*)query, length);
 	length		= 0;
 	numquery	= 0;
 
@@ -435,7 +436,23 @@ ExecuteQuery(QUERYTHREADPARAMS * param)
         param->wnd->m_pctabmodule->GetActiveTabEditor()->m_pctabmgmt->m_pcquerymessageedit->m_sumofexectime = 0;
         param->wnd->m_pctabmodule->GetActiveTabEditor()->m_pctabmgmt->m_pcquerymessageedit->m_sumoftotaltime = 0;
     }
+	//find number of queries--if number of queries are more than one we don't use profiler.
+	while(tokentemp=toktemp->GetQuery(&lentemp, &linenumbertemp, &isdeltemp, delimitertemp))
+	{
+		if(numberofqueries>1)
+		{
+			break;
+		}
 
+		else
+
+		{
+			numberofqueries++;
+		}
+	}
+	if(numberofqueries>1)
+	{   ismultiplequeries=wyTrue;}
+	//ok we are done with counting number of queries--lets execute them.
 	while(token = tok->GetQuery(&len, &linenum, &isdel, delimiter))
 	{
 		param->m_islimitpresent = wyTrue;
@@ -472,7 +489,7 @@ ExecuteQuery(QUERYTHREADPARAMS * param)
 			        continue;
 		        }
 
-				if(HelperExecuteQuery(param, dump2))
+				if(HelperExecuteQuery(param, dump2,ismultiplequeries))
 				{
 					(*param->error)++;
 					param->wnd->m_isselectquery = wyFalse;
@@ -488,7 +505,7 @@ ExecuteQuery(QUERYTHREADPARAMS * param)
 				if(param->m_iseditor == wyTrue && pGlobals->m_resuttabpageenabled == wyTrue)
 					HandleLimitWithSelectQuery(dump2, param);
                 
-				if(HelperExecuteQuery(param, dump2))
+				if(HelperExecuteQuery(param, dump2,ismultiplequeries))
 				{
 					(*param->error)++;
 					param->wnd->m_isselectquery = wyFalse;
@@ -533,7 +550,7 @@ ExecuteQuery(QUERYTHREADPARAMS * param)
 			                continue;
 		                }
 
-                        if(HelperExecuteQuery(param, dump2))
+                        if(HelperExecuteQuery(param, dump2,ismultiplequeries))
 					    {
 						    (*param->error)++;
 						    param->wnd->m_isselectquery = wyFalse;
@@ -546,7 +563,7 @@ ExecuteQuery(QUERYTHREADPARAMS * param)
 					if(pGlobals->m_resuttabpageenabled == wyTrue)
 						HandleLimitWithSelectQuery(dump2, param);
 					
-					if(HelperExecuteQuery(param, dump2))
+					if(HelperExecuteQuery(param, dump2,ismultiplequeries))
 					{
 						(*param->error)++;
 						param->wnd->m_isselectquery = wyFalse;
@@ -758,13 +775,13 @@ AddExplainQueryResults(QueryResultList * queryresult, wyString &str, TabMgmt * t
 
 /* function adds date to the tab with information from the list */
 void
-AddQueryResults(QueryResultList * queryresult, wyString &str, TabMgmt * tab, wyInt32 err, MDIWindow *wnd,  wyBool isfirstexecute)
+AddQueryResults(QueryResultList * queryresult, wyString &str, TabMgmt * tab, wyInt32 err, MDIWindow *wnd, wyBool isfirstexecute)
 {
 	wyInt32         count = 0, warningcount = 0, i;
     QueryResultElem *elem;	
     wyString        temp;
     wyBool          isTabResultAdded = wyFalse;
-    wyInt32         indexResultTab = 0;
+    wyInt32         indexResultTab = 0,numberofqueries;
 
 #ifndef COMMUNITY
 	wyInt32			ret = 1;
@@ -774,7 +791,7 @@ AddQueryResults(QueryResultList * queryresult, wyString &str, TabMgmt * tab, wyI
     SendMessage(tab->m_hwnd, WM_SETREDRAW, FALSE, 0);
     tab->DeleteAllItem(wyFalse);
 	elem = (QueryResultElem*)queryresult->GetFirst();	
-    
+	numberofqueries=queryresult->GetCount();
 	while(elem)
 	{
 		/* if its a result then add a result param */
@@ -798,11 +815,12 @@ AddQueryResults(QueryResultList * queryresult, wyString &str, TabMgmt * tab, wyI
         if(tab->m_tabeditorptr->m_peditorbase->m_isadvedit == wyFalse &&
             pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO && pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_NORMAL)
 		{	
-			if(wnd && pGlobals->m_ispqaenabled == wyTrue && elem->param && ispqa == wyFalse)
+			if(wnd && pGlobals->m_ispqaenabled == wyTrue && elem->param && ispqa == wyFalse && numberofqueries<=1)
 			{
 				istunnel = (elem->param->m_pmdi->m_tunnel->IsTunnel()) ? wyTrue : wyFalse;
 				
 				//Anylyzer tab index will be just after the 1st 'select' result tab
+				
 				ret = tab->AddQueryAnalyzer(elem->param, elem->param->m_isselectquery, istunnel, count);
 				
 				if(ret == 1 || ret == -1)
@@ -1046,5 +1064,6 @@ void FreeQueryExeFInishParams(QUERYFINISHPARAMS *queryparams, wyInt32 freeparam)
     FreeList(queryparams->list, freeparam);
 
 	free(queryparams);
+
 	return;
 }

@@ -1235,6 +1235,11 @@ ConnectionCommunity::CreateTargetInstance(CopyDatabase *copydb)
 		ShowMySQLError(copydb->m_hwnddlg, copydb->m_newtargettunnel, &tempmysql, NULL, wyTrue);
 		return wyFalse;
 	}
+	else
+	{
+		copydb->m_newtargetmysql=newtargetmysql;
+	
+	}
 
 	if(!copydb->CreateTargetDB())
 		return wyFalse;

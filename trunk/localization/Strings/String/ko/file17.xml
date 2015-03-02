@@ -4,7 +4,7 @@
 	<string name="3596">차집합%.*s 첫 번째 배치 검색 중</string>
 	<string name="3597">차집합%.*s 다음 배치 검색 중</string>
 	<string name="3598">차집합%.*s 이전 배치 검색 중</string>
-	<string name="3599">테ㅇ</string>
+	<string name="3599">테이블이 존재하지 않습니다</string>
 	<string name="3600">스키마 불일치! 수정하려면 스키마 동기화 도구를 이용하세요.</string>
 	<string name="3601">기본 키/유일 키가 없는 테이블 비교는 지원하지 않습니다.</string>
 	<string name="3602">현재 테이블에 저장되지 않은 변경사항이 있습니다.</string>

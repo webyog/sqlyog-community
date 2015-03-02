@@ -645,7 +645,9 @@ TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres,wyString createtable)
 	if(m_ismariadb52)
 	{
 	wholecreatestring = (wyChar*)strdup(createtable.GetString());
+	if(wholecreatestring)
 	currentrowstr=strtok(wholecreatestring,"\n");
+	if(currentrowstr)
 	currentrowstr=strtok(NULL,"\n");
 	}
 	/// Extracting and storing all column values
@@ -823,7 +825,7 @@ TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres,wyString createtable)
 		cwrapobj2 = new FieldStructWrapper(fieldattr, wyFalse);
         m_listwrapperstruct.Insert(cwrapobj);
 		m_listwrapperstruct_2.Insert(cwrapobj2);
-		
+		if(IsMariaDB52 && currentrowstr)
 		currentrowstr=strtok(NULL,"\n");
 	}
     return wyTrue;
