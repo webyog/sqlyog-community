@@ -1342,6 +1342,7 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 	wyChar			  *ch = NULL;
 	wyInt32			  pos;
 	wyBool			  ismysql5017;
+	wyBool      isshowcreateworked=wyTrue;
 
 	ismysql5017 = IsMySQL5017(m_tunnel, &m_mysql);
     		
@@ -1351,6 +1352,7 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 			return wyFalse;
 	}
 
+
 	m_routine(m_lpparam, trigger, 0, TRIGGERSTART);
 	
 	if(m_flushlog == wyTrue) 
@@ -1358,6 +1360,17 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 		if(OnFlushLog() == wyFalse)
 			return wyFalse;
 	}	
+	//There are mutiple issues with show triggers and show create trigger in MySQL servers--
+	//with show create trigger there are following issues-
+	//1-SHOW CREATE TRIGGER was added in MySQL 5.1.21 so it will not work for older versions
+	//2-This bug reprot-http://bugs.mysql.com/bug.php?id=58996
+	//With show triggers there are following issues--
+	//1-Curruption of quotes refer-http://forums.webyog.com/index.php?showtopic=7625&hl= and http://bugs.mysql.com/bug.php?id=75685.
+	//So now here is the logic for getting things correct up to maximum extent--
+	//fire both queries and
+	//First try to use show create trigger if query works then get the body of trigger from the result
+	//if show create trigger fails use show triggers--because user can have trigger without quotes
+	//Below is the implementation of this logic.
 	query.Sprintf("show triggers from `%s` where `trigger` = '%s'", m_db.GetString(), trigger);
 	query1.Sprintf("show create trigger `%s`. `%s`", m_db.GetString(), trigger);
 
@@ -1376,15 +1389,24 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 	if(!res)
 		return OnError();
 	if(!res1)
-		return OnError();
+		isshowcreateworked=wyFalse;
 	row	= sja_mysql_fetch_row(m_tunnel, res);
 	//bug http://bugs.mysql.com/bug.php?id=75685. We have to fire show create trigger to get the body of trigger
+	if(isshowcreateworked)
 	row1=sja_mysql_fetch_row(m_tunnel, res1);
 	if(!row)
 		return OnError();
 	//body of trigger
-	bodyoftrigger.SetAs(row1[2]);
-	GetBodyOfTrigger(&bodyoftrigger);	
+	if(isshowcreateworked && row1[2])
+	{
+		bodyoftrigger.SetAs(row1[2]);
+	if(GetBodyOfTrigger(&bodyoftrigger)==-1)
+	{
+	sja_mysql_free_result(m_tunnel,res);
+	sja_mysql_free_result(m_tunnel,res1);
+	
+	}
+	}
 
 	//Definer
 	if(!m_isremdefiner)
@@ -1429,6 +1451,8 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 	}
 	
 	if(m_isremdefiner)
+	{
+		if(isshowcreateworked && bodyoftrigger.GetLength()!=0)
 		buffer->AddSprintf("%s/*!50003 CREATE */ /*!50003 TRIGGER `%s` %s %s ON `%s` FOR EACH ROW %s */$$%s%s", 
 						m_strnewline.GetString(),
 						row[0], /* Trigger */
@@ -1438,7 +1462,21 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 						bodyoftrigger.GetString(), /*  Statement */
                         m_strnewline.GetString(),
                         m_strnewline.GetString());
+		else
+			buffer->AddSprintf("%s/*!50003 CREATE */ /*!50003 TRIGGER `%s` %s %s ON `%s` FOR EACH ROW %s */$$%s%s", 
+						m_strnewline.GetString(),
+						row[0], /* Trigger */
+						row[4], /* Timing */
+						row[1], /* Event */
+						row[2], /* table */
+						row[3], /*  Statement */
+                        m_strnewline.GetString(),
+                        m_strnewline.GetString());
+
+	}
 	else
+	{
+		if(isshowcreateworked && bodyoftrigger.GetLength()!=0)
 		buffer->AddSprintf("%s/*!50003 CREATE */ %s /*!50003 TRIGGER `%s` %s %s ON `%s` FOR EACH ROW %s */$$%s%s", 
 						m_strnewline.GetString(),
                         definer.GetString(), /*Definer*/
@@ -1446,10 +1484,22 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 						row[4], /* Timing */
 						row[1], /* Event */
 						row[2], /* table */
-							bodyoftrigger.GetString(), /*  Statement */
+						bodyoftrigger.GetString(), /*  Statement */
+                        m_strnewline.GetString(),
+                        m_strnewline.GetString());
+		else
+			buffer->AddSprintf("%s/*!50003 CREATE */ %s /*!50003 TRIGGER `%s` %s %s ON `%s` FOR EACH ROW %s */$$%s%s", 
+						m_strnewline.GetString(),
+                        definer.GetString(), /*Definer*/
+						row[0], /* Trigger */
+						row[4], /* Timing */
+						row[1], /* Event */
+						row[2], /* table */
+						row[3], /*  Statement */
                         m_strnewline.GetString(),
                         m_strnewline.GetString());
 
+	}
 	buffer->AddSprintf("%sDELIMITER ;%s", m_strnewline.GetString(), m_strnewline.GetString());
 	
 	sja_mysql_free_result(m_tunnel, res);

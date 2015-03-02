@@ -37,6 +37,7 @@ TabAdvancedProperties::TabAdvancedProperties(HWND hwnd, TableTabInterfaceTabMgmt
     m_hlastfocusedwnd       =   NULL;
     m_mdiwnd                =   GetActiveWin();
     m_ismysql41             =   IsMySQL41(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
+	m_ismysql553            =   IsMySQL553(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
 
     //..To achieve Tab/Shift+Tab keys functionality
     m_wporigcomment         =   NULL;
@@ -412,7 +413,10 @@ void
 TabAdvancedProperties::InitAllWindows(wyBool includedefault)
 {
 	// set the text limit of the edit boxes to the max field.
-	SendMessage(GetDlgItem(m_hwnd, IDC_COMMENT), EM_LIMITTEXT, 60, 0);
+	if(m_ismysql553)
+	SendMessage(GetDlgItem(m_hwnd, IDC_COMMENT), EM_LIMITTEXT, 2048, 0);
+	else 
+     SendMessage(GetDlgItem(m_hwnd, IDC_COMMENT), EM_LIMITTEXT, 60, 0);
 
     InitCheckSumValues(includedefault);
     InitDelayKeyWriteValues(includedefault);

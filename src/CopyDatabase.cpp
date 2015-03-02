@@ -3470,7 +3470,18 @@ CopyDatabase::ExportTrigger(const wyChar *db, const wyChar *triggername)
 	MYSQL_RES	*res = NULL, *tgtres = NULL,*myres1=NULL;
 	MYSQL_ROW	 myrow,myrow1;
 	wyString    query,query1, row0str, row1str, trigger, row3str, row4str,bodyoftrigger;
-	
+	wyBool      isshowcreateworked=wyTrue;
+	 //There are mutiple issues with show triggers and show create trigger in MySQL servers--
+	//with show create trigger there are following issues-
+	//1-SHOW CREATE TRIGGER was added in MySQL 5.1.21 so it will not work for older versions
+	//2-This bug reprot-http://bugs.mysql.com/bug.php?id=58996
+	//With show triggers there are following issues--
+	//1-Curruption of quotes refer-http://forums.webyog.com/index.php?showtopic=7625&hl= and http://bugs.mysql.com/bug.php?id=75685.
+	//So now here is the logic for getting things correct up to maximum extent--
+	//fire both queries and
+	//First try to use show create trigger if query works then get the body of trigger from the result
+	//if show create trigger fails use show triggers--because user can have trigger without quotes
+	//Below is the implementation of this logic.
 	 if(m_dropobjects)
 	 {
 		 //drop trigger if trigger is exists in the target 
@@ -3495,30 +3506,48 @@ CopyDatabase::ExportTrigger(const wyChar *db, const wyChar *triggername)
 	}
 	if(!myres1)
 	{
-		ShowMySQLError(m_hwnddlg, m_newsrctunnel, &m_newsrcmysql, query1.GetString());
-		return wyFalse;
+		isshowcreateworked=wyFalse;
 	}
 	if(m_newsrctunnel->mysql_num_rows(res) == 0)
 	{
 		m_newsrctunnel->mysql_free_result(res);
+		if(myres1)
+			 m_newsrctunnel->mysql_free_result(myres1);
 		return wyFalse;
 	}
 	
 	myrow = m_newsrctunnel->mysql_fetch_row(res);
+	if(isshowcreateworked)
 	myrow1=m_newsrctunnel->mysql_fetch_row(myres1);
 		//body of trigger
+	if(isshowcreateworked && myrow1[2])
+	{
 	bodyoftrigger.SetAs(myrow1[2]);
-	GetBodyOfTrigger(&bodyoftrigger);
+	if(GetBodyOfTrigger(&bodyoftrigger)==-1)
+		{
+         
+		  m_newsrctunnel->mysql_free_result(res);
+		  if(myres1)
+			   m_newsrctunnel->mysql_free_result(myres1);
+           return wyFalse;
 
+	     }
+	}
 	if(myrow && myrow[0] && myrow[1] && myrow[3]&& myrow[2] && myrow[4])
     {
+		if(isshowcreateworked && bodyoftrigger.GetLength()!=0)
        		query.Sprintf("CREATE TRIGGER `%s` %s %s ON `%s`.`%s` FOR EACH ROW %s", 
 				trigger.GetString(), myrow[4], myrow[1], m_targetdb.GetString(),  myrow[2], bodyoftrigger.GetString());
+		else
+           query.Sprintf("CREATE TRIGGER `%s` %s %s ON `%s`.`%s` FOR EACH ROW %s", 
+				trigger.GetString(), myrow[4], myrow[1], m_targetdb.GetString(),  myrow[2], myrow[3]);
 			
     }
     else
     {
 		  m_newsrctunnel->mysql_free_result(res);
+		  if(myres1)
+		  m_newsrctunnel->mysql_free_result(myres1);
           return wyFalse;
     }
 

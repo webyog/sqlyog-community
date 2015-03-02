@@ -207,7 +207,7 @@ VOID		HandleLimitWithSelectQuery(wyChar *query, QUERYTHREADPARAMS *param);
 @param param        : Query thread parameters
 @param query        : Query
 */
-wyInt32     HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar *query);
+wyInt32     HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar *query,wyBool ismultiplequeries);
 
 // critcal section functions
 wyBool      IsQueryStopped(QUERYTHREADPARAMS *param);

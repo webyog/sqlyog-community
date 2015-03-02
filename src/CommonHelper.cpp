@@ -645,11 +645,15 @@ int index;
 wyString result;
 //Find the index of string "for each row"
 index=body->FindI("for each row");
+if(index!=-1)
 //now body will be statrting of string+index+lenght of "for each row"+1
+{
 result.SetAs(body->GetString()+index+13);
 body->Clear();
 body->SetAs(result);
 return 1;
+}
+else return -1;
 }
 #ifdef _WIN32
 wyBool 
@@ -665,19 +669,34 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	wyInt32		colevent = -1;
 	wyInt32		colstmt = -1;
 	wyInt32		coltiming = -1;
-    
+	wyBool      isshowcreateworked=wyTrue;
+    //There are mutiple issues with show triggers and show create trigger in MySQL servers--
+	//with show create trigger there are following issues-
+	//1-SHOW CREATE TRIGGER was added in MySQL 5.1.21 so it will not work for older versions
+	//2-This bug reprot-http://bugs.mysql.com/bug.php?id=58996
+	//With show triggers there are following issues--
+	//1-Curruption of quotes refer-http://forums.webyog.com/index.php?showtopic=7625&hl= and http://bugs.mysql.com/bug.php?id=75685.
+	//So now here is the logic for getting things correct up to maximum extent--
+	//fire both queries and
+	//First try to use show create trigger if query works then get the body of trigger from the result
+	//if show create trigger fails use show triggers--because user can have trigger without quotes
+	//Below is the implementation of this logic.
 	wyBool ismysql5017 = IsMySQL5017(tunnel, mysql);
 	wyBool ismysql41 = IsMySQL41(tunnel, mysql);
 
 	query.Sprintf("show triggers from `%s` where `trigger` = '%s'", db, trigger);
     myres = SjaExecuteAndGetResult(tunnel, mysql, query);
-	//bug http://bugs.mysql.com/bug.php?id=75685. We have to fire show create trigger to get the body of trigger
+	
 	query1.Sprintf("show create trigger `%s`. `%s`", db, trigger);
 	myres1 = SjaExecuteAndGetResult(tunnel, mysql, query1);
-	if(!myres && !myres1)
+	if(!myres)
 	{
 		GetError(tunnel, mysql, strmsg);
 		return wyFalse;
+	}
+	if(!myres1)
+	{
+	isshowcreateworked=wyFalse;
 	}
 		
 	if(sja_mysql_num_rows(tunnel, myres)== 0)
@@ -688,6 +707,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	}
 
 	myrow = sja_mysql_fetch_row(tunnel, myres);
+	if(isshowcreateworked)
 	myrow1= sja_mysql_fetch_row(tunnel, myres1);
 	if(!myrow || !myrow[0])
 	{
@@ -695,11 +715,20 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 		sja_mysql_free_result(tunnel, myres);
         return wyFalse;		
 	}
-			
-	//body of trigger
+		
+	//body of trigger using show create triger
+	if(isshowcreateworked && myrow1[2])
+	{
 	bodyoftrigger.SetAs(myrow1[2]);
-	GetBodyOfTrigger(&bodyoftrigger);
+	if(GetBodyOfTrigger(&bodyoftrigger)==-1)
+		{
+         strmsg.SetAs(_("Unable to retrieve body of trigger."));
+		 sja_mysql_free_result(tunnel, myres);
+		  sja_mysql_free_result(tunnel, myres1);
+           return wyFalse;
 
+	     }
+	}
 //	Trigger Definer
 	if(!isdefiner)
 		if(ismysql5017 == wyTrue) 
@@ -709,6 +738,8 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 			if(coldefiner == -1)
 			{
 				sja_mysql_free_result(tunnel, myres);
+				if(myres1)
+		        sja_mysql_free_result(tunnel, myres1);
 				return wyFalse;
 			}
 		
@@ -726,7 +757,9 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 		
 		MessageBox(hwnd, _(L"Unable to retrive the table for this trigger"), 
 					pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
-		sja_mysql_free_result(tunnel, myres);
+		  sja_mysql_free_result(tunnel, myres);
+		  if(myres1)
+		        sja_mysql_free_result(tunnel, myres1);
 
 #endif
 		return wyFalse;
@@ -737,6 +770,8 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	if(coltiming == -1)// || !myrow[coltiming])
 	{
 		sja_mysql_free_result(tunnel, myres);
+		if(myres1)
+		        sja_mysql_free_result(tunnel, myres1);
 		return wyFalse;
 	}
 		
@@ -745,6 +780,8 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	if(colevent == -1)
 	{
 		sja_mysql_free_result(tunnel, myres);
+		  if(myres1)
+		        sja_mysql_free_result(tunnel, myres1);
 		return wyFalse;
 	}
 			
@@ -754,6 +791,8 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	if(colstmt == -1)// || !myrow[colstmt])
 	{
 		sja_mysql_free_result(tunnel, myres);
+		  if(myres1)
+		        sja_mysql_free_result(tunnel, myres1);
 		return wyFalse;
 	}
 		
@@ -787,11 +826,27 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, myrow[0], myrow[4], myrow[1], table, FMT_SPACE_4, myrow[3]);*/
 
 		if(isdefiner)
+		{
+			if(isshowcreateworked && bodyoftrigger.GetLength()!=0)
+			{strtrigger.Sprintf("CREATE\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
+			FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, bodyoftrigger.GetString());}
+			else
+			{
 			strtrigger.Sprintf("CREATE\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
-			FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, bodyoftrigger.GetString());
+			FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4,myrow[colstmt]);
+			}
+		}
 		else
+		{
+			if(isshowcreateworked && bodyoftrigger.GetLength()!=0)
+			{strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
+			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, bodyoftrigger.GetString());}
+			else
+			{
 			strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
-			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, bodyoftrigger.GetString());
+			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, myrow[colstmt]);
+			}
+		}
 		
     }
     else

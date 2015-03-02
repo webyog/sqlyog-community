@@ -21,17 +21,17 @@
 	<string name="3510">줄</string>
 	<string name="3511">메시지/테이블 데이터/정보</string>
 	<string name="3512">데이터를 보거나 수정하려면 결과를 누르세요</string>
-	<string name="3513">&amp;연결 정보 내보내기...</string>
-	<string name="3514">&amp;연결 정보 가져오기...</string>
-	<string name="3515">연결 정보 내보내기/가져오기</string>
+	<string name="3513">연결 정보 내보내기(&amp;E)...</string>
+	<string name="3514">연결 정보 가져오기(&amp;I)...</string>
+	<string name="3515">연결 정보 내보내기/가져오기(&amp;M)</string>
 	<string name="3516">데이터가 성공적으로 내보내졌습니다. 파일을 열겠습니까?</string>
 	<string name="3517">보관을 위한 파일 이름을 정하세요.</string>
 	<string name="3518">연결 유형</string>
 	<string name="3519">접속명</string>
-	<string name="3521">파일 열기...</string>
+	<string name="3521">파일 열기(&amp;O)...</string>
 	<string name="3522">호스트</string>
-	<string name="3523">전체 선택/선택 해제</string>
-	<string name="3524">가져오기</string>
+	<string name="3523">전체 선택/선택 해제(&amp;S)</string>
+	<string name="3524">가져오기(&amp;I)</string>
 	<string name="3525">연결 정보 내보내기</string>
 	<string name="3526">연결 정보 가져오기</string>
 </resources>

@@ -120,6 +120,8 @@ public:
     MDIWindow*                  m_mdiwnd;
 
     wyBool                      m_ismysql41;
+	
+	wyBool                      m_ismysql553;//if mysql version is greater than 5.5.3
 
     TableTabInterfaceTabMgmt*   m_ptabmgmt;
 

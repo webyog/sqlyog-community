@@ -18,12 +18,13 @@
 적용된 필터를 제거하고(만약 있으면) 오브젝트 브라우저를 새로고침 하세요.</string>
 	<string name="3541">모든 데이터베이스 보기</string>
 	<string name="3542">다음의 함수</string>
-	<string name="3543">다음의 프러시저</string>
+	<string name="3543">다음의 프로시저</string>
 	<string name="3544">다음의 테이블</string>
 	<string name="3545">다음의 이벤트</string>
 	<string name="3546"> %d 쿼리 실행됨,  %d 성공, %d 오류, %d 경고</string>
 	<string name="3547">필터 </string>
 	<string name="3548">다음의 트리거</string>
-	<string name="3549">다음의 전망</string>
+	<string name="3549">다음의 뷰</string>
+
 
 </resources>
