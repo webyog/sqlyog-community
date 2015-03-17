@@ -1,6 +1,6 @@
 #SQLyog Community Edition
 SQLyog is an all-round Management Tool (/'GUI'/'Frontend') for MySQL.
-##[Download SQLyog Community Version](https://www.google.com/url?q=https%3A%2F%2Fgithub.com%2Fwebyog%2Fsqlyog-community-old%2Fwiki%2FDownloads&sa=D&sntz=1&usg=AFQjCNGgL00HZRY0sfG4FVVl_ODz3_uGNQ)
+##[Download SQLyog Community Version](https://github.com/webyog/sqlyog-community/wiki/Downloads)
 
 ###Experience SQLyog power tools
 SQLyog comes in 3 editions. Compare all our editions-[Learn more](https://www.webyog.com/product/sqlyogFeatureListExpanded/)
