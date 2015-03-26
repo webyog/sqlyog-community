@@ -897,7 +897,7 @@ CCustTab::DrawCloseControls(HDC hdcmem, PRECT rect, wyInt32 tabcount, PPOINT ptc
             else
                 holdpen = (HPEN)SelectObject(hdcmem,m_hpenhighlight);
         }
-        DrawCloseButtonBorder(hdcmem, &rectclose);
+       // DrawCloseButtonBorder(hdcmem, &rectclose);
 	}	
 
 	DrawCloseButton(hdcmem, &rectclose, ptcursor);
@@ -2629,7 +2629,7 @@ CCustTab::DrawTab(HDC hdc, wyInt32 tabindex, RECT* pdrawrect, RECT* porigrect, P
             SetGradientArrayOnUnFocus(&m_tabdet[tabindex].ctcitem, &temprect, vertex);
         }
 
-        SetGradient(hdc, vertex);
+       // SetGradient(hdc, vertex);
     }
 }
 
@@ -2735,7 +2735,7 @@ CCustTab::DrawTabs(HDC hdc)
 
         temprect.right = (drawrect.left + m_tabdet[i].m_tabwidth) - CLOSERECTPADDING - (m_extflagclose == wyTrue ? CLOSERECTPADDING + CLOSERECTWIDTH : 0);
         temprect.bottom = drawrect.bottom;
-        temprect.top = drawrect.top + (m_isfixedlength == wyTrue ? 2 : 1);
+        temprect.top = drawrect.top + (m_isfixedlength == wyTrue ? 2 : (-2));
         temp.SetAs(m_tabdet[i].ctcitem.m_psztext);
 
         if(i == m_selectedtab)
@@ -2945,7 +2945,7 @@ CCustTab::DrawPlusButton(HDC hdc, PRECT prect, PPOINT pnt)
     borderrect.bottom = rect.bottom + 4;
     borderrect.right = rect.right + 4;
     hpen = (HPEN)SelectObject(hdc, PtInRect(&borderrect, *pnt) ? m_hpenhighlight : m_hpenactivesep);
-    Rectangle(hdc, borderrect.left, borderrect.top, borderrect.right, borderrect.bottom);
+   // Rectangle(hdc, borderrect.left, borderrect.top, borderrect.right, borderrect.bottom);
     SelectObject(hdc, hpen);
 
     vertex[0].x = borderrect.left + 1;
@@ -2996,7 +2996,7 @@ CCustTab::DrawPlusButton(HDC hdc, PRECT prect, PPOINT pnt)
         hbrush = CreateSolidBrush(m_colorinfo.m_tabcontrols);
     }
 
-    SetGradient(hdc, vertex);
+    //SetGradient(hdc, vertex);
     FillRgn(hdc, hrgnplus, hbrush);
     DeleteObject(hbrush);
     DeleteObject((HGDIOBJ)hrgnplus);
@@ -3111,11 +3111,11 @@ CCustTab::DrawFixedLengthTab(HDC hdcmem, RECT * prect, wyInt32 tabindex, wyBool 
 	// Draws a filled rounded rect using the selected brush and pen
 	if(m_selectedtab == tabindex)
 	{
-		RoundRect(hdcmem, prect->left + 1, prect->top + 1,  prect->left + 1 + FIXED_WIDTH + 1, prect->bottom + IMAGEWIDTH, 10, 10);
+		RoundRect(hdcmem, prect->left + 1, prect->top + 1,  prect->left + 1 + FIXED_WIDTH/*CalculateTabLength(hdcmem,m_selectedtab)*/ + 1, prect->bottom + IMAGEWIDTH, 7, 7);
 	}
 	else
 	{
-		RoundRect(hdcmem, prect->left + 1, prect->top + 3, prect->left + 1 + FIXED_WIDTH + 1, prect->bottom + IMAGEWIDTH, 10, 10);
+		RoundRect(hdcmem, prect->left + 1, prect->top + 3, prect->left + 1 + FIXED_WIDTH/*CalculateTabLength(hdcmem,tabindex)*/ + 1, prect->bottom + IMAGEWIDTH, 7, 7);
 	}
 	
     /*if(m_selectedtab == tabindex)

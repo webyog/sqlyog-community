@@ -29,25 +29,29 @@
 #define ONE_KB				1024
 
 #define CSS_INFOTAB_CLASSES ".resultcaptionstyle	{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left;}\
-.colcaptionstyleleft {font: bold 12px \"Courier New\", Courier, mono; text-align:right; background:#E0E0E0; text-align:left; padding-left:10px; padding-right:10x;}\
-.cellstyleleft{text-align:left;padding-left:10px; padding-right:10px;}\
-.cellstyleright{text-align:right;padding-right:10px; padding-left:10px;}\
+.colcaptionstyleleft {font: bold 12px \"Courier New\", Courier, mono; background:#4caaf9; color: #FFFFFF;text-align:left; padding-left:2px; padding-right:1px;border-spacing:0px;}\
+.cellstyleleft{text-align:left;padding-left:1px; padding-right:1px;}\
+.cellstyleright{text-align:right;padding-right:1px; padding-left:1px;}\
 .captionfontstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right;}\
-.datafontstylerowodd{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#E2E5EE;height:18px;}\
+.datafontstylerowodd{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#e5e5e5;height:23px;}\
 .datafontstyleroweven{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#FFFFFF;height:18px;}\
-.statustablestyle{border:2px solid #EEE1FF;height:auto;word-wrap:break-word;table-layout:fixed;}\
-.pkcolcaptionstyle{background:#E0E0E0;}\
-.imgcaptionstyle{font: bold 16px \"Trebuchet MS\", Verdana, Arial, Helvetica;}\
+.statustablestyle{border: none; solid #EEE1FF;height:auto;word-wrap:break-word;table-layout:fixed;}\
+.pkcolcaptionstyle{background:#4caaf9; color: #FFFFFF;}\
+.imgcaptionstyle{vertical-align: middle;}\
+.text1 {font: bold 16px \"Trebuchet MS\", Verdana, Arial, Helvetica;}\
 .optimizecolstyle{font: 12px \"Courier New\", Courier, mono; text-align:left; background:#D6E7FF;height:18px; text-align:left; padding-left:10px; padding-right:10x;}\
-.optimizedtablestyle{border:2px solid #EEE1FF; word-wrap:break-word;table-layout:fixed;}\
+.optimizedtablestyle{border:none solid #EEE1FF; word-wrap:break-word;table-layout:fixed;}\
 .optimizedtable1style{word-wrap:break-all;table-layout:fixed;}\
-.tablestyle{border:2px solid #EEE1FF;}\
-.tabcaptionstyle{font: 14px \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color:black;}\
-.buttonstyle{color:#0000; font: bold 12px \"Trebuchet MS\", Verdana, Arial, Helvetica,sans-serif;}\
+.tablestyle{border: none; solid #EEE1FF;}\
+.tabcaptionstyle{font: 14px \"Open Sans\", Verdana, Arial, Helvetica; text-align:left; color:black;}\
+.buttonstyle{color:#333333; border-color:#a9b4bc;font: bold 12px \"Trebuchet MS\", Verdana, Arial, Helvetica,sans-serif;  background-color:  #efefee;}\
 .warningstyle{font: 13px \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color:grey;}\
-.redindexrowstyle{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#FAC8A5; height:18px;}\
+.redindexrowstyle{font: 12px \"Couthrier New\", Courier, mono; text-align:right; background:#FAC8A5; height:18px;}\
 .redindexcolstyle{font: 12px \"Courier New\", Courier, mono; text-align:left; background:#FAC8A5; height:18px; text-align:left; padding-left:10px; padding-right:10x;}\
-.captionstyle{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left;background-color:#FFE3E3; background-repeat:repeat-x;}"   
+.captionstyle{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left;background-color:#FFFFFF; background-repeat:repeat-x;}\
+.blueline { background-color: #4caaf9;height: 1px; }\
+a:link { color: #3b7dbb; text-decoration:none;} a:visited { color: #3b7dbb; text-decoration:none;} a:hover {color: #4caaf9; text-decoration:none;} a:active { color: #4caaf9; text-decoration:none;}\
+.whitespace{background-color: #FFFFFF;height: 5px; }"   
 
 #define SCHEMA_OPTBUTTON "<input id=\"schemaoptbutton\" type=\"button\" value=\"%s\" class=\"buttonstyle\"></input>"
 #define LINK_SCHEMA_OPTIMIZE _("Calculate Optimal Datatypes")
@@ -1410,9 +1414,9 @@ ObjectInfo::ShowServerInfo(MDIWindow * wnd)
 		m_serveruptime.SetAs("0");
 	}
 
-	m_htmlformatstr.AddSprintf("<div class=\"imgcaptionstyle\"><img src=\"res:SERVER.PNG\">%s, Running for: %s</div><br>", 
+	m_htmlformatstr.AddSprintf("<div><img class=\"imgcaptionstyle\"src=\"res:SERVER.PNG\"><span class=\"text1\">%s, Running for: %s</span></div><br>", 
 		imgcaption.GetString(), m_serveruptime.GetString());
-
+	  m_htmlformatstr.Add("<div class=\"blueline\"></div>");
 	m_htmlformatstr.Add(htmlinbuff.GetString());
 	m_htmlformatstr.Add("<br/>&nbsp;<br/>&nbsp;</html>");
 	
@@ -1990,8 +1994,8 @@ ObjectInfo::AddObjectInfoHtmlFormat(MDIWindow *wnd, MYSQL_RES *myres, wyString *
 		if(obj == OBJECT_TABLES)
 			HtmlBufferInit(htmlbuffer);
 
-		else
-			htmlbuffer->Add("<br>");
+		//else
+		//	//htmlbuffer->Add("<br>");
 	}
 	else
 	{		
@@ -2002,7 +2006,7 @@ ObjectInfo::AddObjectInfoHtmlFormat(MDIWindow *wnd, MYSQL_RES *myres, wyString *
 			return wyTrue;
 		
 		case OBJECT_VIEWDDL:
-			htmlbuffer->Add("<br/><br/>");
+			htmlbuffer->Add("<br/>");
 			break;
       
 		case OBJECT_TABLEDDL:
@@ -2019,10 +2023,10 @@ ObjectInfo::AddObjectInfoHtmlFormat(MDIWindow *wnd, MYSQL_RES *myres, wyString *
 	
 	//Adding the Title image
 	if(imgpath.GetLength())
-		htmlbuffer->AddSprintf("<div class=\"imgcaptionstyle\"><img src=\"%s\"/>%s</div><br>", 
+		{htmlbuffer->AddSprintf("<div><img  class=\"imgcaptionstyle\"src=\"%s\"/><span class=\"text1\">%s</span></div><br>", 
 									imgpath.GetString(), imgcaption.GetString());
-
-    htmlbuffer->Add("<div class=\"captionstyle\"><b>");
+	htmlbuffer->Add("<div class=\"blueline\"></div>");}
+    htmlbuffer->Add("<br><br><div class=\"captionstyle\"><b>");
 	htmlbuffer->Add(title.GetString());
     htmlbuffer->Add("</div><br>");
 
@@ -2034,7 +2038,7 @@ ObjectInfo::AddObjectInfoHtmlFormat(MDIWindow *wnd, MYSQL_RES *myres, wyString *
 		if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO && pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_NORMAL)
 		{
 			htmlbuffer->AddSprintf("<b>" SCHEMA_OPTBUTTON "</b></div>", LINK_SCHEMA_OPTIMIZE);
-
+			htmlbuffer->Add("<div class=\"whitespace\"></div>");
 			htmlbuffer->Add("<div class = \"warningstyle\">");
 			htmlbuffer->AddSprintf("<b>%s</b></div></div>", OPTIMIZER_HELP);
 		}
@@ -2056,6 +2060,7 @@ ObjectInfo::AddObjectInfoHtmlFormat(MDIWindow *wnd, MYSQL_RES *myres, wyString *
                 htmlbuffer->AddSprintf("<b>" REDUNDANT_INDEX_FINDBUTTON "</b></div>", LINK_REDUNDANT_INDEX_HIDE);
         
             //Add the help text
+			htmlbuffer->Add("<div class=\"whitespace\"></div>");
             htmlbuffer->Add("<div class = \"warningstyle\">");
 	        htmlbuffer->AddSprintf("<b>%s</b></div></div><br>", REDUNDANT_INDEX_DB_HELP);
         }
@@ -2156,7 +2161,7 @@ ObjectInfo::AddObjectInfoHtmlFormat(MDIWindow *wnd, MYSQL_RES *myres, wyString *
 			if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO && pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_NORMAL)
 			{
                 htmlhead.AddSprintf("<b>" SCHEMA_OPTBUTTON "</b>", LINK_HIDE_SCHEMA_OPTIMIZE);
-				
+				htmlbuffer->Add("<div class=\"whitespace\"></div>");
 				htmlhead.Add("<div class = \"warningstyle\">");
 				htmlhead.AddSprintf("<b>%s</b></div></div>", OPTIMIZER_HELP);
 			}
@@ -2169,7 +2174,7 @@ ObjectInfo::AddObjectInfoHtmlFormat(MDIWindow *wnd, MYSQL_RES *myres, wyString *
 			if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO && pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_NORMAL)
 			{
 				htmlhead.AddSprintf("<b>" SCHEMA_OPTBUTTON "</b></div>", LINK_SCHEMA_OPTIMIZE);
-
+				htmlbuffer->Add("<div class=\"whitespace\"></div>");
 				htmlhead.Add("<div class = \"warningstyle\">");
 				htmlhead.AddSprintf("<b>%s</b></div></div>", OPTIMIZER_HELP);
 			}
@@ -2468,7 +2473,8 @@ ObjectInfo::AddObjectInfoHtmlFormatForIndex(MDIWindow *wnd, MYSQL_RES *myres, co
             tempbuff.AddSprintf("<b>" REDUNDANT_INDEX_FINDBUTTON "</b></div>", LINK_REDUNDANT_INDEX_HIDE);
 
         //add redundant index help
-        tempbuff.Add("<div class = \"warningstyle\">");
+		
+        tempbuff.Add("<br><div class = \"warningstyle\">");
 	    tempbuff.AddSprintf("<b>%s</b></div></div><br>", REDUNDANT_INDEX_TABLE_HELP);
     }
 

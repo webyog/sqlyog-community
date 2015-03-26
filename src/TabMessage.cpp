@@ -85,7 +85,7 @@ TabMessage::Create()
     COMBOBOXINFO cbinfo = {0};
 
     CreateQueryMessageEdit(m_hwndparent, m_pmdi);
-    m_hwndcombo = CreateWindowEx(0, L"combobox", L"", WS_CHILD | CBS_DROPDOWNLIST | WS_VISIBLE, 
+    m_hwndcombo = CreateWindowEx(0, L"combobox", L"", WS_CHILD | CBS_DROPDOWN | WS_VISIBLE, 
         0, 0, 0, 0, m_hwndparent, (HMENU)IDC_TOOLCOMBO, (HINSTANCE)GetModuleHandle(0), NULL);
     SendMessage(m_hwndcombo, WM_SETFONT, (WPARAM)hfont, 0);
     cbinfo.cbSize = sizeof(COMBOBOXINFO);

@@ -30,10 +30,11 @@ Author: Vishal P.R
 #define THEMEDIR            "Themes"
 
 //theme section in ini
-#define ACTIVETHEME_SECTION "UserInterface"
+#define ACTIVETHEME_SECTION "Themedetails"
 
 //resource themes
 #define AZURETHEME          IDR_THEME_TWILIGHT
+#define METROTHEME          IDR_THEME_FLAT
 
 //some predefines
 #define MENUBARINDEX        0
@@ -86,11 +87,11 @@ wyTheme::Init()
     THEMEINFO   ti;
     wyString    tempstr;
     
-    //check whether we have a theme set in ini, if not fill the twilight theme
+    //check whether we have a theme set in ini, if not fill the flat theme
     if(wyTheme::GetSetThemeInfo(PROBE_THEME) == wyFalse)
     {
         //set the theme resource identifier as the file name
-        ti.m_filename.SetAs(STRINGIZE(AZURETHEME));
+        ti.m_filename.SetAs(STRINGIZE(METROTHEME));
 
         //mark it as resource theme
         ti.m_type = RESOURCE_THEME;
@@ -147,7 +148,7 @@ wyTheme::GetThemes(LPTHEMEINFO* pthemeinfo)
     wyInt32         i = -1, size, j;
     THEMEINFO       ti;
     TiXmlDocument*  ptx;
-    wyInt32         themes[] = {0, AZURETHEME};
+	wyInt32         themes[] = {0, AZURETHEME,METROTHEME};
 
     //first initialize the array pointer
     *pthemeinfo = NULL;

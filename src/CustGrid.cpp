@@ -31,7 +31,7 @@ wyWChar	splitter[]   = L"CustomGridSplitter";
 
 #define	GV_GRIDPICKLIST						1000
 //#define GV_SELCOLOR							RGB(221, 220, 235)
-#define	GV_SELCOLOR							RGB(180,204,238)
+#define	GV_SELCOLOR							RGB(219,236,252)
 #define	SHIFTED								0x8000
 #define	YOG_GET_WHEEL_DELTA_wparam(wparam)	((short)HIWORD(wparam))
 #define	YOG_DFCS_TRANSPARENT				0x0800
@@ -1976,15 +1976,15 @@ CCustGrid::DrawInitialButton(PGVCOLNODE pgvnode, HDC hdcmem, RECT *rect)
 	vertex[1].x     = rect->right - 2;
 	vertex[1].y     = rect->bottom - 2; 
 
-	vertex[0].Red   = 0xc900;
-	vertex[0].Green = 0xc600;
-	vertex[0].Blue  = 0xb800;
-	vertex[0].Alpha = 0x0000;
+	vertex[0].Red   = 0xffffff;
+	vertex[0].Green = 0xffffff;
+	vertex[0].Blue  = 0xffffff;
+	vertex[0].Alpha = 0xffffff;
 
-	vertex[1].Red   = 0xdd00;
-	vertex[1].Green = 0xdc00;
-	vertex[1].Blue  = 0xd800;
-	vertex[1].Alpha = 0x0000;
+	vertex[1].Red   = 0xffffff;
+	vertex[1].Green = 0xffffff;
+	vertex[1].Blue  = 0xffffff;
+	vertex[1].Alpha = 0xffffff;
 
 	//Gradient for button at lef-top most
 	SetGradient(hdcmem, vertex);
@@ -2079,6 +2079,7 @@ CCustGrid::DrawColumns(RECT *rect, RECT *rectwin, HDC hdcmem, wyUInt32 *totcx, w
     {
         *totcx += m_maxwidth;
         rect->top = m_hight;
+		
     }
     else
     {
@@ -2551,6 +2552,7 @@ CCustGrid::DrawButtonForColumn(HDC hdcmem, PGVCOLUMN pgvcol, RECT *rect, wyUInt3
         rect->right = rect->left + m_maxwidth;
 		*totcx += m_maxwidth;
         *totviscx += m_maxwidth;
+		rect->top=rect->top-1;
     }
     else
     {	
@@ -2561,8 +2563,9 @@ CCustGrid::DrawButtonForColumn(HDC hdcmem, PGVCOLUMN pgvcol, RECT *rect, wyUInt3
 			    pgvcol->cx = rectwin->right - 35;			
 
             rect->right = rect->left + pgvcol->cx;
+			rect->left=rect->left-1;//fixing extra displacement of top cell
 		    *totcx += pgvcol->cx;
-            *totviscx += pgvcol->cx;		
+            *totviscx += pgvcol->cx-1;		
         }
         else
         {
@@ -2589,7 +2592,7 @@ CCustGrid::DrawButtonForColumn(HDC hdcmem, PGVCOLUMN pgvcol, RECT *rect, wyUInt3
 	DrawFrameControl(hdcmem, rect, DFC_BUTTON, state);
 
 	//Column header gradient
-	SetGradient(hdcmem, vertex, wyFalse);
+	//SetGradient(hdcmem, vertex, wyFalse);
 }
 
 void
@@ -2674,7 +2677,9 @@ CCustGrid::DrawTopColumns(HDC hdcmem, PRECT rect, PRECT rectwin, wyUInt32 *totcx
 		
 		if((m_curselcol == ncurcol) && (GetFocus()== m_hwnd))
 			hgdiobj = SelectObject(hdcmem, (HGDIOBJ)m_htopfont);
+		      
 		else
+
 			hgdiobj = SelectObject(hdcmem, (HGDIOBJ)m_hfont);
 	
 		VERIFY(SetBkMode(hdcmem, TRANSPARENT));
@@ -2708,20 +2713,20 @@ CCustGrid::PaintColumnHeader(HDC hdcmem, RECT *recttemp, wyInt32 *ncurcol)
     TRIVERTEX	vertex[2];
 	
 	//Gradient variables
-	vertex[0].x     = recttemp->left;
-	vertex[0].y     = recttemp->top + 2;
+	vertex[0].x     = recttemp->left-3;
+	vertex[0].y     = recttemp->top ;
 
-	vertex[1].x     = recttemp->right;
-	vertex[1].y     = recttemp->bottom - 2; 
+	vertex[1].x     = recttemp->right+1;
+	vertex[1].y     = recttemp->bottom-1; 
 
-	vertex[0].Red   = 0xf400;
-	vertex[0].Green = 0xcb00;
-	vertex[0].Blue  = 0x7b00;
+	vertex[0].Red   = 0x4C00;
+	vertex[0].Green = 0xAA00;
+	vertex[0].Blue  = 0xF900;
 	vertex[0].Alpha = 0x0000;
 
-	vertex[1].Red   = 0xee00;
-	vertex[1].Green = 0xed00;
-	vertex[1].Blue  = 0xd800;
+	vertex[1].Red   = 0x4C00;
+	vertex[1].Green = 0xAA00;
+	vertex[1].Blue  = 0xF900;
 	
     logtext("PaintColumnHeader");
 
@@ -2737,14 +2742,14 @@ CCustGrid::PaintRowHeader(HDC hdcmem, RECT *recttemp, wyInt32 *ncurrow)
 	TRIVERTEX	vertex[2];
 
 	//Gradient variables
-	vertex[0].Red   = 0xf400;
-	vertex[0].Green = 0xcb00;
-	vertex[0].Blue  = 0x7b00;
-	vertex[0].Alpha = 0x0000;
+	vertex[0].Red   = 0xffffff;
+	vertex[0].Green = 0xffffff;
+	vertex[0].Blue  = 0xffffff;
+	vertex[0].Alpha = 0xffffff;
 
-	vertex[1].Red   = 0xee00;
-	vertex[1].Green = 0xed00;
-	vertex[1].Blue  = 0xd800;
+	vertex[1].Red   = 0xffffff;
+	vertex[1].Green = 0xffffff;
+	vertex[1].Blue  = 0xffffff;
 	
     if(m_curselrow == *ncurrow)
 	{
@@ -2758,11 +2763,11 @@ CCustGrid::PaintRowHeader(HDC hdcmem, RECT *recttemp, wyInt32 *ncurrow)
 		temprect.bottom = recttemp->bottom - 1;
 		temprect.right= recttemp->right - 2;
 
-		vertex[0].x     = recttemp->left + 1;
-		vertex[0].y     = recttemp->top + 2;
+		vertex[0].x     = recttemp->left+1 ;
+		vertex[0].y     = recttemp->top ;
 
-		vertex[1].x     = recttemp->right - 1;
-		vertex[1].y     = recttemp->bottom - 2; 
+		vertex[1].x     = recttemp->right-1 ;
+		vertex[1].y     = recttemp->bottom-1 ; 
 		
 		//Gradienty for selected row-header 
 		SetGradient(hdcmem, vertex);        
@@ -2822,8 +2827,16 @@ CCustGrid::DrawColumnText(HDC hdcmem, PGVCOLUMN	pgvcol, RECT recttemp, wyInt32 *
 
 	if(pgvcol  && pgvcol->text)
 	{
+		if(m_curselcol == *ncurcol)
+		{
+			SetTextColor(hdcmem,RGB(255,255,255));
+		}
 		text.SetAs(pgvcol->text);
 	DrawText(hdcmem, text.GetAsWideChar(), lstrlen(text.GetAsWideChar()), &recttemp, format);
+	if(m_curselcol == *ncurcol)
+		{
+			SetTextColor(hdcmem,RGB(0,0,0));
+		}
 	}
 
     if(pgvcol->mask & GVIF_COLUMNMARK)
@@ -2870,21 +2883,21 @@ CCustGrid::DrawRowButtons(HDC hdcmem, RECT *rect, RECT *recttemp, wyInt32 *rowco
 	TRIVERTEX			vertex[2];
 	
 	//Gradient variables
-	vertex[0].x     = rect->left + 2;
-	vertex[0].y     = rect->top + 2;
+	vertex[0].x     = rect->left+1;
+	vertex[0].y     = rect->top;
 
-	vertex[1].x     = rect->right - 2;
-	vertex[1].y     = rect->bottom - 2; 
+	vertex[1].x     = rect->right-1;
+	vertex[1].y     = rect->bottom-1; 
 
-	vertex[0].Red   = 0xc900;
-	vertex[0].Green = 0xc600;
-	vertex[0].Blue  = 0xb800;
-	vertex[0].Alpha = 0x0000;
+	vertex[0].Red   = 0xffffff;
+	vertex[0].Green = 0xffffff;
+	vertex[0].Blue  = 0xffffff;
+	vertex[0].Alpha = 0xffffff;
 
-	vertex[1].Red   = 0xdd00;
-	vertex[1].Green = 0xdc00;
-	vertex[1].Blue  = 0xd800;
-	vertex[1].Alpha = 0x0000;
+	vertex[1].Red   = 0xffffff;
+	vertex[1].Green = 0xffffff;
+	vertex[1].Blue  = 0xffffff;
+	vertex[1].Alpha = 0xffffff;
    
 	// now we see whether we need a checkbox somewhere.
 	if(m_exstyle & GV_EX_ROWCHECKBOX)
@@ -2893,7 +2906,7 @@ CCustGrid::DrawRowButtons(HDC hdcmem, RECT *rect, RECT *recttemp, wyInt32 *rowco
 
 		PaintRowHeader(hdcmem, rect, rowcount);
 
-		state = DFCS_BUTTONCHECK | DFCS_ADJUSTRECT | DFCS_FLAT ;
+		state = DFCS_BUTTONCHECK |  DFCS_FLAT ;
 
 	    m_lpgvwndproc(m_hwnd, GVN_DRAWROWCHECK, *rowcount, (LPARAM)&info);
 
@@ -3526,11 +3539,11 @@ CCustGrid::DrawCell(HDC hdcmem, wyInt32 row, wyInt32 col, PGVCOLNODE topcolstruc
         if((row == m_curselrow &&  col == m_curselcol) && topcolstruct && topcolstruct->isshow == wyTrue)
         {
 		    VERIFY(hbrgrey = CreateSolidBrush(GV_SELCOLOR));
-		    VERIFY(hpenthick = CreatePen(PS_SOLID, 2, RGB(0, 0, 0)));
+		    VERIFY(hpenthick = CreatePen(PS_SOLID, 1, RGB(59,125,187)));
 		    hbrold	= (HBRUSH)SelectObject(hdcmem, hbrgrey); // no ret
 		    hpenold = (HPEN)SelectObject(hdcmem, hpenthick); // no ret
 
-		    VERIFY(Rectangle(hdcmem, rect->left - 1, rect->top - 1, rect->right + 1, rect->bottom + 1));
+		    VERIFY(Rectangle(hdcmem, rect->left-2, rect->top-2, rect->right+1, rect->bottom+1));
 
             SelectObject(hdcmem, hbrold); // no ret
 		    SelectObject(hdcmem, hpenold); // no ret
@@ -3542,8 +3555,8 @@ CCustGrid::DrawCell(HDC hdcmem, wyInt32 row, wyInt32 col, PGVCOLNODE topcolstruc
 	    if(row == m_curselrow && col != m_curselcol)
         {
 		    color = ROWHIGHLIGHTCOLOR;
-		    r.left = rect->left;
-		    r.top = rect->top;
+		    r.left = rect->left-1;
+		    r.top = rect->top-1;
 		    r.right = rect->right;
 		    r.bottom = rect->bottom;
 
@@ -3553,8 +3566,8 @@ CCustGrid::DrawCell(HDC hdcmem, wyInt32 row, wyInt32 col, PGVCOLNODE topcolstruc
 	    }
 	    else if(row != m_curselrow)
 	    {
-		    r.left = rect->left;
-		    r.top = rect->top;
+		    r.left = rect->left-1;
+		    r.top = rect->top-1;
 		    r.right = rect->right;
 		    r.bottom = rect->bottom;
 		    color = ALTHIGHLIGHTCOLOR;

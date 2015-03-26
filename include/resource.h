@@ -318,6 +318,7 @@
 #define IDR_PREVIEWMENU                 961
 #define IDI_TABLEEXPORT                 962
 #define IDR_THEME_TWILIGHT              963
+#define IDR_THEME_FLAT                  964
 #define IDI_VIEWTYPE                    965
 #define IDI_TABLEREFRESH                966
 #define IDI_DATAGRID                    967

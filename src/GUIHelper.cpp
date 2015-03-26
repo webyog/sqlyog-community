@@ -8149,8 +8149,8 @@ EnableFolding(HWND hwnd)
         wyString	dirstr(directory);
         
         forecolor   =   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginFgColor",   RGB(0,0,0), dirstr.GetString());
-        backcolor   =   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginBgColor",   DEF_MARGINNUMBER, dirstr.GetString());
-        texturecolor=   wyIni::IniGetInt(GENERALPREFA, "FoldingTextureColor",   COLOR_WHITE, dirstr.GetString());
+        backcolor   =   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginbackgroundColor",   DEF_MARGINNUMBER, dirstr.GetString());
+        texturecolor=   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginTextureColor",   COLOR_WHITE, dirstr.GetString());
     }
     SendMessage(hwnd, SCI_SETPROPERTY, (WPARAM)"fold", (LPARAM)"1");
     SendMessage(hwnd, SCI_SETPROPERTY, (WPARAM)"fold.comment", (LPARAM)"1");

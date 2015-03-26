@@ -1702,8 +1702,8 @@ ConnectionBase::SetStatusParts(HWND hwndstatus)
     HDC			hdc;
     HFONT		hfont = NULL;
 	wyString	exestr("Exec: 00:00:00:000       ");
-	wyString	totstr("Total: 00:00:00:000       ");
-	wyString	totrowstr("100000000 row(s)      ");
+	wyString	totstr("Total: 00:00:00:000  ");
+	wyString	totrowstr("100000000 row(s)  ");
     wyString    linestr("Ln 100000, Col 100000     ");
     wyString    connstr("Connections:99999      ");
 
@@ -1736,12 +1736,12 @@ ConnectionBase::SetStatusParts(HWND hwndstatus)
     SelectObject(hdc, (HGDIOBJ)hfont);   
     ReleaseDC(hwndstatus, hdc);
 
-    m_sbparts[0] = (rc.right-rc.left) - (rcexetime.right + rctotaltime.right + rctotrows.right + rcline.right + rcconns.right + rctext.right);
+    m_sbparts[0] = (rc.right-rc.left) - (rcexetime.right + rctotaltime.right + rctotrows.right + rcline.right + rcconns.right + rctext.right)-250;
     m_sbparts[1] = m_sbparts[0] + rcexetime.right;
     m_sbparts[2] = m_sbparts[1] + rctotaltime.right;
     m_sbparts[3] = m_sbparts[2] + rctotrows.right;
     m_sbparts[4] = m_sbparts[3] + rcline.right;
-    m_sbparts[5] = m_sbparts[4] + rcconns.right;
+    m_sbparts[5] = m_sbparts[4] + rcconns.right+250;
     m_sbparts[6] = -1;
 	VERIFY(ret = SendMessage(hwndstatus, SB_SETPARTS,(WPARAM)pGlobals->m_statusbarsections, (LPARAM)m_sbparts));
 

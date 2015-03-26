@@ -213,6 +213,7 @@ TableView::AddToolButtons()
     };
 
 	m_himglist = ImageList_Create(ICON_SIZE, ICON_SIZE, ILC_COLOR32  | ILC_MASK, 1, 0);
+	//SendMessage(m_hwndtoolbar, TB_SETBUTTONSIZE, 0, MAKELPARAM(25, 25));
 	SendMessage(m_hwndtoolbar, TB_SETIMAGELIST, 0, (LPARAM)m_himglist);
 	SendMessage(m_hwndtoolbar, TB_SETEXTENDEDSTYLE, 0 , (LPARAM)TBSTYLE_EX_DRAWDDARROWS);
     SendMessage(m_hwndtoolbar, TB_BUTTONSTRUCTSIZE, sizeof(TBBUTTON), 0);
@@ -241,7 +242,6 @@ TableView::AddToolButtons()
 
     //add extra images
     AddExtraImages(m_himglist);
-
 	SendMessage(m_hwndtoolbar, TB_ADDBUTTONS, (WPARAM)k, (LPARAM) &tbb);
 
     //set the image indexes as lparam for buttons

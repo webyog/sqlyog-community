@@ -2991,14 +2991,14 @@ GetToolBarIconSize()
 	SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
 	dirstr.SetAs(directory);
 	
-	wyIni::IniGetString(GENERALPREFA, "ToolBarIconSize", TOOLBARICONSIZE_DEFAULT, &iconsizestr, dirstr.GetString());
+	wyIni::IniGetString(GENERALPREFA, "ToolIconSize", TOOLBARICONSIZE_DEFAULT, &iconsizestr, dirstr.GetString());
 
 	if(iconsizestr.CompareI("Large") == 0)
 		iconsize = ICON_SIZE_32;
 	else if(iconsizestr.CompareI("Small") == 0)
-		iconsize = ICON_SIZE_16;
-	else
 		iconsize = ICON_SIZE_24;
+	else
+		iconsize = ICON_SIZE_28;
 	   
 	return iconsize;
 }

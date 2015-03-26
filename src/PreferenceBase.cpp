@@ -539,7 +539,7 @@ PreferenceBase::FontPrefHandleWmInitDialog(HWND hwnd)
     if(m_startpage == FONT_PAGE)
 		HandlerToSetWindowPos(hwnd);
     m_htv = GetDlgItem(hwnd,IDC_TREE2);
-    m_rgbtexturecolor   =   wyIni::IniGetInt(GENERALPREFA, "FoldingTextureColor",   COLOR_WHITE, dirstr.GetString());
+    m_rgbtexturecolor   =   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginTextureColor",   COLOR_WHITE, dirstr.GetString());
     tvd=new TREEVIEWDATA;
     color1=new COLORREF;
     color2=new COLORREF;
@@ -661,8 +661,8 @@ PreferenceBase::FontPrefHandleWmInitDialog(HWND hwnd)
 
     color1=new COLORREF;
     color3=new COLORREF;
-    *color1=wyIni::IniGetInt(GENERALPREFA, "NumberMarginBgColor",   DEF_MARGINNUMBER, dirstr.GetString());
-    *color3=wyIni::IniGetInt(GENERALPREFA, "NumberMarginFgColor",   RGB(0,0,0), dirstr.GetString());
+    *color1=wyIni::IniGetInt(GENERALPREFA, "NumberMarginbackgroundColor",   DEF_MARGINNUMBER, dirstr.GetString());
+    *color3=wyIni::IniGetInt(GENERALPREFA, "NumberMarginforegroundColor",   DEF_MARGINNUMBERFG, dirstr.GetString());
     tvd=new TREEVIEWDATA;
     tvd->style=EDITOR_LINENUMBERMARGIN;
     tvd->mask=IF_FOREGROUND_MASK|IF_BACKGROUND_MASK;
@@ -675,7 +675,7 @@ PreferenceBase::FontPrefHandleWmInitDialog(HWND hwnd)
 
     color1=new COLORREF;
     color3=new COLORREF;
-    *color1=wyIni::IniGetInt(GENERALPREFA, "FoldingMarginBgColor",   DEF_MARGINNUMBER, dirstr.GetString());
+    *color1=wyIni::IniGetInt(GENERALPREFA, "FoldingMarginbackgroundColor",   DEF_MARGINNUMBER, dirstr.GetString());
     *color3=wyIni::IniGetInt(GENERALPREFA, "FoldingMarginFgColor",   RGB(0,0,0), dirstr.GetString());
     tvd=new TREEVIEWDATA;
     tvd->style=EDITOR_FOLDINGMARGIN;
@@ -1485,7 +1485,7 @@ PreferenceBase::InitOthersPrefValues()
 	SendMessage(GetDlgItem(m_hwnd, IDC_UPDATEPROMPT), BM_SETCHECK, truncdata, 0);
 
     // Iconsize combo box
-	wyIni::IniGetString(GENERALPREFA, "ToolBarIconSize", TOOLBARICONSIZE_DEFAULT, &tempstr, dirstr.GetString());
+	wyIni::IniGetString(GENERALPREFA, "ToolIconSize", TOOLBARICONSIZE_DEFAULT, &tempstr, dirstr.GetString());
 	ret = SendMessage(GetDlgItem(m_hwnd, IDC_ICONSIZE), CB_SELECTSTRING, -1, (LPARAM)tempstr.GetAsWideChar());
 	if(ret == CB_ERR)
 		SendMessage(GetDlgItem(m_hwnd, IDC_ICONSIZE), CB_SETCURSEL, 1,(LPARAM)0);
@@ -1718,7 +1718,7 @@ PreferenceBase::SaveOthersPreferences(HWND hwndbase, wyInt32 page)
 	SetBoolProfileString(hwnd, GENERALPREF, L"ResuttabRetainsPage", IDC_RESUTTABPAGERETAIN);
 
 	// Iconsize combo box
-	SetIntProfileString(hwnd, GENERALPREF, L"ToolBarIconSize", IDC_ICONSIZE);
+	SetIntProfileString(hwnd, GENERALPREF, L"ToolIconSize", IDC_ICONSIZE);
     
     hwndcombo = GetDlgItem(hwnd, IDC_THEMECOMBO);
 
@@ -1729,7 +1729,7 @@ PreferenceBase::SaveOthersPreferences(HWND hwndbase, wyInt32 page)
         i = SendMessage(hwndcombo, CB_GETITEMDATA, i, 0);
             
         if((!pactivetheme && (pthemeinfo + i)->m_type != NO_THEME) ||
-            (pactivetheme && pactivetheme->m_filename.CompareI((pthemeinfo + i)->m_filename) && pactivetheme->m_type != (pthemeinfo + i)->m_type))
+            (pactivetheme && pactivetheme->m_filename.CompareI((pthemeinfo + i)->m_filename)/* && pactivetheme->m_type != (pthemeinfo + i)->m_type)*/))//fixing issue--user was not able to switch between same theme type.
         {
             m_isthemechanged = wyTrue;
             wyTheme::GetSetThemeInfo(SET_THEME, pthemeinfo + i);
@@ -1748,7 +1748,7 @@ PreferenceBase::SetToolBarIconSize()
 	wyString	tempiconsize;
 	MDIWindow   *pcquerywnd = NULL;
 	
-	wyIni::IniGetString(GENERALPREFA, "ToolBarIconSize", TOOLBARICONSIZE_DEFAULT, &iconsize, dirstr.GetString());
+	wyIni::IniGetString(GENERALPREFA, "ToolIconSize", TOOLBARICONSIZE_DEFAULT, &iconsize, dirstr.GetString());
 	
 	//Get the current index of combo as per the icon size value
 	switch(pGlobals->m_pcmainwin->m_toolbariconsize)
@@ -1757,16 +1757,16 @@ PreferenceBase::SetToolBarIconSize()
 		tempiconsize.SetAs("Large");
 		break;
 
-	case ICON_SIZE_24:
+	case ICON_SIZE_28:
 		tempiconsize.SetAs("Normal");
 		break;
 
-	case ICON_SIZE_16:
+	case ICON_SIZE_24:
 		tempiconsize.SetAs("Small");
 		break;
 
 	default:
-		tempiconsize.SetAs("Normal");
+		tempiconsize.SetAs("Large");
 
 	}
 
@@ -1776,9 +1776,9 @@ PreferenceBase::SetToolBarIconSize()
 		if(iconsize.CompareI("Large") == 0)
 			pGlobals->m_pcmainwin->m_toolbariconsize = ICON_SIZE_32;
 		else if(iconsize.CompareI("Small") == 0)
-			pGlobals->m_pcmainwin->m_toolbariconsize = ICON_SIZE_16;
-		else
 			pGlobals->m_pcmainwin->m_toolbariconsize = ICON_SIZE_24;
+		else
+			pGlobals->m_pcmainwin->m_toolbariconsize = ICON_SIZE_28;
 	
 		//Re-arrange the tool bar with this new icon size
 		pGlobals->m_pcmainwin->ReArranageToolBar();
@@ -2013,22 +2013,22 @@ PreferenceBase::SetColorPrefDetails()
                     case EDITOR_LINENUMBERMARGIN:
                         _snwprintf(color, 31, L"%d", *(tvd->bgColor));
 	                    colorstr.SetAs(color);
-	                    wyIni::IniWriteString(GENERALPREFA, "NumberMarginBgColor",	colorstr.GetString(),	dirstr.GetString());
+	                    wyIni::IniWriteString(GENERALPREFA, "NumberMarginbackgroundColor",	colorstr.GetString(),	dirstr.GetString());
                         _snwprintf(color, 31, L"%d", *(tvd->fgColor));
 	                    colorstr.SetAs(color);
-	                    wyIni::IniWriteString(GENERALPREFA, "NumberMarginFgColor",	colorstr.GetString(),	dirstr.GetString());
+	                    wyIni::IniWriteString(GENERALPREFA, "NumberMarginforegroundColor",	colorstr.GetString(),	dirstr.GetString());
                         
                     break;
                     case EDITOR_FOLDINGMARGIN:
                         _snwprintf(color, 31, L"%d", *(tvd->bgColor));
 	                    colorstr.SetAs(color);
-	                    wyIni::IniWriteString(GENERALPREFA, "FoldingMarginBgColor",	colorstr.GetString(),	dirstr.GetString());
+	                    wyIni::IniWriteString(GENERALPREFA, "FoldingMarginbackgroundColor",	colorstr.GetString(),	dirstr.GetString());
                         _snwprintf(color, 31, L"%d", *(tvd->fgColor));
 	                    colorstr.SetAs(color);
 	                    wyIni::IniWriteString(GENERALPREFA, "FoldingMarginFgColor",	colorstr.GetString(),	dirstr.GetString());
                         _snwprintf(color, 31, L"%d", m_rgbtexturecolor);
 	                    colorstr.SetAs(color);
-	                    wyIni::IniWriteString(GENERALPREFA, "FoldingTextureColor",	colorstr.GetString(),	dirstr.GetString());
+	                    wyIni::IniWriteString(GENERALPREFA, "FoldingMarginTextureColor",	colorstr.GetString(),	dirstr.GetString());
                        
                     break;
                     case EDITOR_TEXTSELECTION:
@@ -2163,7 +2163,7 @@ PreferenceBase::SetGeneralPrefDefaultSizeValues(HWND hwnd)
 void
 PreferenceBase::SetOthersPrefDefaultValues(HWND hwnd)
 {
-	wyString iconsize;
+	wyString iconsize,defaulttheme;
 
 	//Added an option for Retaining  user modified column width
 	SendMessage(GetDlgItem(hwnd, IDC_RETAINCOLUMNWIDTH), BM_SETCHECK, RETAINCOLUMNWIDTH_DEFAULT, 0);
@@ -2181,9 +2181,11 @@ PreferenceBase::SetOthersPrefDefaultValues(HWND hwnd)
 
 	//Iconsize combo box
     iconsize.SetAs(TOOLBARICONSIZE_DEFAULT);
+	//default theme
+	defaulttheme.SetAs("Flat");
 	SendMessage(GetDlgItem(hwnd, IDC_ICONSIZE), CB_SELECTSTRING, -1, (LPARAM)iconsize.GetAsWideChar());
 
-    SendMessage(GetDlgItem(hwnd, IDC_THEMECOMBO), CB_SETCURSEL, 0, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_THEMECOMBO), CB_SELECTSTRING, -1,(LPARAM) defaulttheme.GetAsWideChar());
    
 	SetOthersPrefDefaultLimitValues(hwnd);
 	
@@ -2333,7 +2335,7 @@ PreferenceBase::SetDefaultColorDetails(HWND hwnd)
                     break;
                     case EDITOR_LINENUMBERMARGIN:
                         *(tvd->bgColor)=DEF_MARGINNUMBER;
-                        *(tvd->fgColor)=RGB(0,0,0);
+                        *(tvd->fgColor)=RGB(59,125,187);
                     break;
                     case EDITOR_FOLDINGMARGIN:
                         *(tvd->bgColor)=DEF_MARGINNUMBER;
@@ -2447,7 +2449,7 @@ PreferenceBase::SaveDefaultOthersPreferences()
 	wyIni::IniWriteInt(GENERALPREFA, "ResuttabRetainsPage", RESULTRETAINPAGE_DEFAULT, dirstr.GetString());
 	pGlobals->m_retainpagevalue = wyTrue;
 		
-	wyIni::IniWriteString(GENERALPREFA, "ToolBarIconSize", TOOLBARICONSIZE_DEFAULT, dirstr.GetString());
+	wyIni::IniWriteString(GENERALPREFA, "ToolIconSize", TOOLBARICONSIZE_DEFAULT, dirstr.GetString());
 	SetToolBarIconSize();
 
     if(wyTheme::GetActiveThemeInfo())

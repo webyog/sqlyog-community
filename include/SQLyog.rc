@@ -1326,7 +1326,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDI_EXPORTDATA,IDC_COPYTABLE_GRIP,9,9,20,20
     LTEXT           "This option copies object(s) between database/hosts.",IDC_STATIC,39,13,198,9
-    GROUPBOX        "Source {Connection - Database}",IDC_GROUP1,6,31,183,236
+    GROUPBOX        "Source {Connection - Database}",IDC_GROUP1,6,31,183,243
     LTEXT           "Name:",IDC_STATICTITLE2,11,42,23,8
     LTEXT           "",IDC_TARGETDB,36,42,142,8,SS_WORDELLIPSIS
     LTEXT           "&Object(s)",IDC_STATICTITLE3,11,56,29,8
@@ -2738,6 +2738,7 @@ IDR_README              README                  "readme.txt"
 //
 
 IDR_THEME_TWILIGHT      THEME                   "twilight_theme.xml"
+IDR_THEME_FLAT          THEME                   "Flat.xml"
 
 /////////////////////////////////////////////////////////////////////////////
 //

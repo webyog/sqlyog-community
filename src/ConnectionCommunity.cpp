@@ -1457,7 +1457,7 @@ ConnectionCommunity::OnStatusBarWmCtlColorStatic(HWND hwnd, WPARAM wparam, LPARA
     wyInt32   identifier;
 	wyInt32  fontheight = 0;	
     HDC	hdc = (HDC)wparam;
-    COLORREF clr = RGB(0, 0, 255);
+    COLORREF clr = RGB(59,125,187);
 
     identifier = GetDlgCtrlID((HWND)lparam);
 	if(identifier == IDC_LINK)

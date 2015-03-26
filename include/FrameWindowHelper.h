@@ -499,9 +499,9 @@ All Files(*.*)\0*.*\0"
 
 #define	ICON_SIZE		16
 
-#define	ICON_SIZE_16	16
 #define	ICON_SIZE_24	24
 #define	ICON_SIZE_32	32
+#define	ICON_SIZE_28	28
 
 #define	 YYSMALL			"yyyy-mm-dd"
 #define	 YYLONG				"yyyy-mm-dd hh:mm:ss"

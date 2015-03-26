@@ -1504,12 +1504,11 @@ FrameWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
             MapWindowRect(hwnd, NULL, &rcclient);
             
             ret = DefFrameProc(hwnd, pGlobals->m_hwndclient, message, wparam, lparam);
-            HBRUSH hbr = GetSysColorBrush(COLOR_BTNFACE);
-            wyTheme::GetBrush(BRUSH_FRAMEWINDOW, &hbr);
-
+			HBRUSH hbr = GetStockBrush(LTGRAY_BRUSH)/*GetSysColorBrush(COLOR_BTNFACE)*/;
+            //wyTheme::GetBrush(BRUSH_FRAMEWINDOW, &hbr);
             rect.left = rect.top = (rcclient.left - rcwnd.left);
             rect.top = (rcclient.top - rcwnd.top) - 1;
-            rect.bottom = rect.top + 1;
+            rect.bottom = rect.top +1;
             rect.right = rcclient.right - rcwnd.left;
 
             if(rect.right - rect.left && rect.bottom - rect.top)
@@ -2042,7 +2041,7 @@ HWND
 FrameWindow::CreateToolCombo(HWND hwndtool)
 {
 	HWND        hwndcombo;
-	wyUInt32    style = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_VSCROLL | CBS_DROPDOWNLIST | CBS_DISABLENOSCROLL ;
+	wyUInt32    style = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_VSCROLL | CBS_DROPDOWN | CBS_DISABLENOSCROLL ;
 		
 	VERIFY(hwndcombo = CreateWindowEx(0, WC_COMBOBOXEX, TEXT(""), style, 516, 0, 150, 425,
 												m_hwndtool,(HMENU)IDC_TOOLCOMBO,(HINSTANCE)GetHinstance(), NULL));
@@ -2175,7 +2174,7 @@ FrameWindow::CreateStatusBarWindow()
 	RECT     rc;
 	HWND     hwndstatus;
 	wyUInt32 exstyles = NULL;
-	wyUInt32 styles = WS_CHILD | WS_BORDER | WS_VISIBLE;
+	wyUInt32 styles = WS_CHILD | WS_VISIBLE;
 
 	VERIFY(GetClientRect(GetHwnd(), &rc));
 
@@ -2216,31 +2215,35 @@ FrameWindow::ResizeToolBar()
 	wyInt32	vpos, hpos, height, width, comboht = TOOLBAR_HEIGHT, tabheight = 0,sectoolx;
 	wyInt32 firsttoolextrawidth = 0, combovpos = 0, firsttoolbarheight = 0;
 	RECT	rc, rctool, rcttemp;
-
 	VERIFY(GetClientRect((HWND)GetHwnd(), &rc));
-
-	if(m_toolbariconsize == ICON_SIZE_32)
+	if(m_toolbariconsize == ICON_SIZE_28)
 	{
-		firsttoolextrawidth = m_toolbariconsize + m_toolbariconsize / 2;
-		combovpos = 8;		
+		/*firsttoolextrawidth = m_toolbariconsize + m_toolbariconsize / 2-14;
+		combovpos = 12;	*/	
+		firsttoolextrawidth = (m_toolbariconsize * 2) - 12;
+		combovpos = 7;
 	}
 
-	else if(m_toolbariconsize == ICON_SIZE_24)
+	else if(m_toolbariconsize == ICON_SIZE_32)
 	{
-		firsttoolextrawidth = (m_toolbariconsize * 2) - 2;
-		combovpos = 4;		
+		/*firsttoolextrawidth = (m_toolbariconsize * 2) - 2;
+		combovpos = 4;*/
+		firsttoolextrawidth = m_toolbariconsize + m_toolbariconsize / 2-3;
+		combovpos = 10;
 	}
 
 	else
 	{
-		firsttoolextrawidth = (m_toolbariconsize * 3) - 2;
-		combovpos = 0;		
+		/*firsttoolextrawidth = (m_toolbariconsize * 3) - 2;
+		combovpos = 0;	*/	
+		firsttoolextrawidth = (m_toolbariconsize * 2) - 2;
+		combovpos = 4;
 	}
 
 	firsttoolbarheight = m_toolbariconsize +  8;
 
 	// Set the values for toolbar.
-	vpos	= 0; 
+	vpos	= 1; 
 	hpos	= 0; 
 	height = firsttoolbarheight;
 	
@@ -6935,7 +6938,11 @@ FrameWindow::OnWmInitPopup(WPARAM wparam, LPARAM lparam)
 		} 
 
 		RecursiveMenuEnable((HMENU)wparam, iswindowmenu, MF_ENABLED);
-        m_connection->HandleMenu(menuindex, (HMENU)wparam);
+		if(wyTheme::m_theme->IsSysmenuEnabled())
+        m_connection->HandleMenu(menuindex, (HMENU)wparam);//if system menu is not enabled we need to move one extra in menu
+		else
+		 m_connection->HandleMenu(menuindex+1, (HMENU)wparam);
+
 	}
 
     /// Dissable list all tags and list matching tags menu items if qb/sd is on

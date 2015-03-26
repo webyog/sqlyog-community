@@ -79,21 +79,23 @@ class tabdetailelem;
 
 //...........................................................................................................
 //.CSS Classes
-#define CSS_CLASSES ".resultcaptionstyle	{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left;}\
-.colcaptionstyleleft {font: bold 12px \"Courier New\", Courier, mono; background:#E0E0E0; text-align:left; padding-left:10px; padding-right:10x}\
-.colcaptionstyleright{font: bold 12px \"Courier New\", Courier, mono; background:#E0E0E0; text-align:right; padding-right:10px; padding-left:10x}\
-.cellstyleleft{text-align:left;padding-left:10px; padding-right:10px;}\
-.cellstyleright{text-align:right;padding-right:10px; padding-left:10px;}\
+#define CSS_CLASSES ".resultcaptionstyle	{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left;color: #424242}\
+.colcaptionstyleleft {font: bold 12px \"Courier New\", Courier, mono; background:#4caaf9; color: #FFFFFF;text-align:left; padding-left:2px; padding-right:1px;border-spacing:0px;}\
+.colcaptionstyleright{font: bold 12px \"Courier New\", Courier, mono; background:#4caaf9; color: #FFFFFF;text-align:left; padding-left:2px; padding-right:1px;border-spacing:0px;}\
+.cellstyleleft{text-align:left;padding-left:1px; padding-right:1px;}\
+.cellstyleright{text-align:left;padding-right:1px; padding-left:1px;}\
 .captionfontstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right;}\
-.datafontstylerowodd{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#E2E5EE;height:18px;}\
+.datafontstylerowodd{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#E2E5EE;height:23px;}\
 .datafontstyle{font: 12px \"Courier New\", Courier, mono; text-align:right;}\
 .datafontstyleroweven{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#FFFFFF;height:18px;}\
-.tablestyle{border:2px solid #EEE1FF;}\
-.statustablestyle{border:2px solid #EEE1FF;}\
+.tablestyle{border:none solid #EEE1FF;}\
+.statustablestyle{border:none solid #EEE1FF;}\
 .extendedlevelcaptionstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right;}\
 .extendedleveldatastyle{font: 12px \"Courier New\", Courier, mono; text-align:right;}\
 .warningstyle{font: 13px  \"Courier New\", Courier, mono; text-align:left; color:grey;}\
-.pkcolcaptionstyle{background:#E0E0E0;}"  
+.pkcolcaptionstyle{background:#E0E0E0;}\
+.blueline { background-color: #4caaf9;height: 1px; }\
+a:link { color: #3b7dbb; text-decoration:none;} a:visited { color: #3b7dbb; text-decoration:none;} a:hover {color: #4caaf9; text-decoration:none;} a:active { color: #4caaf9; text-decoration:none;}"  
 
 #define CSS_OPTIMIZE_CLASS "\
 .datafontstyle_optimize{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#FF0000;height:18px;}"

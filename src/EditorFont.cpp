@@ -191,8 +191,8 @@ EditorFont::SetColorFromIni(HWND hwndedit, wyWChar directory[], wyBool isinfotab
 	wyString	dirstr(directory);
 
 	//Change Margin color
-    forecolor   =   wyIni::IniGetInt(GENERALPREFA, "NumberMarginFgColor",   RGB(0,0,0), dirstr.GetString());
-    backcolor   =   wyIni::IniGetInt(GENERALPREFA, "NumberMarginBgColor",   DEF_MARGINNUMBER, dirstr.GetString());
+    forecolor   =   wyIni::IniGetInt(GENERALPREFA, "NumberMarginforegroundColor",   DEF_MARGINNUMBERFG, dirstr.GetString());
+    backcolor   =   wyIni::IniGetInt(GENERALPREFA, "NumberMarginbackgroundColor",   DEF_MARGINNUMBER, dirstr.GetString());
     SendMessage(hwndedit, SCI_STYLESETFORE,STYLE_LINENUMBER,forecolor);
     SendMessage(hwndedit,SCI_STYLESETBACK,STYLE_LINENUMBER,backcolor);   
     
