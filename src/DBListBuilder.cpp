@@ -121,10 +121,10 @@ DBListBuilder::GetServers(HWND hwnd, LPARAM lparam)
 
 	SetCursor(LoadCursor(NULL, IDC_ARROW));
 	return wyTrue;
-
-cleanup:
-		SetCursor(LoadCursor(NULL, IDC_ARROW));
-		return wyFalse;	
+//cleanup not needed, causing a unreachable code warning.
+//cleanup:
+//		SetCursor(LoadCursor(NULL, IDC_ARROW));
+//		return wyFalse;	
 }
 wyInt32  
 DBListBuilder::GetDBFromActiveWins(HWND hwnd, LPARAM lparam)
@@ -285,7 +285,7 @@ DBListBuilder::GetDBFromActiveWinscopydb(HWND hwnd, LPARAM lparam)
     wyString        findvalue, dbname;
 	TVITEM			tvi;
 	HTREEITEM		hitem;
-	LPDIFFCOMBOITEM	pdiffcombo = NULL;
+	//LPDIFFCOMBOITEM	pdiffcombo = NULL;
 
 	hwndcombo =(HWND)lparam;
 
@@ -346,7 +346,7 @@ DBListBuilder::GetDBFromServerscopydb(HWND hwnd, LPARAM lparam)
 	MDIWindow		*pcquerywnd=NULL, *wnd=NULL;
 	wyWChar         classname[SIZE_512] = {0};
 	wyString        dbname, findvalue;
-	LPDIFFCOMBOITEM	pdiffcombo = NULL;
+	//LPDIFFCOMBOITEM	pdiffcombo = NULL;
 
 	MYSQL_RES			*myres=NULL;
 	MYSQL_ROW			myrow;

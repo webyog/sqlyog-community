@@ -751,6 +751,12 @@ public:
 	@returns wyTrue on success  else wyFalse
 	*/
 	wyBool		SaveDataAsXML(HANDLE hfile);
+	/// This function implements working of Save As JSON option in the import/export menu.
+	/**
+	@param hfile		: IN File HANDLE
+	@returns wyTrue on success  else wyFalse
+		*/
+	wyBool     SaveDataAsJson(HANDLE hfile);
 
 	/// This function implements working of Save As Excel option in the import/export menu.
 	/**
@@ -902,13 +908,21 @@ public:
 	*/
 	wyBool	StartHTMLExport(StopExport *resultset, wyWChar *file);
 
-	/// Starts the export as HTML
+	/// Starts the export as XML
 	/**
 	@param resultset		: IN StopExport struct
 	@param file				: IN File name
 	returns wyTrue on successful export
 	*/
 	wyBool	StartXMLExport(StopExport *resultset, wyWChar *file);
+	
+	/// Starts the export as JSON
+	/**
+	@param resultset		: IN StopExport struct
+	@param file				: IN File name
+	returns wyTrue on successful export
+	*/
+	wyBool  StartJSONExport(StopExport *resultset, wyWChar *file);
 
 	
 	/// Function to call when the SQL option is checked
@@ -935,6 +949,9 @@ public:
 	/**
 	*/
 	void	OnCSVCheck();
+
+	//this function is caled when JSON option is selected.
+	void   OnJSONCheck();
 
 		/* Function to handle resize
 	@param hwnd         : Window HANDLE
@@ -990,6 +1007,9 @@ public:
 
 	/// SQL Window HANDLE in export dialog
 	HWND        m_hwndsql;
+
+	//Json window HANDLE in export dialog
+	HWND        m_hwndjson;
 
 	/// Font HANDLE
 	HFONT		m_hfont;

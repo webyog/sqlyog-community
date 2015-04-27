@@ -956,7 +956,7 @@ MDIWindow::OnWmNotify(HWND hwnd, WPARAM wparam, LPARAM lparam)
 	LPNMHDR			lpnmhdr =(LPNMHDR)lparam;
     wyInt32			image;
     TabEditor		*ptabeditor = NULL;
-    HMENU           hmenu, htrackmenu;
+    HMENU           hmenu=NULL, htrackmenu;
     POINT           pnt;
     TabTypes*       ptab;
     TabQueryTypes*  ptabqtype;

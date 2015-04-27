@@ -6611,7 +6611,7 @@ CQueryObject::EndRenameTrigger(LPNMTVDISPINFO ptvdi)
 	wyString		mytemprow1, mytemprow2, mytemprow3, mytemprow4, myrowstr;
     wyBool			restore = wyFalse;
 	MYSQL_RES		*res;
-	MYSQL_ROW		myrow,myrow1;
+	MYSQL_ROW		myrow;//,myrow1
 	wyString		myrow0str, myrow1str, myrow2str, myrow3str, myrow4str, myrow5str;
 
 	MDIWindow*		wnd = (MDIWindow*)GetWindowLongPtr(m_hwndparent, GWLP_USERDATA);

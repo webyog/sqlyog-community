@@ -584,6 +584,7 @@
 #define IDC_HTML                        1190
 #define IDC_CURDATABASE                 1190
 #define IDC_CSV                         1191
+#define IDC_JSON                        1391
 #define IDC_EXCEL                       1192
 #define IDC_SOURCEDB                    1193
 #define IDC_SQL                         1193

@@ -9097,7 +9097,7 @@ wyBool GetTabDetailsFromTable(wyWChar* path, wyInt32 id, List* temptablist)
 	hfind = FindFirstFile(path, &fdata);			
 	directoryname.SetAs(path);
 
-	sqliteobj = new wySQLite;
+	sqliteobj = new wySQLite();
 	//sqliteobj->Open(directoryname.GetString());
 
 
@@ -9132,7 +9132,7 @@ wyBool GetTabDetailsFromTable(wyWChar* path, wyInt32 id, List* temptablist)
 			//fail
 			tabtype = IDI_QUERY_16;
 		
-		temptabdetail = new tabdetailelem;
+		temptabdetail = new tabdetailelem();
 		temptabdetail->m_id = id;
 		temptabdetail->m_iimage = tabtype;
 		 colval = sqliteobj->GetText(&res , "Tabid");
@@ -9191,6 +9191,8 @@ wyBool GetTabDetailsFromTable(wyWChar* path, wyInt32 id, List* temptablist)
 
 	}
 	sqliteobj->Finalize(&res);
+	sqliteobj->Close();
+	delete sqliteobj;
 	return wyTrue;
 }
 
@@ -9211,7 +9213,7 @@ wyBool GetHistoryDetailsFromTable(wyWChar* path, wyInt32 id, wyString *historyda
 	pathstr.SetAs(path);
 	hfind = FindFirstFile(path, &fdata);			
 	directoryname.SetAs(path);
-	sqliteobj = new wySQLite;
+	sqliteobj = new wySQLite();
 
 	if(hfind == INVALID_HANDLE_VALUE)
 	{
@@ -9229,6 +9231,8 @@ wyBool GetHistoryDetailsFromTable(wyWChar* path, wyInt32 id, wyString *historyda
 			 historydata->SetAs(colval);
 	}
 	sqliteobj->Finalize(&res);
+	sqliteobj->Close();
+	delete sqliteobj;
 	return wyTrue;
 }
 
@@ -9267,6 +9271,8 @@ wyBool GetOBDetailsFromTable(wyWChar* path, wyInt32 id, wyString *obdb)
 			 obdb->SetAs(colval);
 	}
 	sqliteobj->Finalize(&res);
+	sqliteobj->Close();
+	delete sqliteobj;
 	return wyTrue;
 }
 
@@ -9614,6 +9620,8 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 
 	}
 	sqliteobj->Finalize(&res);
+	sqliteobj->Close();
+	delete sqliteobj;
 	tempmdilist->m_id = id;
 	//tempmdilist->mdi = wnd;
 	tempmdilist->m_ispresent = wyTrue;

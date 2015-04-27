@@ -1051,9 +1051,9 @@ wyBool
 FrameWindow::MoveToInitPosByrc(HWND hwnd, RECT	*rc)
 {
 	//RECT	    rc;
-	wyInt32     lstyle = 0;
-    wyWChar     *lpfileport=0;
-	wyWChar     directory[MAX_PATH + 1] = {0};
+//	wyInt32     lstyle = 0;
+//    wyWChar     *lpfileport=0;
+//	wyWChar     directory[MAX_PATH + 1] = {0};
 	wyString	dirstr;
 	wyInt32	    screenwidth, width, screenheight, height;
 	wyInt32		virtx, virty;
@@ -1794,7 +1794,7 @@ FrameWindow::TrialbuyWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
 {
 	WNDPROC wndproc = (WNDPROC)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 	TRACKMOUSEEVENT te;
-	RECT rc;
+//	RECT rc;
 	switch (message)
 	{
 	case WM_MOUSEMOVE:	
@@ -1830,12 +1830,12 @@ LRESULT	CALLBACK
 FrameWindow::ToolbarWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
     WNDPROC wndproc = (WNDPROC)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-    HDC hdc;
-    RECT rcwnd, rcclient, rect;
-    HBRUSH hbr;
-    wyBool ret = wyFalse;
+//    HDC hdc;
+//    RECT  rect;// rcwnd,rcclient,
+//    HBRUSH hbr;
+//    wyBool ret = wyFalse;
 	LPDRAWITEMSTRUCT lpdis;
-	RECT  textrect;
+//	RECT  textrect;
 	GRADIENT_RECT gRect;
 	TRIVERTEX vertex[2];
 	wyInt32  fontheight = 0;
@@ -6882,7 +6882,14 @@ FrameWindow::OnWmClose(HWND hwnd)
 		sqlitequery.Sprintf("DELETE FROM conndetails");
 		pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
 	}
-	pGlobals->m_sqliteobj->Close();
+	if(pGlobals->m_sqliteobj)
+	{
+		pGlobals->m_sqliteobj->Close();
+		delete (pGlobals->m_sqliteobj);
+	
+	}
+	if(pGlobals->m_mdiwlist)
+		delete pGlobals->m_mdiwlist;
     return wyTrue;
 }
 
@@ -9371,7 +9378,7 @@ wyBool
 FrameWindow::WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id, TabTypes *tabactive, MDIWindow *wnd, wySQLite	*ssnsqliteobj)
 {
 	sqlite3_stmt*   stmt;
-	TabEditor		*tabquery;
+	TabEditor		*tabquery=NULL;
 	wyString		testquery, sqlitequery;
 	wySQLite	*sqliteobj;
 	sqliteobj = ssnsqliteobj ? ssnsqliteobj : pGlobals->m_sqliteobj;
@@ -9504,7 +9511,7 @@ FrameWindow::SaveConnectionDetails(wySQLite	*ssnsqliteobj)
 	wyString			*testquery, historydata;
 	wyInt32				totalconntabs, j, k, l;
 	wyInt32				subtabcount, totalquetabs;
-	TabEditor			*tabquery,*tabqueryactive;
+	TabEditor			*tabquery=NULL,*tabqueryactive;
 	TabHistory			*tabhistory;	
 #ifndef COMMUNITY
 	TabQueryBuilder		*tabquerybuilder;	
@@ -9998,23 +10005,23 @@ FrameWindow::SaveConnectionDetails2(wySQLite	*ssnsqliteobj)
 	CTCITEM contabitem = {0}, quetabitem = {0};
 	contabitem.m_mask = CTBIF_LPARAM | CTBIF_COLOR;
 	MDIWindow	*wnd, *wndactive;
- 	wyBool isend = wyFalse, isendq = wyFalse;
+ 	wyBool isend = wyFalse;//, isendq = wyFalse
 	
 	wyString	dirstr;
 	
-	tabeditorelem		*temptabeditorele, *deltabeditorele;
-	MDIlist				*tempmdilist, *deltempmdilist;
-	wyString			*testquery, historydata;
-	wyInt32				totalconntabs, j, k, l;
-	wyInt32				subtabcount, totalquetabs;
-	TabEditor			*tabquery,*tabqueryactive;
+	tabeditorelem		*temptabeditorele;//, *deltabeditorele
+	MDIlist				*tempmdilist;//, *deltempmdilist
+	wyString			 historydata;//*testquery,
+	wyInt32				 k;//, j, l,totalconntabs,
+	wyInt32				subtabcount;//, totalquetabs
+	TabEditor			*tabqueryactive;//*tabquery,
 	TabHistory			*tabhistory;	
 #ifndef COMMUNITY
 	TabQueryBuilder		*tabquerybuilder;	
 	TabSchemaDesigner	*tabschemadesigner;
 #endif
 	wyString			sqlitequery,sqliteerr,tempstr;
-	wyInt32				newid = 0,newqid = 0;
+	wyInt32				newid = 0;//,newqid = 0
 	sqlite3_stmt*		stmt;
 	TabTypes			*activetab;
 	wySQLite			*sqliteobj;
@@ -10117,7 +10124,7 @@ FrameWindow::OpenSessionFile()
 {
 	
 	wyInt32			ret = 0, retcls = 0;
-    wyBool          retval = wyFalse;
+//    wyBool          retval = wyFalse;
 	wyWChar			openfilename[MAX_PATH + 1] = {0};
 	wyString		failedconnections, filename;
 	wyWChar			fname[MAX_PATH] = {0}, ext[MAX_PATH] = {0};
@@ -10214,8 +10221,8 @@ FrameWindow::SaveSessionFile(HWND hwnd, wyBool issaveas)
 	wyString    file;
 	wyWChar     filename[MAX_PATH+1] = {0};
 	wyString	buffer;
-	DWORD		dwbyteswritten;
-	HANDLE		hfile;
+//	DWORD		dwbyteswritten;
+//	HANDLE		hfile;
 	wyBool		ret;
 	wySQLite	*sqliteobj;
 	//#define  SIZE_8K		(8*1024)
@@ -10392,8 +10399,8 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 	TabHistory *tabhistory;
 	TiXmlDocument		*doc;
 	TabQueryBuilder *tabquerybuilder;
-	TabSchemaDesigner	*tabschemadesigner;
-	HTREEITEM hitem;
+    TabSchemaDesigner	*tabschemadesigner;
+//	HTREEITEM hitem;
 	const wyChar    *colval = NULL;
 
 	//if(sessionfile == NULL)
@@ -10436,7 +10443,7 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 	}
 	//}
 	
-	sqliteobj = new wySQLite;
+	sqliteobj = new wySQLite();
 	//sqliteobj->Open(directoryname.GetString());
 	sqliteobj->Open(directoryname.GetString(), wyTrue);
 
@@ -10752,9 +10759,16 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 			//	pGlobals->m_pcmainwin->AddTextInCombo(NODBSELECTED);
 		}
 		pGlobals->m_conrestore = wyFalse;
+		if(sqliteobj)
+		{
+		delete(sqliteobj);
+		sqliteobj=NULL;
+		
+		}
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
 		PostMessage(pGlobals->m_pcmainwin->m_hwndrestorestatus, UM_CLOSE_RESTORE_STATUS, 0, 0);
 		return wyTrue;
+		
 		
 }
 
@@ -10900,6 +10914,7 @@ sessionsavesproc(void *arg)
 	wyBool				ismutexowned = wyFalse, ispurge = wyFalse, isvacuum = wyTrue, ret;
 	wyFile					plinklock;
 	sqlite3_stmt		*res;
+	wySQLite            *pwySQLite;
 	/*lpMutexAttributes.bInheritHandle = TRUE;
 	lpMutexAttributes.lpSecurityDescriptor = NULL;
 	lpMutexAttributes.nLength = sizeof(lpMutexAttributes);*/
@@ -10923,8 +10938,8 @@ sessionsavesproc(void *arg)
 
 	hfind = FindFirstFile(directory, &fdata);			
 	directoryname.SetAs(directory);
-
-	pGlobals->m_sqliteobj = new wySQLite;
+	pwySQLite=new wySQLite();
+	pGlobals->m_sqliteobj = pwySQLite;
 	pGlobals->m_sqliteobj->Open(directoryname.GetString());
 
 	sqlitequery.Sprintf("PRAGMA foreign_keys = ON");

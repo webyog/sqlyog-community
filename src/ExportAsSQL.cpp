@@ -1337,7 +1337,7 @@ wyBool
 MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trigger, wyInt32 * fileerr)
 {
 	MYSQL_RES	      *res = NULL,*res1=NULL;
-	MYSQL_ROW 	      row = NULL,row1;
+	MYSQL_ROW 	      row = NULL,row1=NULL;
 	wyString	      query, def, definer, deftemp,query1,bodyoftrigger;
 	wyChar			  *ch = NULL;
 	wyInt32			  pos;

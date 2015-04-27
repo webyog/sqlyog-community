@@ -3534,7 +3534,7 @@ CCustGrid::DrawCell(HDC hdcmem, wyInt32 row, wyInt32 col, PGVCOLNODE topcolstruc
     {
 	    isnotgrey = m_lpgvwndproc(m_hwnd, GVN_ISWHITEBKGND, row, col);
 
-        // now if the row is the current selected row then we draw a thin black border thru the row
+        // now if the row is the current selected row then we draw a thin border thru the row
 
         if((row == m_curselrow &&  col == m_curselcol) && topcolstruct && topcolstruct->isshow == wyTrue)
         {

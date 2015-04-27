@@ -663,7 +663,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	wyChar		*ch = NULL;
 	wyString    deftemp, def, query,query1, definer,bodyoftrigger;
 	MYSQL_RES	*myres,*myres1;
-	MYSQL_ROW	myrow,myrow1;
+	MYSQL_ROW	myrow,myrow1=NULL;
 	wyInt32		coldefiner = -1; 
 	wyInt32		coltablename = -1;
 	wyInt32		colevent = -1;
@@ -3221,8 +3221,9 @@ StartTransaction(Tunnel *tunnel, MYSQL *mysql)
 {
 	wyString query;
 	MYSQL_RES *res;
-	//abhishek--use transaction instead of autocommit=0
-	query.Sprintf("SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;START TRANSACTION;");
+	//use autocommit=0 for starting the transaction.
+	//query.Sprintf("SET SESSION TRANSACTION ISOLATION LEVEL REPEATABLE READ;START TRANSACTION;");
+	query.Sprintf("set autocommit=0;");
 	res = SjaExecuteAndGetResult(tunnel, &mysql, query);
 
 	if(!res && mysql->affected_rows == -1)

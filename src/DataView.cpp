@@ -245,7 +245,7 @@ DataView::DataView(MDIWindow *wnd, HWND hwndparent)
     m_arg = m_wnd->GetKeywords(&m_argcount);
     m_stop = 0;
     m_data = NULL;
-    m_extraimages[IMG_INDEX_STOP] = IDI_STOP;
+    m_extraimages[IMG_INDEX_STOP] = IDI_CLOSETAB;
     m_extraimages[IMG_INDEX_RESET_FILTER] = IDI_RESETFILTER;
     m_htrackmenu = NULL;
     m_findreplace = NULL;

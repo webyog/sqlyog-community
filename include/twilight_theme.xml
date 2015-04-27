@@ -1,6 +1,6 @@
 <sqlyogtheme name="Twilight">
 	<framewindow>
-		<background color1="0xF5F5F5" />
+		<background color1="14339524" />
 		<!-- text active="16777215" inactive="16777215" / -->
 	</framewindow>
 	
@@ -23,7 +23,7 @@
 	</menu>
 	
 	<menubar>
-		<background color1="0xF5F5F5" />
+		<background color1="0xB6C1D2" />
 		<foreground color2="10938623" color1="0xFFFFFF" />
 		<text active="0" inactive="8421504"/>
 		<seltext active="0" inactive="8421504"/>
@@ -31,14 +31,14 @@
 	</menubar>
 	
 	<toolbar>
-		<background color1="0xF5F5F5" />
+		<background color1="14866898" />
 		<foreground color2="0xFFE8A6" color1="0xFFFFFF" />
 		<selected color1="0xE5C365" color2="0xE5C365" />
 		<!-- text active="16777215" inactive="16777215" / -->
 	</toolbar>
 	
 	<maintoolbar>
-		<background color1="0xF5F5F5" />
+		<background color1="14339524" />
 		<foreground color2="10938623" color1="0xFFFFFF" />
 		<selected color1="0xE5C365" color2="0xE5C365" />
 	</maintoolbar>
@@ -54,7 +54,7 @@
 	</vsplitter>
 	
 	<conntab tabbottomline="true">
-		<background color1="0xF5F5F5" color2="0xF5F5F5" />
+		<background color1="14339524" color2="14339524" />
 		<foreground color1="13218213" color2="13218213" />
 		<selectedtab color2="13218213" />
 		<plusbutton color1="6770753" />

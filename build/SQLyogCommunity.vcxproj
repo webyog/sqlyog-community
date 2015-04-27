@@ -98,7 +98,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shfolder.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shfolder.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT; LIBC;LIBCD;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -110,7 +110,7 @@
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
     </Link>
     <Manifest>
-      <EnableDPIAwareness>true</EnableDPIAwareness>
+      <EnableDPIAwareness>false</EnableDPIAwareness>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -138,7 +138,7 @@
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
     </Link>
     <Manifest>
-      <EnableDPIAwareness>true</EnableDPIAwareness>
+      <EnableDPIAwareness>false</EnableDPIAwareness>
     </Manifest>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN64</PreprocessorDefinitions>
@@ -175,7 +175,7 @@
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
     </Link>
     <Manifest>
-      <EnableDPIAwareness>true</EnableDPIAwareness>
+      <EnableDPIAwareness>false</EnableDPIAwareness>
     </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -208,7 +208,7 @@
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
     </Link>
     <Manifest>
-      <EnableDPIAwareness>true</EnableDPIAwareness>
+      <EnableDPIAwareness>false</EnableDPIAwareness>
     </Manifest>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN64</PreprocessorDefinitions>
@@ -225,6 +225,9 @@
       <IgnoreSpecificDefaultLibraries>LIBCMT; LIBC;LIBCD;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='x86' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
     </Link>
+    <Manifest>
+      <EnableDPIAwareness>false</EnableDPIAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Template|x64'">
     <ClCompile>
@@ -237,6 +240,9 @@
       <IgnoreSpecificDefaultLibraries>LIBCMT; LIBC;LIBCD;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <AdditionalManifestDependencies>type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='amd64' publicKeyToken='6595b64144ccf1df' language='*'</AdditionalManifestDependencies>
     </Link>
+    <Manifest>
+      <EnableDPIAwareness>false</EnableDPIAwareness>
+    </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\src\Announcements.cpp" />
@@ -314,6 +320,7 @@
     <ClCompile Include="..\src\ResultView.cpp" />
     <ClCompile Include="..\src\SortAndFilter.cpp" />
     <ClCompile Include="..\src\SQLFormatter.cpp" />
+    <ClCompile Include="..\src\sqlite3.c" />
     <ClCompile Include="..\src\SQLMaker.cpp" />
     <ClCompile Include="..\src\SQLTokenizer.cpp" />
     <ClCompile Include="..\src\StatusbarMgmt.cpp" />

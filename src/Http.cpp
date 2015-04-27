@@ -30,6 +30,7 @@
 //#define		USER_AGENT			"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)"
 //changing user agent to IE11 running in windows 8.1 in SQLyog version 12.08
 #define		USER_AGENT			   "Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0;  rv:11.0) like Gecko"
+#define     RECIEVE_TIMEOUT         28800000 //8 hrs     
 
 void httplog(char * buff)
 {/*
@@ -404,7 +405,7 @@ CHttp::AllocHandles ( bool isbase64, int *status, bool checkauth)
 							INTERNET_FLAG_NO_CACHE_WRITE | 
 							INTERNET_FLAG_KEEP_CONNECTION;
     unsigned long errnum;
-
+	DWORD rec_timeout = RECIEVE_TIMEOUT;					// override the 30 second timeout fixed in 12.11
 	wyString contenttype,contenttypestr;
 	//wyInt32     ret;
 	
@@ -423,7 +424,7 @@ CHttp::AllocHandles ( bool isbase64, int *status, bool checkauth)
 	
 	if (!m_InternetSession )
 		return false;
-
+	InternetSetOption(m_InternetSession, INTERNET_OPTION_RECEIVE_TIMEOUT, &rec_timeout, sizeof(rec_timeout));
 	m_InternetConnect = InternetConnect (m_InternetSession, m_HostName, m_Port, m_UserName, m_Password, INTERNET_SERVICE_HTTP, 0L, 0L );
 	if (!m_InternetConnect )
 		return false;

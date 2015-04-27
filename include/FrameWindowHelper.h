@@ -348,6 +348,7 @@
 #define		ZIP											L"ZIP Files(*.zip)\0*.zip;All Files(*.*)\0"	
 //#define		SQL											L"SQL Files(*.sql)\0*.sql\0All Files(*.*)\0*.*\0"
 #define		CSV											L"CSV Files(*.csv)\0*.csv\0All Files(*.*)\0*.*\0"
+#define     JSON                                        L"JSON Files(*.json)\0*.json\0All Files(*.*)\0*.*\0"
 #define		HTML										L"HTML Files(*.htm;*.html)\0*.htm\0All Files(*.*)\0*.*\0"
 #define		XML											L"XML Files(*.xml)\0*.xml\0All Files(*.*)\0*.*\0"
 #define		LOG											L"LOG Files(*.log)\0*.log\0All Files(*.*)\0*.*\0"

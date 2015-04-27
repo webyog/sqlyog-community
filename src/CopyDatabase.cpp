@@ -330,7 +330,7 @@ CopyDatabase::OnUmCopydatabase(HWND hwnd)
 	HWND		hwndmsg = NULL;
 	wyWChar     buffer[SIZE_128];
 	VERIFY(wnd = GetActiveWin());
-	LPDIFFCOMBOITEM lpdiff;
+	//LPDIFFCOMBOITEM lpdiff;
 	m_ispromtstorepgrmmessage = wyFalse;
 	m_isstoredpgrms = wyFalse;
 
@@ -795,7 +795,7 @@ void CopyDatabase::FindTrigerAndCheck(HWND htree, wyString *tablename, wyBool re
 	wyString    myrowstr, query;
 	MYSQL_RES	*myres = NULL;
 	MYSQL_ROW	myrow;
-	wyBool		ismysql41 = ((GetActiveWin())->m_ismysql41), ret;
+	wyBool		ismysql41 = ((GetActiveWin())->m_ismysql41);//, ret
 	MDIWindow   *wnd;
 	wyBool		iscollate = wyFalse;
 	VERIFY(wnd = GetActiveWin());
@@ -1378,7 +1378,7 @@ CopyDatabase::FreedbComboParam()
 wyBool
 CopyDatabase::GetTargetDatabase()
 {
-	LPDIFFCOMBOITEM	lpdiff,lpdiff2;
+	LPDIFFCOMBOITEM	lpdiff;//,lpdiff2
 	wyInt32         index;
 
 	VERIFY((index = SendMessage(m_hwndcombo, CB_GETCURSEL, 0, 0))!= CB_ERR);
@@ -3468,7 +3468,7 @@ wyBool
 CopyDatabase::ExportTrigger(const wyChar *db, const wyChar *triggername)
 {
 	MYSQL_RES	*res = NULL, *tgtres = NULL,*myres1=NULL;
-	MYSQL_ROW	 myrow,myrow1;
+	MYSQL_ROW	 myrow,myrow1=NULL;
 	wyString    query,query1, row0str, row1str, trigger, row3str, row4str,bodyoftrigger;
 	wyBool      isshowcreateworked=wyTrue;
 	 //There are mutiple issues with show triggers and show create trigger in MySQL servers--
@@ -3574,9 +3574,9 @@ CopyDatabase::ExportTrigger(const wyChar *db, const wyChar *triggername)
 wyBool
 CopyDatabase::CheckTargetDB(HWND m_hwnddlg)
 {
-	LPDIFFCOMBOITEM	lpdiff,lpdiff2;
-	wyInt32         index, i=0,ret;
-	wyWChar     buffer[SIZE_128];
+	LPDIFFCOMBOITEM	lpdiff;//lpdiff2;
+	wyInt32         index,ret;//, i=0
+	//wyWChar     buffer[SIZE_128];
 	wyString	activevalue;
 	MDIWindow           *wnd = GetActiveWin();
 	/*	fixed a bug #281. It might be that a user has only one connection with only one

@@ -825,7 +825,7 @@ TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres,wyString createtable)
 		cwrapobj2 = new FieldStructWrapper(fieldattr, wyFalse);
         m_listwrapperstruct.Insert(cwrapobj);
 		m_listwrapperstruct_2.Insert(cwrapobj2);
-		if(IsMariaDB52 && currentrowstr)
+		if(m_ismariadb52 && currentrowstr)
 		currentrowstr=strtok(NULL,"\n");
 	}
     return wyTrue;
@@ -1853,7 +1853,7 @@ void TabFields::GetVirtualOrPersistentValue(wyString& query, FieldStructWrapper*
 {
    FIELDATTRIBS    *fieldattr = NULL;
     wyString	virtuality, expression;
-    wyChar      *tbuff =  NULL;
+//    wyChar      *tbuff =  NULL;
 	
     if(!cwrapobj || !cwrapobj->m_newval)
         return;

@@ -35,6 +35,7 @@
 #define	 SHOWWARNING	WM_USER + 1
 #define  SIZE_8K		(8*1024)
 
+
 extern	PGLOBALS		 pGlobals;
 
 #define SQLWARNING  _(L"This saves the data in most simple form of SQL statement.\n\
@@ -1187,6 +1188,7 @@ CExportResultSet::OnWmInitDlgValues(HWND hwnd)
 	VERIFY(m_hwndxml  = GetDlgItem(hwnd, IDC_XML));
 	VERIFY(m_hwndhtml = GetDlgItem(hwnd, IDC_HTML));
 	VERIFY(m_hwndcsv = GetDlgItem (hwnd, IDC_CSV));
+	VERIFY(m_hwndjson=GetDlgItem (hwnd, IDC_JSON));
 	VERIFY(m_hwndchange = GetDlgItem(hwnd, IDC_CHANGE));
     
     VERIFY(m_hwndbloblimit = GetDlgItem(hwnd, IDC_BLOB));
@@ -1212,6 +1214,7 @@ CExportResultSet::OnWmInitDlgValues(HWND hwnd)
 	m_p->Add(hwnd, IDC_HTML, "HTML", "0", CHECKBOX);
 	m_p->Add(hwnd, IDC_CSV, "CSV", "1", CHECKBOX);
     m_p->Add(hwnd, IDC_EXCEL, "EXCEL", "0", CHECKBOX);
+	m_p->Add(hwnd, IDC_JSON, "JSON", "0", CHECKBOX);
 
 	m_p->Add(hwnd, IDC_SQL, "SQL", "0", CHECKBOX);
 
@@ -1471,6 +1474,9 @@ CExportResultSet::OnWmCommand(HWND hwnd, WPARAM wparam, LPARAM lparam)
 		if(Button_GetCheck(GetDlgItem(hwnd, IDC_SQL)) == BST_CHECKED)
 		    OnSQLCheck(hwnd);
 		break;
+	case IDC_JSON:
+		OnJSONCheck();
+		break;
 
 	case IDC_CHANGE:
 		{
@@ -1541,7 +1547,17 @@ CExportResultSet::OnXMLCheck()
     ChangeFileExtension();
 	EnableWindow(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), FALSE);
 }
+VOID 
+	CExportResultSet::OnJSONCheck()
+{
 
+	DisableExcelOptions();
+	DisableCSVOptions();
+	DisableSQLOptions();
+    ChangeFileExtension();
+	EnableWindow(GetDlgItem(m_hwnd, IDC_CHARSETCOMBO), FALSE);
+
+}
 VOID
 CExportResultSet::OnHTMLCheck()
 {
@@ -1591,6 +1607,9 @@ CExportResultSet::ChangeFileExtension()
 
 	if((SendMessage(GetDlgItem(m_hwnd, IDC_XML), BM_GETCHECK, 0, 0))== BST_CHECKED)
 		filename.Add("xml");
+	
+	if((SendMessage(GetDlgItem(m_hwnd, IDC_JSON), BM_GETCHECK, 0, 0))== BST_CHECKED)
+		filename.Add("json");
 
 	if((SendMessage(GetDlgItem(m_hwnd, IDC_CSV), BM_GETCHECK, 0, 0))== BST_CHECKED)
 		filename.Add("csv");
@@ -2025,6 +2044,11 @@ CExportResultSet::SetExpFile()
 		openfilename.lpstrFilter	   = HTML;
 		openfilename.lpstrDefExt       = L"html";
 	}
+	else if(SendMessage(m_hwndjson, BM_GETCHECK, 0, 0)== BST_CHECKED)
+	{
+		openfilename.lpstrFilter	   = JSON;
+		openfilename.lpstrDefExt       = L"json";
+	}
 	else if(SendMessage(m_hwndcsv, BM_GETCHECK, 0, 0)== BST_CHECKED)
 	{
 		openfilename.lpstrFilter	   = CSV;	
@@ -2082,7 +2106,10 @@ CExportResultSet::ExportData(LPVOID lpparam)
 
 	if(SendMessage(resultset->m_exportresultset->m_hwndxml, BM_GETCHECK, 0, 0)== BST_CHECKED)
 		ret = resultset->m_exportresultset->StartXMLExport(resultset, 
-                            resultset->m_exportresultset->m_filename.GetAsWideChar());
+		resultset->m_exportresultset->m_filename.GetAsWideChar());
+	if(SendMessage(resultset->m_exportresultset->m_hwndjson, BM_GETCHECK, 0, 0)== BST_CHECKED)
+		ret = resultset->m_exportresultset->StartJSONExport(resultset, 
+		resultset->m_exportresultset->m_filename.GetAsWideChar());
 
 	else if(SendMessage(resultset->m_exportresultset->m_hwndhtml, BM_GETCHECK, 0, 0)== BST_CHECKED)
 		ret = resultset->m_exportresultset->StartHTMLExport(resultset, 
@@ -2125,6 +2152,25 @@ CExportResultSet::StartXMLExport(StopExport *resultset, wyWChar *file)
         }
 		//ShellExecute(NULL, TEXT("open"), file, NULL, NULL, SW_SHOWNORMAL);
     }
+	return ret;
+}
+wyBool
+	CExportResultSet::StartJSONExport(StopExport *resultset, wyWChar *file)
+{
+    wyBool ret;
+	wyInt32 ret1 = 0;
+
+	ret =  resultset->m_exportresultset->SaveDataAsJson(resultset->m_exportresultset->m_hfile);
+	VERIFY(CloseHandle(resultset->m_exportresultset->m_hfile));
+	if(ret == wyTrue)
+    {
+        ret1 = yog_message(resultset->m_exportresultset->m_hwnd, _(L"Data exported successfully. Would you like to open file?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION);
+        if(ret1 == IDYES)
+        {
+            ShellExecute(NULL, TEXT("open"), file, NULL, NULL, SW_SHOWNORMAL);
+        }
+    }
+
 	return ret;
 }
 
@@ -2479,6 +2525,186 @@ CExportResultSet::SaveDataAsXML(HANDLE hfile)
 
 	return wyTrue;
 }
+//this function export the data as Json in the file given as parameter
+//format for josn is [{row 1}{row 2}....]
+wyBool 
+	CExportResultSet::SaveDataAsJson(HANDLE hfile)
+{
+		wyUInt32		j,k;
+	BOOL			ret;
+	DWORD			dwbyteswritten;
+    wyInt32         messagecount = 0;
+    wyInt32         rowcount = 0, rowptr = 0,row_counter=0;
+    wyString        messbuff, myrowstr, buffer(SIZE_8K);
+	wyBool			ismysql41 = ((GetActiveWin())->m_ismysql41);
+	MYSQL_RES		*myres;
+	MYSQL_ROW		myrow;
+	MYSQL_FIELD		*myfield;
+	MYSQL_ROWEX	    *tmp = NULL;
+	MYSQL_ROWS		*rowswalker = NULL;
+
+	myres			= m_res;
+	myfield			= m_field;
+
+	SetCursor(LoadCursor(NULL, IDC_WAIT));
+
+	//Add to buffer then to file
+	buffer.Add("[ \r\n");
+
+	m_tunnel->mysql_data_seek(myres,(my_ulonglong)0);
+
+   
+    while(1)
+	{
+		if(IsStopExport() == wyTrue)
+        {
+            SetWindowText(GetDlgItem(m_hwnd, IDC_MESSAGE), _(L"Aborted by user"));
+			return wyFalse;
+        }
+
+		// now depending upon the user has started to edit or not we get the row accordingly
+        if(!m_ptr->m_rowarray->GetLength())
+        {
+			if(m_resultfromquery == wyTrue)
+			{	
+				//If use mysql_useresult() then we should use this
+				myrow = m_tunnel->mysql_fetch_row(myres);
+			}
+			else
+			{
+				SeekCurrentRowFromMySQLResult(myres, &rowswalker, m_tunnel, &myrow, NULL);
+			}
+			if(!myrow)
+				break;
+		}
+        else 
+        {
+            if(rowptr == m_ptr->m_rowarray->GetLength())
+                break;
+
+            //no need to export unsaved row.. if it is a saved row then m_newrow =wyFalse
+            
+            
+            if(m_ptr->m_rowarray->GetRowExAt(rowptr)->IsNewRow())
+			{
+                rowptr++;
+                break;
+            }
+            if(m_ptr->m_modifiedrow >=0 && m_ptr->m_modifiedrow == rowptr && m_ptr->m_oldrow->IsNewRow() == wyFalse)
+            {
+                tmp = m_ptr->m_oldrow;
+                myrow = m_ptr->m_oldrow->m_row;
+            }
+            else
+            {
+                tmp = m_ptr->m_rowarray->GetRowExAt(rowptr);
+                myrow =tmp->m_row;
+            }
+            rowptr++;
+		}
+
+		buffer.Add("{ \r\n");
+		
+		for(j=0; j < (myres->field_count); j++)
+        {
+			if(m_selectedfields[j] == wyFalse)
+				continue;
+			
+			buffer.Add("\"");
+			
+			// we output the fields but before we check if there is a space in between.
+			k=0;
+
+			while(myfield[j].name[k])
+			{
+				switch(myfield[j].name[k])
+				{
+				case C_SPACE:
+					buffer.Add("_");
+					break;
+
+				default:
+					buffer.AddSprintf("%c", *(myfield[j].name+k));
+					break;
+				}
+				
+				k++;
+			}
+
+			
+			buffer.Add("\":");
+			
+			if(myrow[j] != NULL)
+			{
+				myrowstr.SetAs(myrow[j], ismysql41);
+
+				//Now add the value. If it number than use as it is other wise use double quotes refer-http://json.org/
+				if(myfield[j].type==MYSQL_TYPE_DECIMAL ||myfield[j].type==MYSQL_TYPE_FLOAT ||myfield[j].type==MYSQL_TYPE_INT24
+					||myfield[j].type==MYSQL_TYPE_LONG||myfield[j].type==MYSQL_TYPE_LONGLONG||myfield[j].type==MYSQL_TYPE_NEWDECIMAL
+					||myfield[j].type==MYSQL_TYPE_SHORT)
+					buffer.Add(myrowstr.GetString());
+				else
+				
+					{
+						buffer.Add("\"");
+						buffer.Add(myrowstr.GetString());
+						buffer.Add("\"");
+				}
+			}
+			else
+				buffer.Add("null");
+			if(j!=(myres->field_count-1))
+			buffer.Add(",\r\n");
+			else
+            	buffer.Add("\r\n");
+		}
+		//last row will not add comma after it
+		 if(row_counter == (m_ptr->m_rowarray->GetLength()-1)|| rowptr==(m_ptr->m_rowarray->GetLength()-1))
+			{
+				buffer.Add("}");
+				row_counter++;
+		 }
+		 else
+		 {
+			 buffer.Add("},");
+			 row_counter++;
+		 }
+		
+		buffer.Add("\r\n");
+	
+		//Write to file if buffer size is more
+		if(buffer.GetLength() >= SIZE_8K)
+		{
+			ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbyteswritten, NULL);
+			buffer.Clear();
+			
+			if(ret == FALSE)
+			{
+				DisplayErrorText(GetLastError(), _("Error writing in file."));
+				return wyFalse;
+			}
+		}
+
+		//Display number of rows exported
+		messbuff.Sprintf(_("  %d Rows Exported"), ++messagecount);
+        SendMessage(m_hwndmessage, WM_SETTEXT, 0,(LPARAM) messbuff.GetAsWideChar());
+        rowcount++;
+	}
+
+		buffer.Add("]");
+	
+	ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbyteswritten, NULL);
+	
+	if(ret == FALSE)
+	{
+		DisplayErrorText(GetLastError(), _("Error writing in file."));
+		return wyFalse;
+	}
+	
+	SetCursor(LoadCursor(NULL, IDC_ARROW));
+
+	return wyTrue;
+}
 
 wyBool 
 CExportResultSet::IsStopExport() 
@@ -2521,8 +2747,8 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
 	MYSQL_FIELD		*fields;
 	MYSQL_ROW		myrow;
 	wyChar			*encbuffer;
-	wyWChar		    *wencbuffer;
-	wyUInt32		wlenptr = 0;
+	//wyWChar		    *wencbuffer;
+	//wyUInt32		wlenptr = 0;
 	VERIFY(myres	= m_res);
 	wyBool			iswritten = wyFalse;
 	unsigned char Header[3]; //unicode text file header
@@ -3001,6 +3227,7 @@ CExportResultSet::GetCtrlRects()
     wyInt32 ctrlid[] = {
        	IDC_HORZBAR1, 1, 0,
         //IDC_CSV, 0, 0,
+		IDC_JSON,0,0,
         IDC_HTML, 0, 0,
         IDC_XML, 0, 0,
         IDC_EXCEL, 0, 0,
@@ -3068,17 +3295,19 @@ CExportResultSet::PositionCtrls()
 			switch(pdlgctrl->m_id)
 			{
 				case IDC_HTML:
-					x = (rect.right - rect.left)/4 + 17;
+					x = (rect.right - rect.left)/3 +20;
 					break;
 
 				case IDC_XML:
-					x = (rect.right - rect.left)/2 - 18;
+					x = (rect.right - rect.left)/2+25;
 					break;
 
 				case IDC_EXCEL:
-					x = (rect.right - rect.left)*2/3 - 7;
+					x = (rect.right - rect.left)*2/3+25;
 					break;
-
+               case IDC_JSON:
+				   x = (rect.right - rect.left)/5;
+				   break;
 				case IDC_SQL:
 				case IDC_EXPFILESELECT:
 				case IDC_DESELECTALL:

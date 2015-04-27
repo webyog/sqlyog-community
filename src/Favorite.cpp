@@ -180,7 +180,6 @@ FavoriteBase::AddFile(HMENU hmenu, wyString &parentpath,  wyWChar *filename)
 	lpmii.dwTypeData	= data;
 	
     VERIFY(::InsertMenuItem(hmenu, -1, TRUE, &lpmii));
-
 	free(data);
 
     return wyTrue;
