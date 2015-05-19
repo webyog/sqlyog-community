@@ -3078,6 +3078,12 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 		if(hwndactive)
 			pcquerywnd->m_pcqueryobject->ImportFromCSV(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
 		break;
+	case ACCEL_IMPORTXML:	
+	case ID_IMPORT_FROMXML:
+		if(hwndactive)
+			pcquerywnd->m_pcqueryobject->ImportFromXML(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+			break;
 
 	case ACCEL_CREATEDB:
 	case IDM_CREATEDATABASE:
@@ -4814,7 +4820,7 @@ FrameWindow::OnActiveConn()
 								ID_OBJECT_DROPDATABASE, ID_OBJECT_EMPTYDATABASE, ID_OBJECT_CREATESCHEMA, 
 								ID_OBJECT_TABLEEDITOR, ID_OBJECT_MANINDEX, ID_IMPORTEXPORT_TABLESEXPORTTABLES, 
 								ID_EXPORT_AS, ID_EXPORT_ASXML, ID_EXPORT_ASHTML, 
-								ID_OBJECT_COPYTABLE, ID_IMPORT_FROMCSV, ID_OBJECT_RENAMETABLE, ID_OBJECT_CLEARTABLE, 
+								ID_OBJECT_COPYTABLE, ID_IMPORT_FROMCSV,ID_IMPORT_FROMXML, ID_OBJECT_RENAMETABLE, ID_OBJECT_CLEARTABLE, 
 								ID_OBJECT_DROPTABLE, ID_OBJECT_REORDER, ID_OBJECT_CHANGETABLETYPE_ISAM, 
 								ID_OBJECT_CHANGETABLETYPE_MYISAM, ID_OBJECT_CHANGETABLETYPE_HEAP, 
 								ID_OBJECT_CHANGETABLETYPE_MERGE, ID_OBJECT_CHANGETABLETYPE_INNODB, ID_OBJECT_CHANGETABLETYPE_BDB, 
@@ -6022,7 +6028,7 @@ FrameWindow::Refresh(MDIWindow	*pcquerywnd)
 	EditorBase		*peditorbase = pcquerywnd->GetActiveTabEditor()->m_peditorbase;
 	//pcquerywnd->m_pcqueryobject->RefreshObjectBrowserOnCreateAlterTable()
 	if(pcquerywnd->m_pcqueryobject->GetSelectionImage()== NSERVER)
-		pcquerywnd->m_pcqueryobject->RefreshObjectBrowser(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		pcquerywnd->m_pcqueryobject->RefreshObjectBrowser(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql,pcquerywnd);
 	else
 	{
 	/*	Refresh Parent node only, leaving others unchanged, So we can
@@ -7694,7 +7700,7 @@ FrameWindow::HandleOnRefresh(MDIWindow *pcquerywnd)
 {
 	if(pcquerywnd->m_pcqueryobject->GetSelectionImage() == NSERVER)
 	{
-		pcquerywnd->m_pcqueryobject->RefreshObjectBrowser(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		pcquerywnd->m_pcqueryobject->RefreshObjectBrowser(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql,pcquerywnd);
 	}
 	else
 	{
@@ -7782,7 +7788,7 @@ FrameWindow::OnCreateDatabase(HWND hwndactive, MDIWindow *wnd)
 		
         SendMessage(wnd->m_pcqueryobject->m_hwnd, WM_SETREDRAW, FALSE, 0);
         wnd->m_pcqueryobject->GetTreeState();
-		wnd->m_pcqueryobject->RefreshObjectBrowser(wnd->m_tunnel, &wnd->m_mysql);				
+		wnd->m_pcqueryobject->RefreshObjectBrowser(wnd->m_tunnel, &wnd->m_mysql,wnd);				
         wnd->m_pcqueryobject->RestoreTreeState();
         wnd->m_pcqueryobject->m_seltype = NDATABASE;
 		wnd->m_pcqueryobject->m_seldatabase.SetAs(dbname);

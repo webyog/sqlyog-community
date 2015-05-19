@@ -33,7 +33,7 @@
 extern	PGLOBALS		 pGlobals;
 
 /*
-	Implementation of export as CSV Dialog.
+	Implementation of export as CSV/XML Dialog.
 	This in itself calls the character dialog box and user can export the data in the 
 	specified format.
 																					*/
@@ -47,7 +47,10 @@ ExportMultiFormat::ExportMultiFormat()
 	m_esch.ReadFromFile(EXPORTCSVSECTION);
 
 	m_p = new Persist;
-	m_p->Create("IMPORTCSV");
+	m_p->Create("IMPORTCSV");//This persist pointer will be used  CSV import.
+	m_p_XML=new Persist;
+	m_p_XML->Create("IMPORTXML");
+
 }
 
 ExportMultiFormat::~ExportMultiFormat()
@@ -71,6 +74,27 @@ ExportMultiFormat::Create(HWND hwnd, wyChar *db, wyChar *table, Tunnel * tunnel,
 
 	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_IMPORTCSV),
 		hwnd, ExportMultiFormat::DlgProc, (LPARAM)this);
+
+	if(ret)
+        return wyTrue;
+
+    return wyFalse;
+}
+//function to create import from XML dialog
+wyBool 
+ExportMultiFormat::CreateXML(HWND hwnd, wyChar *db, wyChar *table, Tunnel * tunnel, PMYSQL mysql)
+{
+	wyInt32 ret;
+
+	m_hwndparent    =	hwnd;
+	m_mysql	        = mysql;
+	m_tunnel        = tunnel;
+
+	m_db.SetAs(db);
+	m_table.SetAs(table);
+
+	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_IMPORTXML),
+		hwnd, ExportMultiFormat::DlgProcXML, (LPARAM)this);
 
 	if(ret)
         return wyTrue;
@@ -106,13 +130,48 @@ ExportMultiFormat::DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
 
 	case WM_DESTROY:
 		delete picsv->m_p;
+		delete picsv->m_p_XML;
 		break;
 
 	}
 
 	return 0;
 }
+INT_PTR CALLBACK
+ExportMultiFormat::DlgProcXML(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	ExportMultiFormat * picsv =(ExportMultiFormat*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
+	switch(message)
+	{
+	case WM_INITDIALOG:
+		SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
+        LocalizeWindow(hwnd);
+		PostMessage(hwnd, WM_INITDLGVALUES, 0, 0);
+		break;
+
+	case WM_INITDLGVALUES:
+	    picsv->OnWmInitDlgValuesXML(hwnd);
+		break;
+
+	case WM_HELP:
+		ShowHelp("http://sqlyogkb.webyog.com/article/217-import-XML-data-using-load-local");
+		return TRUE;
+
+	case WM_COMMAND:
+		if(picsv->OnWmCommandXML(hwnd, wParam, lParam) == wyFalse)
+            return 0;
+		break;
+
+	case WM_DESTROY:
+		delete picsv->m_p;
+		delete picsv->m_p_XML;
+		break;
+
+	}
+
+	return 0;
+}
 void
 ExportMultiFormat::OnWmInitDlgValues(HWND hwnd)
 {
@@ -133,6 +192,31 @@ ExportMultiFormat::OnWmInitDlgValues(HWND hwnd)
 		EnableWindow(GetDlgItem(hwnd, IDC_IGNORENUM), TRUE);
 
 	SetStaticText();
+	FillInitData();
+    return;
+}
+
+void
+ExportMultiFormat::OnWmInitDlgValuesXML(HWND hwnd)
+{
+	m_hwnd = hwnd;
+	VERIFY(m_hwndtlist      = GetDlgItem(hwnd, IDC_TABLELIST));
+	VERIFY(m_hwndfieldlist  = GetDlgItem(hwnd, IDC_FIELDLIST));
+	VERIFY(m_hwndedit       = GetDlgItem(hwnd, IDC_EXPORTFILENAME));
+	
+	m_p_XML->Add(hwnd, IDC_EXPORTFILENAME, "FileName", "", TEXTBOX);
+	m_p_XML->Add(hwnd, IDC_LOWPRIORITY, "LowPriority", "0", CHECKBOX);
+	m_p_XML->Add(hwnd, IDC_CONCURRENT, "Concurrent", "0", CHECKBOX);
+	m_p_XML->Add(hwnd, IDC_REPLACE, "Replace", "0", CHECKBOX);
+	m_p_XML->Add(hwnd, IDC_IGNORE, "Ignore", "0", CHECKBOX);
+	m_p_XML->Add(hwnd, IDC_IGNORELINES, "IgnoreLines", "0", CHECKBOX);
+	m_p_XML->Add(hwnd, IDC_IGNORENUM, "IgnoreLinesNumber", "", TEXTBOX);
+	m_p_XML->Add(hwnd, IDC_ROWSIDTEXT, "rowsidentifiedby", "row", TEXTBOX);
+
+	if(SendMessage(GetDlgItem(hwnd, IDC_IGNORELINES), BM_GETCHECK, 0, 0))
+		EnableWindow(GetDlgItem(hwnd, IDC_IGNORENUM), TRUE);
+	if(SendMessage(GetDlgItem(hwnd, IDC_ROWSIDBY), BM_GETCHECK, 0, 0))
+		EnableWindow(GetDlgItem(hwnd, IDC_ROWSIDTEXT), TRUE);
 	FillInitData();
     return;
 }
@@ -230,6 +314,114 @@ ExportMultiFormat::OnWmCommand(HWND hwnd, WPARAM wparam, LPARAM lparam)
 			EnableWindow(GetDlgItem(hwnd, IDC_IGNORENUM), TRUE);
 		else
 			EnableWindow(GetDlgItem(hwnd, IDC_IGNORENUM), FALSE);
+		break;
+
+	case IDC_CHARSETCOMBO:
+		{
+			if((HIWORD(wparam))== CBN_SELENDOK)
+			{
+				FetchSelectedCharset(hwnd, &tempcharset, wyFalse);
+				if(tempcharset.GetLength())
+					m_importfilecharset.SetAs(tempcharset);              
+			}	
+		}
+	}
+    return wyTrue;
+}
+wyBool
+ExportMultiFormat::OnWmCommandXML(HWND hwnd, WPARAM wparam, LPARAM lparam)
+{
+    wyBool ret;
+	wyString	tempcharset;
+
+    switch(LOWORD(wparam))
+	{
+	case IDCANCEL:
+		m_p->Cancel();
+		m_esch.m_towrite = wyTrue;
+		yog_enddialog(hwnd, 0);
+		break;
+
+	case IDC_SELECTALL:
+		SendMessage(m_hwndfieldlist, LB_SETSEL, TRUE, -1);
+		break;
+
+	case IDC_UNSELECTALL:
+		SendMessage(m_hwndfieldlist, LB_SETSEL, FALSE, -1);
+		break;
+
+	case IDC_EXPFILESELECT:
+		SetExpFileName(wyFalse);
+		break;
+
+	case IDC_TABLELIST:
+		if(HIWORD(wparam)== LBN_SELCHANGE)
+		{
+            wyWChar  table[SIZE_512] = {0};
+			wyInt32 index = SendMessage(m_hwndtlist, LB_GETCURSEL, 0, 0);
+
+			if(index == LB_ERR)
+				return wyFalse;
+
+			SendMessage(m_hwndtlist, LB_GETTEXT, index,(LPARAM)table);
+
+            m_table.SetAs(table);
+			FillFields();
+		}
+		break;
+
+	case IDOK:
+		if(SendMessage(m_hwndedit, WM_GETTEXTLENGTH, 0, 0)== 0){
+			SetFocus(m_hwndedit);
+			yog_message(hwnd, _(L"Please specify a filename"), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
+			return wyFalse;
+		}
+
+		if(SendMessage(m_hwndfieldlist, LB_GETSELCOUNT, 0, 0)== 0){
+			SetFocus(m_hwndfieldlist);
+			yog_message(hwnd, _(L"Select at least one field"), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
+			return wyFalse;
+		}
+
+		ret = ImportData(wyFalse);
+
+		if(ret)
+			yog_enddialog(hwnd, 1);
+
+		break;
+
+	case IDC_LOWPRIORITY:
+		if(SendMessage((HWND)lparam, BM_GETCHECK, 0 , 0)== BST_CHECKED)
+			SendMessage(GetDlgItem(hwnd, IDC_CONCURRENT), BM_SETCHECK, BST_UNCHECKED, 0);
+		break;
+
+	case IDC_CONCURRENT:
+		if(SendMessage((HWND)lparam, BM_GETCHECK, 0 , 0)== BST_CHECKED)
+			SendMessage(GetDlgItem(hwnd, IDC_LOWPRIORITY), BM_SETCHECK, BST_UNCHECKED, 0);
+		break;
+
+	case IDC_REPLACE:
+		if(SendMessage((HWND)lparam, BM_GETCHECK, 0 , 0)== BST_CHECKED)
+			SendMessage(GetDlgItem(hwnd, IDC_IGNORE), BM_SETCHECK, BST_UNCHECKED, 0);
+		break;
+
+	case IDC_IGNORE:
+		if(SendMessage((HWND)lparam, BM_GETCHECK, 0 , 0)== BST_CHECKED)
+			SendMessage(GetDlgItem(hwnd, IDC_REPLACE), BM_SETCHECK, BST_UNCHECKED, 0);
+		break;
+
+	case IDC_IGNORELINES:
+		if(SendMessage((HWND)lparam, BM_GETCHECK, 0 , 0)== BST_CHECKED)
+			EnableWindow(GetDlgItem(hwnd, IDC_IGNORENUM), TRUE);
+		else
+			EnableWindow(GetDlgItem(hwnd, IDC_IGNORENUM), FALSE);
+		break;
+	case IDC_ROWSIDBY:
+		if(SendMessage((HWND)lparam, BM_GETCHECK, 0 , 0)== BST_CHECKED)
+			EnableWindow(GetDlgItem(hwnd, IDC_ROWSIDTEXT), TRUE);
+		else
+			EnableWindow(GetDlgItem(hwnd, IDC_ROWSIDTEXT), FALSE);
+
 		break;
 
 	case IDC_CHARSETCOMBO:
@@ -378,7 +570,7 @@ ExportMultiFormat::SetComboText()
 		free(data);
 		data = NULL;
 	}
-
+	m_importfilecharset.SetAs(datastr.GetString());
 	VERIFY(hwndcombo = GetDlgItem(m_hwnd, IDC_CHARSETCOMBO));	
 	ret = SendMessage(hwndcombo, CB_FINDSTRINGEXACT, (WPARAM)-1, (LPARAM)datastr.GetAsWideChar());
 	if(ret == CB_ERR)
@@ -436,12 +628,19 @@ ExportMultiFormat::FillFields()
 
 // Gets a file name and add it to edit box.
 wyBool 
-ExportMultiFormat::SetExpFileName()
+ExportMultiFormat::SetExpFileName(wyBool iscsv)
 {
 	wyWChar  filename[MAX_PATH + 1] = {0};
-
-	if(!InitOpenFile(m_hwnd, filename, CSVINDEX, MAX_PATH))
+	if(iscsv==wyTrue)
+	{
+		if(!InitOpenFile(m_hwnd, filename, CSVINDEX, MAX_PATH))
 		return wyFalse;
+	}
+	else
+	{
+		if(!InitOpenFile(m_hwnd, filename, XMLINDEX, MAX_PATH))
+		return wyFalse;
+	}
 
 	SendMessage(m_hwndedit, WM_SETTEXT, 0,(LPARAM)filename);
 
@@ -538,13 +737,19 @@ ExportMultiFormat::GetEscapeCharacters()
 
 // The real function to export data.
 wyBool 
-ExportMultiFormat::ImportData()
+ExportMultiFormat::ImportData(wyBool iscsv)
 {
     wyString        query, msg;
 	CShowWarning	warn;
     MYSQL_RES       *res;
-
+	if(iscsv==wyTrue)
+	{
 	VERIFY(PrepareQuery(query));
+	}
+	else
+	{
+	VERIFY(PrepareQueryXML(query));
+	}
 
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
     
@@ -669,6 +874,81 @@ ExportMultiFormat::PrepareQuery(wyString &query)
 			query.Add("lines terminated by '' ");
 	}
 
+	// ignore lines.
+	if(SendMessage(GetDlgItem(m_hwnd, IDC_IGNORELINES), BM_GETCHECK, 0, 0) == BST_CHECKED)
+	{
+		// first get the text.
+		SendMessage(GetDlgItem(m_hwnd, IDC_IGNORENUM), WM_GETTEXT, SIZE_64-1,(LPARAM)ignore);
+
+		ignorestr.SetAs(ignore);
+		query.AddSprintf("ignore %s lines ", ignorestr.GetString());
+	}
+
+	// add the columns bu first add the(
+	query.Add("(" );
+
+	for(i = 0; i < fieldcount; i++)
+	{
+		if(SendMessage(m_hwndfieldlist, LB_GETSEL, i, 0))
+		{
+			SendMessage(m_hwndfieldlist, LB_GETTEXT, i,(LPARAM)fieldname);
+			fieldnamestr.SetAs(fieldname);
+			query.AddSprintf("`%s`, ", fieldnamestr.GetString());
+		}
+	}
+	
+    //strip last space and comma(,), so total 2 chars
+	query.Strip(2);
+	query.Add(")");
+
+	return query.GetLength();
+}
+///Create queryy for Load XML inifile
+wyInt32 
+ExportMultiFormat::PrepareQueryXML(wyString &query)
+{
+	wyWChar	    fieldname[SIZE_512] = {0}, ignore[SIZE_64+1] = {0},identified_by[SIZE_512+1]={0};
+    	wyUInt32    selcount=0, fieldcount=0,i=0;
+	wyString	filenamestr, fieldnamestr, ignorestr,identified_bystr;
+	wyBool		ismysql538 = wyFalse;
+
+	selcount	= SendMessage(m_hwndfieldlist, LB_GETSELCOUNT, 0, 0);
+	fieldcount	= SendMessage(m_hwndfieldlist, LB_GETCOUNT, 0, 0);
+
+	GetFileName(filenamestr);
+	
+	query.Sprintf("load XML ");
+	
+	// get low_priority or concurrent
+	if(SendMessage(GetDlgItem(m_hwnd, IDC_LOWPRIORITY), BM_GETCHECK, 0, 0)== BST_CHECKED)
+		query.Add("low_priority ");
+	else if(SendMessage(GetDlgItem(m_hwnd, IDC_CONCURRENT), BM_GETCHECK, 0, 0)== BST_CHECKED)
+		query.Add("concurrent ");
+
+	// add the file name
+	query.AddSprintf("local infile '%s' ", filenamestr.GetString());
+
+	// get replace ignore
+	if(SendMessage(GetDlgItem(m_hwnd, IDC_REPLACE), BM_GETCHECK, 0, 0)== BST_CHECKED)
+		query.Add("replace ");
+	else if(SendMessage(GetDlgItem(m_hwnd, IDC_IGNORE), BM_GETCHECK, 0, 0)== BST_CHECKED)
+		query.Add("ignore ");
+	
+	// add the table name
+	query.AddSprintf("into table `%s`.`%s` ", m_db.GetString(), m_table.GetString());
+
+	///Add 'Charcter set' if importing to mysql version >= 5.0.38
+	if( m_importfilecharset.GetLength() != 0 && m_importfilecharset.CompareI(STR_DEFAULT) != 0)
+          query.AddSprintf("character set '%s' ", m_importfilecharset.GetString());
+ 
+	//rows identified by
+	if(SendMessage(GetDlgItem(m_hwnd, IDC_ROWSIDBY), BM_GETCHECK, 0, 0) == BST_CHECKED)
+	{
+	// first get the text.
+		SendMessage(GetDlgItem(m_hwnd, IDC_ROWSIDTEXT), WM_GETTEXT, SIZE_64-1,(LPARAM)identified_by);
+		identified_bystr.SetAs(identified_by);
+		query.AddSprintf("ROWS IDENTIFIED BY '<%s>' ", identified_bystr.GetString());
+	}
 	// ignore lines.
 	if(SendMessage(GetDlgItem(m_hwnd, IDC_IGNORELINES), BM_GETCHECK, 0, 0) == BST_CHECKED)
 	{

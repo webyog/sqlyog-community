@@ -2434,7 +2434,7 @@ TabForeignKeys::InitDlgGrid()
 	wyInt32     elemsize[] = {0, 0};
 	wyInt32     elemcount[] = {0, 0};
 	wyInt32     mask[] = { GVIF_TEXT, GVIF_TEXT};  
-	wyInt32     cx[] = { 120, 80};
+	wyInt32     cx[] = { 220, 80};
 	wyInt32     fmt[] = { GVIF_LEFT, GVIF_LEFT};
 
 	wyInt32		width = 0;
@@ -2448,20 +2448,20 @@ TabForeignKeys::InitDlgGrid()
 	for(i=0; i < sizeof(heading)/ sizeof(heading[0]); i++)
 	{
 		//if retain user modified width(prefernce option) is checked or not
-		if(isretaincolumnwidth == wyTrue)
-		{
-			//for getting the resized column width
-			colname.SetAs(heading[i]);
-            width =  GetTextSize(colname.GetAsWideChar(), m_hdlggrid, hfont).right + 15;
-			//width = GetColumnWidthFromFile(&dbname, &tblname, &colname);
-		}
+		//if(isretaincolumnwidth == wyTrue)
+		//{
+		//	//for getting the resized column width
+		//	colname.SetAs(heading[i]);
+  //          width =  GetTextSize(colname.GetAsWideChar(), m_hdlggrid, hfont).right + 15;
+		//	//width = GetColumnWidthFromFile(&dbname, &tblname, &colname);
+		//}
 
 		memset(&gvcol, 0, sizeof(gvcol));
 		
 		gvcol.mask = mask[i];
         gvcol.uIsReadOnly = wyTrue;
 		gvcol.fmt  = fmt[i];
-		gvcol.cx   = (width > 0)?width:cx[i];
+		gvcol.cx   = /*(width > 0)?width:*/cx[i];
 		gvcol.text = heading[i];
 		gvcol.nElemSize = elemsize[i];
 		gvcol.nListCount = elemcount[i];
@@ -4577,7 +4577,7 @@ TabForeignKeys::OnWMSizeInfo(LPARAM lparam, HWND hwnd)
     MINMAXINFO* pminmax = (MINMAXINFO*)lparam;
 
     pminmax->ptMinTrackSize.x = m_wndrect.right - m_wndrect.left;
-    pminmax->ptMinTrackSize.y = m_wndrect.bottom - m_wndrect.top;
+    pminmax->ptMinTrackSize.y = m_wndrect.bottom - m_wndrect.top+130;
 }
 
 void
@@ -4734,7 +4734,7 @@ TabForeignKeys::PositionWindow(RECT* prect, HWND hwnd)
 
     //calculate and modify the width and height based on the availabe space to best fit the window
     width = temprect.right - temprect.left;
-    height = temprect.bottom - temprect.top;
+    height = temprect.bottom - temprect.top+130;
     hmargin = mi.rcWork.right - prect->left;
     hmargin = prect->left - mi.rcWork.left > hmargin ? prect->left - mi.rcWork.left : hmargin;
     vmargin = mi.rcWork.bottom - prect->bottom;

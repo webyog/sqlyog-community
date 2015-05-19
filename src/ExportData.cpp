@@ -2107,7 +2107,7 @@ CExportResultSet::ExportData(LPVOID lpparam)
 	if(SendMessage(resultset->m_exportresultset->m_hwndxml, BM_GETCHECK, 0, 0)== BST_CHECKED)
 		ret = resultset->m_exportresultset->StartXMLExport(resultset, 
 		resultset->m_exportresultset->m_filename.GetAsWideChar());
-	if(SendMessage(resultset->m_exportresultset->m_hwndjson, BM_GETCHECK, 0, 0)== BST_CHECKED)
+	else if(SendMessage(resultset->m_exportresultset->m_hwndjson, BM_GETCHECK, 0, 0)== BST_CHECKED)
 		ret = resultset->m_exportresultset->StartJSONExport(resultset, 
 		resultset->m_exportresultset->m_filename.GetAsWideChar());
 
@@ -2534,7 +2534,7 @@ wyBool
 	BOOL			ret;
 	DWORD			dwbyteswritten;
     wyInt32         messagecount = 0;
-    wyInt32         rowcount = 0, rowptr = 0,row_counter=0;
+    wyInt32         rowcount = 0, rowptr = 0;
     wyString        messbuff, myrowstr, buffer(SIZE_8K);
 	wyBool			ismysql41 = ((GetActiveWin())->m_ismysql41);
 	MYSQL_RES		*myres;
@@ -2545,7 +2545,6 @@ wyBool
 
 	myres			= m_res;
 	myfield			= m_field;
-
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
 
 	//Add to buffer then to file
@@ -2658,18 +2657,9 @@ wyBool
 			else
             	buffer.Add("\r\n");
 		}
-		//last row will not add comma after it
-		 if(row_counter == (m_ptr->m_rowarray->GetLength()-1)|| rowptr==(m_ptr->m_rowarray->GetLength()-1))
-			{
-				buffer.Add("}");
-				row_counter++;
-		 }
-		 else
-		 {
-			 buffer.Add("},");
-			 row_counter++;
-		 }
 		
+			 buffer.Add("},");
+			 
 		buffer.Add("\r\n");
 	
 		//Write to file if buffer size is more
@@ -2690,7 +2680,8 @@ wyBool
         SendMessage(m_hwndmessage, WM_SETTEXT, 0,(LPARAM) messbuff.GetAsWideChar());
         rowcount++;
 	}
-
+	//remove last ',' 
+	buffer.SetCharAt(buffer.GetLength()-3,' ');
 		buffer.Add("]");
 	
 	ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbyteswritten, NULL);

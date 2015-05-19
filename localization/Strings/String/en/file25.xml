@@ -23,5 +23,9 @@
 	<string name="3649">Advance options</string>
 	<string name="3650">Prefix with Timestamp</string>
 	<string name="3651">File per object</string>
+	<string name="3652">Import &amp;XML Data Using LOAD LOCAL...	Ctrl+Shift+X</string>
+	<string name="3653">Select Table and Columns To Import In XML</string>
+	<string name="3654">Rows Identified by</string>
+	<string name="3655">Replace</string>
 	
 </resources>

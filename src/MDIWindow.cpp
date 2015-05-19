@@ -1440,7 +1440,7 @@ void
 MDIWindow::OnRefreshObject()
 {
     SendMessage(m_pcqueryobject->m_hwnd, WM_SETREDRAW, FALSE, 0);
-    m_pcqueryobject->RefreshObjectBrowser(m_tunnel, &m_mysql);
+    m_pcqueryobject->RefreshObjectBrowser(m_tunnel, &m_mysql, this);
     SendMessage(m_pcqueryobject->m_hwnd, WM_SETREDRAW, TRUE, 0);
 	m_statusbartext.SetAs(_(L" Objectbrowser refreshed..."));
     pGlobals->m_pcmainwin->AddTextInStatusBar(_(L" Objectbrowser refreshed..."));

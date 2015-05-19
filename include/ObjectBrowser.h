@@ -87,7 +87,7 @@ public:
     @param tunnel      : Tunnel pointer.
     @param mysql       : Pointer to mysql pointer.
     */
-	void		RefreshObjectBrowser(Tunnel * tunnel, PMYSQL mysql);
+	void		RefreshObjectBrowser(Tunnel * tunnel, PMYSQL mysql, MDIWindow* wnd);
    
     /// Gets the old database name.
     /**
@@ -315,6 +315,12 @@ public:
     @param mysql         : Pointer to mysql pointer.
     */
 	wyBool		ImportFromCSV(Tunnel *tunnel, PMYSQL mysql);
+	 /// Initializes the import from XML dialog box.
+    /**
+    @param pcquerywnd    : Query window pointer.
+    @param mysql         : Pointer to mysql pointer.
+    */
+	wyBool		ImportFromXML(Tunnel *tunnel, PMYSQL mysql);
 
     /// This function copies given table into a new table using MySQL inbuilt select command.
     /**

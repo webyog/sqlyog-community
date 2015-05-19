@@ -71,6 +71,7 @@
 #define IDDONE                          379
 #define IDD_ESCAPECHAR                  380
 #define IDD_IMPORTCSV                   382
+#define IDD_IMPORTXML                   301                    
 #define IDD_BACKUP                      383
 #define IDD_RESTORE                     385
 #define IDD_SHOWINFO                    386
@@ -463,6 +464,7 @@
 #define IDC_OPENTABLES                  1060
 #define IDD_CONNECT                     1060
 #define IDC_IGNORELINES                 1061
+#define IDC_ROWSIDBY                    1753
 #define IDC_SSHHOST2                    1061
 #define IDC_DIAG_USEFRMREPAIR           1061
 #define IDC_OPENTABLES2                 1061
@@ -478,6 +480,7 @@
 #define IDD_GETSQLYOGULTIMATE           1064
 #define IDD_OBCOLOR                     1065
 #define IDC_EXPORTFILENAME              1081
+#define IDC_ROWSIDTEXT                  1750
 #define IDC_PROGRESS                    1082
 #define IDC_CHK_USEDBNAME               1083
 #define IDC_CHK_DROPOBJECT              1084
@@ -1198,6 +1201,7 @@
 #define ACCEL_EXPORTBATCH               40195
 #define ID_EXPORT_AS                    40196
 #define ID_IMPORT_FROMCSV               40197
+#define ID_IMPORT_FROMXML               2655
 #define ID_OBJECT_BACKUPDATABASE        40198
 #define ID_OBJECT_RESTOREDATABASE       40199
 #define IDC_EDIT_SHOWRESULT             40200
@@ -1213,6 +1217,7 @@
 #define ACCEL_SCHEMA                    40208
 #define ACCEL_EXPORTCSV                 40209
 #define ACCEL_IMPORTCSV                 40210
+#define ACCEL_IMPORTXML                 2656
 #define ACCEL_MANINDEX                  40212
 #define ID_IMPORTEXPORT_DBEXPORTTABLES  40214
 #define ID_IMPORTEXPORT_TABLESEXPORTTABLES 40215

@@ -248,7 +248,8 @@ ESCAPECHAR::RemoveEscapeChars(wyChar *in, wyChar *out)
 		{
 			case C_BACK_SLASH:
 				out[j++] = '\\';
-				//out[j++] = '\\';
+				if(in[i+1]==NULL)//if we eliminate the one backslash in processchar we should add it back before wriritng to sqlyog.ini.
+				out[j++] = '\\';
 				break;
 			
 			case '\r':

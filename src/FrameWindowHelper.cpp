@@ -3348,7 +3348,7 @@ ObjectBrowserRefresh(wyWChar *database)
 
 	SendMessage(wnd->m_pcqueryobject->m_hwnd, WM_SETREDRAW, FALSE, 0);
 	wnd->m_pcqueryobject->GetTreeState();
-	wnd->m_pcqueryobject->RefreshObjectBrowser(wnd->m_tunnel, &wnd->m_mysql);
+	wnd->m_pcqueryobject->RefreshObjectBrowser(wnd->m_tunnel, &wnd->m_mysql,wnd);
 	wnd->m_pcqueryobject->RestoreTreeState();
 	wnd->m_pcqueryobject->m_seldatabase.SetAs(database); 
 	wnd->m_pcqueryobject->ExpandDatabase();

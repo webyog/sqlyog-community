@@ -162,6 +162,16 @@ public:
 	@returns 0
 	*/
 	static	INT_PTR CALLBACK DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	
+	/// Callback function for export multi format dialog box
+	/**
+	@param hwnd			: IN Window handle
+	@param messgae		: IN Window message
+	@param wparam		: IN Unsigned message parameter
+	@param lparam		: IN Long message parameter
+	@returns 0
+	*/
+	static	INT_PTR CALLBACK DlgProcXML(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 	/// Initializes the values for the export multi format dialog
 	/**
@@ -170,6 +180,13 @@ public:
 	*/
     void    OnWmInitDlgValues(HWND hwnd);
 
+	/// Initializes the values for the export multi format dialog
+	/**
+	@param hwnd				: IN Window HANDLE
+	@returns void
+	*/
+    void    OnWmInitDlgValuesXML(HWND hwnd);
+
 	/// Command handler for export multi format 
 	/**
 	@param hwnd			: IN Window handle
@@ -177,6 +194,14 @@ public:
 	@returns wyTrue on success else wyFalse
 	*/
     wyBool  OnWmCommand(HWND hwnd, WPARAM wparam, LPARAM lparam);
+
+	/// Command handler for export multi format 
+	/**
+	@param hwnd			: IN Window handle
+	@param wparam		: IN Unsigned message parameter
+	@returns wyTrue on success else wyFalse
+	*/
+    wyBool  OnWmCommandXML(HWND hwnd, WPARAM wparam, LPARAM lparam);
 
 	/// Main dialog creator for export multi format
 	/**
@@ -188,6 +213,17 @@ public:
 	@returns wyTrue on success else wyFalse
 	*/
 	wyBool	Create(HWND hwnd, CHAR * db, CHAR * table, Tunnel * tunnel, PMYSQL mysql);
+	
+	/// Main dialog creator for IMPORT from XML
+	/**
+	@param hwndparent		: IN Parent window HANDLE
+	@param db				: IN Database name
+	@param table			: IN Table name
+	@param tunnel			: Tunnel pointer
+	@param mysql			: Pointer to mysql pointer
+	@returns wyTrue on success else wyFalse
+	*/
+	wyBool	CreateXML(HWND hwnd, CHAR * db, CHAR * table, Tunnel * tunnel, PMYSQL mysql);
 
 	/// Gets the initial data  for the dialog
 	/**
@@ -209,9 +245,10 @@ public:
 
 	/// Creates dialog for the user to select the file name for export
 	/**
+	@param iscsv  :whether import from csv or XML
 	@returns wyTrue on success else wyFalse
 	*/
-	wyBool	SetExpFileName();
+	wyBool	SetExpFileName(wyBool iscsv=wyTrue);
 
 	/// Function to get the escaping characters.
 	/**
@@ -221,9 +258,10 @@ public:
 
 	/// Function where the import data starts
 	/**
+	@param iscsv  :whether import from csv or XML
 	@returns wyTrue on success else wyFalse
 	*/
-	wyBool	ImportData();
+	wyBool	ImportData(wyBool iscsv=wyTrue);
 
 	/// Gets back the file name from the dialog
 	/**
@@ -244,6 +282,13 @@ public:
 	@returns the length of the query
 	*/
 	wyInt32 PrepareQuery(wyString &query);
+
+	/// Function to prepare query depending upon various options selected by user.
+	/**
+	@param query		: IN/OUT Query string
+	@returns the length of the query
+	*/
+	wyInt32 PrepareQueryXML(wyString &query);
 
 	/// Escape char details
 	ESCAPECHAR	m_esch;
@@ -281,6 +326,8 @@ public:
 	/// Persist type pointer
 	Persist	    *m_p;
 
+	/// Persist type pointer for xml import
+	Persist	    *m_p_XML;
 };
 
 class EscapeChar

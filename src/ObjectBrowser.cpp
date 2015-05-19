@@ -52,6 +52,7 @@ extern	PGLOBALS		pGlobals;
 #define		CSVTUNNELIMPORTERROR	_(L"This option cannot be used in HTTP Tunneling mode. \
 \n\nIf you directly want to upload a local CSV file to a Remote Server, you can use SQLyog's Migration Toolkit. \
 \nThe ODBC driver that you could use is Microsoft Text Driver (*.txt, *.csv) ODBC driver that ships with the OS.")
+#define    LOADXMLERROR    _(L"This option is not supported by your server. Minimum supported server is MySQL 5.5.0")
 #define		HTTPNOTWORKINGOPTIONS	_(L"This option cannot be used in HTTP Tunneling mode.")
 #define     TT_REMOVE_DB_FILTER     _(L"Remove database level filter")
 #define     CUEBANNERTEXT           _(L"Filter (Ctrl+Shift+B)")
@@ -1051,7 +1052,7 @@ CQueryObject::CreateImageList()
 // is added for the first time.
 // Basically it executes various SQL queries to get data about the server.
 void
-CQueryObject::RefreshObjectBrowser(Tunnel * tunnel, PMYSQL mysql)
+CQueryObject::RefreshObjectBrowser(Tunnel * tunnel, PMYSQL mysql,MDIWindow* wnd)
 {
 	wyBool              ret;
 	wyString            server, oldserver;
@@ -1059,7 +1060,7 @@ CQueryObject::RefreshObjectBrowser(Tunnel * tunnel, PMYSQL mysql)
 	HCURSOR				hcursornew;
 	HTREEITEM			hserver, hti = NULL;
 	TVINSERTSTRUCT		tvins;
-	MDIWindow*			wnd;
+	//MDIWindow*			wnd;
 	wyWChar				*tempwchar = {0};
 	wyUInt32			length = 1;
     wyWChar             filterText[70];
@@ -1069,7 +1070,7 @@ CQueryObject::RefreshObjectBrowser(Tunnel * tunnel, PMYSQL mysql)
 
 	_ASSERT(mysql != NULL);
 
-	VERIFY(wnd = GetActiveWin());
+	//VERIFY(wnd = GetActiveWin());
 		
 	hcursornew	= LoadCursor(NULL, IDC_WAIT);
 	
@@ -4713,6 +4714,32 @@ CQueryObject::ImportFromCSV(Tunnel * tunnel, PMYSQL mysql)
         return wyFalse;
 
 	cisv.Create(m_hwnd, (wyChar*)m_seldatabase.GetString(), (wyChar*)m_seltable.GetString(), tunnel, mysql);
+
+	return wyTrue;
+}
+// This function initializes the import from XML dialog box so that the user can import data from a XML file 
+wyBool
+CQueryObject::ImportFromXML(Tunnel * tunnel, PMYSQL mysql)
+{
+	wyInt32				item;
+	HTREEITEM			hitem;
+	ExportMultiFormat	cisv;
+
+	VERIFY(hitem = TreeView_GetSelection(m_hwnd));
+	item = GetSelectionImage();
+
+	/*  we dont allow import XML in tunneling mode as its not possible
+	   to do that */
+	if(tunnel->IsTunnel())
+    {
+		yog_message(m_hwnd, CSVTUNNELIMPORTERROR, pGlobals->m_appname.GetAsWideChar(), MB_ICONINFORMATION | MB_OK);
+		return wyTrue;
+	}
+	
+    if(HandlerToGetTableDatabaseName(item, hitem) == wyFalse)
+        return wyFalse;
+
+	cisv.CreateXML(m_hwnd, (wyChar*)m_seldatabase.GetString(), (wyChar*)m_seltable.GetString(), tunnel, mysql);
 
 	return wyTrue;
 }

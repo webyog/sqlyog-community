@@ -23,4 +23,8 @@
 	<string name="3649">事前のオプション</string>
 	<string name="3650">タイムスタンプを初めにつける</string>
 	<string name="3651">目的ごとのファイル</string>
+	<string name="3652">ロード・ローカルを使って&amp;XMLデータをインポート中... 	Ctrl+Shift+X</string>
+	<string name="3653">テーブルとコラムを選択してXMLにインポートしてください。</string>
+	<string name="3654">～によって判別される行</string>
+	<string name="3655">置換</string>
 </resources>

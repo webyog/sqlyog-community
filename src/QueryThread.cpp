@@ -300,7 +300,7 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query,wyBool ismulti
                     elem->param->m_limit = param->m_highlimitvalue;
 				}
                 	
-				AddErrorOrMsg(ERROR_RESULT, *param->str, param->tunnel, param->mysql, ptrquery, param->executestatus, exectime, transfertime, totaltime, param->m_iseditor);
+				AddErrorOrMsg(ERROR_NONRESULT, *param->str, param->tunnel, param->mysql, ptrquery, param->executestatus, exectime, transfertime, totaltime, param->m_iseditor);
 				
 			} 
 			else if(param->tunnel->mysql_error(*param->mysql)[0] != '\0')
@@ -450,8 +450,9 @@ ExecuteQuery(QUERYTHREADPARAMS * param)
 			numberofqueries++;
 		}
 	}
-	if(numberofqueries>1)
-	{   ismultiplequeries=wyTrue;}
+	if(numberofqueries>1 && param->executestatus != EXECUTE_CURRENT )
+	{   ismultiplequeries=wyTrue;
+	}
 	//ok we are done with counting number of queries--lets execute them.
 	while(token = tok->GetQuery(&len, &linenum, &isdel, delimiter))
 	{

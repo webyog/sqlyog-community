@@ -1225,7 +1225,7 @@ EnableTableItems(HMENU hmenu)
 	wyInt32 image, size, count, state, uptorelation = 5;
 	wyInt32 nid[] = {ID_OPEN_COPYTABLE, ID_TABLE_MAKER, ID_OBJECT_TABLEEDITOR, ID_OBJECT_MANINDEX, 
                      IDM_TABLE_RELATION, ID_IMPORTEXPORT_TABLESEXPORTTABLES, ID_EXPORT_AS, 
-                     ID_IMPORT_FROMCSV, 
+                     ID_IMPORT_FROMCSV, ID_IMPORT_FROMXML,
                      ID_OBJECT_COPYTABLE, ID_OBJECT_RENAMETABLE, ID_OBJECT_CLEARTABLE, ID_OBJECT_REORDER, 
                      ID_OBJECT_DROPTABLE, ID_OBJECT_REORDER, ID_OBJECT_VIEWDATA, ID_TABLE_OPENINNEWTAB,
                      ID_OBJECT_ADVANCED, ID_OBJECT_INSERTSTMT, ID_OBJECT_UPDATESTMT, ID_OBJECT_DELETESTMT, ID_TABLE_MAKER, ID_OBJECT_CREATETRIGGER, 
@@ -1270,6 +1270,8 @@ EnableTableItems(HMENU hmenu)
 
 		if(!IsMySQL5010(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql))
 			EnableMenuItem(hmenu, ID_OBJECT_CREATETRIGGER,  MF_GRAYED | MF_BYCOMMAND);
+		if(!IsMySQL5500(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql))
+			EnableMenuItem(hmenu,  ID_IMPORT_FROMXML,  MF_GRAYED | MF_BYCOMMAND);
 
 	}
 	else if(image == NFOLDER)

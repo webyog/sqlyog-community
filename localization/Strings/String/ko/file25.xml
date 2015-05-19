@@ -20,4 +20,12 @@
 	<string name="3646">작업 파일 지정:</string>
 	<string name="3647">가상성  </string>
 	<string name="3648">표현   </string>
+	<string name="3649">고급 옵션</string>
+	<string name="3650">타임스탬프가 포함된 프리픽스</string>
+	<string name="3651">오프젝트 당 파일</string>
+	<string name="3652">LOAD LOCAL을 통해 &amp;XML 데이터 가져오기...	Ctrl+Shift+X</string>
+	<string name="3653">XML을 불러오기 위해 테이블과 칼럼을 선택</string>
+	<string name="3654">다음에 의해 식별된 열:</string>
+	<string name="3655">바꾸기</string>
+	
 </resources>

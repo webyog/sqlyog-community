@@ -23,4 +23,8 @@
 	<string name="3649">高级选项</string>
 	<string name="3650">含时间戳的前缀</string>
 	<string name="3651">每个对象的文件</string>
+	<string name="3652">使用LOAD LOCAL导入&amp;XML数据…… 	Ctrl+Shift+X</string>
+	<string name="3653">选择表格和列在XML中导入</string>
+	<string name="3654">行标识方式：</string>
+	<string name="3655">替换</string>
 </resources>
