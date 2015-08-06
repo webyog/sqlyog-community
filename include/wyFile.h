@@ -81,9 +81,10 @@ public:
 	/**
 	@param pFlags : IN flags to open() function
 	@param pMode  : IN mode of the file to be opened
+	@paarm inheritable:can created file be inherited by child process
 	@return value of open() function
 	*/
-	wyInt32			OpenWithPermission(wyInt32 pAccessMode, wyInt32 pCreationDisposition);
+	wyInt32			OpenWithPermission(wyInt32 pAccessMode, wyInt32 pCreationDisposition, wyBool inheritable=wyFalse);
 
 	//To close the file
 	/**

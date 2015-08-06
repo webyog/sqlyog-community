@@ -573,7 +573,7 @@ wyIni::LoadFile(const wyChar *filename, const wyChar* secname, const wyChar* key
     fname.SetAs(filename);
 	do
 	{
-		if((in_stream = _wfopen(fname.GetAsWideChar(), L"rb")))
+		if((in_stream = _wfopen(fname.GetAsWideChar(), L"rbN")))
 		{
 			break;
 		}
@@ -774,7 +774,7 @@ wyIni::IsIniFileLocked(wyString *filename)
 	//Wait  for 30 seconds to release the .ini file else return
 	do
 	{
-		if(m_lockfile.OpenWithPermission(GENERIC_WRITE, CREATE_ALWAYS) != -1)
+		if(m_lockfile.OpenWithPermission(GENERIC_WRITE, CREATE_ALWAYS, wyTrue) != -1)
 		{
 			return wyFalse; //ini is not locked
 		}

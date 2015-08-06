@@ -59,7 +59,7 @@ wyFile::GetTempFilePath(wyString *pTempPath)
 }
 
 wyInt32
-wyFile::OpenWithPermission(wyInt32 pAccessMode, wyInt32 pCreationDisposition)
+wyFile::OpenWithPermission(wyInt32 pAccessMode, wyInt32 pCreationDisposition,wyBool inheritable)
 {	
 	wyInt32 ret = 0;
 	m_hfile = CreateFile((LPCWSTR)m_filename.GetAsWideChar(), 
@@ -69,6 +69,14 @@ wyFile::OpenWithPermission(wyInt32 pAccessMode, wyInt32 pCreationDisposition)
 	if(m_hfile == INVALID_HANDLE_VALUE) {
 		m_hfile = NULL;
 		ret = -1;
+	}
+	else if(inheritable)
+	{
+	//child process(plink.exe) shoudn't inherit this file.
+		if(!SetHandleInformation(m_hfile, HANDLE_FLAG_INHERIT, 0))
+		{
+		//
+		}
 	}
 	return ret;
 }

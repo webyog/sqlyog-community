@@ -27,7 +27,8 @@
 extern	PGLOBALS pGlobals;
 
 #define FIND_STR_LEN	256
-#define		REGKEY			"USE ANY UUID HERE"
+
+#define		REGKEY			"Use Any UUID Here"
 #define		REGAPPID		"InU"
 /* window identifiers for all windows in both the connection dialog tabs */
 /* since we create everything by hand ( and not using the resource eidtor) 
