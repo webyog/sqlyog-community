@@ -30,7 +30,7 @@ extern	PGLOBALS pGlobals;
 
 //#define		REGKEY			"Software\\{906D6D9F-AB51-429F-8816-8D33284204FF}"
 //#define		REGKEY			"Software\\{BEE2684F-3781-4372-BA18-75ECC22C3B70}"
-#define		REGKEY			"Software\\{1a003c2f-d27f-42ca-991f-0df04f9aa72d}"
+#define		REGKEY			"Use Any UUID Here"
 #define		REGAPPID		"InU"
 /* window identifiers for all windows in both the connection dialog tabs */
 /* since we create everything by hand ( and not using the resource eidtor) 
