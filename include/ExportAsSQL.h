@@ -133,6 +133,8 @@ typedef struct __schdextra_options
 	wyBool    m_fkchecks;
 	wyBool	  m_appendtofile;
 	wyString  m_charset;
+	wyBool	m_includeversion;
+	wyBool	m_rowperline;
 } SCHDEXTRAOPTIONS;
 
 /**
@@ -556,6 +558,12 @@ private:
 	/// Auto commit enabled or not
 	wyBool			m_autocommit;
 
+	///Whether to include version info or not
+	wyBool         m_includeversion;
+	
+	//One Row Per Line
+	wyBool		   m_rowperline;
+
 	/// Using Utf8 encoding or not
 	wyBool			m_utf8charset;
 
@@ -869,11 +877,26 @@ public:
 	*/
 	void			SetAutoCommit			(wyBool flag);
 
+	/// Sets the whether to include version info or not
+	/**
+	@param flag			: To include version info or not ?
+	@returns void
+	*/
+	void			SetVersionInfo			(wyBool flag);
+
+	/// Sets the whether during bulk insert one row per lie or not
+	/**
+	@param flag			: One row per line
+	@returns void
+	*/
+	void		SetOneRowPerLine			(wyBool val);
+
 	/// Sets the utf8 charset for exporting
 	/**
 	@param flag			: Utf8 charset ?
 	@returns void
 	*/
+
 	void			SetDumpCharSet			(wyString &charset);
 
          /// Sets the utf8 charset for exporting

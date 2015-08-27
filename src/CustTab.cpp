@@ -71,7 +71,7 @@ the perfomance and a few redundant members are removed.
 #define TABCOLOR_SELTAB_TEXT                   RGB(0x00, 0x00, 0x00)
 #define TABCOLOR_TAB_TEXT                      RGB(0x00, 0x00, 0x00)
 #define TABCOLOR_ACTIVESEP_PEN                 RGB(0xA1, 0xA2, 0xA8)
-#define TABCOLOR_INACTIVESEP_PEN               RGB(120, 120, 120)
+#define TABCOLOR_INACTIVESEP_PEN               RGB(88,88,88)
 #define TABCOLOR_CLOSEBUTTON                   RGB(128, 0, 0)
 #define TABCOLOR_TAB_FG                        GetSysColor(COLOR_BTNFACE)
 #define TABCOLOR_DRAGARROW                     RGB(42, 127, 255)
@@ -2788,7 +2788,7 @@ CCustTab::DrawTabs(HDC hdc)
         SelectClipRgn(hdc, NULL);
     }
 
-    hpen = (HPEN)SelectObject(hdc, m_hpengrey);
+    hpen = (HPEN)SelectObject(hdc, m_hpenactivesep);
     left = 0 - m_scrollpos;
     MoveToEx(hdc, left, drawrect.bottom - 1, NULL);
     LineTo(hdc, selectedrect.left + 1, drawrect.bottom - 1);
@@ -2801,7 +2801,7 @@ CCustTab::DrawTabs(HDC hdc)
         DrawScrollButton(hdc, IDC_LEFTSCROLL, 0, &pt);
         DrawScrollButton(hdc, IDC_RIGHTSCROLL, rect.right - RIGHTPADDING(m_isplussign) + 1 + SCROLLBUTTONPADDING, &pt);
         i = rect.right;
-        hpen = (HPEN)SelectObject(hdc, m_hpengrey);
+        hpen = (HPEN)SelectObject(hdc, m_hpenactivesep);
         //rect.bottom = m_size.cy + RECTHEIGHT + TABTOPSPACE;
         rect.top = 0;
         rect.left = rect.right - RIGHTPADDING(m_isplussign) + 1;
@@ -3111,11 +3111,16 @@ CCustTab::DrawFixedLengthTab(HDC hdcmem, RECT * prect, wyInt32 tabindex, wyBool 
 	// Draws a filled rounded rect using the selected brush and pen
 	if(m_selectedtab == tabindex)
 	{
-		RoundRect(hdcmem, prect->left + 1, prect->top + 1,  prect->left + 1 + FIXED_WIDTH/*CalculateTabLength(hdcmem,m_selectedtab)*/ + 1, prect->bottom + IMAGEWIDTH, 7, 7);
+		RoundRect(hdcmem, prect->left + 1, prect->top + 1,  prect->left + 1 + FIXED_WIDTH/*CalculateTabLength(hdcmem,m_selectedtab)*/ + 1, prect->bottom + IMAGEWIDTH, 10, 10);
+	
+		MoveToEx(hdcmem, prect->left + 1 + FIXED_WIDTH + 1, prect->top+5, NULL);
+		LineTo(hdcmem, prect->left + 1 + FIXED_WIDTH + 1, prect->bottom + IMAGEWIDTH);
 	}
 	else
 	{
-		RoundRect(hdcmem, prect->left + 1, prect->top + 3, prect->left + 1 + FIXED_WIDTH/*CalculateTabLength(hdcmem,tabindex)*/ + 1, prect->bottom + IMAGEWIDTH, 7, 7);
+		RoundRect(hdcmem, prect->left + 1, prect->top + 3, prect->left + 1 + FIXED_WIDTH/*CalculateTabLength(hdcmem,tabindex)*/ + 1, prect->bottom + IMAGEWIDTH, 10, 10);
+		/*MoveToEx(hdcmem, prect->left + 1 + FIXED_WIDTH + 1, prect->top + 3, NULL);
+		LineTo(hdcmem, prect->left + 1 + FIXED_WIDTH + 1,  prect->bottom + IMAGEWIDTH);*/
 	}
 	
     /*if(m_selectedtab == tabindex)
@@ -3424,7 +3429,7 @@ void CCustTab::CreateResources()
 
     m_hpenactivesep = CreatePen(PS_SOLID, 1, m_colorinfo.m_activesep);
     m_hpenclosebutton = CreatePen(PS_SOLID, 0, m_colorinfo.m_closebutton);
-    m_hpengrey = CreatePen(PS_SOLID, 0, m_colorinfo.m_inactivesep);
+    m_hpengrey = CreatePen(PS_SOLID, 2, m_colorinfo.m_inactivesep);
     m_hpenhighlight = CreatePen(PS_SOLID, 0, m_colorinfo.m_highlightsep);
 
     if(m_colorinfo.m_mask & CTCF_BOTTOMLINE)

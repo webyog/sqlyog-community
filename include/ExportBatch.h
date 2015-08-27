@@ -145,6 +145,14 @@ public:
     */
     void    OnWmNotify(HWND hwnd, LPARAM lparam);
 
+	/// Handles Enabling or Disabling of One Row Per Line ption
+	/**
+    @param hwnd			: IN Window HANDLE
+    @param lparam		: IN Long message parameter
+	@returns void
+    */
+
+	void EnableDisableOneRowPerLine();
 	/// Handles the mouse movement over the window
 	/**
     @param hwnd			: IN Window HANDLE

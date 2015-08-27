@@ -59,7 +59,7 @@
 		<selectedtab color2="13218213" />
 		<plusbutton color1="0x3b7dbb" />
 		<closebutton color1="0x3b7dbb" />
-		<seperator highlight="0x3b7dbb" inactive="0xdcd9d9" />
+		<seperator highlight="0x3b7dbb" inactive="0x818080" />
 	</conntab>
 	
 	<querytab tabbottomline="false">

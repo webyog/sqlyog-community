@@ -99,14 +99,30 @@ ExportAsSimpleSQL::WriteHeaders(ExportSQLData *data)
 	wyString	query, appname;
 
 	/* set the app name for comment */
+
+
 	appname.Sprintf("%s %s", pGlobals->m_appname.GetString(), APPVERSION);
     
+	if(data->m_includeversion== wyTrue)
+	{
     query.AddSprintf("/*\n%s\nMySQL - %s \n%s\n*/\r\n",
 						 appname.GetString(),
 						 (data->m_tabrec->m_pmdi->m_mysql)->server_version,
 						 "*********************************************************************"
 						 );
+	}
 
+	else
+	{
+	
+	query.AddSprintf("/*\n%s\nMySQL - %s \n%s\n*/\r\n",
+						pGlobals->m_appname.GetString(),
+						 (data->m_tabrec->m_pmdi->m_mysql)->server_version,
+						 "*********************************************************************"
+						 );
+	
+
+	}
 	return WriteToFile(query);
 }
 

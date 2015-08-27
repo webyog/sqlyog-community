@@ -30,8 +30,8 @@ wyWChar	customname[] = L"CustomGridControl";
 wyWChar	splitter[]   = L"CustomGridSplitter";
 
 #define	GV_GRIDPICKLIST						1000
-//#define GV_SELCOLOR							RGB(221, 220, 235)
-#define	GV_SELCOLOR							RGB(219,236,252)
+//#define GV_SELCOLOR							RGB(221, 220, 235)RGB(219,236,252)
+#define	GV_SELCOLOR							RGB(184,215,246)
 #define	SHIFTED								0x8000
 #define	YOG_GET_WHEEL_DELTA_wparam(wparam)	((short)HIWORD(wparam))
 #define	YOG_DFCS_TRANSPARENT				0x0800
@@ -3539,11 +3539,11 @@ CCustGrid::DrawCell(HDC hdcmem, wyInt32 row, wyInt32 col, PGVCOLNODE topcolstruc
         if((row == m_curselrow &&  col == m_curselcol) && topcolstruct && topcolstruct->isshow == wyTrue)
         {
 		    VERIFY(hbrgrey = CreateSolidBrush(GV_SELCOLOR));
-		    VERIFY(hpenthick = CreatePen(PS_SOLID, 1, RGB(59,125,187)));
+		    VERIFY(hpenthick = CreatePen(PS_SOLID, 2, RGB(59,125,187)));
 		    hbrold	= (HBRUSH)SelectObject(hdcmem, hbrgrey); // no ret
 		    hpenold = (HPEN)SelectObject(hdcmem, hpenthick); // no ret
 
-		    VERIFY(Rectangle(hdcmem, rect->left-2, rect->top-2, rect->right+1, rect->bottom+1));
+		    VERIFY(Rectangle(hdcmem, rect->left-1, rect->top-1, rect->right+1, rect->bottom+1));
 
             SelectObject(hdcmem, hbrold); // no ret
 		    SelectObject(hdcmem, hpenold); // no ret

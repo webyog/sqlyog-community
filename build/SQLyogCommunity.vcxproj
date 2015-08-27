@@ -524,6 +524,8 @@
     <None Include="..\..\..\..\..\..\Chirantan%27s Data\Main Trunk\NewCheckedOut\SQLyog\SQLyogCommunity\include\bitmaps\TabPreview.ico" />
     <None Include="..\..\..\..\..\Chirantan%27s Data\Main Trunk\SQLyog\SQLyogCommunity\include\bitmaps\icon1.ico" />
     <None Include="..\include\bitmaps\add.ico" />
+    <None Include="..\include\bitmaps\apply.png" />
+    <None Include="..\include\bitmaps\apply_all.png" />
     <None Include="..\include\bitmaps\bg.bmp" />
     <None Include="..\include\bitmaps\calendar.png" />
     <None Include="..\include\bitmaps\circle1.ico" />
@@ -534,6 +536,7 @@
     <None Include="..\include\bitmaps\circle6.ico" />
     <None Include="..\include\bitmaps\circle7.ico" />
     <None Include="..\include\bitmaps\circle8.ico" />
+    <None Include="..\include\bitmaps\compare-data.ico" />
     <None Include="..\include\bitmaps\datasearch.ico" />
     <None Include="..\include\bitmaps\dataview.ico" />
     <None Include="..\include\bitmaps\delete.ico" />
@@ -547,9 +550,17 @@
     <None Include="..\include\bitmaps\icon7.ico" />
     <None Include="..\include\bitmaps\icon8.ico" />
     <None Include="..\include\bitmaps\overlay_filter.ico" />
+    <None Include="..\include\bitmaps\progress.gif" />
     <None Include="..\include\bitmaps\remove_db_filter.ico" />
     <None Include="..\include\bitmaps\remove_filter.ico" />
+    <None Include="..\include\bitmaps\renamequery_16.ico" />
     <None Include="..\include\bitmaps\result_export.ico" />
+    <None Include="..\include\bitmaps\revert_all.png" />
+    <None Include="..\include\bitmaps\revert_selected.png" />
+    <None Include="..\include\bitmaps\session_close.ico" />
+    <None Include="..\include\bitmaps\session_open.ico" />
+    <None Include="..\include\bitmaps\session_save_all.ico" />
+    <None Include="..\include\bitmaps\stop.png" />
     <None Include="..\include\bitmaps\TableOptions.ico" />
     <None Include="..\include\bitmaps\tablerefresh.ico" />
     <None Include="..\include\bitmaps\TabPreview.ico" />
@@ -774,6 +785,7 @@
     <None Include="..\include\bitmaps\function.png" />
     <None Include="..\include\bitmaps\index.png" />
     <None Include="..\include\bitmaps\primary_key_16.png" />
+    <None Include="..\include\Flat.xml" />
     <None Include="..\include\readme.txt" />
     <None Include="..\include\bitmaps\serv.png" />
     <None Include="..\include\bitmaps\sp.png" />
@@ -787,6 +799,7 @@
     <None Include="bitmaps\remove_db_filter_black.ico" />
     <None Include="bitmaps\TableOptions.ico" />
     <None Include="bitmaps\TabPreview.ico" />
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

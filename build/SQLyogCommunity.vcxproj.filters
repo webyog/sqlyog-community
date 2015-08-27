@@ -1537,6 +1537,31 @@
     <None Include="..\include\bitmaps\downarrow.png">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="..\include\bitmaps\renamequery_16.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\include\bitmaps\session_save_all.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\include\bitmaps\session_open.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\include\bitmaps\session_close.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\include\bitmaps\compare-data.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\include\bitmaps\revert_selected.png" />
+    <None Include="..\include\bitmaps\apply.png" />
+    <None Include="..\include\bitmaps\apply_all.png" />
+    <None Include="..\include\bitmaps\revert_all.png" />
+    <None Include="..\include\bitmaps\stop.png" />
+    <None Include="..\include\Flat.xml" />
+    <None Include="..\include\bitmaps\progress.gif">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\include\SQLyog.rc">

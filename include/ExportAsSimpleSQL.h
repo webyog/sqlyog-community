@@ -53,6 +53,7 @@ struct __sqlexportdata
 	wyBool			m_structonly;
 	wyBool			m_dataonly;
 	wyBool			m_structdata;
+	wyBool			m_includeversion;
 	wyString		m_dbname;
 	wyString		m_tablename;
 

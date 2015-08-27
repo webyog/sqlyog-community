@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 #include <assert.h>
-
+#include <string.h>
 #ifdef _WIN32
 
 #include <winsock.h>
@@ -102,6 +102,7 @@ MySQLDump::MySQLDump()
 	m_dropobjects = wyFalse;
     m_setfkchecks = wyFalse; 
     m_autocommit = wyFalse; 
+	m_includeversion = wyTrue;
     m_individualtablefiles = wyFalse;
 	m_individualdbfiles = wyFalse;
 	m_dumpalldbs = wyFalse;
@@ -125,6 +126,7 @@ MySQLDump::MySQLDump()
 	m_iserr = wyFalse;
 	m_chunkinsert = wyFalse;
 	m_singletransaction = wyFalse;
+	m_rowperline=wyFalse;
 
     m_stopexport = 0; 
     m_mysql = NULL; 
@@ -336,6 +338,20 @@ void
 MySQLDump::SetAutoCommit(wyBool val)
 {
 	m_autocommit =	val;	
+	return;
+}
+
+void
+MySQLDump::SetVersionInfo(wyBool val)
+{
+	m_includeversion = val;
+	return;
+}
+
+void
+MySQLDump::SetOneRowPerLine(wyBool val)
+{
+	m_rowperline = val;
 	return;
 }
 
@@ -607,6 +623,8 @@ MySQLDump::SetDumpDataOnly(wyBool val)
 	m_dataonly = val;
 	return;
 }
+
+
 
 void
 MySQLDump::SetInsertDelayed(wyBool val)
@@ -1891,6 +1909,7 @@ MySQLDump::Title(wyString * buffer)
 						 "*********************************************************************",
                          m_strnewline.GetString()
 						 );
+	
 	#else
 	buffer->AddSprintf("/*%s%s\nMySQL - %s : Database - %s%s%s%s*/\r\n",
                          m_strnewline.GetString(),
@@ -3968,12 +3987,23 @@ MySQLDump::DumpTableDataAllRows(wyString * buffer, MYSQL_ROW *row, MYSQL_RES *re
 		{ 
 			if(m_startpose == 1)
             {	
+				if(m_rowperline==wyTrue)
+				m_insertcount = m_insertcount + temp.SetAs("\r\n(");
+
+				else
 				m_insertcount =  m_insertcount + temp.SetAs("(");
+
 				m_startpose = 0;
 			}
 			else
-				m_insertcount = m_insertcount + temp.SetAs(",(");	
-				
+			{
+				if(m_rowperline==wyTrue)
+				m_insertcount = m_insertcount + temp.SetAs(",\r\n(");
+
+				else
+				m_insertcount = m_insertcount + temp.SetAs(",(");
+
+			}
 			//Add to buffer from temp
 			buffer->Add(temp.GetString());
 		}

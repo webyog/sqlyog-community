@@ -213,7 +213,7 @@ MDIWindow::Create(wyBool iscon_res, ConnectionInfo* conninfo)
 	//Setting focus to History tab.
 	//m_pctabmodule->GetActiveTabEditor()->m_pctabmgmt->SelectQueryInfoTab();
 				
-	// checks wheather the connection is established and commandline as got filename to be displayed on Sqlyog Editor
+	// checks whether the connection is established and commandline as got filename to be displayed on Sqlyog Editor
 	if(pGlobals->m_isconnected == wyTrue && (pGlobals->m_filename.GetLength() != 0))
 	{
 		hfile = CreateFile(pGlobals->m_filename.GetAsWideChar(), GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);                     

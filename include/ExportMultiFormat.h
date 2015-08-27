@@ -1079,6 +1079,9 @@ public:
 	/// HANDLE for export sql struct and data both
 	HWND		m_hwndstructdata;
 
+	/// HANDLE to include version
+	HWND		m_hwndversion;
+
 	/// Pointer to keep track of selected fields
 	wyBool		*m_selectedfields;
 
@@ -1144,6 +1147,9 @@ public:
 
 	/// Flag for export as SQL struct and data both
 	wyBool			m_structdata;
+
+	///Flag for SQLyog including Version 
+	wyBool			m_includeversion;
 
     /// Flag to check whether the export is initialised from query tab or not
     wyBool          m_fromquerytab;

@@ -58,6 +58,7 @@
 #define IDI_IMPORTDATA                  291
 #define IDI_FIND                        295
 #define IDI_HELP                        298
+#define IDD_IMPORTXML                   301
 #define IDI_REDOSM                      341
 #define IDI_UNDOSM                      342
 #define IDI_CHECK                       348
@@ -71,7 +72,6 @@
 #define IDDONE                          379
 #define IDD_ESCAPECHAR                  380
 #define IDD_IMPORTCSV                   382
-#define IDD_IMPORTXML                   301                    
 #define IDD_BACKUP                      383
 #define IDD_RESTORE                     385
 #define IDD_SHOWINFO                    386
@@ -464,7 +464,6 @@
 #define IDC_OPENTABLES                  1060
 #define IDD_CONNECT                     1060
 #define IDC_IGNORELINES                 1061
-#define IDC_ROWSIDBY                    1753
 #define IDC_SSHHOST2                    1061
 #define IDC_DIAG_USEFRMREPAIR           1061
 #define IDC_OPENTABLES2                 1061
@@ -480,7 +479,6 @@
 #define IDD_GETSQLYOGULTIMATE           1064
 #define IDD_OBCOLOR                     1065
 #define IDC_EXPORTFILENAME              1081
-#define IDC_ROWSIDTEXT                  1750
 #define IDC_PROGRESS                    1082
 #define IDC_CHK_USEDBNAME               1083
 #define IDC_CHK_DROPOBJECT              1084
@@ -498,9 +496,8 @@
 #define IDC_SETUNIQUE                   1093
 #define IDC_BULKINSERT                  1094
 #define IDC_CHK_DEFINER                 1095
-#define IDC_ZIP                         1750
-#define IDC_TIMESTAMP_PREFIX            1751
-#define IDC_FILE_TABLE                  1752
+#define IDC_CHK_VERSION                 1096
+#define IDC_ONEROW                      1097
 #define IDC_NULLREPLACEBY               1098
 #define IDC_OBFONT                      1099
 #define IDC_NULLCHAR                    1099
@@ -587,7 +584,6 @@
 #define IDC_HTML                        1190
 #define IDC_CURDATABASE                 1190
 #define IDC_CSV                         1191
-#define IDC_JSON                        1391
 #define IDC_EXCEL                       1192
 #define IDC_SOURCEDB                    1193
 #define IDC_SQL                         1193
@@ -596,6 +592,7 @@
 #define IDC_OBCHANGE                    1199
 #define IDC_STATIC1                     1200
 #define IDC_ADDCOLUMNS                  1201
+#define IDC_VERSION                     1202
 #define IDC_DEF_QBTAB                   1211
 #define IDC_ONDELETE                    1211
 #define IDC_COLUMNWIDTH                 1211
@@ -681,6 +678,7 @@
 #define IDC_CHALLENGEUSERSTATIC         1380
 #define IDC_CHALLENGEPWDSTATIC          1381
 #define IDC_TREE                        1385
+#define IDC_JSON                        1391
 #define IDC_STATICIMG                   1398
 #define IDC_OPENFILE                    1399
 #define IDC_CPY_ASCTRIGGERS             1401
@@ -859,6 +857,7 @@
 #define IDC_HORZBAR2                    1620
 #define IDC_HORZBAR3                    1621
 #define IDC_HORZBAR1                    1622
+#define IDC_HORZBAR4                    1623
 #define IDC_STAT_HORZ                   1626
 #define IDC_TEMP_STATIC                 1629
 #define IDC_TEMP_STATIC1                1630
@@ -875,7 +874,6 @@
 #define IDC__EXPORTAS_GRIP              1644
 #define IDC_TABLEDIAG_GRIP              1645
 #define IDC_EXPDAT_GRIP                 1646
-#define IDC_LINK_PAID                   2901
 #define IDC_COPYDATA_GRIP               1647
 #define IDC_BTNUP                       1649
 #define IDC_BTNDOWN                     1650
@@ -950,9 +948,17 @@
 #define IDC_CONNECTION_NAME             1713
 #define IDC_DOWNLOAD                    1715
 #define IDC_INITCOMMANDDETAIL           1749
+#define IDC_ROWSIDTEXT                  1750
+#define IDC_ZIP                         1750
+#define IDC_TIMESTAMP_PREFIX            1751
+#define IDC_FILE_TABLE                  1752
+#define IDC_ROWSIDBY                    1753
 #define IDC_INITCOMMANDHELP             2644
 #define IDC_COMBOCUSTOM                 2645
+#define ID_IMPORT_FROMXML               2655
+#define ACCEL_IMPORTXML                 2656
 #define FAVORITE_MENU_ID                2900
+#define IDC_LINK_PAID                   2901
 #define IDI_TABIMG_FIELDS               10000
 #define IDI_TABIMG_ADVPROP              10001
 #define IDI_TABIMG_INDEXES              10002
@@ -1201,7 +1207,6 @@
 #define ACCEL_EXPORTBATCH               40195
 #define ID_EXPORT_AS                    40196
 #define ID_IMPORT_FROMCSV               40197
-#define ID_IMPORT_FROMXML               2655
 #define ID_OBJECT_BACKUPDATABASE        40198
 #define ID_OBJECT_RESTOREDATABASE       40199
 #define IDC_EDIT_SHOWRESULT             40200
@@ -1217,7 +1222,6 @@
 #define ACCEL_SCHEMA                    40208
 #define ACCEL_EXPORTCSV                 40209
 #define ACCEL_IMPORTCSV                 40210
-#define ACCEL_IMPORTXML                 2656
 #define ACCEL_MANINDEX                  40212
 #define ID_IMPORTEXPORT_DBEXPORTTABLES  40214
 #define ID_IMPORTEXPORT_TABLESEXPORTTABLES 40215

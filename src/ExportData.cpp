@@ -1074,6 +1074,7 @@ CExportResultSet::~CExportResultSet()
 	m_dataonly = wyFalse;
 	m_structdata =  wyFalse;
 
+	m_includeversion =  wyTrue;
 	if(m_selectedfields)
 		free(m_selectedfields);
 }
@@ -1200,6 +1201,7 @@ CExportResultSet::OnWmInitDlgValues(HWND hwnd)
 	VERIFY(m_hwndstructonly = GetDlgItem(hwnd, IDC_STRUCTUREONLY));
 	VERIFY(m_hwnddataonly = GetDlgItem(hwnd, IDC_DATAONLY));
 	VERIFY(m_hwndstructdata = GetDlgItem(hwnd, IDC_BOTH));
+	VERIFY(m_hwndversion = GetDlgItem(hwnd, IDC_VERSION));
 
 	VERIFY(m_hwndselall = GetDlgItem(hwnd, IDC_SELECTALL));
 	VERIFY(m_hwnddeselall = GetDlgItem(hwnd, IDC_DESELECTALL));
@@ -1219,6 +1221,7 @@ CExportResultSet::OnWmInitDlgValues(HWND hwnd)
 	m_p->Add(hwnd, IDC_SQL, "SQL", "0", CHECKBOX);
 
 	m_p->Add(hwnd, IDC_BOTH, "STRUCTUREDATA", "1", CHECKBOX);
+	m_p->Add(hwnd, IDC_VERSION, "INCVERSION", "1", CHECKBOX);
 	m_p->Add(hwnd, IDC_STRUCTUREONLY, "STRUCTUREONLY", "0", CHECKBOX);
 	m_p->Add(hwnd, IDC_DATAONLY, "DATAONLY", "0", CHECKBOX);
 
@@ -1660,6 +1663,7 @@ CExportResultSet::DisableSQLOptions()
 	EnableWindow(GetDlgItem(m_hwnd, IDC_STRUCTUREONLY), FALSE);
 	EnableWindow(GetDlgItem(m_hwnd, IDC_DATAONLY), FALSE);
 	EnableWindow(GetDlgItem(m_hwnd, IDC_BOTH), FALSE);
+	EnableWindow(GetDlgItem(m_hwnd, IDC_VERSION), FALSE);
 
 	return wyTrue;
 }
@@ -1671,6 +1675,7 @@ CExportResultSet::EnableSQLOptions()
 	EnableWindow(GetDlgItem(m_hwnd, IDC_STRUCTUREONLY), TRUE);
 	EnableWindow(GetDlgItem(m_hwnd, IDC_DATAONLY), TRUE);
 	EnableWindow(GetDlgItem(m_hwnd, IDC_BOTH), TRUE);
+	EnableWindow(GetDlgItem(m_hwnd, IDC_VERSION), TRUE);
 
     return wyTrue;
 }
@@ -2264,6 +2269,10 @@ CExportResultSet::StartSimpleSQLExport(StopExport *resultset)
 		m_dataonly = wyTrue;
 	if(SendMessage(resultset->m_exportresultset->m_hwndstructdata, BM_GETCHECK, 0, 0)== BST_CHECKED)
 		m_structdata = wyTrue;
+	if(SendMessage(resultset->m_exportresultset->m_hwndversion, BM_GETCHECK, 0, 0)== BST_CHECKED)
+		m_includeversion = wyTrue;
+	else 
+		m_includeversion =wyFalse;
 	
 	ret  = resultset->m_exportresultset->SaveDataAsSQL();
 	VERIFY(CloseHandle(resultset->m_exportresultset->m_hfile));
@@ -2329,6 +2338,7 @@ CExportResultSet::SaveDataAsSQL()
 	data.m_structonly		= m_structonly;
 	data.m_dataonly			= m_dataonly;
 	data.m_structdata		= m_structdata;
+	data.m_includeversion	= m_includeversion;
 
     data.m_tablename.SetAs(m_res->fields[0].table, m_ptr->m_pmdi->m_ismysql41);
     data.m_dbname.SetAs(m_res->fields[0].db ? m_res->fields[0].db : "", m_ptr->m_pmdi->m_ismysql41);
