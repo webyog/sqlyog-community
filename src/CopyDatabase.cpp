@@ -15,7 +15,7 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA
 
 */
-
+#include <Shlwapi.h>
 #include "ExportMultiFormat.h"
 #include "FrameWindowHelper.h"
 #include "MySQLVersionHelper.h"
@@ -80,6 +80,8 @@ CopyDatabase::CopyDatabase()
 	m_isremdefiner = wyFalse;
 	m_iscreatedb = wyFalse;
 	m_iscopytrigger=wyFalse;
+	m_dblist  = NULL;
+	m_countdb =	0;
 }
 
 CopyDatabase::~CopyDatabase()
@@ -94,6 +96,11 @@ CopyDatabase::~CopyDatabase()
 	
     // Release resources used by the critical section object.
     DeleteCriticalSection(&m_cs);
+	if(m_dblist)
+	{
+		free(m_dblist);
+		m_countdb=0;
+	}
 }
 
 // this function creates the actual dialog box and also initializes some values of the class
@@ -678,6 +685,12 @@ CopyDatabase::OnWmCommand(HWND hwnd, WPARAM wparam)
 		if(HIWORD(wparam) == CBN_SELCHANGE)
 			OnCBSelChange(hwnd);
 		break;
+	case IDC_SOURCEDB2:
+		{
+			if(HIWORD(wparam) == CBN_EDITCHANGE)
+			OnCBEditChangeDb(hwnd);
+		}
+		break;
 
 	// To disable bulkinsert when only structure is checked. 
 	case IDC_STRUC:
@@ -692,6 +705,91 @@ CopyDatabase::OnWmCommand(HWND hwnd, WPARAM wparam)
 	}
     return;
 }
+
+void 
+	CopyDatabase::OnCBEditChangeDb(HWND hwnd){
+
+	wyWChar     str[70] = {0},*temp=NULL;
+    wyInt32     len = -1;
+	int i, status=0,index;	//status flag is set when atleast one match found
+	wyWChar     lbStr[70] = {0};
+	GetWindowText(m_hwndcombodb, str, 65);
+	len=wcslen(str);
+		if(len)
+			{
+					 /*if(len==1)
+						 SendMessage(hdb, CB_SHOWDROPDOWN, FALSE, NULL);*/
+
+				for(i=0;i<m_countdb;i++)
+					{	 
+						if(m_dblist[i].m_dbname.GetLength()==0)
+							continue;
+						temp = StrStrI(m_dblist[i].m_dbname.GetAsWideChar(),str);
+						if(temp)
+							status=1;
+							
+
+						if(temp && m_dblist[i].m_dropdown==wyFalse)
+						{
+							index=SendMessage(m_hwndcombodb, CB_ADDSTRING, 0,(LPARAM)m_dblist[i].m_dbname.GetAsWideChar());
+							m_dblist[i].m_dropdown=wyTrue;
+							
+						}
+
+						 if(!temp &&  m_dblist[i].m_dropdown==wyTrue)
+						 {
+							 int index_delete=SendMessage(m_hwndcombodb,CB_FINDSTRINGEXACT,-1,(LPARAM)m_dblist[i].m_dbname.GetAsWideChar());
+							 SendMessage(m_hwndcombodb, CB_DELETESTRING, index_delete,NULL);
+							 m_dblist[i].m_dropdown=wyFalse;
+						}
+				   }
+					 
+				}
+				 if(!len || status==0)
+				 {
+					 if(status==0)
+							SendMessage(m_hwndcombodb, CB_SHOWDROPDOWN, FALSE, NULL);
+					 for(i=0;i<m_countdb;i++)
+					 {
+						 if( m_dblist[i].m_dbname.GetLength()==0)
+							continue;
+						 
+						SetCursor(LoadCursor(NULL, IDC_ARROW));
+						if( m_dblist[i].m_dropdown==wyFalse)
+						{
+						 index=SendMessage(m_hwndcombodb, CB_ADDSTRING, 0,(LPARAM)m_dblist[i].m_dbname.GetAsWideChar());
+						 m_dblist[i].m_dropdown=wyTrue;
+						}
+					 }
+					 if(!len)
+						SendMessage(m_hwndcombodb, CB_SHOWDROPDOWN, TRUE, NULL);
+				        
+				}
+				 else
+				{
+					
+				 if(SendMessage(m_hwndcombodb, CB_GETDROPPEDSTATE, NULL, NULL) == FALSE)
+						{
+							
+							SendMessage(m_hwndcombodb, CB_SHOWDROPDOWN, TRUE, NULL);
+							SetCursor(LoadCursor(NULL, IDC_ARROW));
+							int index = SendMessage(m_hwndcombodb, CB_FINDSTRING, -1,(LPARAM)str);
+			   if(index!=CB_ERR){
+			   SendMessage(m_hwndcombodb, CB_GETLBTEXT, index, (LPARAM)lbStr);
+			   SetWindowText(m_hwndcombodb, lbStr);
+			   SendMessage(m_hwndcombodb, CB_SETEDITSEL, NULL, MAKELPARAM(wcslen(str),-1));
+			   }
+
+						}
+			   
+				 // select only auto-filled text so that user can continue typing
+			  
+              //SendMessage(hdb, CB_SETEDITSEL, NULL, MAKELPARAM(-1,0));
+					
+			  }
+
+}
+
 void 
 CopyDatabase::OnCBSelChange(HWND hwnd)
 {
@@ -917,6 +1015,7 @@ CopyDatabase::AddInitData()
 		if(ret != CB_ERR)
 			SendMessage(m_hwndcombodb, CB_DELETESTRING, ret, 0);
 	}
+	FillDbList();
 	//delete lpdiff;
 	///If combo list is empty then disable the combo box
 	//11.52 we do not disable combo box on single connection since user can create a new db
@@ -1383,6 +1482,8 @@ CopyDatabase::GetTargetDatabase()
 
 	VERIFY((index = SendMessage(m_hwndcombo, CB_GETCURSEL, 0, 0))!= CB_ERR);
 
+	if(index==CB_ERR)
+		return wyFalse;
 	VERIFY(lpdiff =(LPDIFFCOMBOITEM)SendMessage(m_hwndcombo, CB_GETITEMDATA, index, 0));
 
 	//VERIFY((index = SendMessage(m_hwndcombodb, CB_GETCURSEL, 0, 0))!= CB_ERR);
@@ -3610,6 +3711,7 @@ CopyDatabase::CheckTargetDB(HWND m_hwnddlg)
 		if(ret != CB_ERR)
 			SendMessage(m_hwndcombodb, CB_DELETESTRING, ret, 0);
 	}
+	FillDbList();
 	//GetDlgItemText(m_hwnddlg, IDC_SOURCEDB2, buffer, SIZE_128 - 1);
     //m_targetdb.SetAs(buffer);
     //m_targetdb.RTrim();
@@ -3622,7 +3724,7 @@ CopyDatabase::CheckTargetDB(HWND m_hwnddlg)
 	//{
 		//m_iscreatedb = wyTrue;
 	//}
-	
+
 	SendMessage(m_hwndcombodb, CB_SETCURSEL , 0, 0);
 	VERIFY(m_targetmysql = lpdiff->mysql);
 	VERIFY(m_targettunnel = lpdiff->tunnel);
@@ -3643,7 +3745,24 @@ CopyDatabase::CheckTargetDB(HWND m_hwnddlg)
 	return wyTrue;
 }
 
+void
+	CopyDatabase::FillDbList(){
+		 wyWChar     lbStr[70] = {0};
+			if(m_dblist)
+		{
+		free(m_dblist);
+		m_countdb=0;
+		}
+	m_countdb = SendMessage(m_hwndcombodb, CB_GETCOUNT, 0, 0);
+	m_dblist = (DB_LIST*)calloc(m_countdb,sizeof(DB_LIST));
 
+	for(int i=0;i< m_countdb ; i++){
+	SendMessage(m_hwndcombodb, CB_GETLBTEXT , i, (LPARAM)lbStr);
+	m_dblist[i].m_dbname.SetAs(lbStr);
+	m_dblist[i].m_dropdown = wyTrue;
+	}
+
+}
 wyBool 
 CopyDatabase::CreateTemporaryTables(const wyChar *db, const wyChar *view)
 {

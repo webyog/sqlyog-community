@@ -37,6 +37,12 @@ struct __copydb_longparam
 	wyString	*m_summary;
 };
 
+typedef struct db_list
+{
+	wyString	m_dbname;
+	wyBool	m_dropdown;
+}DB_LIST;
+
 /*! Creates a type copydb information */ 
 typedef struct	__copydb_longparam COPYDBPARAM;
 
@@ -115,7 +121,7 @@ public:
     @returns wyBool, wyTrue if copy is stopped, else wyFalse
     */
     wyBool      IsCopyStopped();
-
+	void		FillDbList();
     /// handles the mouse move while the copy is on progress.
     /**
     @param hwnd: IN window handle
@@ -284,6 +290,8 @@ public:
 
 	wyBool				m_iscreatedb;
 
+	DB_LIST				*m_dblist;			/* List of Db in temporary array */
+	wyUInt32			m_countdb;
 private:
 
 	//max allowed packet size
@@ -772,6 +780,7 @@ private:
 	*/
 	void    Delete(List *list);
 	void    OnCBSelChange(HWND hwnd);
+	void    OnCBEditChangeDb(HWND hwnd);
 	void    ExpandAndFillTriggers(HWND hwnd);
 	void    Filltriggers(HWND htreeitem);
 	void    FindTrigerAndCheck(HWND htreeitem, wyString *tablename, wyBool remove);

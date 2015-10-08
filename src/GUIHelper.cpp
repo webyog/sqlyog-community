@@ -7846,7 +7846,8 @@ OnDrawConnNameCombo(HWND hwndcombo, LPDRAWITEMSTRUCT lpds,  wyBool isconndbname)
 				}
 				else
 				{
-				OnDrawComboItem(hwndcombo, lpds, pGlobals->m_pcmainwin->m_connection->m_arrayofcolor[lpds->itemID]);
+					if(lpds->itemID != (UINT)-1)
+					OnDrawComboItem(hwndcombo, lpds, pGlobals->m_pcmainwin->m_connection->m_arrayofcolor[lpds->itemID]);
 				}
 				break;
 
@@ -9271,6 +9272,7 @@ wyBool GetOBDetailsFromTable(wyWChar* path, wyInt32 id, wyString *obdb)
 		colval = sqliteobj->GetText(&res , "obdb");
 		if(colval)
 			 obdb->SetAs(colval);
+			 
 	}
 	sqliteobj->Finalize(&res);
 	sqliteobj->Close();
@@ -9622,6 +9624,28 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 
 	}
 	sqliteobj->Finalize(&res);
+
+	sqlitequery.Sprintf("SELECT * from obdetails where Id = %d",id);
+	sqliteobj->Prepare(&res, sqlitequery.GetString());
+	if(sqliteobj->Step(&res, wyFalse) && sqliteobj->GetLastCode() == SQLITE_ROW)
+	{
+		colval = sqliteobj->GetText(&res , "obdb");
+		if(colval)
+			tempmdilist->m_obdetails.SetAs(colval);
+	}
+	sqliteobj->Finalize(&res);
+
+	sqlitequery.Sprintf("SELECT * from historydetails where Id = %d",id);
+	sqliteobj->Prepare(&res, sqlitequery.GetString());
+	if(sqliteobj->Step(&res, wyFalse) && sqliteobj->GetLastCode() == SQLITE_ROW)
+	{
+		colval = sqliteobj->GetText(&res , "historydata");
+		if(colval)
+			tempmdilist->m_historydata.SetAs(colval);
+			 
+	}
+	sqliteobj->Finalize(&res);
+
 	sqliteobj->Close();
 	delete sqliteobj;
 	tempmdilist->m_id = id;

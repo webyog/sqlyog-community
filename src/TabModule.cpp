@@ -171,6 +171,7 @@ TabModule::Create(MDIWindow * wnd)
 				temptabeditorele->m_tooltiptext.SetAs(temptabdetail->m_tooltiptext);
 				temptabeditorele->m_iimage = temptabdetail->m_iimage;
 				temptabeditorele->m_tabptr = 0;
+				temptabeditorele->m_content = temptabdetail->m_content;
 				//if not IDI_QUERY_16 create advanced editor
 				//CreateAdvEditorTab(wnd, (wyChar *)temptabeditorele->m_psztext.GetString(), temptabeditorele->m_iimage, hfunctionitem, &temptabeditorele->m_psztext);
 				if(temptabdetail->m_iimage != IDI_QUERYBUILDER_16 && temptabdetail->m_iimage != IDI_SCHEMADESIGNER_16)

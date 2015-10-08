@@ -9413,9 +9413,10 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 	{
 	tabquery = (TabEditor*)quetabitem.m_lparam;
 		temptabeditorele->m_pctabeditor = tabquery;
+		
 	}
 
-		
+	temptabeditorele->m_tabptr = quetabitem.m_lparam;	
 	//tabquery = (TabEditor*)quetabitem.m_lparam;
 	temptabeditorele->m_id = id;
 	temptabeditorele->m_ispresent = wyTrue;
@@ -9425,6 +9426,8 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 	temptabeditorele->m_color = quetabitem.m_color;
 	temptabeditorele->m_fgcolor = quetabitem.m_fgcolor;
 	temptabeditorele->m_isfocussed = wyFalse;
+	
+
 	if((TabTypes*)quetabitem.m_lparam == tabactive)
 			temptabeditorele->m_isfocussed = wyTrue;
 	if(quetabitem.m_iimage != IDI_QUERYBUILDER_16 && quetabitem.m_iimage != IDI_SCHEMADESIGNER_16 )
@@ -9472,6 +9475,7 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 	}
 	CustomTab_GetTitle(wnd->m_pctabmodule->m_hwnd, position, &temptabeditorele->m_psztext);
 	CustomTab_GetTooltip(wnd->m_pctabmodule->m_hwnd, position, &temptabeditorele->m_tooltiptext);
+	temptabeditorele->m_content.SetAs(testquery.GetString());
 
 	if(!ssnsqliteobj)
 		wnd->m_listtabeditor->Insert(temptabeditorele);
@@ -9579,9 +9583,12 @@ FrameWindow::SaveConnectionDetails(wySQLite	*ssnsqliteobj)
 			}
 			else
 			{
+				if(m_previoussessionfile.GetLength())
+				{
 				sqlitequery.Sprintf("DELETE FROM sessiondetails");
 				sqliteobj->Execute(&sqlitequery, &sqliteerr);
 				m_previoussessionfile.SetAs("");
+				}
 			}
 			tabcount = CustomTab_GetItemCount(m_hwndconntab);
 			totalconntabs = pGlobals->m_mdiwlist->GetCount();
@@ -9651,17 +9658,24 @@ FrameWindow::SaveConnectionDetails(wySQLite	*ssnsqliteobj)
 							sqliteobj->Execute(&sqlitequery, &sqliteerr);
 						}
 
+						if(historydata.Compare(tempmdilist->m_historydata)){
+
+						tempmdilist->m_historydata.SetAs(historydata.GetString());
 						sqlitequery.Sprintf("UPDATE historydetails set historydata = ? where Id = %d",tempmdilist->m_id);
 						sqliteobj->Prepare(&stmt, sqlitequery.GetString());
 						sqliteobj->SetText(&stmt, 1,	historydata.GetString());
 						sqliteobj->Step(&stmt, wyFalse);
 						sqliteobj->Finalize(&stmt);	
+						}
+						if(wnd->m_pcqueryobject->m_seldatabase.Compare(tempmdilist->m_obdetails)){
 
+						tempmdilist->m_obdetails.SetAs(wnd->m_pcqueryobject->m_seldatabase.GetString());
 						sqlitequery.Sprintf("UPDATE obdetails set obdb = ? where Id = %d", tempmdilist->m_id);
 						sqliteobj->Prepare(&stmt, sqlitequery.GetString());
 						sqliteobj->SetText(&stmt, 1,	wnd->m_pcqueryobject->m_seldatabase.GetString());
 						sqliteobj->Step(&stmt, wyFalse);
 						sqliteobj->Finalize(&stmt);	
+					}
 						//sqliteobj->Execute(&sqlitequery, &sqliteerr);
 
 					}
@@ -9848,12 +9862,16 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 									{
 										testquery = new wyString;
 										temptabeditorele->m_pctabeditor->m_peditorbase->GetCompleteTextByPost(*testquery,wnd);
+										if(testquery->Compare(temptabeditorele->m_content))
+										{
 										sqlitequery.Sprintf("UPDATE tabdetails set content = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
 										sqliteobj->Prepare(&stmt, sqlitequery.GetString());
 										sqliteobj->SetText(&stmt, 1,  testquery->GetString());
+										temptabeditorele->m_content.SetAs(testquery->GetString());
 										delete testquery;
 										sqliteobj->Step(&stmt, wyFalse);
-										sqliteobj->Finalize(&stmt);	
+										sqliteobj->Finalize(&stmt);
+										}
 									}
 									//temptabeditorele->m_leftortoppercent = tabquery->m_pcetsplitter->GetLeftTopPercent();
 									if(temptabeditorele->m_leftortoppercent != tabquery->m_pcetsplitter->GetLeftTopPercent())
@@ -9885,12 +9903,16 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 										{
 											testquery = new wyString;
 											tabquerybuilder->WriteToXMLbuffer(*testquery);
+											if(testquery->Compare(temptabeditorele->m_content))
+										{
+										
 											sqlitequery.Sprintf("UPDATE tabdetails set content = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
 											sqliteobj->Prepare(&stmt, sqlitequery.GetString());
 											sqliteobj->SetText(&stmt, 1,  testquery->GetString());
 											delete testquery;
 											sqliteobj->Step(&stmt, wyFalse);
 											sqliteobj->Finalize(&stmt);	
+										}
 										}
 }
 #endif
@@ -9914,14 +9936,18 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 										}
 										if(!temptabeditorele->m_isfile || temptabeditorele->m_isedited )
 										{
+											
 											testquery = new wyString;
 											tabschemadesigner->WriteToXMLbuffer(*testquery);
+											if(testquery->Compare(temptabeditorele->m_content))
+										{
 											sqlitequery.Sprintf("UPDATE tabdetails set content = ? where Id = %d AND Tabid = %d",tempmdilist->m_id, temptabeditorele->m_tabid);
 											sqliteobj->Prepare(&stmt, sqlitequery.GetString());
 											sqliteobj->SetText(&stmt, 1,  testquery->GetString());
 											delete testquery;
 											sqliteobj->Step(&stmt, wyFalse);
 											sqliteobj->Finalize(&stmt);	
+										}
 										}
 }
 #endif
@@ -10093,12 +10119,16 @@ FrameWindow::SaveConnectionDetails2(wySQLite	*ssnsqliteobj)
 					sqliteobj->Step(&stmt, wyFalse);
 					sqliteobj->Finalize(&stmt);	
 
+					tempmdilist->m_historydata = historydata.GetString();
+
 					sqlitequery.Sprintf("INSERT INTO obdetails (Id, obdb) VALUES (? , ?)");
 					sqliteobj->Prepare(&stmt, sqlitequery.GetString());
 					sqliteobj->SetInt(&stmt, 1,	tempmdilist->m_id);
 					sqliteobj->SetText(&stmt, 2,	wnd->m_pcqueryobject->m_seldatabase.GetString());
 					sqliteobj->Step(&stmt, wyFalse);
 					sqliteobj->Finalize(&stmt);	
+
+					tempmdilist->m_obdetails = wnd->m_pcqueryobject->m_seldatabase.GetString();
 
 					for(k = 0; k < subtabcount; k++)
 					{

@@ -74,6 +74,8 @@ public:
 	wyBool		m_isfocussed;
 	COLORREF	m_rgbconn;	
 	COLORREF	m_rgbfgconn;
+	wyString	m_obdetails;
+	wyString	m_historydata;
 };
 
 class tabdetailelem : public wyElem

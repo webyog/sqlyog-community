@@ -15,9 +15,8 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA
 
 */
-
+#include <Shlwapi.h>
 #include "CCustomComboBox.h"
-
 // Default Constructor
 CCustomComboBox::CCustomComboBox()
 {
@@ -31,6 +30,7 @@ CCustomComboBox::CCustomComboBox()
     m_hwndParent        = NULL;
     m_hwnd              = NULL;
     m_hwndCombo         = NULL;
+	m_isconnlist		=wyFalse;
     memset(&m_editRect, 0, sizeof(RECT));
     memset(&m_marginRect, 0, sizeof(RECT));
 }
@@ -38,7 +38,11 @@ CCustomComboBox::CCustomComboBox()
 // Destructor
 CCustomComboBox::~CCustomComboBox()
 {
-    
+	if(m_isconnlist==wyTrue)
+			{
+				free(m_connectionlist);
+				m_isconnlist=wyFalse;
+			}
 }
 
 // Subcalssed procedure to handle Handle ComboBox's Edit control
@@ -278,55 +282,168 @@ CCustomComboBox::SetMargin(LPARAM lparam)
 void
 CCustomComboBox::HandleEditChange()
 {
-    wyInt32     id;
+    wyBool     id;
     int         len = -1;
     wyWChar     str[70] = {0};
     wyWChar     lbStr[70] = {0};
 
+	if(m_isconnlist==wyFalse){
+		CreateConnectionList();
+		m_isconnlist=wyTrue;
+	}
+	
     len = GetWindowText(m_hwndCombo, str, 65);
-    if(len <= 0)
-    {   
-        SendMessage(m_hwndCombo, CB_SETCURSEL, -1, 0);
-        SendMessage(m_hwndCombo, CB_SHOWDROPDOWN, FALSE, NULL);
-        SetCursor(LoadCursor(NULL, IDC_ARROW));
-    }
-    else
-    {
-        id = SendMessage(m_hwndCombo, CB_FINDSTRING, -1, (LPARAM)str);
-        if(m_isBkSpcPrsd == wyFalse)
-        {
-            if(id != CB_ERR)
-            {
-                if(SendMessage(m_hwndCombo, CB_GETDROPPEDSTATE, NULL, NULL) == FALSE)
-                {
-                    if(m_showDropDown == wyTrue)
-                    {
-                        SendMessage(m_hwndCombo, CB_SHOWDROPDOWN, TRUE, NULL);
-                        SetCursor(LoadCursor(NULL, IDC_ARROW));
-                    }
-                    else
-                    {
-                        m_showDropDown = wyTrue;
-                    }
-                }
-
-                SendMessage(m_hwndCombo, CB_GETLBTEXT, id, (LPARAM)lbStr);
-                m_fillText = wyTrue;
-                SetWindowText(m_hwndCombo, lbStr);
-                SendMessage(m_hwndCombo, CB_SETEDITSEL, NULL, MAKELPARAM(wcslen(str), wcslen(lbStr)));
-                PostMessage(m_cbif.hwndList, LB_SETCURSEL, id, NULL);
-            }
-        }
-        else
-        {
-            if(id != CB_ERR)
-            {
-                PostMessage(m_cbif.hwndList, LB_SETCURSEL, id, NULL);
-            }
-        }
-    }
+	OnHandleEditChange();
+     
 }
 
+
+///Function to create list of connection
+void
+CCustomComboBox::CreateConnectionList(){
+
+
+	wyInt32	ret, connindex,i=0;
+	wyWChar     directory[MAX_PATH + 1], *lpfileport=0;
+    wyChar      *tempnum = NULL, *allsectionnames, *tempconsecname;
+	wyString    conn, dirstr, connnamestr, connselnamestr, tempnumstr;
+	wyString	selconnnamestr, codepage, allsecnames, tempdir;
+    wyChar	    seps[] = ";";
+
+	// Get the complete path.
+	ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+	if(ret == 0)
+		return;
+	
+	dirstr.SetAs(directory);
+	tempdir.SetAs(directory);
+    
+    ret = wyIni::IniGetString(SECTION_NAME, "Host", "root", &selconnnamestr, dirstr.GetString());
+
+    //wyIni::IniWriteString(SECTION_NAME, "Host", selconnnamestr.GetString(), dirstr.GetString());
+
+	//wyIni::IniWriteString(SECTION_NAME, "Encoding", "utf8", dirstr.GetString());
+
+	m_conncount=wyIni::IniGetSection(&allsecnames, &tempdir);
+
+	m_connectionlist=(CONNLIST *)calloc(m_conncount, sizeof(CONNLIST));
+    if(m_connectionlist==NULL)
+	{
+	exit(1);
+	}
+	
+
+    allsectionnames = (wyChar*)allsecnames.GetString();
+
+    tempconsecname = strtok(allsectionnames, seps);
+	while(tempconsecname)
+	{
+        conn.SetAs(tempconsecname);
+		
+        tempnum  = strstr(tempconsecname, " ");
+		
+		if(tempnum != NULL)
+		{
+			tempnum = tempnum + 1;
+			tempnumstr.SetAs(tempnum);
+		}
+
+        wyIni::IniGetString(conn.GetString(), "Name", "", &connnamestr, dirstr.GetString());
+
+
+		m_connectionlist[i].m_dropdown=wyTrue;
+		m_connectionlist[i].m_connectionname.SetAs(connnamestr.GetAsWideChar());
+		m_connectionlist[i].m_itemvalue.SetAs(tempnumstr.GetAsWideChar());
+		i++;
+        tempconsecname = strtok(NULL, seps);
+    }
+
+
+	return;
+
+}
+//Function to Handle Edit Change
+wyBool
+CCustomComboBox::OnHandleEditChange(){
+	wyWChar     str[70] = {0},*temp=NULL;
+    wyInt32     id = -1;
+    wyInt32     len = -1;
+	int i, status=0,index;	//status flag is set when atleast one match found
+
+				 GetWindowText(m_hwndCombo, str, 65);
+				 len=wcslen(str);
+				 if(len)
+				 {
+					 if(len==1)
+						 SendMessage(m_hwndCombo, CB_SHOWDROPDOWN, FALSE, NULL);
+
+					 for(i=0;i<m_conncount;i++)
+					{	 
+						if(m_connectionlist[i].m_connectionname.GetLength()==0)
+							continue;
+						temp = StrStrI(m_connectionlist[i].m_connectionname.GetAsWideChar(),str);
+						if(temp)
+							status=1;
+							
+
+						if(temp && m_connectionlist[i].m_dropdown == wyFalse)
+						{
+							index=SendMessage(m_hwndCombo, CB_ADDSTRING, 0,(LPARAM)m_connectionlist[i].m_connectionname.GetAsWideChar());
+							//MessageBox(hcb,connlist[i].itemvalue.GetAsWideChar(),connlist[i].conn_name.GetAsWideChar(),MB_OK);
+							VERIFY(SendMessage(m_hwndCombo, CB_SETITEMDATA, index,m_connectionlist[i].m_itemvalue.GetAsInt32()));
+							m_connectionlist[i].m_dropdown=wyTrue;
+							
+						}
+
+						 if(!temp && m_connectionlist[i].m_dropdown==wyTrue)
+						 {
+							 int index_delete=SendMessage(m_hwndCombo,CB_FINDSTRINGEXACT,-1,(LPARAM)m_connectionlist[i].m_connectionname.GetAsWideChar());
+							 SendMessage(m_hwndCombo, CB_DELETESTRING, index_delete,NULL);
+							 m_connectionlist[i].m_dropdown=wyFalse;
+						}
+				   }
+					 
+				}
+				 if(!len || status==0)
+				 {
+					 SendMessage(m_hwndCombo, CB_SETCURSEL, -1, 0);
+			 for(i=0;i<m_conncount;i++)
+					 {
+						 if(m_connectionlist[i].m_connectionname.GetLength())
+						 {
+						
+						if(m_connectionlist[i].m_dropdown == wyFalse)
+						{
+						 index=SendMessage(m_hwndCombo, CB_ADDSTRING, 0,(LPARAM)m_connectionlist[i].m_connectionname.GetAsWideChar());
+						 VERIFY(SendMessage(m_hwndCombo, CB_SETITEMDATA, index, (LPARAM)m_connectionlist[i].m_itemvalue.GetAsInt32()));
+						 m_connectionlist[i].m_dropdown=wyTrue;
+						}
+						
+						 }
+					 }
+				        
+				}
+				 else
+				{
+				
+					 if(SendMessage(m_hwndCombo, CB_GETDROPPEDSTATE, NULL, NULL) == FALSE)
+						{
+							if(m_showDropDown == wyTrue)
+						{
+							SendMessage(m_hwndCombo, CB_SHOWDROPDOWN, TRUE, NULL);
+							SetCursor(LoadCursor(NULL, IDC_ARROW));
+						}
+							else
+							m_showDropDown = wyTrue;
+							
+						}
+				 SendMessage(m_hwndCombo, CB_SETEDITSEL, NULL, MAKELPARAM(-1,0));
+					
+				}
+				
+
+				 return wyTrue;
+}
 
 // function handles WM_COMMAND message to the Custom Combo Control
 void

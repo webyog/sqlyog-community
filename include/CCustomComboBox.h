@@ -79,10 +79,36 @@ lparam: Not Used
 //Custom ComboBox class registered for Community and Connection Manager 
 #define CUSTOMCOMBOBOX1     L"CustomComboBox1"
 
+
+/*! \struct connectionlist
+    \brief 
+    \param wyString		m_connectionname				name of connection
+    \param wyString		m_itemvalue						value to each connction
+    \param wyBool		m_dropdown						Is present in the dropdown
+    
+*/
+typedef struct connectionlist
+{
+	wyString	m_connectionname;
+	wyString	m_itemvalue;
+	wyBool		m_dropdown;
+	
+}CONNLIST;
+
 // Custom Combo Box Class
 class CCustomComboBox
 {
 private:
+
+	//Holds the list of connection
+	CONNLIST	*m_connectionlist;
+
+	//Number of Connection
+	wyInt32		m_conncount;
+
+	//Is Connectionlist created
+	wyBool		m_isconnlist;
+
     // Holds information about the ComboBox.
     COMBOBOXINFO        m_cbif;
 
@@ -147,6 +173,12 @@ public:
 
     /// Function handles the CBN_EDITCHANGE message of the Combo Box
     void    HandleEditChange();
+
+	///Function to handle Edit change
+	wyBool	OnHandleEditChange();
+
+	///Function to create list of connection
+	void	CreateConnectionList();
 
     /// Function Sets the margin for edit control of the Combo Box, handles the CCBM_SETMARGIN message
     /***

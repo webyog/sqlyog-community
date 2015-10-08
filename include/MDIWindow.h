@@ -65,6 +65,7 @@ public:
 	wyBool		m_isfocussed;
 	wyBool		m_isedited;
 	wyInt32		m_leftortoppercent;
+	wyString	m_content;
 };
 
 class TableDiag
