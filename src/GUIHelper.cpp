@@ -6756,8 +6756,10 @@ ChColor(HWND hwnd, LPCOLORREF rgbcolor)
  
 	ret = ChooseColor(&cc);
 
-	if(!ret)
+	if(!ret){
 		return wyFalse;
+	}
+	
 
 	*rgbcolor = cc.rgbResult;  
 
