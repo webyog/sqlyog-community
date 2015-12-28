@@ -34,6 +34,7 @@
 #include "ConnectionTab.h"
 #include "ExportImportConnectionDetails.h"
 
+
 using namespace std;
 
 #ifdef COMMUNITY
@@ -49,7 +50,10 @@ class	Favorites;
 class	UpgradeCheck;
 class	ConnectionTab;
 class	tabeditorelem;
-
+class	TabHistory;
+class	TabTypes;
+class	TabEditor;
+class	List;
 
 /*! \struct SSHPORTINFO
 	\brief ssh port information
@@ -76,6 +80,25 @@ public:
 	COLORREF	m_rgbfgconn;
 	wyString	m_obdetails;
 	wyString	m_historydata;
+	List		*m_listtabeditor;
+};
+
+class MDIlisttemp : public wyElem
+{
+public:
+	MDIWindow	*mdi;
+	wyInt32		m_id;
+	wyInt32		m_position;
+	wyBool		m_ispresent;
+	wyBool		m_isfocussed;
+	COLORREF	m_rgbconn;	
+	COLORREF	m_rgbfgconn;
+	wyString	m_obdetails;
+	wyString	m_historydata;
+    TabHistory	*m_tabhistory;
+	TabTypes	*m_activetab;
+	TabEditor	*m_tabqueryactive;
+	List		*m_listtabeditor_temp;		
 };
 
 class tabdetailelem : public wyElem
@@ -1649,7 +1672,9 @@ public:
 	wyString			m_sessionname;
 	wyString			m_previoussessionfile;
 	wyBool				m_previoussessionedited;
-	wyBool				WriteTabDetailsToTable(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id,TabTypes *tabqueryactive, MDIWindow *wnd,wySQLite	*ssnsqliteobj = NULL);
+	wyBool				WriteTabDetailsToTable2(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id, TabTypes *tabactive, MDIWindow *wnd,wySQLite	*ssnsqliteobj = NULL);
+	wyBool				WriteTabDetailsToTable(tabeditorelem *temptabeditorele, tabeditorelem *temptabeditorele_temp, wyInt32 tabid, wyInt32 position, wyInt32 id,TabTypes *tabqueryactive,wySQLite	*ssnsqliteobj = NULL);
+	wyBool				WriteTabDetailsToTempList(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id,TabTypes *tabqueryactive, MDIWindow *wnd);
 	wyBool				SetStatusParts2(HWND hwndstatus);
 	wyInt32				OnStatusBarWmCtlColorStatic(HWND hwnd, WPARAM wparam, LPARAM lparam);
 	HFONT			    m_trialtextfont;

@@ -237,7 +237,7 @@ wyElem*
 List::Remove(wyUInt32 index)
 {
     wyUInt32 i;
-	wyElem *elempointer;
+	wyElem *elempointer, *nextpointer;
 
 	// Some boundary condition.
 	if(!index)
@@ -250,5 +250,7 @@ List::Remove(wyUInt32 index)
 		i++;
 	}
 
-	return Remove(elempointer);
+	nextpointer = Remove(elempointer);
+	delete elempointer;
+	return nextpointer;
 }

@@ -1854,8 +1854,11 @@ CExportResultSet::StartExport()
 	unsigned		thdid;
 	StopExport		stopevt;
 	wyInt32			count;
-	wyBool			flag = wyFalse;
+	wyBool			flag = wyFalse,is_csv = wyFalse,is_blob = wyFalse;
     wyWChar         file[MAX_PATH + 1] = {0};
+	wyString		msg;
+	wyInt32     create;
+	
 
     
     DisableAll();
@@ -1906,6 +1909,33 @@ CExportResultSet::StartExport()
         EnableWindow(GetDlgItem(m_hwnd, IDOK), TRUE);
 		goto freeup;
 	}
+
+//------------------------------------Warning message for BLOB Type Fixed Length csv export---------------------------------------//
+	if(SendMessage(m_hwndcsv, BM_GETCHECK, 0, 0) == BST_CHECKED)
+		is_csv = wyTrue;
+	else
+		is_csv = wyFalse;
+	
+for(count = 0; count < m_res->field_count; count++)
+	{
+		if(m_selectedfields[count] == wyTrue && m_res->fields[count].type>= FIELD_TYPE_TINY_BLOB && m_res->fields[count].type<= FIELD_TYPE_BLOB)
+			is_blob = wyTrue;
+	}
+
+	if(is_csv && m_cesv.m_esch.m_isfixed && is_blob){
+		msg.SetAs("Fixed length CSV is not supported for BLOB/TEXT types. \n Do you still want to continue?");
+		create = yog_message(m_hwnd, msg.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(),  MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2);
+		
+		if(create != IDYES)
+		{
+		m_exporting = wyFalse;
+		EnableAll();
+		SendMessage(m_hwndmessage, WM_SETTEXT, 0, (LPARAM)L"");
+        EnableWindow(GetDlgItem(m_hwnd, IDOK), TRUE);
+		goto freeup;
+		}
+	}
+//------------------------------------------------------------------------------------------------------------------------------------//
 
 	stopevt.m_exportevent = CreateEvent(NULL, TRUE, FALSE, NULL);
     stopevt.m_exportresultset = this;
@@ -2540,7 +2570,7 @@ CExportResultSet::SaveDataAsXML(HANDLE hfile)
 wyBool 
 	CExportResultSet::SaveDataAsJson(HANDLE hfile)
 {
-		wyUInt32		j,k;
+		wyUInt32		j,k,count;
 	BOOL			ret;
 	DWORD			dwbyteswritten;
     wyInt32         messagecount = 0;
@@ -2613,12 +2643,15 @@ wyBool
 		}
 
 		buffer.Add("{ \r\n");
-		
+		count = 0;
 		for(j=0; j < (myres->field_count); j++)
         {
 			if(m_selectedfields[j] == wyFalse)
 				continue;
-			
+
+			if(count!=0)
+			buffer.Add(",\r\n");
+
 			buffer.Add("\"");
 			
 			// we output the fields but before we check if there is a space in between.
@@ -2662,13 +2695,10 @@ wyBool
 			}
 			else
 				buffer.Add("null");
-			if(j!=(myres->field_count-1))
-			buffer.Add(",\r\n");
-			else
-            	buffer.Add("\r\n");
+		count++;
 		}
 		
-			 buffer.Add("},");
+			 buffer.Add("\r\n},");
 			 
 		buffer.Add("\r\n");
 	
@@ -2741,8 +2771,8 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
     DWORD           dwbytesread;
 	MYSQL_ROWEX	    *tmp = NULL;
 	MYSQL_ROWS		*rowswalker = NULL;
-    wyInt32         messagecount = 0, rescount = 0, rowptr = 0, charset = 0, comboindex = -1;
-	wyString        messbuff, myrowstr, buffer(SIZE_8K);
+    wyInt32         messagecount = 0, rescount = 0, rowptr = 0, charset = 0, comboindex = -1,count;
+	wyString        messbuff, myrowstr, buffer(SIZE_8K), msg;
 	wyInt32			lenptr = 0;
 	MYSQL_RES		*myres;
 	MYSQL_FIELD		*fields;
@@ -2861,10 +2891,14 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
 		}*/
 		
 		//First data is added to buffer and then written to file
+		count = 0;
 		for(i=0; i<numfields; i++)
 		{
 			if(m_selectedfields[i] == wyFalse)
 				continue;
+
+			if(count != 0)
+				buffer.Add(m_cesv.m_esch.m_fescape);
 
             if(m_cesv.m_esch.m_isfixed)
 			{
@@ -2879,11 +2913,10 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
 										fterm, isfterm, lterm, islterm, encl, isencl);
 				
 				// if only add the separator if its not the last field.
-				if(i != numfields-1)
-					buffer.Add(m_cesv.m_esch.m_fescape);
+					
 			}
+			count++; 
 		}
-		
 		//Freeing the row_lengths buffer 
         if(!m_ptr->m_rowarray->GetLength() && m_resultfromquery == wyFalse && length)
 		{
