@@ -9981,7 +9981,7 @@ FrameWindow::SaveConnectionDetails(wySQLite	*ssnsqliteobj)
 					newqid = 0;
 					for(k = 0; k < totalquetabs; k++)
 					{
-						if(k == 0);
+						if(k == 0)
 							temptabeditorele = (tabeditorelem*)tempmdilist->m_listtabeditor->GetFirst();
 
 						temptabeditorele->m_ispresent = wyFalse;
