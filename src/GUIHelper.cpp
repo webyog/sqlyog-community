@@ -1911,6 +1911,41 @@ DisplayErrorText(wyUInt32 dwlasterror, const wyChar *extratext, HWND hwnd)
 	return;
 }
 
+
+void
+CombineErrorText(wyUInt32 dwlasterror, const wyChar *extratext, HWND hwnd, wyString *finalmessage,wyString filename)
+{
+ 	wyString    comperr;
+	wyWChar      *mess;
+    wyString	message;
+	static int i=0;
+    wyUInt32    len, lasterror = 0;
+    wyUInt32    flags = FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS |
+									FORMAT_MESSAGE_FROM_SYSTEM; 
+	if(pGlobals->m_conrestore)
+		return;
+    VERIFY(len = FormatMessage(flags, NULL, dwlasterror, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),(LPWSTR)&mess, 0, NULL));
+
+	// null terminate the buffer
+	mess[len] = 0;
+
+	// if error length is zero set message to null
+	if(!len)
+		return;
+
+	message.SetAs(mess);
+	lasterror = GetLastError();
+	comperr.Sprintf("%s\n%d:%s", extratext, lasterror, message.GetString());
+	finalmessage->AddSprintf("%s : %s\n",filename.GetString(),comperr.GetString());
+	/*
+*/
+	// free the memory allocated by system
+	i++;
+	VERIFY(LocalFree(mess) == NULL);
+
+	return;
+}
+
 wyInt32 
 GetMySQLError(HWND hdlg, Tunnel * tunnel, PMYSQL mysql, wyString &err)
 {
@@ -7561,6 +7596,11 @@ OpenFileType(wyString *filename)
 	else if(!extn.CompareI(".schemaxml"))
 		return SDFILE;
 
+	else if(!extn.CompareI(""))
+		{
+		filename->Add(".sql");
+		return SQLFILE;
+	}
 	else
 		return SQLFILE;
 #endif
@@ -7741,18 +7781,20 @@ HandleOnDragAndDropFiles(HDROP phandle, MDIWindow *wnd)
 	wyInt32		filecount = 0;
 	wyInt32		i = 0;
 	wyWChar		fname[MAX_PATH];
-	wyString	filename;
+	wyString	filename,finalerrormessage;
 	
 	filecount = DragQueryFile(phandle, 0xFFFFFFFF, NULL, 0);
-
+	finalerrormessage.SetAs("");
 	for(i = 0; i < filecount; i++)
 	{
 		DragQueryFile(phandle, i, fname, MAX_PATH);
 		
 		filename.SetAs(fname);		
-		wnd->OpenFileinTab(&filename);		
+		wnd->OpenFileinTab(&filename,&finalerrormessage);		
 	}	
 
+	if(finalerrormessage.GetLength())
+		yog_message(NULL, finalerrormessage.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONERROR | MB_OK | MB_TASKMODAL);
 	//Release the memory
 	DragFinish(phandle);
 }

@@ -530,7 +530,7 @@ public:
 	@param isrecentfiles  : IN open file from 'Recent Files' or not
 	@returns wyTrue on success else wyFalse
 	*/
-	wyBool				OpenFileinTab(wyString *filename, wyBool issametab = wyFalse, wyBool isrecentfiles = wyFalse);
+	wyBool				OpenFileinTab(wyString *filename, wyString *finalerrormessage, wyBool issametab = wyFalse, wyBool isrecentfiles = wyFalse);
 
     // This function opens the SQL file asked from user and copies its content in the edit box.
     /**
@@ -539,7 +539,7 @@ public:
 	@param isrecentfiles  : IN open file from 'Recent Files' or not
 	@returns wyTrue on success else wyFalse
     */
-	wyBool				OpenSQLFile (wyString *filename, wyBool issametab = wyFalse, wyBool isrecentfiles = wyFalse);
+	wyBool				OpenSQLFile (wyString *filename, wyString *finalerrormessage, wyBool issametab = wyFalse, wyBool isrecentfiles = wyFalse);
 	wyBool				OpenSQLFile2 (wyString *filename, EditorBase *peditorbase, wyBool isrecentfiles = wyFalse);
 	// This function opens the Schema file asked by user and copies its content in the schema designer.
     /**

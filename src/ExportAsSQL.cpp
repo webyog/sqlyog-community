@@ -3546,7 +3546,7 @@ MySQLDump::DumpFunction(wyString * buffer, const wyChar *db, const wyChar *funct
  */
 wyBool
 MySQLDump::TableHeader(wyString * buffer, const wyChar * db, const wyChar * table, wyInt32 fcount, 
-					   wyUInt32 rcount, MYSQL_RES * res)
+					   wyUInt32 rcount, MYSQL_RES * res,wyBool *isvirtual)
 {
         wyChar		*tablech = NULL;
 		wyInt32		len;
@@ -3625,7 +3625,7 @@ MySQLDump::TableHeader(wyString * buffer, const wyChar * db, const wyChar * tabl
 			
 			}
 			else				
-				CompleteInsert(buffer, db, res, table, fcount);
+				CompleteInsert(buffer, db, res, table, fcount,isvirtual);
 		}
 	} 
 
@@ -3636,7 +3636,7 @@ MySQLDump::TableHeader(wyString * buffer, const wyChar * db, const wyChar * tabl
     exceeds maximam allowd size	it inserts one more insert statement */									
 wyBool
 MySQLDump::CheckQueryLength(wyString * buffer, const wyChar * db, const wyChar * table, 
-							MYSQL_RES *res, wyInt32 fieldcount)
+							MYSQL_RES *res, wyInt32 fieldcount,wyBool *isvirtual)
 {	
 	/* get size of all fields,and add to get the total length it should not be more than 
 	 * MAX_ALLOWED_LENGTH if ecxceeds we will insert one more insert statement */ 
@@ -3695,7 +3695,7 @@ MySQLDump::CheckQueryLength(wyString * buffer, const wyChar * db, const wyChar *
 				buffer->Add(";");
 				
 				//inserts field names in to insert statement, in case complete insert option is wyTrue.
-				CompleteInsert(buffer, db, res, table, fieldcount);
+				CompleteInsert(buffer, db, res, table, fieldcount, isvirtual);
 			} 
             else 				
 			{
@@ -3742,18 +3742,26 @@ MySQLDump::CheckQueryLength(wyString * buffer, const wyChar * db, const wyChar *
 /*	This function  prints each and every field value to the expoert file
  *	in order ti dump table data */ 											
 wyBool
-MySQLDump::PrintFieldValue(wyString * buffer, MYSQL_RES *res, MYSQL_ROW row, wyInt32 fcount)
+MySQLDump::PrintFieldValue(wyString * buffer, MYSQL_RES *res, MYSQL_ROW row, wyInt32 fcount, wyBool *isvirtual)
 {
 	wyInt32     *lengths;
-	wyInt32     to, count;
+	wyInt32     to, count, firstcol =0;
 	MYSQL_FIELD	*field;
 
 	lengths = (wyInt32 *)sja_mysql_fetch_lengths(m_tunnel, res);
 
-	for(count = 0; count <= fcount; count++)		
+	for(count = 0; count < fcount; count++)		
 	{  
 		field = sja_mysql_fetch_field_direct(m_tunnel, res, count);
 
+		if(isvirtual[count]==1)
+		{
+		continue;
+		}
+
+		if(firstcol>0){
+		buffer->Add(",");
+		}
 		/* if its NULL then just write NULL */
 		if(!row[count]) 
 			buffer->Add("NULL"); 
@@ -3788,10 +3796,7 @@ MySQLDump::PrintFieldValue(wyString * buffer, MYSQL_RES *res, MYSQL_ROW row, wyI
         else 
 			buffer->AddSprintf("%s", row[count]);
 			
-		if(count == fcount - 1)
-			break;
-
-	    buffer->Add(",");
+	    firstcol ++;
 	} 	
 	
 	sja_mysql_field_seek(m_tunnel, res , 0);
@@ -3911,10 +3916,51 @@ MySQLDump::DumpTableDataRows(wyString * buffer, MYSQL_ROW *row, const wyChar *db
                                  wyInt32 rcount)
 {	
     MYSQL_RES   *res = NULL;
-    wyInt32     fcount;	
-    wyString    query;
+    wyInt32     fcount, no_rows, l=0;	
+    wyString    query, virt_query;
     wyBool      intable = wyFalse;
     
+	MYSQL_RES   *virt_res = NULL;
+	MYSQL_ROW	virt_row;
+	wyBool *isvirtual = NULL;
+	
+	virt_query.Sprintf("SHOW FIELDS FROM `%s`.`%s`",db, table);
+
+	virt_res = SjaExecuteAndGetResult(m_tunnel, 
+        &m_mysql, virt_query);
+
+	if(!virt_res  && sja_mysql_num_rows(m_tunnel, virt_res) == -1) 
+			return OnError();
+
+		no_rows =  mysql_num_rows(virt_res);
+
+		if(isvirtual != NULL)
+		{
+		free(isvirtual);
+		isvirtual = NULL;
+		}
+		isvirtual = (wyBool *)calloc(no_rows,sizeof(wyBool));
+		
+		virt_row = sja_mysql_fetch_row(m_tunnel, virt_res);
+		while(virt_row)
+		{
+			if(strstr(virt_row[5], "VIRTUAL") || strstr(virt_row[5], "PERSISTENT") || strstr(virt_row[5], "STORED"))
+			{
+				isvirtual[l++] = wyTrue;
+				m_completeinsert = wyTrue;
+			}
+			else
+			{
+				isvirtual[l++]= wyFalse;
+			}
+			virt_row = sja_mysql_fetch_row(m_tunnel, virt_res);
+		}
+		
+		sja_mysql_free_result(m_tunnel, virt_res);
+		
+		//-------------------------------isvirtual[] filled end -----------------------------------------//
+	
+
     do{
 		m_startrow = m_endrow;
 		m_endrow += m_chunklimit;
@@ -3942,10 +3988,10 @@ MySQLDump::DumpTableDataRows(wyString * buffer, MYSQL_ROW *row, const wyChar *db
 
 		fcount = sja_mysql_num_fields(m_tunnel, res);	//counts number of fields
 
-		if(m_startrow == wyFalse && TableHeader(buffer, db, table, fcount, rcount ,res) == wyFalse)
+		if(m_startrow == wyFalse && TableHeader(buffer, db, table, fcount, rcount ,res,isvirtual) == wyFalse)
 			return wyFalse;
 
-        DumpTableDataAllRows(buffer, row, res, db, table, &fcount, rcount, intable);
+        DumpTableDataAllRows(buffer, row, res, db, table, &fcount, rcount, intable, isvirtual);
 								
 		sja_mysql_free_result(m_tunnel, res);
 	
@@ -3958,12 +4004,17 @@ MySQLDump::DumpTableDataRows(wyString * buffer, MYSQL_ROW *row, const wyChar *db
 	while( m_endrow < m_rowcount && (m_tunnel->IsTunnel() || (!m_tunnel->IsTunnel() && 
 			(m_chunkinsert == wyTrue && m_chunklimit != 0))));
 
+	if(isvirtual != NULL)
+		{
+		free(isvirtual);
+		isvirtual = NULL;
+		}
     return wyTrue;
 }
 
 wyBool
 MySQLDump::DumpTableDataAllRows(wyString * buffer, MYSQL_ROW *row, MYSQL_RES *res, const wyChar *db, 
-								const wyChar *table, wyInt32 *fcount, wyInt32 rcount, wyBool intable)
+								const wyChar *table, wyInt32 *fcount, wyInt32 rcount, wyBool intable, wyBool *isvirtual)
 {
     wyUInt32		startpos = 0;
 	wyString        temp;
@@ -3976,7 +4027,7 @@ MySQLDump::DumpTableDataAllRows(wyString * buffer, MYSQL_ROW *row, MYSQL_RES *re
         if(IsExportingStopped() == wyTrue)
             break;
 		
-		if(CheckQueryLength(buffer, db, table, res, *fcount) == wyFalse)
+		if(CheckQueryLength(buffer, db, table, res, *fcount, isvirtual) == wyFalse)
 			return wyFalse;
 
 		startpos++;
@@ -4020,13 +4071,13 @@ MySQLDump::DumpTableDataAllRows(wyString * buffer, MYSQL_ROW *row, MYSQL_RES *re
 					buffer->Add(temp.GetString());
 				}
 				else
-			 		CompleteInsert(buffer, db, res, table, *fcount);
+			 		CompleteInsert(buffer, db, res, table, *fcount,isvirtual);
 
 				m_basicquery = wyTrue;
 			}
 		}
 					
-		if(PrintFieldValue(buffer, res, *row, *fcount) == wyFalse)
+		if(PrintFieldValue(buffer, res, *row, *fcount,isvirtual) == wyFalse)
 			return wyFalse;
 		
 		if(startpos == (wyUInt32)rcount)
@@ -4060,10 +4111,10 @@ MySQLDump::DumpTableDataAllRows(wyString * buffer, MYSQL_ROW *row, MYSQL_RES *re
    is wyTrue.*/
 
 wyBool
-MySQLDump::CompleteInsert(wyString * buffer, const wyChar *db, MYSQL_RES *res ,const wyChar *table , wyInt32 fcount)
+MySQLDump::CompleteInsert(wyString * buffer, const wyChar *db, MYSQL_RES *res ,const wyChar *table , wyInt32 fcount, wyBool*isvirtual)
 {	
 	MYSQL_FIELD	*field = NULL;
-	wyInt32     startpos = 0;
+	wyInt32     startpos = 0, firstcol = 0;
 	wyChar		*tablech = NULL;
 	wyString    temp;
 
@@ -4094,18 +4145,21 @@ MySQLDump::CompleteInsert(wyString * buffer, const wyChar *db, MYSQL_RES *res ,c
 
 	while(field = sja_mysql_fetch_field(m_tunnel, res))
 	{ 
-		if(!field->name)
-			continue;
+		if(!field->name || isvirtual[startpos++]==1)
+		{
+		continue;
+		}
+
+		if(firstcol>0){
+		buffer->Add(",");
+		}
 
 		//Back quotes with field names
 		m_insertcountcomplete = m_insertcountcomplete + temp.Sprintf("`%s`", field->name);
 	    
 		buffer->Add(temp.GetString());
 
-		if(++startpos == fcount)
-			break;
-
-		buffer->Add(",");
+		firstcol++;
 	}
 
 	m_insertcountcomplete = m_insertcountcomplete + temp.SetAs( ") values ") +(fcount -1);

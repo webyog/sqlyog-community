@@ -73,6 +73,8 @@ struct FIELDATTRIBS
     wyString                m_comment;                  /// column comment
 	wyString                m_virtuality;               //for mariadb virtual/persistent columns
 	wyString                m_expression;               //expression for virtual coloumn.
+	wyString                m_mysqlvirtuality;               //for mysql virtual/stored columns
+	wyString                m_mysqlexpression;               //expression for virtual coloumn.
     struct FIELDATTRIBS*    m_next;                     /// pointer to the next FIELDATTRIBS struct elem
 };
 
@@ -145,6 +147,9 @@ public:
     wyBool                      m_ismysql41;
 	//is mariadb version>=5.2
 	wyBool                     m_ismariadb52;
+
+	//is mysql version>=5.7
+	wyBool                     m_ismysql57;
 
     /// Flag used to check one auto increment field selected
 	wyBool			            m_autoincrpresent;

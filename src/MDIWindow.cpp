@@ -2191,21 +2191,43 @@ MDIWindow::SaveAsFile()
 wyBool
 MDIWindow::HandleFileOpen(wyInt32 filetype, wyBool issametab)
 {
-	wyInt32			ret = 0;
+	wyInt32			ret = 0, length;
     wyBool          retval = wyFalse;
 	wyWChar			openfilename[MAX_PATH + 1] = {0};
-	wyString		filename;
+	wyString		filename,fn,finalerrormessage;
+	wchar_t*		ptr;
 			
 	//Get File 'open' dialog
-	ret = InitOpenFile(m_hwnd, openfilename, filetype, MAX_PATH);
+	ret = InitOpenFile(m_hwnd, openfilename, filetype, MAX_PATH,wyTrue);
 
 	if(!ret)
 		return wyFalse;
 	
+	finalerrormessage.SetAs("");
+	ptr = openfilename;
 	filename.SetAs(openfilename);
+	length=lstrlen(openfilename);
 
-	retval = OpenFileinTab(&filename, issametab);
+	ptr[length] = 0;
+	ptr += length+1;
 
+	if(!(*ptr))
+	{
+	retval = OpenFileinTab(&filename, &finalerrormessage, issametab);
+	}
+
+	//When Multiple files are selected
+	while (*ptr)
+	{
+	fn.SetAs(filename);
+	fn.AddSprintf("\\%ls",ptr);
+	retval = OpenFileinTab(&fn, &finalerrormessage, issametab);
+	ptr += (lstrlenW(ptr)+1);
+	}
+	//End Loop
+	
+	if(finalerrormessage.GetLength())
+	yog_message(NULL, finalerrormessage.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONERROR | MB_OK | MB_TASKMODAL);
 	return retval;	
 }
 
@@ -2216,7 +2238,7 @@ MDIWindow::HandleFileOpen(wyInt32 filetype, wyBool issametab)
 - isrecentfiles: This sets wyTrue when used 'Recent Files' menu
 */
 wyBool
-MDIWindow::OpenFileinTab(wyString *filename, wyBool issametab, wyBool isrecentfiles)
+MDIWindow::OpenFileinTab(wyString *filename, wyString *finalerrormessage, wyBool issametab, wyBool isrecentfiles)
 {
 	wyBool			retval = wyFalse;
 	wyInt32			sel = 0;
@@ -2244,7 +2266,7 @@ MDIWindow::OpenFileinTab(wyString *filename, wyBool issametab, wyBool isrecentfi
 
 		default:        
 			{
-				retval = OpenSQLFile(filename, issametab, isrecentfiles);
+				retval = OpenSQLFile(filename,finalerrormessage, issametab, isrecentfiles);
 				break;
 			}		
 	}
@@ -2346,7 +2368,7 @@ MDIWindow::OpenSchemaFile(wyString *filename, wyBool issametab, wyBool isrecentf
 
 // This function opens the SQL file asked from user and copies its content in the edit box.
 wyBool
-MDIWindow::OpenSQLFile(wyString *filename, wyBool issametab, wyBool isrecentfiles)
+MDIWindow::OpenSQLFile(wyString *filename, wyString *finalerrormessage, wyBool issametab, wyBool isrecentfiles)
 {
 	HANDLE			hfile;
     EditorBase		*peditorbase;
@@ -2370,7 +2392,8 @@ MDIWindow::OpenSQLFile(wyString *filename, wyBool issametab, wyBool isrecentfile
 
 	if(hfile == INVALID_HANDLE_VALUE)
 	{
-        DisplayErrorText(GetLastError(), _("Could not open file."), peditorbase->m_hwnd);
+       /* DisplayErrorText(GetLastError(), _("Could not open file."), peditorbase->m_hwnd);*/
+		CombineErrorText(GetLastError(), _("Could not open file."), peditorbase->m_hwnd, finalerrormessage,filename->GetString());
 		return wyFalse;
 	}
 	

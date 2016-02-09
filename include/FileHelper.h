@@ -43,7 +43,7 @@ wyBool InitFile(HWND hwnd, wyWChar *filename, wyInt32 filter, wyInt32 bufsize, w
 @param bufsize		: IN Size of the buffer
 @returns wyBool, wyTrue if success, otherwise wyFalse
 */
-wyBool InitOpenFile(HWND hwnd, wyWChar *filename, wyInt32 filter, wyInt32 bufsize);
+wyBool InitOpenFile(HWND hwnd, wyWChar *filename, wyInt32 filter, wyInt32 bufsize, wyBool ismainwnd = wyFalse);
 
 /// Overloaded function for the InitOpenFile for handling wyString data type
 /**
@@ -53,7 +53,7 @@ wyBool InitOpenFile(HWND hwnd, wyWChar *filename, wyInt32 filter, wyInt32 bufsiz
 @param bufsize		: IN Size of the buffer
 @returns wyBool, wyTrue if success, otherwise wyFalse
 */
-wyBool InitOpenFile(HWND hwnd, wyString &filename, wyInt32 filter, wyInt32 bufsize);
+wyBool InitOpenFile(HWND hwnd, wyString &filename, wyInt32 filter, wyInt32 bufsize, wyBool ismainwnd = wyFalse);
 
 
 /// Displays a dialog box enabling the user to select a folder

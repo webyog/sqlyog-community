@@ -33,7 +33,7 @@ Author: Vishal P.R, Janani SriGuha
 #endif
 #include "BlobMgmt.h"
 #include "EditorFont.h"
-
+#include "ClientMySQLWrapper.h"
 #define	DEFAULT_FIELD_SIZE  2
 #define	CHARSET_NUMBER      63
 #define MAXSIZE             1600000
@@ -952,6 +952,32 @@ DataView::IsColumnReadOnly(wyInt32 col)
     return wyTrue;
 }
 
+//function to check whether a column is virtual or not
+wyBool 
+DataView::IsColumnVirtual(wyInt32 col)
+{
+    wyString query,db, table,column;
+	MYSQL_RES  *fieldres = NULL;
+	wyBool flag = wyFalse;
+
+    //get the db and table name 
+    if(GetDBName(db, col) == wyTrue && GetTableName(table, col) == wyTrue && GetColumnName(column, col) == wyTrue)
+    {
+		query.Sprintf("show full fields from `%s`.`%s` WHERE FIELD=\"%s\" AND (Extra LIKE \"%%VIRTUAL%%\" OR Extra LIKE \"%%STORED%%\" OR Extra LIKE \"%%PERSISTENT%%\")", db.GetString(), table.GetString(),column.GetString());
+		fieldres = SjaExecuteAndGetResult(m_wnd->m_tunnel,&m_wnd->m_mysql,query);
+
+		if(fieldres)
+		{
+			if(fieldres->row_count == 1)
+				flag = wyTrue;
+
+		m_wnd->m_tunnel->mysql_free_result(fieldres);
+		}
+		
+    }
+	return flag;
+}
+
 //function to check whether a column is of type binary
 wyBool 
 DataView::IsBinary(wyInt32 col)
@@ -1000,7 +1026,7 @@ DataView::AddDataToQuery(MYSQL_ROW data, wyString &query, const wyChar* delimite
     for(; i < max; i++)
     {
         //we ignore readonly columns
-        if(IsColumnReadOnly(i) == wyFalse)
+        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) == wyFalse )
         {
             isblob = IsBinary(i);
             GetColumnName(colname, i);
@@ -1073,7 +1099,7 @@ DataView::GenerateInsertQuery(wyString &query)
         myrow = m_data->m_rowarray->GetRowExAt(m_data->m_modifiedrow)->m_row;
 
         //ignore readonly columns and columns that are same        
-        if(IsColumnReadOnly(i) == wyFalse && (!m_data->m_oldrow || m_data->m_oldrow->m_row[i] != myrow[i] || fieldarray[i]))        
+        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) == wyFalse && (!m_data->m_oldrow || m_data->m_oldrow->m_row[i] != myrow[i] || fieldarray[i]))        
         {
             if(!fieldarray[i] && m_data->m_oldrow && m_data->m_oldrow->m_row[i] && myrow[i] && !strcmp(m_data->m_oldrow->m_row[i], myrow[i]))            
             {                
@@ -1105,7 +1131,7 @@ DataView::GenerateInsertQuery(wyString &query)
     for(i = 0, k = 0; i < m_data->m_datares->field_count; i++)
 	{
         //ignore readonly columns
-        if(IsColumnReadOnly(i) == wyFalse && fieldarray[i])
+        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) == wyFalse && fieldarray[i])
         {
             if(k++)
             {
@@ -3276,7 +3302,7 @@ DataView::HandleBlobValue(WPARAM wparam, LPARAM lparam)
     pib.m_data = GetCellValue(row, col, &len, wyFalse);
 
     //check whether the column is readonly or not
-    isedit = IsColumnReadOnly(col) ? wyFalse : wyTrue;
+    isedit = (IsColumnReadOnly(col) || IsColumnVirtual(col) )? wyFalse : wyTrue;
 	
 	//if chardown is true then lparam = 1, else 0.
 	if(!pib.m_data)
@@ -6473,7 +6499,7 @@ DataView::UpdateRow()
 
     for(i = 0; pkcount && i < m_data->m_datares->field_count; ++i)
     {
-        if(IsColumnReadOnly(i) == wyFalse)
+        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) == wyFalse)
         {
             GetColumnName(colname, i);
 
@@ -7441,12 +7467,12 @@ DataView::GridWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
         //whether to draw white background
         case GVN_ISWHITEBKGND:
             //if the column is readonly then we dont draw white background
-            return pviewdata->IsColumnReadOnly(lparam) ? FALSE : TRUE;
+            return (pviewdata->IsColumnReadOnly(lparam)||pviewdata->IsColumnVirtual(lparam)) ? FALSE : TRUE;
 	
         //begin label edit
 	    case GVN_BEGINLABELEDIT:
             //allow only if the column is not read-only
-            if(pviewdata->IsColumnReadOnly(lparam))
+            if(pviewdata->IsColumnReadOnly(lparam)||pviewdata->IsColumnVirtual(lparam))
             {
                 return FALSE;
             }
@@ -7573,7 +7599,7 @@ void
 DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
 {
     HMENU       hmenu, htrackmenu;
-    wyBool      iscolreadonly = wyTrue, iscolnullable = wyFalse, iscolhasdefault = wyFalse;
+    wyBool      iscolreadonly = wyTrue,iscolvirtual = wyFalse, iscolnullable = wyFalse, iscolhasdefault = wyFalse;
     wyString    column;
     wyInt32     copymenupos = 14,i;
     HWND        hwndtoolbar;
@@ -7636,7 +7662,7 @@ DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
                     GetColumnName(column, col);
 
                     //if the column is not read-only
-                    if((iscolreadonly = IsColumnReadOnly(col)) == wyFalse)
+                    if((iscolreadonly = IsColumnReadOnly(col)) == wyFalse && (iscolvirtual = IsColumnVirtual(col)) == wyFalse )
                     {
                         //check whether the column is nullable
                         iscolnullable = IsNullable(m_wnd->m_tunnel, m_data->m_fieldres, (wyChar*)column.GetString());
@@ -7648,7 +7674,7 @@ DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
             }
 
             //enable/disable the menu items
-            EnableMenuItem(htrackmenu, IDC_SETEMPTY, iscolreadonly == wyTrue ? MF_GRAYED : MF_ENABLED);
+            EnableMenuItem(htrackmenu, IDC_SETEMPTY, iscolreadonly == wyTrue||iscolvirtual == wyTrue? MF_GRAYED : MF_ENABLED);
             EnableMenuItem(htrackmenu, IDC_SETNULL, iscolnullable == wyFalse ? MF_GRAYED : MF_ENABLED);
             EnableMenuItem(htrackmenu, IDC_SETDEF, iscolhasdefault == wyFalse ? MF_GRAYED : MF_ENABLED); 
 

@@ -362,7 +362,7 @@ private:
 	@returns wyTrue on successful deletion else wyFalse
 	*/
     wyBool              DumpTableDataAllRows(wyString * buffer, MYSQL_ROW *row, MYSQL_RES *res, const wyChar *db, const wyChar *table, 
-                                                wyInt32 *fcount, wyInt32 rcount, wyBool intable);
+                                                wyInt32 *fcount, wyInt32 rcount, wyBool intable,wyBool *isvirtual);
 
 	/// Executes the Single transaction statement
 	/**
@@ -481,7 +481,7 @@ private:
 	/* flags for mysql dump */
 
 	/// Flag to write use db stmt. in the file
-	wyBool			m_usedb;		
+	wyBool			m_usedb;	
 
 	/// Flag to set fk_checks = 0 and 1
 	wyBool			m_setfkchecks;	
@@ -1388,7 +1388,7 @@ private:
 	@param fcount		: IN Field count
 	@returns wyTrue
 	*/
-	wyBool  	PrintFieldValue(wyString * buffer, MYSQL_RES *res, MYSQL_ROW row, wyInt32 fcount);
+	wyBool  	PrintFieldValue(wyString * buffer, MYSQL_RES *res, MYSQL_ROW row, wyInt32 fcount,wyBool *isvirtual);
 
 	/// This function prints Database related header information 
     /// to the export file 
@@ -1419,7 +1419,7 @@ private:
 	@param rcount		: IN Row count
 	@param res			: IN Mysql result set
 	*/
-	wyBool  	TableHeader(wyString * buffer, const wyChar * db, const wyChar * table,wyInt32 fcount, wyUInt32 rcount, MYSQL_RES * res);
+	wyBool  	TableHeader(wyString * buffer, const wyChar * db, const wyChar * table,wyInt32 fcount, wyUInt32 rcount, MYSQL_RES * res,wyBool *isvirtual);
 
 	/// Dumps the selected tables
 	/**
@@ -1494,7 +1494,7 @@ private:
 	@param fieldcount	: INNumber of fields
 	@returns wyTrue on success else wyFalse
 	*/
-	wyBool  	CompleteInsert(wyString * buffer, const wyChar * db, MYSQL_RES * res ,const wyChar * table ,wyInt32 fcount);
+	wyBool  	CompleteInsert(wyString * buffer, const wyChar * db, MYSQL_RES * res ,const wyChar * table ,wyInt32 fcount,wyBool *isvirtual);
 
 	/// Checks and determines the query length
 	/**
@@ -1505,7 +1505,7 @@ private:
 	@param fieldcount	: IN Number of fields
 	@returns wyTrue on length within limit else wyFalse
 	*/
-	wyBool	    CheckQueryLength(wyString * buffer, const wyChar * db, const wyChar * table, MYSQL_RES * q_res, wyInt32 fieldcount);
+	wyBool	    CheckQueryLength(wyString * buffer, const wyChar * db, const wyChar * table, MYSQL_RES * q_res, wyInt32 fieldcount,wyBool *isvirtual);
 
 	/// This function gets row count
 	/**

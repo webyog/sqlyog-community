@@ -547,6 +547,16 @@ wyBool	OverWriteFile(HWND hwnd, const wyWChar * file);
 */
 void DisplayErrorText(wyUInt32 dwlasterror, const wyChar *extratext, HWND hwnd = NULL);
 
+// Function to combine all the error message into one finalmessage
+/**
+@param dwlasterror	: IN Last error
+@param extratext	: IN Extra text to be printed along with the 
+@param hwnd         : IN handle to the parent window
+@returns void
+*/
+void
+CombineErrorText(wyUInt32 dwlasterror, const wyChar *extratext, HWND hwnd, wyString *finalmessage, wyString filename);
+
 /// Initializes the connection info structure
 /**
 @param con  : IN structure to initialize

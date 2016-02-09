@@ -78,7 +78,7 @@ InitFile(HWND hwnd, wyWChar* filename, wyInt32 filter, wyInt32 bufsize, wyUInt32
 }
 
 wyBool 
-InitOpenFile(HWND hwnd, wyString &filename, wyInt32 filter, wyInt32 bufsize)
+InitOpenFile(HWND hwnd, wyString &filename, wyInt32 filter, wyInt32 bufsize, wyBool ismainwnd)
 {
     wyWChar     file[MAX_PATH] = {0};
     wyBool      ret;
@@ -90,7 +90,7 @@ InitOpenFile(HWND hwnd, wyString &filename, wyInt32 filter, wyInt32 bufsize)
 }
 
 wyBool 
-InitOpenFile(HWND hwnd, wyWChar *filename, wyInt32 filter, wyInt32 bufsize)
+InitOpenFile(HWND hwnd, wyWChar *filename, wyInt32 filter, wyInt32 bufsize, wyBool ismainwnd)
 {
 	OPENFILENAME openfilename;
 
@@ -130,10 +130,15 @@ InitOpenFile(HWND hwnd, wyWChar *filename, wyInt32 filter, wyInt32 bufsize)
 									(filter == SESSIONINDEX)?(L"ysav"):
 									(filter == EXCELINDEX)?(L"xls"):(NULL);
 
-	openfilename.Flags             = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST;
+	if(ismainwnd == wyTrue)
+		openfilename.Flags             = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_ALLOWMULTISELECT | OFN_EXPLORER;
 
+	else
+		openfilename.Flags             = OFN_HIDEREADONLY | OFN_PATHMUSTEXIST;
+	
 	if(GetOpenFileName(&openfilename))
 		return wyTrue;
+
 	else
         return wyFalse;
 }

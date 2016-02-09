@@ -1120,7 +1120,7 @@ const char *ptr = strstr(currentrow,find);
 if(ptr) {
 	found=wyTrue;
   int index = ptr - currentrow+2;
-   while(currentrow[index]!='P'&& currentrow[index]!='V' )
+   while(currentrow[index]!='S'&& currentrow[index]!='P'&& currentrow[index]!='V' )
    {
 	   expression->AddSprintf("%c",currentrow[index]);
    

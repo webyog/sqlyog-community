@@ -1246,6 +1246,9 @@ class DataView
         @returns wyTrue if it is readonly otherwise wyFalse
         */
         wyBool                  IsColumnReadOnly(wyInt32 col);
+
+		//function to check whether a column is virtual or not
+		wyBool					IsColumnVirtual(wyInt32 col);
     
         ///Generic function to add data to query, for update, delete and duplicate check
         /**

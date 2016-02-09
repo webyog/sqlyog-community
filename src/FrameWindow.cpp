@@ -4577,7 +4577,7 @@ FrameWindow::InsertFromLatestFile(wyInt32 id, MDIWindow * pcquerywnd)
 	wyWChar     filename[MAX_PATH+1]={0};
     HMENU	    hmenu, hsubmenu;	
     wyBool      retval = wyFalse;
-	wyString    recfilename;
+	wyString    recfilename,finalerrormessage;
 
 	VERIFY(hmenu  = GetMenu(m_hwndmain));
 	// First get the maximized state of the window,
@@ -4597,9 +4597,12 @@ FrameWindow::InsertFromLatestFile(wyInt32 id, MDIWindow * pcquerywnd)
 	
 		recfilename.SetAs(filename+3); //to avoid recent index num, just incriment to +3
 		
-		retval = pcquerywnd->OpenFileinTab(&recfilename, wyFalse, wyTrue);
+		retval = pcquerywnd->OpenFileinTab(&recfilename,&finalerrormessage, wyFalse, wyTrue);
 		VERIFY(SetCursor(LoadCursor(NULL, IDC_ARROW)));
 	}	
+
+	if(finalerrormessage.GetLength())
+	yog_message(NULL, finalerrormessage.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONERROR | MB_OK | MB_TASKMODAL);
 
 	return retval;
 }
