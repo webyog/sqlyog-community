@@ -507,7 +507,7 @@ void
 ResultView::EndTableComboChange(ThreadExecStatus te)
 {
     ResultTabTableElem* pelem;
-    wyInt32             row, prevseltable, rowcount, temp;
+    wyInt32             row, prevseltable, rowcount, temp,no_row;
     HWND                hwndfocus = GetActiveDispWindow();
 
     //if the operation was succesfull
@@ -567,6 +567,16 @@ ResultView::EndTableComboChange(ThreadExecStatus te)
 
                 return;
             }
+
+			no_row = m_wnd->m_tunnel->mysql_num_fields(m_mydata->m_datares);
+
+			if(!m_data->m_colvirtual)
+			{
+				m_data->m_colvirtual = (wyInt32*)calloc(no_row, sizeof(wyInt32));
+				memset(m_data->m_colvirtual,-1,no_row * sizeof(wyInt32));
+			}
+
+			
 
             //we are here means, the operation was succesful
 
@@ -816,7 +826,7 @@ ResultView::RefreshDataView()
     wyString        query;
     wyInt32         ret;
     MySQLDataEx*    pdata;
-
+    
     //set the query
     query.SetAs(m_mydata->GetQuery());
 

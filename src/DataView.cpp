@@ -84,6 +84,7 @@ MySQLDataEx::Initialize()
 	m_datares = NULL;
 	m_keyres = NULL;
 	m_fieldres = NULL;
+	m_colvirtual = NULL;
 	m_oldrow = NULL;	
 	m_modifiedrow = -1;
 	m_checkcount = 0;
@@ -136,6 +137,12 @@ MySQLDataEx::FreeAllocatedResources()
         m_oldrow = NULL;
     }
 
+	if(m_colvirtual)
+    {
+        delete m_colvirtual;
+        m_colvirtual = NULL;
+    }
+
     //free warnings
     if(m_warningres)
     {
@@ -168,6 +175,7 @@ MySQLDataEx::Free()
     {
 	    m_pmdi->m_tunnel->mysql_free_result(m_fieldres);
     }
+
 
     //free key result
     if(m_keyres)
@@ -953,29 +961,49 @@ DataView::IsColumnReadOnly(wyInt32 col)
 }
 
 //function to check whether a column is virtual or not
-wyBool 
+wyInt32 
 DataView::IsColumnVirtual(wyInt32 col)
 {
     wyString query,db, table,column;
 	MYSQL_RES  *fieldres = NULL;
-	wyBool flag = wyFalse;
 
-    //get the db and table name 
-    if(GetDBName(db, col) == wyTrue && GetTableName(table, col) == wyTrue && GetColumnName(column, col) == wyTrue)
-    {
-		query.Sprintf("show full fields from `%s`.`%s` WHERE FIELD=\"%s\" AND (Extra LIKE \"%%VIRTUAL%%\" OR Extra LIKE \"%%STORED%%\" OR Extra LIKE \"%%PERSISTENT%%\")", db.GetString(), table.GetString(),column.GetString());
-		fieldres = SjaExecuteAndGetResult(m_wnd->m_tunnel,&m_wnd->m_mysql,query);
-
-		if(fieldres)
+	if(m_data->m_colvirtual)
+	{
+		if(m_data->m_colvirtual[col]!=-1)
 		{
-			if(fieldres->row_count == 1)
-				flag = wyTrue;
-
-		m_wnd->m_tunnel->mysql_free_result(fieldres);
+			return m_data->m_colvirtual[col];
 		}
+
+		else
+		{
+			//get the db and table name 
+			if(GetDBName(db, col) == wyTrue && GetTableName(table, col) == wyTrue && GetColumnName(column, col) == wyTrue)
+			 {
+				query.Sprintf("show full fields from `%s`.`%s` WHERE FIELD=\"%s\" AND (Extra LIKE \"%%VIRTUAL%%\" OR Extra LIKE \"%%STORED%%\" OR Extra LIKE \"%%PERSISTENT%%\")", db.GetString(), table.GetString(),column.GetString());
+				fieldres = SjaExecuteAndGetResult(m_wnd->m_tunnel,&m_wnd->m_mysql,query);
+
+				if(fieldres)
+				{
+					if(fieldres->row_count == 1)
+						{
+							m_data->m_colvirtual[col] = 1;
+						}
+					else
+						{
+							m_data->m_colvirtual[col] = 0;
+						}
+
+				m_wnd->m_tunnel->mysql_free_result(fieldres);
+				}
 		
-    }
-	return flag;
+			}
+		
+		}
+
+	}
+    
+	else
+		return 0;
 }
 
 //function to check whether a column is of type binary
@@ -7223,7 +7251,7 @@ DataView::GetTableDetails()
 {
     wyString    query;
     MYSQL_RES   *myres = NULL, *fieldres = NULL, *keyres = NULL;
-    MYSQL_ROW   myrow;
+    MYSQL_ROW   myrow=NULL;
 
     //we can be sure that the form view need to be refreshed
     SetRefreshStatus(wyTrue, FORMVIEW_REFRESHED);
@@ -7274,6 +7302,7 @@ DataView::GetTableDetails()
         m_wnd->m_tunnel->mysql_free_result(myres);
         return TE_ERROR;
     }
+
 
     //get the key res
     query.Sprintf("show keys from `%s`.`%s`", m_data->m_db.GetString(), m_data->m_table.GetString());
@@ -7467,15 +7496,26 @@ DataView::GridWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
         //whether to draw white background
         case GVN_ISWHITEBKGND:
             //if the column is readonly then we dont draw white background
-            return (pviewdata->IsColumnReadOnly(lparam)||pviewdata->IsColumnVirtual(lparam)) ? FALSE : TRUE;
-	
-        //begin label edit
-	    case GVN_BEGINLABELEDIT:
-            //allow only if the column is not read-only
-            if(pviewdata->IsColumnReadOnly(lparam)||pviewdata->IsColumnVirtual(lparam))
+            if(pviewdata->IsColumnReadOnly(lparam))
             {
                 return FALSE;
             }
+			if(pviewdata->IsColumnVirtual(lparam)==1)
+			{
+				return FALSE;
+			}
+			return TRUE;
+        //begin label edit
+	    case GVN_BEGINLABELEDIT:
+            //allow only if the column is not read-only
+            if(pviewdata->IsColumnReadOnly(lparam))
+            {
+                return FALSE;
+            }
+			if(pviewdata->IsColumnVirtual(lparam)==1)
+			{
+			return FALSE;
+			}
 
 		    pviewdata->OnGvnBeginLabelEdit(wparam, lparam);
 		    return TRUE;
@@ -7599,9 +7639,9 @@ void
 DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
 {
     HMENU       hmenu, htrackmenu;
-    wyBool      iscolreadonly = wyTrue,iscolvirtual = wyFalse, iscolnullable = wyFalse, iscolhasdefault = wyFalse;
+    wyBool      iscolreadonly = wyTrue, iscolnullable = wyFalse, iscolhasdefault = wyFalse;
     wyString    column;
-    wyInt32     copymenupos = 14,i;
+    wyInt32     copymenupos = 14,i,iscolvirtual=0;
     HWND        hwndtoolbar;
 	wyBool		isunsort = wyFalse;
 
@@ -7662,7 +7702,7 @@ DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
                     GetColumnName(column, col);
 
                     //if the column is not read-only
-                    if((iscolreadonly = IsColumnReadOnly(col)) == wyFalse && (iscolvirtual = IsColumnVirtual(col)) == wyFalse )
+                    if((iscolreadonly = IsColumnReadOnly(col)) == wyFalse && (iscolvirtual = IsColumnVirtual(col)) == 0 )
                     {
                         //check whether the column is nullable
                         iscolnullable = IsNullable(m_wnd->m_tunnel, m_data->m_fieldres, (wyChar*)column.GetString());

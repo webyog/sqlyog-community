@@ -300,6 +300,9 @@ class MySQLDataEx
         //Currently selected column, valid only when setting/resetting/refreshing the data
         wyInt32		        m_selcol;
 
+		//whether column is virtual or not
+        wyInt32*		        m_colvirtual;
+
         //Active database
         wyString		    m_db;
 
@@ -1248,7 +1251,7 @@ class DataView
         wyBool                  IsColumnReadOnly(wyInt32 col);
 
 		//function to check whether a column is virtual or not
-		wyBool					IsColumnVirtual(wyInt32 col);
+		wyInt32					IsColumnVirtual(wyInt32 col);
     
         ///Generic function to add data to query, for update, delete and duplicate check
         /**

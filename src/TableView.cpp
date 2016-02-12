@@ -331,8 +331,9 @@ wyInt32
 TableView::ExecuteTableData()
 {
 	wyString        query;
-    wyInt32         ret;
+    wyInt32         ret,extraindex,j=0,no_row;
     MySQLDataEx*    pdata;
+	MYSQL_ROW        fieldrow;
 
     query.Sprintf("select * from `%s`.`%s`", m_mydata->m_db.GetString(), m_mydata->m_table.GetString());
 
@@ -368,6 +369,23 @@ TableView::ExecuteTableData()
         delete pdata;
         return ret;
     }
+	extraindex = GetFieldIndex(m_wnd->m_tunnel, m_data->m_fieldres, "Extra");
+	no_row = m_wnd->m_tunnel->mysql_num_rows(m_data->m_fieldres);
+	m_data->m_colvirtual = (wyInt32*)calloc(no_row, sizeof(wyInt32));
+
+	while(fieldrow = m_wnd->m_tunnel->mysql_fetch_row(m_data->m_fieldres)){
+
+	if(!strstr(fieldrow[extraindex], "VIRTUAL") && !strstr(fieldrow[extraindex], "PERSISTENT") && !strstr(fieldrow[extraindex], "STORED"))
+		{
+			m_data->m_colvirtual[j++] = 0;
+		}
+
+		else 
+		{
+			m_data->m_colvirtual[j++] = 1;
+		}
+	
+	}
 
     //add new row in the end
     AddNewRow();

@@ -2299,12 +2299,17 @@ CopyDatabase::ExportData(LPGUI_COPYDB_UPDATE_ROUTINE gui_routine, void * lpParam
 	RelTableFldInfo      *table;
 	HWND				  hwndtree = NULL;
 	HTREEITEM			  hrootitem = NULL;
-	wyInt32				  bulksize = 0;
+	wyInt32				  bulksize = 0,j=0;
 	wyString			  msg;
 	wyUInt32			  maxallowedsize = 0;
 	
     m_gui_routine = gui_routine;
     m_gui_lparam = lpParam;
+	MYSQL_RES   *virt_res = NULL;
+	MYSQL_ROW	virt_row;
+	wyBool *isvirtual = NULL;
+	wyInt32    no_rows;	
+    wyString   virt_query;
 
 	if(m_exportdata == wyTrue)//Checking struct & data option selected
 	{
@@ -2374,10 +2379,52 @@ CopyDatabase::ExportData(LPGUI_COPYDB_UPDATE_ROUTINE gui_routine, void * lpParam
 		if(ret == wyFalse || (IsCopyStopped() == wyTrue))
 				return ret;		
 		
+		
 		if(m_exportdata == wyTrue)
         {
 			m_copiedcount = 0;
-			ret = ExportActualData((wyChar*)table->m_tablefld.GetString());
+
+		//---------------------------Virtuality------------------------------//
+			
+			virt_query.Sprintf("SHOW FIELDS FROM `%s`.`%s`",m_srcdb.GetString(), table->m_tablefld.GetString());
+			virt_res = SjaExecuteAndGetResult(m_newsrctunnel, &m_newsrcmysql, virt_query);
+			no_rows =  m_newsrctunnel->mysql_num_rows(virt_res);
+
+			if(!virt_res  && no_rows == -1) 
+			{
+			ShowMySQLError(m_hwnddlg, m_newsrctunnel, &m_newsrcmysql);
+			return wyFalse;
+			}
+			
+			isvirtual = (wyBool *)calloc(no_rows,sizeof(wyBool));
+		
+			virt_row = m_newsrctunnel->mysql_fetch_row(virt_res);
+			j=0;
+			while(virt_row)
+			{
+				if(strstr(virt_row[5], "VIRTUAL") || strstr(virt_row[5], "PERSISTENT") || strstr(virt_row[5], "STORED"))
+				{
+				isvirtual[j++] = wyTrue;
+				}
+				else
+				{
+				isvirtual[j++]= wyFalse;
+				}
+				virt_row = sja_mysql_fetch_row(m_newsrctunnel, virt_res);
+			}
+		
+			m_newsrctunnel->mysql_free_result(virt_res);
+	//-------------------------------------Virtuality----------------------------//
+
+
+			ret = ExportActualData((wyChar*)table->m_tablefld.GetString(),isvirtual);
+
+			
+			if(isvirtual != NULL)
+			{
+			free(isvirtual);
+			isvirtual = NULL;
+			}
 
 			//for showing the total no of rows copied in a table
 			m_gui_routine((void*)m_gui_lparam,(wyChar*)table->m_tablefld.GetString(), m_copiedcount, wyTrue, TABLECOPIED );	
@@ -2968,7 +3015,7 @@ CopyDatabase::ExecuteInsertQuery(MYSQL_RES *myres, wyString &insertstmt, wyChar 
 // usung these function getting single insert or bulkinsert(adding row values to the query)
 void
 CopyDatabase::GetInsertQuery(MYSQL_RES *myres, MYSQL_ROW myrow, wyString &insertstmt, wyInt32 nfilelds, 
-							 wyBool ismysql41)
+							 wyBool ismysql41,wyBool *isvirtual)
 {
 	wyULong        *lengths;
 	wyChar          *temp;
@@ -2980,6 +3027,9 @@ CopyDatabase::GetInsertQuery(MYSQL_RES *myres, MYSQL_ROW myrow, wyString &insert
 
     for(j = 0; j < nfilelds; j++)
 	{
+		if(isvirtual[j]==wyTrue)
+			continue;
+	
 		VERIFY(myfield = m_newsrctunnel->mysql_fetch_field_direct(myres, j));
 		// Write NULL if NULL value.
 		if(myrow[j] == NULL)
@@ -3025,7 +3075,7 @@ CopyDatabase::GetInsertQuery(MYSQL_RES *myres, MYSQL_ROW myrow, wyString &insert
 // Function creates insert statement and executes in the targetmysql.
 
 wyBool
-CopyDatabase::ExportActualData(wyChar * table)
+CopyDatabase::ExportActualData(wyChar * table,wyBool *isvirtual)
 {
 	wyInt32         ret;
 	wyString        query, msg, insertstmt, myrowstr;
@@ -3039,7 +3089,7 @@ CopyDatabase::ExportActualData(wyChar * table)
 	wyString        bulkquery, fieldval, errmsg;
 	wyBool          flag = wyTrue;
 	wyInt32         querylength = 0;
-	wyInt32			rowscopied = 0;
+	wyInt32			rowscopied = 0,i=0;
 	MDIWindow		*wnd = GetActiveWin();
 	wyInt32			chunklimit;
 	wyBool			ischunkinsert;
@@ -3102,9 +3152,14 @@ CopyDatabase::ExportActualData(wyChar * table)
 			// insert field names in bulkinsert query
 			while(fieldnames = m_newsrctunnel->mysql_fetch_field(myres))
 			{
-				//bulkquery.AddSprintf("`%s`,", fieldnames->name);
+				if(isvirtual[i]== wyTrue)
+					{
+						i++;
+						continue;
+					}
 				fieldval.SetAs(fieldnames->name, ismysql41);
 				bulkquery.AddSprintf("`%s`,", fieldval.GetString());
+				i++;
 			}
 
 			bulkquery.Strip(1);
@@ -3143,7 +3198,7 @@ CopyDatabase::ExportActualData(wyChar * table)
 					insertstmt.SetAs("");
 					insertstmt.SetAs(bulkquery.GetString());
 				}
-				GetInsertQuery(myres, myrow, insertstmt, nfilelds, ismysql41);				
+				GetInsertQuery(myres, myrow, insertstmt, nfilelds, ismysql41,isvirtual);				
 				insertstmt.Strip(2);
 				insertstmt.Add("),(");				
 			}
@@ -3164,12 +3219,13 @@ CopyDatabase::ExportActualData(wyChar * table)
 		}
 		else
 		{
+			i = 0;
 			while(myrow = m_newsrctunnel->mysql_fetch_row(myres))
 			{				
 				exportedrowcount ++;
-				// get the length of the row so that we can place some binary data as 				
-				insertstmt.Sprintf("insert into `%s`.`%s` values(", m_targetdb.GetString(), table);
-				GetInsertQuery(myres, myrow, insertstmt, nfilelds, ismysql41);
+				// get the length of the row so that we can place some binary data as 	
+				insertstmt.SetAs(bulkquery.GetString());
+				GetInsertQuery(myres, myrow, insertstmt, nfilelds, ismysql41,isvirtual);
 				insertstmt.Strip(2);
 				insertstmt.Add(")");
 				if(IsCopyStopped() == wyTrue)

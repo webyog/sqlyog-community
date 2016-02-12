@@ -566,7 +566,7 @@ private:
     @param table: IN table to be copied
     @returns wyBool, wyTrue is SUCCESS, otherwise wyFalse
     */
-	wyBool      ExportActualData(wyChar *table);
+	wyBool      ExportActualData(wyChar *table, wyBool *isvirtual);
 	/// adding field values of a row to the query 
 	/**
 	@param myres            : Mysql result pointer
@@ -578,7 +578,7 @@ private:
 
 	*/
 	void		GetInsertQuery(MYSQL_RES *myres, MYSQL_ROW myrow, wyString &insertstmt, wyInt32 nfilelds, 
-								wyBool ismysql41);
+								wyBool ismysql41,wyBool *isvirtual);
 	/// Execute Bulk query or Single query
 	/**
 	@param myres            : Mysql result pointer
