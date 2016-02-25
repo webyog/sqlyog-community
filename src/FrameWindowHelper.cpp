@@ -2692,12 +2692,14 @@ GetColLengthArray(MYSQL_ROW row, wyInt32 col, wyUInt32 *len)
 	// loop thru and get the length of each field
 	for (; ((INT)i) <= (col + 1); column++, arr++)
 	{
+		if((INT)i!=col && (INT)i!=(col+1)){
 		if (!*column)
 		{
 			*arr = 0;
+			//i++;
 			continue;
 		}
-		
+		}
 		if (start)
 			*plen = (unsigned long) ((byte*)*column-start-1);
 		

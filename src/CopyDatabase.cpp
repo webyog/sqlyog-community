@@ -3125,6 +3125,7 @@ CopyDatabase::ExportActualData(wyChar * table,wyBool *isvirtual)
 	{
 		startrowcount	= endrowcount;
 		endrowcount		+= chunklimit;
+		i=0;
 
 		 if(IsCopyStopped() == wyTrue)
 			return wyTrue;

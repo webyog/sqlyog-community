@@ -997,7 +997,8 @@ DataView::IsColumnVirtual(wyInt32 col)
 				}
 		
 			}
-		
+			
+			return m_data->m_colvirtual[col];
 		}
 
 	}
@@ -1054,7 +1055,7 @@ DataView::AddDataToQuery(MYSQL_ROW data, wyString &query, const wyChar* delimite
     for(; i < max; i++)
     {
         //we ignore readonly columns
-        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) == wyFalse )
+        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) != 1 )
         {
             isblob = IsBinary(i);
             GetColumnName(colname, i);
@@ -1127,7 +1128,7 @@ DataView::GenerateInsertQuery(wyString &query)
         myrow = m_data->m_rowarray->GetRowExAt(m_data->m_modifiedrow)->m_row;
 
         //ignore readonly columns and columns that are same        
-        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) == wyFalse && (!m_data->m_oldrow || m_data->m_oldrow->m_row[i] != myrow[i] || fieldarray[i]))        
+        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) != 1 && (!m_data->m_oldrow || m_data->m_oldrow->m_row[i] != myrow[i] || fieldarray[i]))        
         {
             if(!fieldarray[i] && m_data->m_oldrow && m_data->m_oldrow->m_row[i] && myrow[i] && !strcmp(m_data->m_oldrow->m_row[i], myrow[i]))            
             {                
@@ -1159,7 +1160,7 @@ DataView::GenerateInsertQuery(wyString &query)
     for(i = 0, k = 0; i < m_data->m_datares->field_count; i++)
 	{
         //ignore readonly columns
-        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) == wyFalse && fieldarray[i])
+        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) != 1 && fieldarray[i])
         {
             if(k++)
             {
@@ -3330,7 +3331,7 @@ DataView::HandleBlobValue(WPARAM wparam, LPARAM lparam)
     pib.m_data = GetCellValue(row, col, &len, wyFalse);
 
     //check whether the column is readonly or not
-    isedit = (IsColumnReadOnly(col) || IsColumnVirtual(col) )? wyFalse : wyTrue;
+    isedit = (IsColumnReadOnly(col) || IsColumnVirtual(col)==1 )? wyFalse : wyTrue;
 	
 	//if chardown is true then lparam = 1, else 0.
 	if(!pib.m_data)
@@ -6527,7 +6528,7 @@ DataView::UpdateRow()
 
     for(i = 0; pkcount && i < m_data->m_datares->field_count; ++i)
     {
-        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) == wyFalse)
+        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) != 1)
         {
             GetColumnName(colname, i);
 
@@ -7702,7 +7703,7 @@ DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
                     GetColumnName(column, col);
 
                     //if the column is not read-only
-                    if((iscolreadonly = IsColumnReadOnly(col)) == wyFalse && (iscolvirtual = IsColumnVirtual(col)) == 0 )
+                    if((iscolreadonly = IsColumnReadOnly(col)) == wyFalse && (iscolvirtual = IsColumnVirtual(col)) != 1 )
                     {
                         //check whether the column is nullable
                         iscolnullable = IsNullable(m_wnd->m_tunnel, m_data->m_fieldres, (wyChar*)column.GetString());
