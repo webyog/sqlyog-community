@@ -2008,6 +2008,7 @@ MySQLDump::DumpAllDatabases(wyString * buffer)
     wyBool	        success;
     wyBool          ismysql41 = IsMySQL41(m_tunnel, &m_mysql);
 	wyBool			ismysql553 = IsMySQL553(m_tunnel, &m_mysql);
+	wyBool			ismysql577 = IsMySQL577(m_tunnel, &m_mysql);
 	wyInt32			err = 0;
 
 	if(m_charset.CompareI("utf8") == 0)
@@ -2072,7 +2073,7 @@ MySQLDump::DumpAllDatabases(wyString * buffer)
 				continue;
 			}
 		}
-		else if(stricmp(row[0], "PERFORMANCE_SCHEMA") == 0) //INFORMATION_SCHEMA is not exported
+		else if(stricmp(row[0], "PERFORMANCE_SCHEMA") == 0) //PERFORMANCE_SCHEMA is not exported
 		{	
 			if(ismysql553 == wyTrue) 
 			{	
@@ -2080,7 +2081,14 @@ MySQLDump::DumpAllDatabases(wyString * buffer)
 				continue;
 			}
 		}
-
+		else if(stricmp(row[0], "SYS") == 0) //SYS SCHEMA is not exported for Mysql 5.7.7 and higher version
+		{	
+			if(ismysql577 == wyTrue) 
+			{	
+				row = sja_mysql_fetch_row(m_tunnel, res);
+				continue;
+			}
+		}
 				
 		else if(stricmp(row[0], "mysql") == 0 ) 
 		{
@@ -2204,7 +2212,8 @@ MySQLDump::DumpAlldbsToSingleFile(wyString * buffer, MYSQL_RES *dbres)
 	wyString   dbname;	
 	wyBool     ismysql41 = IsMySQL41(m_tunnel, &m_mysql);
 	wyBool     ismysql51 = IsMySQL5010(m_tunnel, &m_mysql);
-	wyBool	   ismysql553 = IsMySQL553(m_tunnel, &m_mysql);  
+	wyBool	   ismysql553 = IsMySQL553(m_tunnel, &m_mysql); 
+	wyBool	   ismysql577 = IsMySQL577(m_tunnel, &m_mysql); 
 	
 
 
@@ -2220,6 +2229,9 @@ MySQLDump::DumpAlldbsToSingleFile(wyString * buffer, MYSQL_RES *dbres)
 			continue;
 
 		if((stricmp(dbname.GetString(), "PERFORMANCE_SCHEMA") == 0) && (ismysql553 == wyTrue))
+			continue;
+
+		if((stricmp(dbname.GetString(), "SYS") == 0) && (ismysql577 == wyTrue))
 			continue;
 		
 		if((stricmp(dbname.GetString(), "MYSQL") == 0) && (m_expmysql == wyFalse))
@@ -2257,6 +2269,9 @@ MySQLDump::DumpAlldbsToSingleFile(wyString * buffer, MYSQL_RES *dbres)
 			continue;
 
 		if((stricmp(dbname.GetString(), "PERFORMANCE_SCHEMA") == 0) && (ismysql553 == wyTrue))
+			continue;
+
+		if((stricmp(dbname.GetString(), "SYS") == 0) && (ismysql577 == wyTrue))
 			continue;
 
 		if((stricmp(dbname.GetString(), "MYSQL") == 0) && (m_expmysql == wyFalse))

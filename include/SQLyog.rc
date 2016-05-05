@@ -1795,21 +1795,23 @@ CAPTION "General"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Generate &queries using backquote(`)",IDC_BACKQUOTES,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,4,3,202,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,4,5,202,10
     CONTROL         "Keep &focus on SQL editor after query execution",IDC_FOCUSAFTERQUERY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,16,205,10
     CONTROL         "P&rompt if a tab with unsaved changes is closed",IDC_CONFIRMONTABCLOSE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,29,202,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,27,202,10
     CONTROL         "Paste object name in &editor on double-click",IDC_GETTEXTONDBCLICK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,42,202,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,38,202,10
     CONTROL         "Enable &word wrap in SQL editor and BLOB viewer",IDC_WORDWRAP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,55,202,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,49,202,10
     CONTROL         "Enable transaction support for &batch process",IDC_TRANSACTIONENABLE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,68,202,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,60,202,10
     CONTROL         "Force disable F&K check throughout HTTP import batch process",IDC_FKCHKIMPORT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,81,225,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,71,225,10
     CONTROL         "&Show Warning(s) in Messages tab",IDC_SHOWWARNING,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,94,124,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,82,124,10
+    CONTROL         "Halt Execution of Queries on Error",IDC_HALTEXEC,
+					"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,93,124,10
     GROUPBOX        "Export Options ",IDC_STATIC,4,106,247,99
     GROUPBOX        "Max. size (in KB) for BULK INSERT statement(s)",IDC_STATIC,9,116,237,40
     CONTROL         "&Get server default",IDC_DEF_BULK_SIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,127,112,8
@@ -2056,9 +2058,10 @@ STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_CHILD | WS_BORDER
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_MONTHCALENDAR1,"SysMonthCal32",MCS_NOTODAY | WS_TABSTOP,0,0,116,88
-    DEFPUSHBUTTON   "OK",IDOK,54,88,30,15
-    PUSHBUTTON      "Cancel",IDCANCEL,83,88,30,15
-    CONTROL         "",IDC_DATETIMEPICKER1,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,0,88,54,15
+    PUSHBUTTON      "Cancel",IDCANCEL,85,88,29,14
+    CONTROL         "",IDC_DATETIMEPICKER1,"SysDateTimePick32",DTS_RIGHTALIGN | DTS_UPDOWN | WS_TABSTOP | 0x8,0,88,40,14
+    DEFPUSHBUTTON   "OK",IDOK,64,88,20,15
+    PUSHBUTTON      "NOW",IDCURRDATE,42,88,21,15
 END
 
 IDD_SEARCHFILTER DIALOGEX 0, 0, 270, 241

@@ -844,7 +844,7 @@ void
 TabAdvancedProperties::GenerateCreateQuery(wyString &query)
 {
     wyInt32		    selindex, ret;
-    wyWChar         textbuf[512]={0};           // none of the value will go more then this and neway we send the max len to the api so it will not fail
+    wyWChar         textbuf[2049]={0};           // none of the value will go more then this and neway we send the max len to the api so it will not fail
     wyChar*         commentbuff = {0};
     wyString        enginestr, rowformat, tempstr;
     wyString        advpropval;
@@ -882,7 +882,7 @@ TabAdvancedProperties::GenerateCreateQuery(wyString &query)
     }
 
     // 5. The comment.
-	SendMessage(m_heditcomment, WM_GETTEXT, 511, (LPARAM)textbuf);
+	SendMessage(m_heditcomment, WM_GETTEXT, 2049, (LPARAM)textbuf);
     tempstr.SetAs(textbuf);
     
     // Escape the comment string
@@ -965,7 +965,7 @@ void
 TabAdvancedProperties::GenerateAlterQuery(wyString &query)
 {
     wyInt32		    selindex, ret;
-    wyWChar         textbuf[512]={0};           // none of the value will go more then this and neway we send the max len to the api so it will not fail
+    wyWChar         textbuf[2049]={0};           // none of the value will go more then this and neway we send the max len to the api so it will not fail
     wyChar*         commentbuff = {0};//, commentbuff2 = {0};
     wyString        enginestr, rowformat, tempstr, newline("\r\n   ");
     wyString        advpropval;
@@ -1016,7 +1016,7 @@ TabAdvancedProperties::GenerateAlterQuery(wyString &query)
     }
 
     // 5. The comment thing.
-	SendMessage(m_heditcomment, WM_GETTEXT, 511, (LPARAM)textbuf);
+	SendMessage(m_heditcomment, WM_GETTEXT, 2049, (LPARAM)textbuf);
     tempstr.SetAs(textbuf);
     
     // Escape the comment string

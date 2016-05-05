@@ -40,6 +40,7 @@ extern PGLOBALS		pGlobals;
 #define		ROW_LIMIT_DEFAULT			1000
 #define		BULKINSERT_DEFAULT			1
 #define		SHOWWARNINGS_DEFAULT		0
+#define		HALTEXEC_DEFAULT			0
 #define     INFOTAB_POS_DEFAULT         1
 #define     TABLEDATA_POS_DEFAULT       1
 #define     HISTORY_POS_DEFAULT         0
@@ -1165,6 +1166,9 @@ PreferenceBase::InitGeneralPrefValues()
 	truncdata	= wyIni::IniGetInt(GENERALPREFA, "ShowWarnings", SHOWWARNINGS_DEFAULT, dirstr.GetString());
 	SendMessage(GetDlgItem(m_hwnd, IDC_SHOWWARNING), BM_SETCHECK, truncdata, 0);
 
+	truncdata	= wyIni::IniGetInt(GENERALPREFA, "HaltExecutionOnError", HALTEXEC_DEFAULT, dirstr.GetString());
+	SendMessage(GetDlgItem(m_hwnd, IDC_HALTEXEC), BM_SETCHECK, truncdata, 0);
+
 	//disable fk check in http import batch
 	truncdata	= wyIni::IniGetInt(GENERALPREFA, "FKcheckImport", FKCHKIMPORT_DEFAULT, dirstr.GetString());
 	SendMessage(GetDlgItem(m_hwnd, IDC_FKCHKIMPORT), BM_SETCHECK, truncdata, 0);
@@ -1619,6 +1623,7 @@ PreferenceBase::SaveGeneralPreferences(HWND hwndbase, wyInt32 page)
 	SetBoolProfileString(hwnd, GENERALPREF, L"FKcheckImport", IDC_FKCHKIMPORT);
 
 	SetBoolProfileString(hwnd, GENERALPREF, L"ShowWarnings", IDC_SHOWWARNING);
+	SetBoolProfileString(hwnd, GENERALPREF, L"HaltExecutionOnError", IDC_HALTEXEC);
     SetBoolProfileString(hwnd, GENERALPREF, L"TableDataUnderQuery", IDC_TABLEDATAPOSITION);
     SetBoolProfileString(hwnd, GENERALPREF, L"InfoTabUnderQuery", IDC_INFOPOSITION);
     SetBoolProfileString(hwnd, GENERALPREF, L"HistoryUnderQuery", IDC_HISTORYPOSITION);
@@ -2137,6 +2142,7 @@ PreferenceBase::SetGenPrefDefaultValues(HWND hwnd)
     EnableBulkInsert(hwnd, DEF_BULK_SIZE_DEFAULT);
 
 	SendMessage(GetDlgItem(hwnd, IDC_SHOWWARNING), BM_SETCHECK, SHOWWARNINGS_DEFAULT, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_HALTEXEC), BM_SETCHECK, HALTEXEC_DEFAULT, 0);
     SendMessage(GetDlgItem(hwnd, IDC_TABLEDATAPOSITION), BM_SETCHECK, TABLEDATA_POS_DEFAULT, 0);
     SendMessage(GetDlgItem(hwnd, IDC_INFOPOSITION), BM_SETCHECK, INFOTAB_POS_DEFAULT, 0);
     SendMessage(GetDlgItem(hwnd, IDC_HISTORYPOSITION), BM_SETCHECK, HISTORY_POS_DEFAULT, 0);

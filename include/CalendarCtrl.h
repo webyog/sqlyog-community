@@ -137,6 +137,9 @@ class CalendarCtrl
 	//Handles click of the OK button
 		void	OnClickOk();
 
+	//Handles click of the OK button
+		void	OnClickNow();
+
 	//Handles click of the Cancel button
 		void	OnClickCancel();
 

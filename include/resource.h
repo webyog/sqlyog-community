@@ -8,6 +8,7 @@
 #define IDC_ADD                         3
 #define IDC_UP                          4
 #define IDC_MOVEDOWN                    4
+#define IDCURRDATE                      5
 #define ID_SELECTALL                    6
 #define IDC_DOWN                        6
 #define IDC_UNSELALL2                   10
@@ -766,7 +767,8 @@
 #define IDC_COMPRESSHELP                1533
 #define IDC_TIMEOUTHELP                 1534
 #define IDC_TIMESEC                     1535
-#define IDC_SHOWWARNING                 1539
+#define IDC_SHOWWARNING                 1536
+#define IDC_HALTEXEC                    1539
 #define IDC_GETULT                      1540
 #define IDC_ENTFEATURE                  1541
 #define IDC_GETENTTEXT                  1542

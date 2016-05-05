@@ -191,6 +191,10 @@ CalendarCtrl::CalendarCtrlProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 		case WM_COMMAND:
 			switch(LOWORD(wParam))
 			{
+				case IDCURRDATE:
+					pcc->OnClickNow();
+					break;
+
 				case IDOK:
 					pcc->OnClickOk();
 					break;
@@ -367,7 +371,7 @@ CalendarCtrl::PositionWindow(RECT* rect)
     RECT        temprect = {0};
 	RECT prect = {0} ;
     wyInt32     width, height, hmargin = 0, vmargin = 0;
-	RECT calrect,timerect,okrect,cancelrect;
+	RECT calrect,timerect,okrect,cancelrect,nowrect;
 	GetClientRect(m_hwndparent, &prect);
 	prect.right = prect.right - prect.left;
 	prect.bottom = prect.bottom - prect.top;
@@ -379,6 +383,7 @@ CalendarCtrl::PositionWindow(RECT* rect)
 	MonthCal_GetMinReqRect(GetDlgItem(m_hwnd,IDC_MONTHCALENDAR1),&calrect);  
 	GetWindowRect(GetDlgItem(m_hwnd,IDC_DATETIMEPICKER1),&timerect);
 	GetWindowRect(GetDlgItem(m_hwnd,IDOK),&okrect);
+	GetWindowRect(GetDlgItem(m_hwnd,IDCURRDATE),&nowrect);
 	GetWindowRect(GetDlgItem(m_hwnd,IDCANCEL),&cancelrect);
 
     //calculate and modify the width and height based on the availabe space to best fit the window
@@ -394,9 +399,14 @@ CalendarCtrl::PositionWindow(RECT* rect)
 		{
 			temprect.top = rect->bottom - height;
 		}
+		else if(rect->bottom + height/2 <= prect.bottom && rect->bottom - height/2 >= prect.top)
+		{
+			temprect.top = rect->bottom - height/2;
+		}
+
 		else
 		{
-			temprect.top = rect->top;
+			temprect.top = prect.top;
 		}
 	}
 	else
@@ -450,21 +460,28 @@ CalendarCtrl::PositionWindow(RECT* rect)
 	MoveWindow(GetDlgItem(m_hwnd,IDC_DATETIMEPICKER1),
 		0,
 		(calrect.bottom - calrect.top)-1,
-		width - (2*(okrect.right-okrect.left)),
+		width - (3*(okrect.right-okrect.left)+10),
+		okrect.bottom-okrect.top+1,
+		TRUE);
+
+	MoveWindow(GetDlgItem(m_hwnd,IDCURRDATE),
+		width - (3*(okrect.right-okrect.left)+10),
+		(calrect.bottom - calrect.top)-2,
+		(okrect.right-okrect.left)+1,
 		okrect.bottom-okrect.top+1,
 		TRUE);
 
 	MoveWindow(GetDlgItem(m_hwnd,IDOK),
-		width - (2*(okrect.right-okrect.left)),
+		width - (2*(okrect.right-okrect.left)+10),
 		(calrect.bottom - calrect.top)-2,
 		(okrect.right-okrect.left),
 		okrect.bottom-okrect.top+1,
 		TRUE);
 
 	MoveWindow(GetDlgItem(m_hwnd,IDCANCEL),
-		width - (okrect.right-okrect.left)-1,
+		width - (okrect.right-okrect.left)-10,
 		(calrect.bottom - calrect.top)-2,
-		(okrect.right-okrect.left),
+		(okrect.right-okrect.left)+9,
 		okrect.bottom-okrect.top+1,
 		TRUE);
 
@@ -484,6 +501,7 @@ CalendarCtrl::OnClickOk()
 {
     wyInt32 row, col;
      
+
     ConvertCtrlValues();
     SendMessage(m_hwnd,UM_ENDDIALOG,0,0);
 	CustomGrid_ApplyChanges(m_hwndparent);
@@ -495,6 +513,21 @@ CalendarCtrl::OnClickOk()
 	m_dv->m_gridwndproc(m_dv->m_hwndgrid, GVN_ENDLABELEDIT, MAKELONG(row, col), (LPARAM)m_date.GetString());
 	
 	delete this;
+}
+
+
+// handle NOW Click
+void 
+CalendarCtrl::OnClickNow()
+{
+    wyInt32 row, col;
+	wyString    temp;
+	SYSTEMTIME seltime;
+	GetLocalTime(&seltime);
+	MonthCal_SetCurSel(GetDlgItem(m_hwnd,IDC_MONTHCALENDAR1), &seltime);
+	DateTime_SetFormat(GetDlgItem(m_hwnd,IDC_DATETIMEPICKER1), L"HH:mm:ss");
+	DateTime_SetSystemtime(GetDlgItem(m_hwnd,IDC_DATETIMEPICKER1),GDT_VALID, &seltime);
+	
 }
 
 

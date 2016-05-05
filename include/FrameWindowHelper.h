@@ -392,19 +392,19 @@ All Files(*.*)\0*.*\0"
 #define		DEFAULT_NO_TABLE							_("(Read Only)")
 #define		DEFAULT_NO_TABLEW							_(L"(Read Only)")
 #define		DEFAULT_READONLY_RESULT						_(L"Read-only result")
-#define		BUYURL										"http://www.webyog.com/shop"
-#define		BUYURL_POWERTOOLS							"http://www.webyog.com/shop/?ref=community.powertools"
-////#define		BUYURL_NAGBEGIN								"http://www.webyog.com/shop/?ref=community.nagbegin"
-#define		BUYURL_TOOLBARRIBBON						"http://www.webyog.com/shop/?ref=community.toolbarribbon"
-#define		BUYURL_NAGEND								"http://www.webyog.com/shop/?ref=community.nagend"
+#define		BUYURL										"http://www.webyog.com/product/sqlyogpricing"
+#define		BUYURL_POWERTOOLS							"http://www.webyog.com/product/sqlyogpricing/?ref=community.powertools"
+////#define		BUYURL_NAGBEGIN								"http://www.webyog.com/product/sqlyogpricing/?ref=community.nagbegin"
+#define		BUYURL_TOOLBARRIBBON						"http://www.webyog.com/product/sqlyogpricing/?ref=community.toolbarribbon"
+#define		BUYURL_NAGEND								"http://www.webyog.com/product/sqlyogpricing/?ref=community.nagend"
 #define     HOMEURL_ABOUTUS								"http://www.webyog.com/?ref=community.aboutus"
-#define     BUYURL_STATUSBAR							"http://www.webyog.com/shop/?ref=community.statusbar"
+#define     BUYURL_STATUSBAR							"http://www.webyog.com/product/sqlyogpricing/?ref=community.statusbar"
 #define     HOMEURL_UPGRADECHECK						"http://www.webyog.com/?ref=community.upgradecheck"
-////#define		BUYURL_BUYNAGBEGIN							"http://www.webyog.com/shop/?ref=community.buynagbegin"
-#define		BUYURL_BUYNAGEND							"http://www.webyog.com/shop/?ref=community.buynagend"
-#define		SUPPORTURL									"https://www.webyog.com/customer"
+////#define		BUYURL_BUYNAGBEGIN							"http://www.webyog.com/product/sqlyogpricing/?ref=community.buynagbegin"
+#define		BUYURL_BUYNAGEND							"http://www.webyog.com/product/sqlyogpricing/?ref=community.buynagend"
+#define		SUPPORTURL									"https://www.webyog.com/customer?ref=sqlyog"
 
-#define     BUYENT										"http://www.webyog.com/shop"
+#define     BUYENT										"http://www.webyog.com/product/sqlyogpricing"
 #define		IMAGEURL									"http://www.webyog.com"
 #define     PRODUCTURL                                  "https://www.webyog.com/product/sqlyog"
 #define     COMMUNITYURL                                "https://www.webyog.com/community" 
@@ -1235,6 +1235,10 @@ wyInt32		SetListBoxWidth(HWND hwndlist);
 
 ///Show warnings in messages tab
 wyBool		IsShowWarnings();
+
+
+///Halt Query Execution on Errors
+wyBool      IsHaltExecutionOnError();
 
 
 /// Helper function to write the database information to xml file

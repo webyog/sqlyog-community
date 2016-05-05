@@ -510,6 +510,8 @@ ExecuteQuery(QUERYTHREADPARAMS * param)
 				{
 					(*param->error)++;
 					param->wnd->m_isselectquery = wyFalse;
+					if(IsHaltExecutionOnError() == wyTrue)
+						break;
 				}
 				
 #ifndef COMMUNITY

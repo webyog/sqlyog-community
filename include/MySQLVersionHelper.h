@@ -147,6 +147,8 @@ wyBool IsMariaDB52(Tunnel * tunnel, PMYSQL mysql);
 //MySQL 5.7.0 for Virtual/Stored columns
 wyBool IsMySQL57(Tunnel * tunnel, PMYSQL mysql);
 
+//MySQL 5.7.7 for SYS Schema
+wyBool IsMySQL577(Tunnel * tunnel, PMYSQL mysql);
 /// Checks the server version is greater than or equal to mySQL5.0.2
 /**
 @param tunnel: IN tunnel pointer

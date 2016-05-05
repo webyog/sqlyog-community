@@ -455,6 +455,20 @@ wyBool IsMySQL57(Tunnel * tunnel, PMYSQL mysql)
 
 
 }
+
+
+//MySQL 5.7.7
+wyBool
+IsMySQL577(Tunnel * tunnel, PMYSQL mysql)
+{
+	long me = mysql_get_server_version(*mysql);/* Only available from MySQLv4.1*/
+
+	if(me >= 50707)
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
 wyBool
 IsMySQL502(Tunnel * tunnel, PMYSQL mysql)
 {

@@ -63,7 +63,7 @@ HandleClickEventOnLink(HWND hwndLayout, HELEMENT helem, const wchar_t *url)
 				delete pref;
 			}
 		}
-		else if(!wcsicmp(url, L"http://www.webyog.com/shop/?ref=community.queryprofiler"))
+		else if(!wcsicmp(url, L"http://www.webyog.com/product/sqlyogpricing/?ref=community.queryprofiler"))
         {
 			::ShellExecuteW(hwndLayout,L"open", url, NULL,NULL,SW_SHOWNORMAL);
         }

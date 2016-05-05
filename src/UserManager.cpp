@@ -409,7 +409,7 @@ UserManager::InitDialog(HWND hwnd)
                 (WPARAM)LVS_EX_CHECKBOXES,(LPARAM)LVS_EX_CHECKBOXES);
 
     //limit the text in various edit controls
-    SendMessage(GetDlgItem(m_hwnd, IDC_USERNAME), EM_LIMITTEXT, (WPARAM)16, 0);
+    SendMessage(GetDlgItem(m_hwnd, IDC_USERNAME), EM_LIMITTEXT, (WPARAM)32, 0);
     SendMessage(GetDlgItem(m_hwnd, IDC_HOSTNAME), CB_LIMITTEXT, (WPARAM)60, 0);
 
     //add some default strings for the host combo

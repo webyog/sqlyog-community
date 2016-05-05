@@ -29,7 +29,7 @@
 
 #define QA_ULTIMATE _("Query Profiler is available only in Ultimate version of SQLyog.\
 <br>&nbsp;<br>\
-Click <a href=\"http://www.webyog.com/shop/?ref=community.queryprofiler\" target=\"_blank\">here</a> to buy SQLyog Ultimate\
+Click <a href=\"http://www.webyog.com/product/sqlyogpricing/?ref=community.queryprofiler\" target=\"_blank\">here</a> to buy SQLyog Ultimate\
 			   <br>&nbsp;<br>\
 			   Query Profiler Features:\
 <UL>\

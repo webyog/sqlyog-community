@@ -2692,14 +2692,12 @@ GetColLengthArray(MYSQL_ROW row, wyInt32 col, wyUInt32 *len)
 	// loop thru and get the length of each field
 	for (; ((INT)i) <= (col + 1); column++, arr++)
 	{
-		if((INT)i!=col && (INT)i!=(col+1)){
 		if (!*column)
 		{
 			*arr = 0;
-			//i++;
 			continue;
 		}
-		}
+		
 		if (start)
 			*plen = (unsigned long) ((byte*)*column-start-1);
 		
@@ -3312,6 +3310,23 @@ IsShowWarnings()
 	
 	//getting show warnings status from init File
 	ret = wyIni::IniGetInt(GENERALPREFA, "ShowWarnings", 0, dirstr.GetString());
+	return(ret)?(wyTrue):(wyFalse);
+
+}
+
+wyBool
+IsHaltExecutionOnError()
+{
+	wyWChar     *lpfileport = 0;
+	wyWChar     directory[MAX_PATH + 1]= {0};
+    wyInt32     ret;
+	wyString	dirstr;
+	
+	SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+	dirstr.SetAs(directory);
+	
+	//getting show warnings status from init File
+	ret = wyIni::IniGetInt(GENERALPREFA, "HaltExecutionOnError", 0, dirstr.GetString());
 	return(ret)?(wyTrue):(wyFalse);
 
 }
