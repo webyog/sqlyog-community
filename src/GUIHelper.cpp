@@ -8315,14 +8315,16 @@ ConvertStringToBinary(wyChar *data,  wyUInt32 len, wyInt32 colwidth, wyString *s
 		if(!ascii)
 		{
 			isnullchar = wyTrue;
+			revstr.Replace(0, 0, "00000000");
+			isnullchar = wyFalse;
 			continue;
 		}
 		//Adding 0s if NULL character inbetween
-		if(isnullchar == wyTrue)
+		/*if(isnullchar == wyTrue)
 		{
 			revstr.Replace(0, 0, "00000000");
 			isnullchar = wyFalse;
-		}
+		}*/
 		//For handling the BIT column width
 		//if(colwidth > 0)
 		//{		

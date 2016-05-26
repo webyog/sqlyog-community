@@ -401,7 +401,7 @@ wyChar *
     FormatResultSet(Tunnel * tunnel, MYSQL_RES * myres, MYSQL_FIELD * myfield, MySQLDataEx *mdata)
 {
 	wyUInt32    count, ncounter = 0, *pfieldlenarr, nfieldlen = 0, nmaxlen = 0;
-	wyInt32     dwtitlecount, dwcurrline = 1, dwlinenum, dwlinenumtemp;
+	wyInt32     dwtitlecount, dwcurrline = 1,dwmaxline = 1, dwlinenum, dwlinenumtemp;
     wyUInt32    dwcharpoint; 
     wyInt32     dwnewlinepoint, dwheapsize, dwlast=0, dwsize;
 	wyChar      sznull[] = STRING_NULL;
@@ -715,10 +715,14 @@ wyChar *
 						// now change the initial poition.
 						dwlinenumtemp++;
 						dwnewlinepoint	=	0;
-
+				
 						// first pad up everything in the new line to spaces.
-                        VerifyMemory(&result, &totalsize, (dwlinenumtemp * dwtitlecount) + extrapad + totalpad, dwtitlecount);
-						memset(result + (dwlinenumtemp * dwtitlecount) + extrapad + totalpad, ' ', dwtitlecount);
+						if(ncounter==0 || dwmaxline < dwlinenumtemp )
+                        {
+							VerifyMemory(&result, &totalsize, (dwlinenumtemp * dwtitlecount) + extrapad + totalpad, dwtitlecount);
+							memset(result + (dwlinenumtemp * dwtitlecount) + extrapad + totalpad, ' ', dwtitlecount);
+							dwmaxline = dwlinenumtemp;
+						}
 						dwcurrline	=	dwlinenumtemp;
 
 						// Now check if there is another \r or \n then we take it as one only.
@@ -762,7 +766,9 @@ wyChar *
 				*(result + (dwtitlecount * dwcurrline) + pfieldlenarr[myres->field_count] + totalpad - extrapad) = '\r';
 				*(result + (dwtitlecount * dwcurrline) + pfieldlenarr[myres->field_count] + 1 + totalpad - extrapad) = '\n';
 			}
-			dwlast = (dwtitlecount * dwcurrline) + pfieldlenarr[myres->field_count] + 1 + totalpad - extrapad;
+
+
+			dwlast = (dwtitlecount * dwmaxline) + pfieldlenarr[myres->field_count] + 1 + totalpad - extrapad;
 			isfirstline = wyTrue;
 		}
 				

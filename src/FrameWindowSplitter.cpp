@@ -31,7 +31,7 @@ FrameWindowSplitter::FrameWindowSplitter(HWND hwnd, wyUInt32 pleftortoppercent)
 	m_lastleftpercent   = 0;
 	m_lasttoppercent    = 35;
 	m_hwndparent        = hwnd;
-    m_width             = 2; //GetSystemMetrics(SM_CXSIZEFRAME) + 1;
+    m_width             = 4; //GetSystemMetrics(SM_CXSIZEFRAME) + 1;
     m_x                 = 0;
     m_prevstyle         = 0;
     m_hdc               = NULL;

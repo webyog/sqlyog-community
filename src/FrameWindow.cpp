@@ -5216,7 +5216,7 @@ FrameWindow::InitCreateObjectDlg(HWND hwnd, wyChar *object)
 	}
     else if(stricmp(object, "createdb") == 0)
     {
-       SendMessage(GetDlgItem(hwnd, IDC_DBEDIT), EM_LIMITTEXT, 64, 0);
+       SendMessage(GetDlgItem(hwnd, IDC_DBEDIT), EM_LIMITTEXT, 63, 0);
 		if(GetActiveWin()->m_ismysql41 == wyFalse)
         {
             EnableWindow((GetDlgItem(hwnd, IDC_CHARSETCOMBO)), FALSE);

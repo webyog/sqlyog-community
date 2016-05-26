@@ -29,7 +29,7 @@ TabEditorSplitter::TabEditorSplitter(HWND hwnd, wyUInt32 ptoppercent)
 	m_pctabeditor	   = NULL;
     m_ischanged         = wyFalse;
 	m_isdlgsplitter		= wyFalse;
-    m_height            = 2; //GetSystemMetrics(SM_CXSIZEFRAME) + 1;
+    m_height            = 4; //GetSystemMetrics(SM_CXSIZEFRAME) + 1;
     m_hwndprevfocus = NULL;
     m_y = 0;
     m_hdc = NULL;

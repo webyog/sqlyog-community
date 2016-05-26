@@ -3506,19 +3506,30 @@ CopyDatabase::ExportSP(const wyChar *db, const wyChar *sp, wyBool isproc)
             m_newtargettunnel->mysql_free_result(res);
 	 }
 
+	 else
+	 {
+		if(isproc)
+		{
+			pattern.AddSprintf("PROCEDURE");
+			extra = 9;
+		}
+		else
+		{
+			pattern.AddSprintf("FUNCTION");
+			extra = 8;
+		 }
+	 
+	 }
+
 	 if(isproc)
 	 {
-		pattern.AddSprintf("PROCEDURE");
-		extra = 9;
 		query.Sprintf("show create procedure `%s`.`%s`", db, sp);
 	 }
 	 else
 	 {
-		pattern.AddSprintf("FUNCTION");
-		extra = 8;
 		query.Sprintf("show create function `%s`.`%s`", db, sp);
 	 }
-
+	 
 	res = SjaExecuteAndGetResult(m_newsrctunnel, &m_newsrcmysql, query);
 	if(!res)
 	{

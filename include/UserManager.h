@@ -161,6 +161,8 @@ class UserManager
         */
         void                    OnUserComboChange();
 
+		void					OnHandleEditChange();
+
         ///Initializes the tree view
         /**
         @returns void

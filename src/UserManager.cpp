@@ -872,6 +872,11 @@ UserManager::OnWMCommand(WPARAM wparam, LPARAM lparam)
             m_ispasswordchanged = wyTrue;
         }
 
+		if(LOWORD(wparam)== IDC_USERCOMBO){
+		 OnHandleEditChange();
+		
+		}
+
         return wyTrue;
     }
 
@@ -905,8 +910,7 @@ UserManager::OnWMCommand(WPARAM wparam, LPARAM lparam)
             break;
 
         case IDC_USERCOMBO:
-
-            if(HIWORD(wparam) == CBN_SELCHANGE)
+           if(HIWORD(wparam) == CBN_SELCHANGE)
             {
                 OnUserComboChange();
             }
@@ -1355,6 +1359,34 @@ UserManager::OnUserComboChange()
 
     //automate the rest
     OnTreeViewSelChanged();
+}
+
+void
+UserManager::OnHandleEditChange()
+{
+    int     id;
+    int         len = -1,textlen=-1;
+	wyWChar     str[70] = {0};
+	wyWChar   textstr[70] = {0};
+    HWND        hwndusercombo = GetDlgItem(m_hwnd, IDC_USERCOMBO);
+    len = GetWindowText(hwndusercombo, str, 65);
+	id = SendMessage(hwndusercombo, CB_SELECTSTRING, -1, (LPARAM)str);
+	if(id != CB_ERR)
+        {
+		if(len==1)
+			SendMessage(hwndusercombo, CB_SHOWDROPDOWN, FALSE, NULL);
+
+		SendMessage(hwndusercombo, CB_SHOWDROPDOWN, TRUE, NULL);
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
+		SetWindowText(hwndusercombo,str);
+		SendMessage(hwndusercombo, CB_SETEDITSEL, NULL, MAKELPARAM(len,len));
+        }
+	else
+		{
+			SetWindowText(hwndusercombo,str);
+			SendMessage(hwndusercombo, CB_SETEDITSEL,NULL, MAKELPARAM(len-1,len));
+		}
+     
 }
 
 //function shows/hides the respective tree view
