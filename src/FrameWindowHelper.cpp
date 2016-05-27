@@ -767,8 +767,11 @@ wyChar *
 				*(result + (dwtitlecount * dwcurrline) + pfieldlenarr[myres->field_count] + 1 + totalpad - extrapad) = '\n';
 			}
 
+			if(ismultiline == wyTrue)
+				dwlast = (dwtitlecount * dwmaxline) + pfieldlenarr[myres->field_count] + 1 + totalpad - extrapad;
 
-			dwlast = (dwtitlecount * dwmaxline) + pfieldlenarr[myres->field_count] + 1 + totalpad - extrapad;
+			else
+				dwlast = (dwtitlecount * dwcurrline) + pfieldlenarr[myres->field_count] + 1 + totalpad - extrapad;
 			isfirstline = wyTrue;
 		}
 				
