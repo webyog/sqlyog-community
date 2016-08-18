@@ -2642,6 +2642,9 @@ wyBool
             rowptr++;
 		}
 
+		if(rowcount != 0)
+			buffer.Add(",\r\n");
+
 		buffer.Add("{ \r\n");
 		count = 0;
 		for(j=0; j < (myres->field_count); j++)
@@ -2683,11 +2686,11 @@ wyBool
 				//Now add the value. If it number than use as it is other wise use double quotes refer-http://json.org/
 				if(myfield[j].type==MYSQL_TYPE_DECIMAL ||myfield[j].type==MYSQL_TYPE_FLOAT ||myfield[j].type==MYSQL_TYPE_INT24
 					||myfield[j].type==MYSQL_TYPE_LONG||myfield[j].type==MYSQL_TYPE_LONGLONG||myfield[j].type==MYSQL_TYPE_NEWDECIMAL
-					||myfield[j].type==MYSQL_TYPE_SHORT)
+					||myfield[j].type==MYSQL_TYPE_SHORT || myfield[j].type==MYSQL_TYPE_JSON)
 					buffer.Add(myrowstr.GetString());
-				else
+				 else
 				
-					{
+			    {
 						buffer.Add("\"");
 						buffer.Add(myrowstr.GetString());
 						buffer.Add("\"");
@@ -2698,9 +2701,9 @@ wyBool
 		count++;
 		}
 		
-			 buffer.Add("\r\n},");
+			 buffer.Add("\r\n}");
 			 
-		buffer.Add("\r\n");
+		
 	
 		//Write to file if buffer size is more
 		if(buffer.GetLength() >= SIZE_8K)
@@ -2721,7 +2724,7 @@ wyBool
         rowcount++;
 	}
 	//remove last ',' 
-	buffer.SetCharAt(buffer.GetLength()-3,' ');
+//	buffer.SetCharAt(buffer.GetLength()-3,' ');
 		buffer.Add("]");
 	
 	ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbyteswritten, NULL);

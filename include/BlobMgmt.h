@@ -51,6 +51,7 @@ struct tagInsertUpdateBlob
 	wyBool      m_isoldnull;
 	wyBool      m_ischanged;
 	wyBool		m_isblob;
+	wyBool		m_isJson;
 };
 
 /*! Creates a type tagInsertUpdateBlob*/ 
@@ -217,6 +218,10 @@ private:
     */
 	wyBool				ProcessCancel();
 
+	/// Function to check whether the text entered is a valid JSON or not
+
+	wyBool				IsValidJsonText(wyString txt);
+
 	//Sests the dialog when pops up
 	/**
 	@return void
@@ -358,6 +363,12 @@ private:
 	/// Is Blob or Text?
 	wyBool				m_isblob;
 
+	// if JSON ...special handling is to be done
+	wyBool				m_isJson;
+
+	//if this is wyTrue then we dont close the window on clicking OK ---- JSON type
+	wyBool				donot_close_window;
+	
 	//Object for FindAndRepalce class
 	FindAndReplace		*m_findreplace;
 };

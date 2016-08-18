@@ -460,10 +460,10 @@ checkalways:
             
 			Sleep(DELAY_12HOUR); // 12 Hours			
 			//Sleep(60000); //1 min
-			
+
 		}
-	}
-			
+	}	
+
 	return 1;
 }
 

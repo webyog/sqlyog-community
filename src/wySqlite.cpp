@@ -255,7 +255,7 @@ wyBool wySQLite::Execute(wyString *query, wyString *err_msg)
 
         err_msg->SetAs(errmsg);
     }
-
+	free(errmsg);
     return (ret_ == SQLITE_OK) ? wyTrue : wyFalse;
 }
 

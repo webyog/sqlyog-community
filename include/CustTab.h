@@ -792,6 +792,9 @@ private:
 	/// Selected Tab
 	wyInt32         m_selectedtab;
 
+	///previously selected tab needed for tab deletion of tab other than selected tab
+	wyInt32         m_prevtab;
+
 	/// Starting Tab
 	wyInt32         m_starttab;
 

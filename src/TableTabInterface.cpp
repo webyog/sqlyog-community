@@ -20,6 +20,7 @@
 #include "TableTabInterfaceTabMgmt.h"
 #include "TabEditorSplitter.h"
 #include "TabFields.h"
+#include "MySQLVersionHelper.h"
 #include "TabIndexes.h"
 #include "TabForeignKeys.h"
 #include "TabAdvancedProperties.h"
@@ -60,6 +61,7 @@ TableTabInterface::TableTabInterface(HWND hwnd, wyBool open_in_dialog, wyBool is
     m_open_in_dialog        =   open_in_dialog;
 	m_setfocustotab         =   setfocustotab;
     m_isfksupported         =   wyTrue;
+	m_isfkforndbcluster		=	wyFalse;
 
     m_dirtytab              =   wyFalse;
     m_disableenchange       =   wyFalse;
@@ -174,8 +176,8 @@ TableTabInterface::Create()
         {
             if(m_setfocustotab == TABFK)
             {
-                MessageBox(m_hwndparent, _(L"The selected table does not support foreign keys.\nTable engine must be InnoDB, PBXT or SolidDB."), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
-                return wyFalse;
+                MessageBox(m_hwnd, _(L"The selected table does not support foreign keys.\nTable engine must be InnoDB, PBXT, SolidDB or ndbcluster (if ndbcluster engine version is greater than or equal to 7.3)."), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
+				return wyFalse;
             }
         }
     }
@@ -267,8 +269,8 @@ TableTabInterface::OnWmNotify(HWND hwnd, WPARAM wparam, LPARAM lparam)
 			lpnmctc = (LPNMCTC)lparam;
             if(lpnmctc->count == 2 && !m_isfksupported)
             {
-				MessageBox(m_hwnd, _(L"The selected table does not support foreign keys.\nTable engine must be InnoDB, PBXT or SolidDB."), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
-                return 0;
+				MessageBox(m_hwnd, _(L"The selected table does not support foreign keys.\nTable engine must be InnoDB, PBXT, SolidDB or ndbcluster (if ndbcluster engine version is greater than or equal to 7.3)."), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
+				return 0;
 			}
 
             return m_ptabintmgmt->OnTabSelChanging();
@@ -695,19 +697,29 @@ TableTabInterface::OnWmCommand(HWND hwnd, WPARAM wParam, LPARAM lParam)
                     if(!m_disableenchange)
                     {
                         wyString    str;
+						MDIWindow	*wnd = NULL;
+						
+						VERIFY(wnd = GetActiveWin());
+						/// getting the engine version from the combo-box
                         GetComboboxValue((HWND)lParam, str);
-                        
+            
                         if((HWND)lParam == m_hcmbtabletype)
                         {
-                            if(str.CompareI("innodb") == 0 || str.CompareI("pbxt") == 0 || str.CompareI(STR_DEFAULT) == 0)
-                                m_isfksupported = wyTrue;
-                            else
-                            {
-                                m_isfksupported = wyFalse;
-                                /// Changing the selected subtab, if the active subtab is Foreign-Keys
-                                if(m_ptabintmgmt->GetActiveTabImage() == IDI_MANREL_16)
-                                    m_ptabintmgmt->SelectTab(1);
-                            }
+                            /// if engine type is ndbcluster we need to check if, this version of ndbcluster engine supports foreign key or not
+							/// Foreign key support for NDBcluster engine was provided from cluster version 7.3 and greater.
+							if(str.CompareI("ndbcluster") == 0)
+							{
+								m_isfkforndbcluster = GetClusterdbSupportForFk(wnd);
+							}
+							if(str.CompareI("innodb") == 0 || str.CompareI("pbxt") == 0 || str.CompareI(STR_DEFAULT) == 0 || m_isfkforndbcluster)
+								m_isfksupported = wyTrue;
+							else
+						    {
+								m_isfksupported = wyFalse;
+								/// Changing the selected subtab, if the active subtab is Foreign-Keys
+								if(m_ptabintmgmt->GetActiveTabImage() == IDI_MANREL_16)
+									m_ptabintmgmt->SelectTab(1);
+							}
                         }
                         else if(!m_ptabintmgmt->m_tabpreview->m_istabempty && ((HWND)lParam == m_hcmbdbname))
                         {
@@ -994,7 +1006,6 @@ TableTabInterface::OnClickSave(wyBool onclosetab, wyBool showsuccessmsg)
 void
 TableTabInterface::CancelChanges()
 {
-    wyString str;
     m_disableenchange = wyTrue;
     SendMessage(m_hedittblname, WM_SETTEXT, 0, (LPARAM)(m_isaltertable ? m_origtblname.GetAsWideChar() : TEXT(""))); //Sets table name
 
@@ -1004,9 +1015,9 @@ TableTabInterface::CancelChanges()
 
     SendMessage(m_hcmbtabletype, CB_SELECTSTRING, 0, (LPARAM) (m_isaltertable ? m_origtableengine.GetAsWideChar() : TEXT(STR_DEFAULT)));
 
-    /// Getting table-type combobox value and setting m_isfksupported variable
-    GetComboboxValue(m_hcmbtabletype, str);
-    m_isfksupported = ((str.CompareI("innodb") == 0) || str.CompareI("pbxt") == 0 || str.CompareI(STR_DEFAULT) == 0) ? wyTrue : wyFalse;
+    /// setting m_isfksupported variable
+	wyBool error = wyTrue;
+	m_isfksupported = IsTableInnoDB(error);
 
     if(m_ismysql41)
     {
@@ -2428,7 +2439,11 @@ TableTabInterface::SetFocusToGridRow(wyString& objname)
 wyBool
 TableTabInterface::IsTableInnoDB(wyBool& error)
 {
-    MYSQL_ROW	    mystatusrow;
+	MYSQL_ROW	    mystatusrow; 
+	wyString		query, str; 
+	MDIWindow		*wnd = NULL;
+
+	VERIFY(wnd = GetActiveWin());
 
     m_mdiwnd->m_tunnel->mysql_data_seek(m_myrestablestatus, 0);
 	VERIFY(mystatusrow = m_mdiwnd->m_tunnel->mysql_fetch_row(m_myrestablestatus));
@@ -2439,15 +2454,23 @@ TableTabInterface::IsTableInnoDB(wyBool& error)
     }
     error = wyFalse;
 
-	if(!mystatusrow[1] || (stricmp(mystatusrow[1], "InnoDB") != 0 && stricmp(mystatusrow[1], "pbxt")!= 0 &&
-        stricmp(mystatusrow[1], "solidDB") != 0 ))
+	str.SetAs(mystatusrow[1]);
+	/// if engine type is ndbcluster we need to check if, this version of ndbcluster engine supports foreign key or not
+	/// Foreign key support for NDBcluster engine was provided from cluster version 7.3 and greater.
+	if(str.CompareI("ndbcluster") == 0)
+	{		
+		m_isfkforndbcluster = GetClusterdbSupportForFk(wnd);
+	}
+	if(str.CompareI("innodb") == 0 || str.CompareI("pbxt") == 0 || str.CompareI(STR_DEFAULT) == 0 || m_isfkforndbcluster)
+	{	
+		m_isfksupported = wyTrue;
+		return wyTrue;
+	}
+	else
 	{
+		m_isfksupported = wyFalse;
 		return wyFalse;
 	}
-	
-	SetCursor(LoadCursor(NULL, IDC_ARROW ));
-
-	return wyTrue;
 }
 
 wyBool

@@ -120,7 +120,7 @@ Ctrl+Shift+H		Open History Tab
 Ctrl+Shift+I		Open Info Tab
 Ctrl+C			Copy
 Ctrl+A			Select All
-Ctrl+F			Find (SQL Window/Result Window And Table Data In Text Mode/Blob Viewer)
+Ctrl+F			Find (SQL Window/Result Window And Table Data In Text Mode/Blob Viewer/JSON Viewer)
 F3			Find Next (SQL Window/Result Window And Table Data In Text Mode)
 Ctrl+S			Save
 Ctrl+PgUp		Switch To Previous Tab

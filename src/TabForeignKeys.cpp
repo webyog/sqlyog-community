@@ -204,8 +204,8 @@ TabForeignKeys::OnTabSelChange()
     {
         if(!m_ptabmgmt->m_tabinterfaceptr->m_isfksupported)
         {
-            MessageBox(m_hwnd, _(L"The table does not support foreign keys.\r\nTable engine must be InnoDB, PBXT or SolidDB."), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
-            return;
+			MessageBox(m_hwnd, _(L"The selected table does not support foreign keys.\nTable engine must be InnoDB, PBXT, SolidDB or ndbcluster (if ndbcluster engine version is greater than or equal to 7.3)."), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
+			return;
         }
     }
 

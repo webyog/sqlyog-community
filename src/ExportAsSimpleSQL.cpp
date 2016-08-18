@@ -185,6 +185,7 @@ wyBool
 ExportAsSimpleSQL::SkipLength(MysqlDataType &retdatatype)
 {
     if(retdatatype.m_mysqltype.CompareI("blob")         == 0 ||
+		retdatatype.m_mysqltype.CompareI("json")         == 0 ||
        retdatatype.m_mysqltype.CompareI("date")         == 0 ||
        retdatatype.m_mysqltype.CompareI("timestamp")    == 0 || 
        retdatatype.m_mysqltype.CompareI("time")         == 0 || 

@@ -1013,6 +1013,7 @@ class DataView
         */
 		wyBool			        IsBlob(wyInt32 col);
 
+		wyBool			        IsJSON(wyInt32 col);
         ///Helper function to change the filter icon
         /**
         @returns void
@@ -1146,6 +1147,7 @@ class DataView
         */
 	    wyBool                  AppendDataToQuery(MYSQL_ROW myrow, wyInt32 col, wyInt32 colcount, wyString &query, wyBool isblob);
 
+		wyBool                  AppendDataToQueryJSON(MYSQL_ROW myrow, wyInt32 col, wyInt32 colcount, wyString &query, wyBool isJSON);
         ///Helper function for showing mysql errors
         /**
         @param query            : IN query that raised the error
@@ -1264,6 +1266,9 @@ class DataView
         @returns wyTrue if data is added else wyFalse
         */
         wyBool                  AddDataToQuery(MYSQL_ROW data, wyString &query, const wyChar* delimiter, const wyChar* nullcheck, wyInt32 col, wyBool isfirst = wyTrue, wyBool ischeckspdata = wyFalse);
+
+
+		wyBool                  AddDataToQueryJSON(MYSQL_ROW data, wyString &query, const wyChar* delimiter, const wyChar* nullcheck, wyInt32 col, wyBool isfirst = wyTrue, wyBool ischeckspdata = wyFalse);
 
         ///Function generates the query to check duplicates
         /**

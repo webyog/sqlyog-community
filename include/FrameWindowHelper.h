@@ -165,6 +165,7 @@
 #define		UM_GETEDITORTEXT							WM_USER+129
 #define		UM_QBITEMFROM								WM_USER+130
 #define		UM_QBITEMTO									WM_USER+131
+#define		UM_CHECKSTATECHANGE							WM_USER+132
 
 
 // some column #defines for validation.
@@ -246,6 +247,7 @@
 #define		SQLTEMPLATE_SECTION							"SQLTemplate"
 #define		STRING_NULL									"(NULL)"
 #define		STRING_BLOB									"BLOB..."
+#define		STRING_JSON									"JSON..."
 #define		BINARY_DATA									"(Binary/Image)"
 #define		STR_DEFAULT									" [default]"
 #define		SHIFTED										0x8000
@@ -523,7 +525,7 @@ All Files(*.*)\0*.*\0"
 #define BLOB_DATA			8
 #define DATETIME_DATA		16
 #define BIN_DATA			32
-
+#define JSON_DATA			64
 /// Function to notify user with various stuff.
 /**
 @param hwnd         : IN Window HANDLE
@@ -872,6 +874,8 @@ wyInt32  GetKeyWordCase();
 @returns void
 */
 void	GetColumnName(wyWChar *field);
+
+int		IsColumnTypeJson(wyWChar *field);
 
 /// Ensures a range is visible in the scintilla control
 /**

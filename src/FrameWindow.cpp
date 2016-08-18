@@ -257,12 +257,10 @@ FrameWindow::~FrameWindow()
 	{
 		delete m_conntab;
 	}
-
     delete m_statusbarmgmt;
     CloseL10n();
 
-
-		
+	
 
 }
 
@@ -8870,6 +8868,7 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 			pGlobals->m_pcmainwin->OnActiveConn();
 			pcquerywnd->m_pcqueryobject->OnSelChanged(TreeView_GetSelection(pcquerywnd->m_pcqueryobject->m_hwnd));
 			SetForegroundWindow(pcquerywnd->m_hwnd);
+	
             PostMessage(pGlobals->m_pcmainwin->m_hwndmain, WM_SETACTIVEWINDOW, (WPARAM)pcquerywnd->m_hwnd, 0 );
 			SetCursor(LoadCursor(NULL, IDC_ARROW));
 		}
@@ -10201,7 +10200,7 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 								temptabeditorele = new tabeditorelem;
 								WriteTabDetailsToTable(temptabeditorele, temptabeditorele_temp, newqid, k, tempmdilist->m_id, tempmdilist_temp->m_activetab);
 								tempmdilist->m_listtabeditor->Insert(temptabeditorele);
-								
+
 							}
 						}
 
@@ -10290,14 +10289,13 @@ if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 							
 							temptabeditorele = new tabeditorelem;
 							WriteTabDetailsToTable(temptabeditorele, temptabeditorele_temp, k, k, tempmdilist->m_id, tempmdilist_temp->m_activetab);
-							tempmdilist->m_listtabeditor->Insert(temptabeditorele);
-
+							tempmdilist->m_listtabeditor->Insert(temptabeditorele);							
 						}
 						temptabeditorele_temp = (tabeditorelem*)temptabeditorele_temp->m_next;
 					}
-
 					pGlobals->m_mdiwlist->Insert(tempmdilist);
 				}
+
 //---------------------------------------------------------New Connecton Added in the linked List------------------------------------//
 
 			tempmdilist_temp = (MDIlisttemp*)tempmdilist_temp->m_next; //----Move to next connection window----//
@@ -10753,9 +10751,6 @@ FrameWindow::RestoreStatusDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM
 	return FALSE;
 }
 
-
-
-
 wyBool
 ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 {
@@ -11011,7 +11006,11 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 							}
 						}
 						if((temptabeditorele->m_iimage != IDI_QUERYBUILDER_16 && temptabeditorele->m_iimage != IDI_SCHEMADESIGNER_16) && (!temptabeditorele->m_isfile || temptabeditorele->m_isedited))
+						{
+							
 							SendMessage(temptabeditorele->m_pctabeditor->m_peditorbase->m_hwnd, SCI_SETTEXT, temptabdetail->m_content.GetLength(),(LPARAM)temptabdetail->m_content.GetString());
+							EditorFont::SetLineNumberWidth(temptabeditorele->m_pctabeditor->m_peditorbase->m_hwnd );
+						}
 						else
 						if(temptabeditorele->m_iimage == IDI_QUERYBUILDER_16 && (!temptabeditorele->m_isfile || temptabeditorele->m_isedited))
 							{
@@ -11034,6 +11033,7 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 								}
 								//CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd,  i, 1);
 								pcquerywnd->SetDirtyTitle();
+								delete doc;							
 							}
 #endif
 							}
@@ -11074,7 +11074,10 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 						temptabdetail = (tabdetailelem*)temptabdetail->m_next;
 						temptabeditorele = (tabeditorelem*)temptabeditorele->m_next;
 						pcquerywnd->m_listtabdetails->Remove(firstindex);
+							
+						
 					}
+
 					if(totaltabs == 0)
 					{
 						pcquerywnd->m_pctabmodule->CreateQueryEditorTab(pcquerywnd);
@@ -11199,7 +11202,7 @@ Htmlannouncementsproc(void *arg)
 	char		*received=NULL;
 	int status;
 	const wyChar    *langcode;
-	wyString productid, appmajorversion, appminorversion, extrainfo, url, htmlbuffer;
+	wyString productid, appmajorversion, appminorversion, extrainfo, url, htmlbuffer, str;
 	wyWChar		headers[1024*3] = {0};
 	wyUInt32 daysleft = 0;
 
@@ -11232,8 +11235,11 @@ Htmlannouncementsproc(void *arg)
 	appminorversion.SetAs(MINOR_VERSION UPDATE_VERSION);
 	extrainfo.SetAs(EXTRAINFO); // beta string	
 			
+#ifdef _DEBUG
+	url.SetAs("http://dev.webyog.com/notifications/sqlyog");
+#else
 	url.SetAs("http://www.webyog.com/notifications/sqlyog");
-
+#endif
 #ifdef _WIN64
 
 		url.AddSprintf("?user_type=%s&major_version=%s&minor_version=%s&extra=%s&os=win64&language=%s&uuid=%s", productid.GetString(), 
@@ -11269,14 +11275,20 @@ Htmlannouncementsproc(void *arg)
 	}
 	
 	received = http.GetResponse();
+	
 	if(!received)
 	{
 		goto cleanup;
 	}
-	htmlbuffer.SetAs(received);
 
-	pGlobals->m_announcementshtml.SetAs(received);
+	str.SetAs(received);
+	///The HTTP message received from the server will contain "closeann" string if its a valid HTTP response from webyog server.
+	if(str.FindI("closeann", 0) != -1)
+	{
+		htmlbuffer.SetAs(received);
 
+		pGlobals->m_announcementshtml.SetAs(received);
+	}
 
 cleanup:
 	

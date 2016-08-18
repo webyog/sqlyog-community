@@ -417,6 +417,21 @@ IsMySQL564MariaDB53(Tunnel *tunnel, PMYSQL mysql)
 		return wyFalse;
 }
 
+void GetVersionInfoforAutoComplete(MYSQL *mysql, wyString &VersionS)
+{
+	long me = mysql_get_server_version(mysql);
+	char *dbString = mysql_get_server_info(mysql);
+	if(strstr(dbString, "MariaDB")) ///if its mariadb,check if the version is above 10.2
+	{
+		if(me >= 100200) 
+			me = 50713;///if mariadb version is > 10.2 it supports JSON, hence include functions till mysql version 5.7.13
+		else
+			me = 50066;///if mariadb version is < 10.2, include functions only for previous versons of mysql.		
+	}
+	
+ 	VersionS.Sprintf("%ld", me);
+}
+
 //DEFAULT, ON UPDATE clause for DATETIME 
 wyBool
 IsMySQL565MariaDB1001(Tunnel *tunnel, PMYSQL mysql)
@@ -456,6 +471,30 @@ wyBool IsMySQL57(Tunnel * tunnel, PMYSQL mysql)
 
 }
 
+// MySQL 5.7.8
+wyBool IsMySQL578(Tunnel * tunnel, PMYSQL mysql)
+{
+	long me = mysql_get_server_version(*mysql);
+	const char *dbString = mysql_get_server_info(*mysql);
+
+	if(me >= 50708 && !strstr(dbString, "MariaDB") )
+		return wyTrue;
+	else
+		return wyFalse;
+}
+/*
+wyBool IsClusterDb(Tunnel * tunnel, PMYSQL mysql)
+{
+	long me = mysql_get_server_version(*mysql);
+
+	const char *dbString = mysql_get_server_info(*mysql);
+
+	if(me >= 50708 && strstr(dbString, "ClusterDB") )
+		return wyTrue;
+	else
+		return wyFalse;
+}
+*/
 
 //MySQL 5.7.7
 wyBool

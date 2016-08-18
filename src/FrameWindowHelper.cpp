@@ -1787,7 +1787,7 @@ GetColWidth(HWND grid, MYSQL_FIELD * myfield, wyInt32 index)
 	// now calculate which has to implemented,
 	extra  = 5;
 	// but first we check is it blob
-	if((myfield->type >= FIELD_TYPE_TINY_BLOB)&&(myfield->type <= FIELD_TYPE_BLOB))
+	if(((myfield->type >= FIELD_TYPE_TINY_BLOB)&&(myfield->type <= FIELD_TYPE_BLOB)) || (myfield->type == FIELD_TYPE_JSON) ) 
     {
 		//cx = maxlen.cx + extra;
 		//Same code repeated in else condition also, I will change this
@@ -2329,6 +2329,14 @@ GetColumnName(wyWChar *field)
     return;
 }
 
+int  IsColumnTypeJson(wyWChar *field)
+{
+	wchar_t* result=wcschr(field,L', ');
+	if(wcsncmp(result,L", json",6))
+		return 0;
+	else 
+		return 1;
+}
 
 wyBool
 IsGetObjectInfoAlways()

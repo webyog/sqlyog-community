@@ -123,6 +123,7 @@ UserManager::UserManager()
     m_hobjprivicon = NULL;
     m_gripproc = NULL;
     m_isdeleteuser = wyFalse;
+	m_userlist = NULL;
 #ifdef _DEBUG
     m_sqlite.SetLogging(wyTrue);
 #else
@@ -178,6 +179,12 @@ UserManager::~UserManager()
         m_controllist.Remove(pdlgctrl);
         delete pdlgctrl;
     }
+	while(m_userlist)
+	{	
+		USERLIST *temp1 = m_userlist;
+		m_userlist = m_userlist->next;
+		delete temp1;
+	}
 }
 
 PrivilegedObject::PrivilegedObject(wyInt32 privcount, Privileges** privileges, wyInt32 context, wyInt32 value)
@@ -469,6 +476,8 @@ UserManager::InitDialog(HWND hwnd)
 
     //set the db context to mysql
     SetResetDBContext(wyTrue);
+
+
 
     return wyTrue;
 }
@@ -859,26 +868,31 @@ wyBool
 UserManager::OnWMCommand(WPARAM wparam, LPARAM lparam)
 {
     wyInt32 ret;
-
     //for any edit control changes
     if(m_initcompleted == wyTrue && 
        (HIWORD(wparam) == EN_CHANGE || HIWORD(wparam) == CBN_EDITCHANGE))
-    {
-        SetDirtyFlag(wyTrue);
+    { 
+        if(LOWORD(wparam)!= IDC_USERCOMBO)	
+			SetDirtyFlag(wyTrue);
 
-        if(LOWORD(wparam) == IDC_PASSWORD ||
+		if(LOWORD(wparam) == IDC_PASSWORD ||
            LOWORD(wparam) == IDC_PASSWORD_CONFIRM)
         {
             m_ispasswordchanged = wyTrue;
         }
 
 		if(LOWORD(wparam)== IDC_USERCOMBO){
-		 OnHandleEditChange();
-		
+			OnHandleEditChange();
 		}
 
         return wyTrue;
     }
+	if(m_initcompleted == wyTrue && 
+       (HIWORD(wparam) == CBN_SELCHANGE))
+	{
+		if(!SendMessage(GetDlgItem(m_hwnd,IDC_USERCOMBO), CB_GETDROPPEDSTATE, NULL, NULL))
+			OnUserComboChange();
+	}
 
     switch(LOWORD(wparam))
     {
@@ -910,14 +924,14 @@ UserManager::OnWMCommand(WPARAM wparam, LPARAM lparam)
             break;
 
         case IDC_USERCOMBO:
-           if(HIWORD(wparam) == CBN_SELCHANGE)
+			///check upon closeup, not when changed
+           if(HIWORD(wparam) == CBN_CLOSEUP)// || HIWORD(wparam) == CBN_SELCHANGE)
             {
-                OnUserComboChange();
+					OnUserComboChange();
             }
             break;
 
         case IDC_HOSTNAME:
-
             if(HIWORD(wparam) == CBN_SELCHANGE && m_initcompleted)
             {
                 SetDirtyFlag();
@@ -981,6 +995,7 @@ UserManager::OnSaveChanges()
         m_selindex = SendMessage(hwndcombo, CB_ADDSTRING, 0, (LPARAM)user.GetAsWideChar());
         SendMessage(hwndcombo, CB_SETITEMDATA, (WPARAM)m_selindex, (LPARAM)m_username.GetLength());
         SendMessage(hwndcombo, CB_SETCURSEL, (WPARAM)m_selindex, 0);
+		
         SetWindowText(hwndcancel, U_CANCELBUTTON_TEXT);
         SetWindowText(hwndsave, U_SAVEBUTTON_TEXT);
         m_isedited = wyFalse;
@@ -1004,6 +1019,7 @@ UserManager::OnSaveChanges()
         //reset the flags
         m_isnewuser = wyFalse;
         EnableDisableSaveCancel();
+		SendMessage(hwndcombo, CB_DELETESTRING, m_selindex, 0);
         SetFocus(GetDlgItem(m_hwnd, IDC_OBTREE));
     }
     else
@@ -1018,7 +1034,7 @@ UserManager::OnSaveChanges()
 wyBool
 UserManager::AddNewUser()
 {
-    wyString    query, username, host, password, password2, tempuser, temphost, temppassword;
+    wyString    query, username, host, password, password2, tempuser, temphost, temppassword, temp;
     wyWChar     buffer[SIZE_128];
     wyInt32     ret;
 
@@ -1087,11 +1103,28 @@ UserManager::AddNewUser()
             return wyFalse;
         }
     }
-
-    //set the user name and apply the limitations
+	
     m_username.SetAs(username);
     m_host.SetAs(host);
+
+	temp.SetAs(username.GetString());
+	temp.AddSprintf("@%s",host.GetString()); 
+
+	USERLIST *tempnode = new USERLIST; 
+	tempnode->m_uname.SetAs(temp.GetString());
+	tempnode->m_dropdown = wyFalse;
+	tempnode->m_itemvalue.Sprintf("%d",m_usercount);
+	tempnode->next = NULL;
+
+	USERLIST *itr = m_userlist;
+	while(itr->next)
+		itr = itr->next;
+	itr->next = tempnode;
+
+
+
     ApplyLimitations();
+	m_usercount += 1;
     return wyTrue;
 }
 
@@ -1138,13 +1171,27 @@ UserManager::PopulateUserCombo()
     MYSQL_RES*  myres;
     MYSQL_ROW   row;
     wyString    temp;
-    wyInt32     retflag = 0, index, length;
+    wyInt32     retflag = 0, index, length, i=0;
     HWND        hwndusercombo = GetDlgItem(m_hwnd, IDC_USERCOMBO);
 
     SetCursor(LoadCursor(NULL, IDC_WAIT));
 
     //reset the combo box contents
     SendMessage(hwndusercombo, CB_RESETCONTENT, 0, 0);
+	query.SetAs("SELECT COUNT(`Host`) FROM `mysql`.`user`");
+	myres = ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query);
+
+    if(myres == NULL)
+    {
+        OnUMError(query.GetString(), wyTrue);
+        return -1;
+    }
+	if((row =  m_hmdi->m_tunnel->mysql_fetch_row(myres)))
+    {
+        temp.SetAs(row[0], m_hmdi->m_ismysql41);
+		m_usercount = temp.GetAsInt32();
+	}
+	m_hmdi->m_tunnel->mysql_free_result(myres);
 
     //execute the query and get all the entries
     query.SetAs("SELECT `Host`, `User` FROM `mysql`.`user`");
@@ -1157,13 +1204,30 @@ UserManager::PopulateUserCombo()
     }
 
     //add it to combo box in the ascending order
+	USERLIST *itr;
     while((row =  m_hmdi->m_tunnel->mysql_fetch_row(myres)))
     {
+		USERLIST *tempnode = new USERLIST;
         temp.SetAs(row[1], m_hmdi->m_ismysql41);
         length = temp.GetLength();
         temp.AddSprintf("@%s", row[0]);        
         index = SendMessage(hwndusercombo, CB_ADDSTRING, 0, (LPARAM)temp.GetAsWideChar());
         SendMessage(hwndusercombo, CB_SETITEMDATA, (WPARAM)index, (LPARAM)length);
+		tempnode->m_uname.SetAs(temp.GetString());
+		tempnode->m_dropdown = wyTrue;
+		tempnode->m_itemvalue.Sprintf("%d",i);
+		tempnode->next = NULL;
+		i++;
+		if(!m_userlist)
+		{	
+			itr = tempnode;
+			m_userlist = tempnode;
+		}
+		else
+		{
+			itr->next = tempnode;
+			itr = itr->next;
+		}
     }
 
     m_hmdi->m_tunnel->mysql_free_result(myres);
@@ -1305,7 +1369,14 @@ UserManager::OnUserComboChange()
        m_isdeleteuser == wyFalse &&
        m_selindex == SendMessage(hwndusercombo, CB_GETCURSEL, 0, 0))
     {
-        return;
+		len = SendMessage(hwndusercombo, CB_GETLBTEXTLEN, (WPARAM)m_selindex, 0) + 1;
+		buffer = new wyWChar[len + 1];
+		SendMessage(hwndusercombo, CB_GETLBTEXT, (WPARAM)m_selindex, (LPARAM)buffer);
+		wyString user;
+		user.SetAs(buffer);
+		delete buffer;
+		if(user.CompareI(m_username) == 0)
+			return;
     }
 
     //prompt if there is any unsaved changes
@@ -1323,12 +1394,19 @@ UserManager::OnUserComboChange()
 
     if(m_selindex == -1)
     {
-        EndDialog(m_hwnd, 0);
-        MessageBox(m_hwnd, 
+		wyWChar     str[70] = {0};
+
+		if(GetWindowText(GetDlgItem(m_hwnd,IDC_USERCOMBO), str, 65))
+		if(SendMessage(GetDlgItem(m_hwnd,IDC_USERCOMBO), CB_FINDSTRING, -1,(LPARAM)str) != CB_ERR)
+		{
+			EndDialog(m_hwnd, 0);
+			MessageBox(m_hwnd, 
                    _(L"User Manager cannot continue with empty user set. Closing now"), 
                    pGlobals->m_appname.GetAsWideChar(),
                    MB_OK | MB_ICONINFORMATION);
+		}
         return;
+		
     }
 
     //set the current user name and host name
@@ -1337,7 +1415,7 @@ UserManager::OnUserComboChange()
     SendMessage(hwndusercombo, CB_GETLBTEXT, (WPARAM)m_selindex, (LPARAM)buffer);
     curruser.SetAs(buffer);
     delete[] buffer;
-    len = SendMessage(hwndusercombo, CB_GETITEMDATA, (WPARAM)m_selindex, 0);
+	len =  curruser.FindChar('@');
     temp = curruser.Substr(0, len);
     m_username.SetAs(temp ? temp : "");
     temp = curruser.Substr(len + 1, curruser.GetLength() - len - 1);
@@ -1364,28 +1442,94 @@ UserManager::OnUserComboChange()
 void
 UserManager::OnHandleEditChange()
 {
-    int     id;
-    int         len = -1,textlen=-1;
+    int			id = -1, i, status = 0, index;
+    int         len = -1, textlen=-1;
+	wyInt32		temp = 0;
 	wyWChar     str[70] = {0};
-	wyWChar   textstr[70] = {0};
+	wyChar		str1[140] = {0};
+	wyWChar		textstr[70] = {0};
     HWND        hwndusercombo = GetDlgItem(m_hwnd, IDC_USERCOMBO);
-    len = GetWindowText(hwndusercombo, str, 65);
-	id = SendMessage(hwndusercombo, CB_SELECTSTRING, -1, (LPARAM)str);
-	if(id != CB_ERR)
-        {
-		if(len==1)
-			SendMessage(hwndusercombo, CB_SHOWDROPDOWN, FALSE, NULL);
+	USERLIST *itr = m_userlist;
 
-		SendMessage(hwndusercombo, CB_SHOWDROPDOWN, TRUE, NULL);
-		SetCursor(LoadCursor(NULL, IDC_ARROW));
-		SetWindowText(hwndusercombo,str);
-		SendMessage(hwndusercombo, CB_SETEDITSEL, NULL, MAKELPARAM(len,len));
-        }
-	else
+	len = GetWindowText(hwndusercombo, str, 65);
+	int ret = wcstombs ( str1, str, sizeof(str1) ); 
+	if(len)
+	{
+		while(itr)
+		{	 
+			if(itr->m_uname.GetLength() == 0)
+			{
+				itr = itr->next;
+				continue;
+			}
+			wyString t;
+			t.SetAs(itr->m_uname.GetAsWideChar());
+			temp = t.FindI(str1, 0);
+			if(temp != -1)
+			{
+				status=1;
+			}
+			if(temp != -1 && itr->m_dropdown == wyFalse)
+			{
+				index=SendMessage(hwndusercombo, CB_ADDSTRING, 0,(LPARAM)itr->m_uname.GetAsWideChar());
+				VERIFY(SendMessage(hwndusercombo, CB_SETITEMDATA, index,itr->m_itemvalue.GetAsInt32()));
+				itr->m_dropdown=wyTrue;	
+			}
+			
+			if(temp == -1 && itr->m_dropdown==wyTrue)
+			{
+				 int index_delete=SendMessage(hwndusercombo,CB_FINDSTRINGEXACT,-1,(LPARAM)itr->m_uname.GetAsWideChar());
+				 SendMessage(hwndusercombo, CB_DELETESTRING, index_delete,NULL);
+				 itr->m_dropdown=wyFalse;
+			}
+			itr = itr->next;
+	   }
+	
+	
+	}
+	if(!len || status == 0)
+	{
+		SendMessage(hwndusercombo, CB_SETCURSEL, -1, 0);
+		
+		for(itr = m_userlist; itr; itr = itr->next)
+		{
+			if(itr->m_uname.GetLength())
+			{			
+				if(itr->m_dropdown == wyFalse)
+				{
+					index=SendMessage(hwndusercombo, CB_ADDSTRING, 0,(LPARAM)itr->m_uname.GetAsWideChar());
+					VERIFY(SendMessage(hwndusercombo, CB_SETITEMDATA, index, (LPARAM)itr->m_itemvalue.GetAsInt32()));
+					itr->m_dropdown=wyTrue;
+				}		
+			}
+		}
+
+		if(len)
 		{
 			SetWindowText(hwndusercombo,str);
-			SendMessage(hwndusercombo, CB_SETEDITSEL,NULL, MAKELPARAM(len-1,len));
+			if(SendMessage(hwndusercombo, CB_GETDROPPEDSTATE, NULL, NULL) == FALSE)
+			{
+				SendMessage(hwndusercombo, CB_SHOWDROPDOWN, TRUE, NULL);
+				SetCursor(LoadCursor(NULL, IDC_ARROW));					
+			}
+			SendMessage(hwndusercombo, CB_SETEDITSEL, NULL, MAKELPARAM(0,-1));
+		}		
+	}
+	else
+	{
+		if(SendMessage(hwndusercombo, CB_GETDROPPEDSTATE, NULL, NULL) == FALSE)
+		{
+			SendMessage(hwndusercombo, CB_SHOWDROPDOWN, TRUE, NULL);
+			SetCursor(LoadCursor(NULL, IDC_ARROW));					
 		}
+		int indexh = SendMessage(hwndusercombo, CB_FINDSTRING, -1,(LPARAM)str);
+		if(indexh != CB_ERR)
+			SendMessage(hwndusercombo, CB_SETCURSEL, indexh, NULL);
+		SetWindowText(hwndusercombo,str);	
+		SendMessage(hwndusercombo, CB_SETEDITSEL, NULL, MAKELPARAM(0,-1));
+		SendMessage(hwndusercombo, CB_SETEDITSEL, NULL, MAKELPARAM(-1,-1));
+	}
+	
      
 }
 
@@ -2009,7 +2153,8 @@ UserManager::OnCancelChanges()
 wyBool
 UserManager::ApplyChanges(wyBool issave)
 {
-    wyString    query, errormsg, temp, user;
+    wyString    query, errormsg, temp, user, userold;
+	wyWChar *	buffer;
     wyInt32     retval;
     HWND        hwndobtree = GetDlgItem(m_hwnd, IDC_OBTREE);
     HWND        hwndprivtree = GetDlgItem(m_hwnd, IDC_PRIVOBTREE);
@@ -2038,12 +2183,24 @@ UserManager::ApplyChanges(wyBool issave)
             FlushPrivileges();
 
             user.Sprintf("%s@%s", m_username.GetString(), m_host.GetString());
-
-            //update the combo box
+			wyInt32 len = SendMessage(hwndcombo, CB_GETLBTEXTLEN, (WPARAM)m_selindex, 0) + 1;
+			buffer = new wyWChar[len + 1];
+			SendMessage(hwndcombo, CB_GETLBTEXT, (WPARAM)m_selindex, (LPARAM)buffer);
+			userold.SetAs(buffer);
+			delete[] buffer;
+			//update the combo box
             SendMessage(hwndcombo, CB_DELETESTRING, (WPARAM)m_selindex, 0);
             m_selindex = SendMessage(hwndcombo, CB_ADDSTRING, 0, (LPARAM)user.GetAsWideChar());
             SendMessage(hwndcombo, CB_SETITEMDATA, (WPARAM)m_selindex, (LPARAM)m_username.GetLength());
             SendMessage(hwndcombo, CB_SETCURSEL, (WPARAM)m_selindex, 0);
+			for(USERLIST* itr = m_userlist; itr ;itr = itr->next)
+			{
+				if(userold.CompareI(itr->m_uname) == 0)
+				{
+					itr->m_uname.SetAs(user.GetString());
+					break;
+				}
+			}
 
             //set the tree view item
             tvi.mask = TVIF_TEXT;
@@ -2426,10 +2583,32 @@ UserManager::ExecuteGrantRevoke(wyString* grantquery, wyString* revokequery)
 wyBool
 UserManager::DropUser()
 {
-    wyString query, tempuser, temphost;
+    wyString query, tempuser, temphost, temp;
 
     EscapeMySQLString(m_username.GetString(), tempuser);
     EscapeMySQLString(m_host.GetString(), temphost);
+	
+	temp.SetAs(tempuser.GetString());
+	temp.AddSprintf("@%s",temphost.GetString());
+	m_usercount -= 1;
+	USERLIST *itr = m_userlist, *prev = m_userlist;
+	if(temp.CompareI(itr->m_uname) == 0 )
+	{
+		m_userlist = itr->next;
+		delete itr;
+	}
+	else
+	{
+		for(itr = itr->next; itr ;itr = itr->next, prev = prev->next)
+		{
+			if(temp.CompareI(itr->m_uname) == 0)
+			{
+				prev->next = itr->next;
+				delete itr;
+				break;
+			}	
+		}
+	}
 
     //for MySQL > 5.02 , we use the direct DROP USER syntax 
     //else manually delete the user from the mysql tables
@@ -2443,7 +2622,6 @@ UserManager::DropUser()
         {
             return wyFalse;
         }
-
         return wyTrue;
     }
 
@@ -2781,6 +2959,21 @@ UserManager::OnDeleteUser()
         //delete the string from the combo box and call the combo change handler to automate the operation
         SendMessage(hwndcombo, CB_DELETESTRING, (WPARAM)m_selindex, 0);
         m_selindex = 0;
+		//if there are no more users with the filter applied in edit change deleting the last one will give empty editbox,
+		//which shouldnt be allowed, so repopulate usercombo and select first one.
+		if(SendMessage(hwndcombo, CB_GETCOUNT, 0, 0) == 0)
+		{
+			int index;
+			for(USERLIST *itr = m_userlist; itr; itr = itr->next)
+			{
+				if(itr->m_uname.GetLength())
+				{			
+					index = SendMessage(hwndcombo, CB_ADDSTRING, 0,(LPARAM)itr->m_uname.GetAsWideChar());
+					VERIFY(SendMessage(hwndcombo, CB_SETITEMDATA, index, (LPARAM)itr->m_itemvalue.GetAsInt32()));
+					itr->m_dropdown=wyTrue;		
+				}
+			}
+		}
         SendMessage(hwndcombo, CB_SETCURSEL, (WPARAM)m_selindex, 0);
         m_isedited = wyFalse;
         OnUserComboChange();

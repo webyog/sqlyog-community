@@ -106,6 +106,8 @@ a:link { color: #3b7dbb; text-decoration:none;} a:visited { color: #3b7dbb; text
 #define CSS_CLASS2 ".extendedcodecaptionstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right; padding-left:10px; padding-right:10px;}\
 .extendedcodedatastyle{font: 12px \"Courier New\", Courier, mono; text-align:right; padding-left:10px; padding-right:10px;}"  
 
+#define GET_NDB_VERSION_STRING ("select @@ndb_version_string")
+
 typedef struct treeviewparams
 {
 	HWND		hwnd;
@@ -331,6 +333,10 @@ void                    SetExplainMenuItems(HMENU hmenu, HWND hwnd);
 void                    GetCurrentQuery(HWND hwndedit, MDIWindow *wnd, wyString *query, wyInt32 &pos);
 
 void                    GetCurrentQueryForAuto(HWND hwndedit, MDIWindow *wnd, wyString *query, wyInt32 &pos);
+
+wyBool					GetClusterdbSupportForFk(MDIWindow *wnd);
+
+
 ///Handle the File menu(Remove QB, SD options with PRO)
 /**
 @param hmenu         : IN Handle to the menu

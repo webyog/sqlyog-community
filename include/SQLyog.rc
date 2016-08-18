@@ -1108,7 +1108,7 @@ END
 
 IDD_INSERTUPDATEBLOB DIALOGEX 0, 0, 427, 366
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
-CAPTION " Insert/Update Blob Field"
+CAPTION " Insert/Update Blob/JSON Field"
 FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     CONTROL         "Tab2",IDC_MAINTAB,"SysTabControl32",TCS_BUTTONS,7,7,176,97
@@ -1583,7 +1583,7 @@ BEGIN
     LTEXT           "&Blob viewer",IDC_EDITOR3,8,41,60,9
     LTEXT           " ",IDC_BLOBFONT,76,41,120,10,SS_WORDELLIPSIS
     PUSHBUTTON      "Change...",IDC_BLOBCHANGE,205,40,41,12
-    LTEXT           "Ob&ject Browser",IDC_EDITOR5,8,54,60,10
+      LTEXT           "Ob&ject Browser",IDC_EDITOR5,8,54,60,10
     LTEXT           " ",IDC_OBFONT,76,54,120,10,SS_WORDELLIPSIS
     PUSHBUTTON      "Change...",IDC_OBCHANGE,205,54,41,12
     LTEXT           "&Others",IDC_EDITOR4,8,68,60,10
@@ -1802,7 +1802,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,27,202,10
     CONTROL         "Paste object name in &editor on double-click",IDC_GETTEXTONDBCLICK,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,38,202,10
-    CONTROL         "Enable &word wrap in SQL editor and BLOB viewer",IDC_WORDWRAP,
+    CONTROL         "Enable &word wrap in SQL editor, BLOB and JSON viewer",IDC_WORDWRAP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,49,202,10
     CONTROL         "Enable transaction support for &batch process",IDC_TRANSACTIONENABLE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,60,202,10

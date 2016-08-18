@@ -237,6 +237,44 @@ OpenKeyWordsDB(sqlite3 **phdb)
     return wyTrue;
 }
 
+wyBool					
+GetClusterdbSupportForFk(MDIWindow *wnd)
+{
+	wyString	query, str1;
+	wyChar		*major, *minor;
+	wyChar		seps[] = ".";
+	wyInt32		majorver = 0, minorver = 0;
+	MYSQL_RES	*res;
+	MYSQL_ROW	myrow;
+	res = NULL;
+	query.Sprintf(GET_NDB_VERSION_STRING);
+	res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
+	if(!res)
+	{
+		return wyFalse;
+	}
+	VERIFY(myrow = wnd->m_tunnel->mysql_fetch_row(res));
+	if(!myrow)
+	{
+		wnd->m_tunnel->mysql_free_result(res);
+		return wyFalse;
+	}
+	str1.SetAs(myrow[0]);
+	str1.FindIAndReplace("ndb-","");
+	major = strtok((wyChar*)str1.GetString(), seps);
+	minor = strtok(NULL, seps);								
+	majorver = atoi(major);
+	minorver = atoi(minor);
+	wnd->m_tunnel->mysql_free_result(res);
+	if(majorver > 7 || (majorver >= 7 && minorver >= 3))
+	{
+		return wyTrue;
+	}
+	else
+	{
+		return wyFalse;
+	}
+}
 
 wyChar *
 GetUtf8String(const wyChar *ansistr)

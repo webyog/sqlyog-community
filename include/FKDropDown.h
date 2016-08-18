@@ -417,7 +417,7 @@ class FKDropDown
         ///Composite filter if any
         wyString                    m_compositefilter;
 
-        ///The button text to be shown in the blob columns
+        ///The button text to be shown in the blob/JSON columns
         wyString                    m_buttontext;
 
         ///Text for the column

@@ -80,6 +80,8 @@ BlobMgmt::Create(HWND hwndParent, PINSERTUPDATEBLOB pib, wyBool edit)
 	m_edit          =	edit;
 	m_hfont         =	NULL;
 	m_isblob		=   pib->m_isblob;
+	m_isJson		=	pib->m_isJson;
+	donot_close_window = wyTrue;
 
 	//Post 8.01F
 	//RepaintTabModule();
@@ -176,7 +178,9 @@ BlobMgmt::InitDlgVales()
 	VERIFY(m_hwndcombo = GetDlgItem(m_hwnddlg, IDC_COMBO));
     
 	InsertTab(m_hwndtab, 0, _(L"Text"));
-    InsertTab(m_hwndtab, 1, _(L"Image"));
+  
+	if(! m_isJson)
+	InsertTab(m_hwndtab, 1, _(L"Image"));
 	
 	// if its not word wrap then we need to destroy it.
 	SetEditWordWrap(m_hwndedit, wyTrue, wyTrue);
@@ -267,8 +271,10 @@ BlobMgmt::OnDlgProcWmCommand(WPARAM wparam, LPARAM lparam)
 	case IDOK:
 		if(ProcessOK() == wyTrue)
 		    VERIFY(yog_enddialog(m_hwnddlg, 1));
-        else
-            VERIFY(yog_enddialog(m_hwnddlg, 0));
+		else	if(! m_isJson)
+			VERIFY(yog_enddialog(m_hwnddlg, 0));
+		else if( m_isJson && ( donot_close_window==wyFalse ) ) // for closing the window if no changes are made and its a JSON type
+			VERIFY(yog_enddialog(m_hwnddlg, 0));
 		break;
 
 	case IDC_SAVETOFILE:
@@ -939,6 +945,8 @@ BlobMgmt::SaveToFile()
 {
 	OPENFILENAME	open;
 	wyWChar         filename[MAX_PATH + 1] = {0};
+	wyWChar			temp[MAX_PATH + 1] = {0};
+	wyWChar			extention[]=L".json";
 	HANDLE			hfile = NULL;
 	DWORD			dwbytesread;
 
@@ -953,7 +961,10 @@ BlobMgmt::SaveToFile()
 	open.lStructSize       = OPENFILENAME_SIZE_VERSION_400;
 	open.hwndOwner         = m_hwnddlg;
 	open.hInstance         = pGlobals->m_pcmainwin->GetHinstance();
-	open.lpstrFilter       = L"All Files(*.*)\0*.*\0";
+	if(m_isJson)
+		open.lpstrFilter       = L"JSON Files(*.json)\0*.json\0";
+	else
+		open.lpstrFilter       = L"All Files(*.*)\0*.*\0";
 	open.lpstrCustomFilter =(LPWSTR)NULL;
 	open.nFilterIndex      = 1L;
 	open.lpstrFile         = filename;
@@ -965,6 +976,12 @@ BlobMgmt::SaveToFile()
 	   return wyFalse;
 
 	// else successfull.
+	wcscpy(temp,filename);
+	wcsrev(temp);
+	wcsrev(extention);
+	if(m_isJson && wcsncmp(temp,extention,5))
+	wcscat(filename,L".json");
+	open.lpstrTitle		=	filename;
 	hfile = CreateFile((LPCWSTR)filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL,
 						 NULL);	
 
@@ -1094,10 +1111,21 @@ BlobMgmt::ProcessOK()
 		m_piub->m_isnull		= wyFalse;
 		m_piub->m_ischanged     = wyTrue;
 		
-		return wyTrue;
+		if(! m_isJson)
+			return wyTrue;
+		if(m_isJson && IsValidJsonText(m_piub->m_data))
+			return wyTrue;
+		else
+		{
+	        m_piub->m_ischanged     = wyFalse;  // to disable the save option in dataview
+			MessageBox(m_hwnddlg,L"Invalid JSON value. Please enter a valid JSON", 
+				pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR);
+			return wyFalse;
+		}
+
 	}
 
-	
+
 	// we change the blob otherwise
 	if(sel == 1 && m_olddata != m_piub->m_data && m_isencodingchanged == wyFalse)
 	{
@@ -1111,9 +1139,7 @@ BlobMgmt::ProcessOK()
 	if(m_isencodingchanged == wyTrue)
 	{
 		bufsize = SendMessage(m_hwndedit, SCI_GETTEXTLENGTH, 0, 0);
-		
 		VERIFY(newbuf = AllocateBuff(bufsize + 2));
-		
 		bufsize = SendMessage(m_hwndedit, SCI_GETTEXT, bufsize + 1,(LPARAM)newbuf);
 
 		m_piub->m_data          = (wyChar *)newbuf;
@@ -1121,8 +1147,19 @@ BlobMgmt::ProcessOK()
 		m_piub->m_isnull		= wyFalse;
 		m_piub->m_ischanged     = wyTrue;
 		m_blobdata.SetAs(newbuf);
-		
 		ProcessComboSelection(m_changedcombotext);
+		if(! m_isJson)
+			return wyTrue;
+		if(m_isJson && IsValidJsonText(m_piub->m_data))
+			return wyTrue;
+		else
+		{
+			m_piub->m_ischanged     = wyFalse;   // to disable the save option in the dataview 
+			
+			MessageBox(m_hwnddlg,L"Invalid JSON value. Please Enter a valid JSON", 
+				pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR);
+			return wyFalse;
+		}
 		return wyTrue;
 	}
 
@@ -1135,8 +1172,19 @@ BlobMgmt::ProcessOK()
 		m_piub->m_datasize      = 0;
 		m_piub->m_isnull		= wyFalse;
 		m_piub->m_ischanged     = wyTrue;
+		if(! m_isJson)
+			return wyTrue;
+		if(m_isJson && IsValidJsonText(m_piub->m_data))
+			return wyTrue;
+		else
+		{
+			m_piub->m_ischanged     = wyFalse;   // to disable the save option in the dataview 
+			
+			MessageBox(m_hwnddlg,L"Invalid JSON value. Please Enter a valid JSON", 
+				pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONERROR);
+			return wyFalse;
+		}
 		
-		return wyTrue;
 	}
 	
 	m_piub->m_olddata       = NULL;
@@ -1144,6 +1192,8 @@ BlobMgmt::ProcessOK()
 	m_piub->m_data          = m_olddata;
 	m_piub->m_datasize      = m_olddatasize;
 	m_piub->m_ischanged     = wyFalse;
+	if(m_isJson)    // IF no changes in the json viewer then on clicking OK it will close
+		donot_close_window=wyFalse;
 
 	return wyFalse;
 }
@@ -1486,4 +1536,32 @@ BlobMgmt::OnAccelFindNext(HWND hwnd)
     {
        FindOrReplace(hwnd, wyFalse);
     }
+}
+wyBool
+	BlobMgmt::IsValidJsonText(wyString txt)
+{
+	MYSQL_RES       *myres;
+	MYSQL_ROW		row;
+	wyString query;
+	MDIWindow		*wnd = NULL;
+	wyString		validator;
+	VERIFY(wnd = GetActiveWin());
+	if(!wnd)
+		return wyFalse;
+	query.SetAs("SELECT JSON_VALID('");
+	query.AddSprintf(("%s')"),txt.GetString());
+	myres	=	ExecuteAndGetResult(GetActiveWin(),wnd->m_tunnel,&wnd->m_mysql,query,wyFalse);
+	// wyFalse so that SELECT JSON_VALID is not displayed in the History tab
+	if(!myres && wnd->m_tunnel->mysql_affected_rows(wnd->m_mysql)== -1)
+	{
+		SetCursor(LoadCursor(NULL, IDC_ARROW));
+		return wyFalse;
+	}
+	row = wnd->m_tunnel->mysql_fetch_row(myres);
+	validator.AddSprintf(row[0]);
+	mysql_free_result(myres);
+	if(validator.GetAsInt32()==1)
+	return wyTrue;
+	else
+		return wyFalse;
 }

@@ -18,7 +18,7 @@
 
 
 
-#define		IS_BLOBVALUE(t) ((((t)>= MYSQL_TYPE_TINY_BLOB) && ((t)<= MYSQL_TYPE_BLOB)) || (t == MYSQL_TYPE_GEOMETRY))
+#define		IS_BLOBVALUE(t) ((((t)>= MYSQL_TYPE_TINY_BLOB) && ((t)<= MYSQL_TYPE_BLOB)) || (t == MYSQL_TYPE_GEOMETRY) || (t == MYSQL_TYPE_JSON) )
 
 #ifdef _WIN32
 

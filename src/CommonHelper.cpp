@@ -1934,6 +1934,11 @@ GetMySqlDataType(MysqlDataType *rettypedata, MYSQL_FIELD *fields, wyInt32 fieldn
             rettypedata->m_mysqltype.SetAs("text");
 		break;
 	
+	case MYSQL_TYPE_JSON:
+		rettypedata->m_exceltype.SetAs("JSON");
+        rettypedata->m_mysqltype.SetAs("JSON");
+		break;
+
 	case MYSQL_TYPE_GEOMETRY:
 		rettypedata->m_exceltype.SetAs("String");
 		rettypedata->m_mysqltype.SetAs("Geometry");
@@ -2939,7 +2944,10 @@ GetChildTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
 	fkey.SetAs(*fkeyinfo);
     
 	par = strstr((wyChar*)fkey.GetString(), "FOREIGN KEY (");
-
+	
+	///in cluster version 7.3.0 the show create table returns "FOREIGN KEY(" instead of "FOREIGN KEY ("
+	if(!par)
+		par = strstr((wyChar*)fkey.GetString(), "FOREIGN KEY(");
     wyString fk;
     
     if(par)

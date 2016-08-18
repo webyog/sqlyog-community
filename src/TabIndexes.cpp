@@ -580,6 +580,7 @@ TabIndexes::DoLengthValidation(wyInt32 row)
 	CustomGrid_GetItemText(m_hdlggrid, row, 1, datatype);
 
 	if((wcsicmp(datatype, L"blob")== 0)||
+		(wcsicmp(datatype, L"json")== 0)||
 		(wcsicmp(datatype, L"char")== 0)||
 		(wcsicmp(datatype, L"varchar")== 0)||
 		(wcsicmp(datatype, L"tinyblob")== 0)||

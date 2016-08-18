@@ -142,8 +142,9 @@ CCustTab::CCustTab(HWND hwnd)
     m_tabcontroldown = -1;
     m_overtabcontrol = -1;
     m_lparamdata = NULL;
-
-    hdc = GetDC(hwnd);
+	m_prevtab = 0;
+    
+	hdc = GetDC(hwnd);
     GetTextExtentPoint32(hdc, L">", 1, &m_size);
     ReleaseDC(hwnd, hdc);
     m_hwndprevfocus = NULL;
@@ -1350,6 +1351,8 @@ CCustTab::OnLButtonDown(WPARAM wPram, LPARAM lParam)
             m_closebuttondowntab = i;
         }
 
+		m_prevtab = m_selectedtab;
+
         if(i != -1)
         {
             if(m_selectedtab != i)
@@ -1445,8 +1448,23 @@ CCustTab::OnLButtonUp(WPARAM wPram, LPARAM lParam)
             {
                 OnWMSize();
                 ispaintonlyheader = wyFalse;
-            }
-        }
+
+				///for rightly selecting the previous tab when tab being deleted is not same as previously selected tab, or the selected tab is first one
+				if(m_prevtab != i)
+				{
+					if(m_prevtab > i)
+						m_prevtab -= 1;	
+				}
+				else if(m_prevtab != 0 && m_prevtab == m_tabs )
+				{
+					m_prevtab -= 1;	
+				}
+				if(SetCurSel(m_prevtab, 1) == wyFalse)
+				{
+					return 1;						
+				}     
+			}
+	}
     else if((i = OverTabControls(&pnt)) != -1)
     {
         if(i == m_overtabcontrol && i == m_tabcontroldown)

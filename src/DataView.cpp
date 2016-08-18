@@ -1014,7 +1014,7 @@ DataView::IsBinary(wyInt32 col)
     wyBool isbin;
 
     isbin = ((m_data->m_datares->fields[col].flags & BINARY_FLAG) && 
-        (m_data->m_datares->fields[col].type == MYSQL_TYPE_TINY_BLOB ||
+        (m_data->m_datares->fields[col].type == MYSQL_TYPE_TINY_BLOB || m_data->m_datares->fields[col].type == MYSQL_TYPE_JSON ||
         m_data->m_datares->fields[col].type == MYSQL_TYPE_MEDIUM_BLOB ||
         m_data->m_datares->fields[col].type == MYSQL_TYPE_BLOB ||
         m_data->m_datares->fields[col].type == MYSQL_TYPE_LONG_BLOB)) ? wyTrue : wyFalse;
@@ -1093,6 +1093,105 @@ DataView::AddDataToQuery(MYSQL_ROW data, wyString &query, const wyChar* delimite
 
     return isgenerated;
 }
+
+wyBool
+DataView::AddDataToQueryJSON(MYSQL_ROW data, wyString &query, const wyChar* delimiter, const wyChar* nullcheck, wyInt32 col, wyBool isfirst, wyBool ischeckspdata)
+{
+    wyBool      isjson,isbin ,isgenerated = wyFalse;
+    wyInt32     i, max;
+    wyString    colname;
+
+
+    //if valid col is specified then we will add data for that column only
+    if(col >= 0)
+    {
+        i = col;
+        max = col + 1;
+    }
+    //otherwise add data for all columns
+    else
+    {
+        i = 0;
+        max = m_data->m_datares->field_count;
+    }
+    
+    for(; i < max; i++)
+    {
+        //we ignore readonly columns
+        if(IsColumnReadOnly(i) == wyFalse && IsColumnVirtual(i) != 1 )
+        {
+            isbin = IsBinary(i);
+			isjson = IsJSON(i);
+
+            GetColumnName(colname, i);
+
+			if(isjson==wyFalse)
+			{
+				if(data[i] && strcmp(data[i], "NULL") != 0 && strcmp(data[i], "(NULL)") != 0)
+		    {	
+                query.AddSprintf("%s%s`%s` = ", 
+                    isfirst == wyFalse ? " " : "",
+                    isfirst == wyFalse ? delimiter : "",
+                    colname.GetString());
+
+                //consider interpreting keywords/functions
+                if(ischeckspdata == wyFalse || AppendSpecialDataToQuery(data[i], (wyChar*)colname.GetString(), query) == wyFalse)
+                {
+                    //if it is not special data or we dont want to consider special data, then add the raw data to query
+                    AppendDataToQuery(data, i, m_data->m_datares->field_count, query, isbin);
+                }
+            }
+		    else
+            {
+                //add query data for null, for an insert/update query nullcheck is '= NULL', for others it is 'IS NULL'
+			    query.AddSprintf("%s%s`%s` %s", 
+                    isfirst == wyFalse ? " " : "",
+                    isfirst == wyFalse ? delimiter : "",
+                    colname.GetString(),
+                    nullcheck);
+            }
+
+		    }
+            //for not null data
+			else
+			{
+			if(data[i] && strcmp(data[i], "NULL") != 0 && strcmp(data[i], "(NULL)") != 0)
+		    {	
+                query.AddSprintf("%s%s%s", 
+                    isfirst == wyFalse ? " " : "",
+                    isfirst == wyFalse ? delimiter : "",
+                    "JSON_CONTAINS(");
+
+                //consider interpreting keywords/functions
+                if(ischeckspdata == wyFalse || AppendSpecialDataToQuery(data[i], (wyChar*)colname.GetString(), query) == wyFalse)
+                {
+                    //if it is not special data or we dont want to consider special data, then add the raw data to query
+                    AppendDataToQuery(data, i, m_data->m_datares->field_count, query, isbin);
+                }
+				query.AddSprintf(",`%s`)",colname.GetString());
+
+            }
+		    else
+            {
+                //add query data for null, for an insert/update query nullcheck is '= NULL', for others it is 'IS NULL'
+			    query.AddSprintf("%s%s`%s` %s", 
+                    isfirst == wyFalse ? " " : "",
+                    isfirst == wyFalse ? delimiter : "",
+                    colname.GetString(),
+                    nullcheck);
+            }
+			}
+
+            //set some flags so that we can add proper delimiters
+            isfirst = wyFalse;
+            isgenerated = wyTrue;
+        }
+    
+	}
+
+    return isgenerated;
+}
+
 
 //function to generate query to find duplicates of an item in the table
 wyBool
@@ -1229,11 +1328,11 @@ DataView::GenerateDeleteQuery(wyString& query, wyBool issetlimit, wyUInt32 row)
         //if the row is modified but not saved, then we will consider the old data otherwise current data
         if(m_data->m_modifiedrow >= 0 && row == m_data->m_modifiedrow)
         {
-            isfirst = AddDataToQuery(m_data->m_oldrow->m_row, tempstr, "and ", "is null", -1) ? wyFalse : wyTrue;
+            isfirst = AddDataToQueryJSON(m_data->m_oldrow->m_row, tempstr, "and ", "is null", -1) ? wyFalse : wyTrue;
         }
         else
         {
-            isfirst = AddDataToQuery(m_data->m_rowarray->GetRowExAt(row)->m_row, tempstr, "and ", "is null", -1) ? wyFalse : wyTrue;
+            isfirst = AddDataToQueryJSON(m_data->m_rowarray->GetRowExAt(row)->m_row, tempstr, "and ", "is null", -1) ? wyFalse : wyTrue;
         }
 
         //whether to delete only the current row or all its duplicates
@@ -1334,8 +1433,11 @@ DataView::GenerateUpdateQuery(wyString &query, wyBool issetlimit)
         tempstr.Clear();
 
         //else add all the columns to the query
-        AddDataToQuery(m_data->m_oldrow->m_row, tempstr, "and ", "is null", -1);
-		
+	//	if(!FIELD_TYPE_JSON)
+   //    if(m_data->m_datares->fields->type != MYSQL_TYPE_JSON)
+	//	AddDataToQuery(m_data->m_oldrow->m_row, tempstr, "and ", "is null", -1);
+	//   else
+		AddDataToQueryJSON(m_data->m_oldrow->m_row, tempstr, "and ", "is null", -1);
         //whether to update only the current row or all its duplicates
         if(issetlimit == wyTrue)
         {
@@ -3041,8 +3143,24 @@ DataView::IsBlob(wyInt32 col)
 	myfield = m_wnd->m_tunnel->mysql_fetch_fields(m_data->m_datares);
 
 	if(myfield[col].charsetnr == CHARSET_NUMBER && 
-        (myfield[col].type == MYSQL_TYPE_LONG_BLOB || myfield[col].type == MYSQL_TYPE_MEDIUM_BLOB ||
+		(myfield[col].type == MYSQL_TYPE_LONG_BLOB || myfield[col].type == MYSQL_TYPE_MEDIUM_BLOB || myfield[col].type == MYSQL_TYPE_JSON ||
         myfield[col].type == MYSQL_TYPE_TINY_BLOB || myfield[col].type == MYSQL_TYPE_BLOB))
+	{
+			 return wyTrue;
+	}
+	
+    return wyFalse;
+}
+
+wyBool 
+DataView::IsJSON(wyInt32 col)
+{
+	MYSQL_FIELD* myfield;
+
+    //get the field struct
+	myfield = m_wnd->m_tunnel->mysql_fetch_fields(m_data->m_datares);
+
+	if(myfield[col].type == MYSQL_TYPE_JSON)
 	{
 			 return wyTrue;
 	}
@@ -3314,7 +3432,7 @@ wyBool
 DataView::HandleBlobValue(WPARAM wparam, LPARAM lparam)
 {
 	wyChar*             data = 0;
-	INSERTUPDATEBLOB	pib = {0};
+	INSERTUPDATEBLOB	pib = {0};	
 	BlobMgmt			biu;
     wyUInt32            len = 0;
 	wyInt32				offset = 0, row = 0, col = 0, isdataupdated = 0;
@@ -3350,8 +3468,8 @@ DataView::HandleBlobValue(WPARAM wparam, LPARAM lparam)
 
 	//to check whether it is a blob or text
 	pib.m_isblob = IsBlob(col);
-
-    //show blob
+	pib.m_isJson = IsJSON(col);
+	 //show blob
     ret = biu.Create(m_hwndgrid, &pib, isedit);
 
     //is anything changed
@@ -6113,7 +6231,7 @@ DataView::WriteFixed(HGLOBAL* hglobal, LPWSTR* buffer, wyUInt32 * nsize, wyChar 
 	wyWChar		*padwchar = NULL;
 	wyUInt32	padlen = 1;
 
-	if(field->type >= FIELD_TYPE_TINY_BLOB && field->type <= FIELD_TYPE_BLOB)
+	if(field->type >= FIELD_TYPE_TINY_BLOB && field->type <= FIELD_TYPE_BLOB  ||  field->type == FIELD_TYPE_JSON)
     {
 		return wyTrue;
     }
@@ -6979,7 +7097,7 @@ DataView::CreateColumns(wyBool isupdate)
         }
 		
         //if it is blob
-		if((fields[k].type >= FIELD_TYPE_TINY_BLOB) && (fields[k].type <= FIELD_TYPE_BLOB))
+		if((fields[k].type >= FIELD_TYPE_TINY_BLOB) && (fields[k].type <= FIELD_TYPE_BLOB) || fields[k].type == FIELD_TYPE_JSON)
         {
             //add blob mask
             gvcol.mask |= GVIF_TEXTBUTTON;
@@ -7564,8 +7682,11 @@ DataView::GridWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
        
         //open blob fileds
 	    case GVN_BUTTONCLICK:
-            pviewdata->HandleBlobValue(wparam, lparam);
-		    return TRUE;
+
+	//		MYSQL_FIELD*        fields;
+	//		fields = pviewdata->m_wnd->m_tunnel->mysql_fetch_fields(pviewdata->m_data->m_datares);
+				pviewdata->HandleBlobValue(wparam, lparam);
+					    return TRUE;
 
         //open FK dropdown
         case GVN_BROWSEBUTTONCLICK:
@@ -7641,7 +7762,7 @@ DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
 {
     HMENU       hmenu, htrackmenu;
     wyBool      iscolreadonly = wyTrue, iscolnullable = wyFalse, iscolhasdefault = wyFalse;
-    wyString    column;
+    wyString    column, columntype;
     wyInt32     copymenupos = 14,i,iscolvirtual=0;
     HWND        hwndtoolbar;
 	wyBool		isunsort = wyFalse;
@@ -7707,6 +7828,16 @@ DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
                     {
                         //check whether the column is nullable
                         iscolnullable = IsNullable(m_wnd->m_tunnel, m_data->m_fieldres, (wyChar*)column.GetString());
+						
+						if(!iscolnullable)
+						{
+							//if column type is timestamp,leave the set null key enabled as timestamp takes null and set to current timestamp
+							columntype = GetDataType(m_wnd->m_tunnel, m_data->m_fieldres, (wyChar*)column.GetString());
+							if(columntype.CompareI("timestamp") == 0)
+							{
+								iscolnullable = wyTrue;
+							}
+						}
 
                         //does the column has any defaults
                         iscolhasdefault = (GetDefaultValue(m_wnd->m_tunnel, m_data->m_fieldres, NULL, (wyChar*)column.GetString())) ? wyTrue : wyFalse;
@@ -7829,7 +7960,7 @@ DataView::SetFilterMenu(HMENU hmenu, wyInt32 row, wyInt32 col)
             text = GetCellValue(row, col, &len, wyFalse);
 
             //check if the column is binary/blob/spatial
-            isbinary = (m_data->m_datares->fields[col].type == MYSQL_TYPE_BIT || m_data->m_datares->fields[col].type == MYSQL_TYPE_GEOMETRY
+            isbinary = (m_data->m_datares->fields[col].type == MYSQL_TYPE_BIT || m_data->m_datares->fields[col].type == MYSQL_TYPE_JSON || m_data->m_datares->fields[col].type == MYSQL_TYPE_GEOMETRY
 		        || (m_data->m_datares->fields[col].type == MYSQL_TYPE_BLOB  && BlobMgmt::IsDataBinary(text, len) == wyTrue)) ? wyTrue : wyFalse;
 
             //dummy value

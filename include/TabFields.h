@@ -151,6 +151,8 @@ public:
 	//is mysql version>=5.7
 	wyBool                     m_ismysql57;
 
+	wyBool						m_ismysql578;
+
     /// Flag used to check one auto increment field selected
 	wyBool			            m_autoincrpresent;
 

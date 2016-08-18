@@ -72,6 +72,15 @@ class PrivilegedObject
         wyInt32     m_objecttype;
 };
 
+typedef struct userlist
+{
+	wyString	m_uname;
+	wyString	m_itemvalue;
+	wyBool		m_dropdown;
+	userlist	*next;
+	
+}USERLIST;
+
 //User Manager class
 class UserManager
 {
@@ -622,6 +631,8 @@ class UserManager
 
     private:
 
+		USERLIST				*m_userlist;
+
         //whether to show the respective limitations
         wyBool                  m_showlimitations[U_MAXLIMITATIONS];
 
@@ -645,6 +656,8 @@ class UserManager
 
         //host name of the selected user
         wyString                m_host;
+
+		wyInt32					m_usercount;
 
         //tree view image list
         HIMAGELIST              m_himagelist;

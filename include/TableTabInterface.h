@@ -78,6 +78,9 @@ public:
 
     //..Indicates whether FK is supported or not..?
     wyBool                                  m_isfksupported;
+	
+	//..Indicates if the mySQL cluster version supports foreign keys for NDBcluster or not.. 
+	wyBool									m_isfkforndbcluster;
 
     ///The index of sub-tab to be opened on opening the Alter Table tab
     wyInt32                                 m_setfocustotab;

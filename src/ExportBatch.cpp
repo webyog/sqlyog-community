@@ -157,17 +157,91 @@ ExportBatch::ExpDataDlgProc	(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 		break;
 	case WM_NOTIFY:
 		{
+			TVHITTESTINFO ht = {0};
 			if(lpnm->idFrom == IDC_EXPORTTREE && lpnm->code == NM_CLICK)
+			{
 				HandleTreeViewItem(lParam, wParam);
+				HWND	hwndexpmode;
+				wyInt32	chkstate;
+	
+				VERIFY(hwndexpmode = GetDlgItem(hwnd, IDC_CHK_DATAONLY));
+				chkstate = SendMessage(hwndexpmode, BM_GETCHECK, 0, 0);
+				if(chkstate == BST_CHECKED)
+				{
+					DWORD dwpos = GetMessagePos();
+					ht.pt.x = GET_X_LPARAM(dwpos);
+					ht.pt.y = GET_Y_LPARAM(dwpos);
+					MapWindowPoints(HWND_DESKTOP, lpnm->hwndFrom, &ht.pt, 1);
+
+					TreeView_HitTest(lpnm->hwndFrom, &ht);
+         
+					if(TVHT_ONITEMSTATEICON & ht.flags)
+					{
+						
+						PostMessage(hwnd, UM_CHECKSTATECHANGE, 0, (LPARAM)ht.hItem);
+					}
+				}
+			}	
 
 			if((ptvkd->hdr.idFrom == IDC_EXPORTTREE) && ptvkd->wVKey == VK_SPACE)
-				HandleTreeViewItem(lParam, wParam, wyTrue);
-
+				{
+					HandleTreeViewItem(lParam, wParam, wyTrue);
+					HWND	hwndexpmode;
+					wyInt32	chkstate;
+	
+					VERIFY(hwndexpmode = GetDlgItem(hwnd, IDC_CHK_DATAONLY));
+					chkstate = SendMessage(hwndexpmode, BM_GETCHECK, 0, 0);
+					if(chkstate == BST_CHECKED)
+					{
+						HWND		hwndtree;
+						VERIFY(hwndtree = GetDlgItem(hwnd, IDC_EXPORTTREE));
+						HTREEITEM hitem = TreeView_GetSelection(hwndtree);
+						PostMessage(hwnd, UM_CHECKSTATECHANGE, 0, (LPARAM)hitem);		
+					}
+				}
 			if(lpnm->code == TVN_ITEMEXPANDING)
 			{
-				return pexp->OnItemExpandingHelper(lpnm->hwndFrom, (LPNMTREEVIEW)lParam); 
+				HWND hwndexpmode;
+				VERIFY(hwndexpmode = GetDlgItem(hwnd, IDC_CHK_DATAONLY));
+				wyInt32 chk_data = SendMessage(hwndexpmode, BM_GETCHECK, 0, 0);
+				return pexp->OnItemExpandingHelper(lpnm->hwndFrom, (LPNMTREEVIEW)lParam, chk_data); 
 			}
 
+		}
+		break;
+	case UM_CHECKSTATECHANGE:
+		{
+						HWND		hwndtree;
+						wyInt32		state;
+						wyWChar		temptext[SIZE_512] = {0};
+						TVITEM		tvi = {0};
+
+						VERIFY(hwndtree = GetDlgItem(hwnd, IDC_EXPORTTREE));
+						HTREEITEM   htreeitem = (HTREEITEM)lParam;
+						HTREEITEM	hrootitem = TreeView_GetParent(hwndtree,htreeitem);
+						HTREEITEM	hchilditem;
+						if(hrootitem != NULL)
+						{
+							htreeitem = hrootitem;
+						}
+						tvi.mask		= TVIF_HANDLE |TVIF_TEXT ;
+						tvi.hItem		= htreeitem;
+						tvi.pszText		= temptext;
+						tvi.cchTextMax	= 512 - 1;
+						
+						VERIFY(TreeView_GetItem(hwndtree, &tvi));
+
+						if(wcsicmp(tvi.pszText,TXT_TABLES) != 0)
+						{
+							for(hchilditem = TreeView_GetChild(hwndtree, htreeitem); hchilditem; hchilditem = TreeView_GetNextSibling(hwndtree, hchilditem))
+							{
+								TreeView_SetCheckState(hwndtree, hchilditem, 0);
+							}
+							TreeView_SetCheckState(hwndtree, htreeitem, 0);
+							yog_message(hwnd, _(L"Only table(s) have data. You need to select only table(s) for dumping - Data Only"), 
+							pGlobals->m_appname.GetAsWideChar(), MB_ICONINFORMATION | MB_OK);
+							return TRUE;							
+						}
 		}
 		break;
 
@@ -285,6 +359,29 @@ ExportBatch::EnableDisableOptions(wyInt32 id)
 			state = SendMessage(hwndexpmode, BM_GETCHECK, 0, 0);
 			if(state == BST_CHECKED)
 			{
+				wyWChar		temptext[SIZE_512] = {0};
+				TVITEM		tvi = {0};
+				HWND hwndtree;
+				HTREEITEM		htreeparent;
+				VERIFY(hwndtree = GetDlgItem(m_hwnd, IDC_EXPORTTREE));
+				htreeparent = TreeView_GetRoot(hwndtree);
+				for(; htreeparent; htreeparent = TreeView_GetNextSibling(hwndtree, htreeparent))
+				{
+					tvi.mask		= TVIF_TEXT;
+					tvi.hItem		= htreeparent;
+					tvi.pszText		= temptext;
+					tvi.cchTextMax	= 512 - 1;
+					VERIFY(TreeView_GetItem(hwndtree, &tvi));
+					if(wcsicmp(temptext, TXT_TABLES)!= 0)
+					{
+						TreeView_SetCheckState(hwndtree, htreeparent, 0);
+						for(HTREEITEM hchilditem = TreeView_GetChild(hwndtree, htreeparent); hchilditem; hchilditem = TreeView_GetNextSibling(hwndtree, hchilditem))
+						{
+							TreeView_SetCheckState(hwndtree, hchilditem, 0);
+						}
+					}
+				}
+				
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_CREATEDB), FALSE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DROPOBJECT), FALSE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DEFINER), FALSE);
@@ -315,7 +412,7 @@ ExportBatch::EnableDisableOptions(wyInt32 id)
 				EnableWindow(GetDlgItem(m_hwnd, IDC_BULKINSERT), FALSE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_CREATEDB), TRUE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DROPOBJECT), TRUE);
-				
+				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DEFINER), TRUE);
 				
 			}
 			else
@@ -348,6 +445,7 @@ ExportBatch::EnableDisableOptions(wyInt32 id)
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_CREATEDB), TRUE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DROPOBJECT), TRUE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_LOCKAROUNDINSERT), TRUE);
+				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DEFINER), TRUE);
 			}
 		}
 		break;
@@ -615,16 +713,20 @@ ExportBatch::IntializeTree(HWND hwnd, const wyChar * dbname, wyBool cbselchange)
 			{
 				state = TreeView_GetItemState(hwndtree, htreeparent, TVIS_EXPANDEDONCE);
 				checkstate = TreeView_GetCheckState(hwndtree, htreeparent);
+				wyInt32 dataonly;
 
+				dataonly = SendMessage(GetDlgItem(m_hwnd, IDC_CHK_DATAONLY), BM_GETCHECK, 0, 0)	;
 				if(!checkstate && !(state & TVIS_EXPANDEDONCE))
 					TreeView_SetCheckState(hwndtree, htreeparent, 1);
-
+				if(dataonly == BST_CHECKED) 
+				{
+					break;
+				}
 				if(hti)
 				{
 					tviOB.hItem = hti;
 					tviOB.mask = TVIF_PARAM;
 					TreeView_GetItem(hobtree, &tviOB);
-
 					if((tviOB.lParam && wcslen(((OBDltElementParam *)tviOB.lParam)->m_filterText)) || m_dump_all_tables)
 					{
 						TreeView_Expand(hwndtree, htreeparent, TVE_EXPAND);
@@ -1535,7 +1637,7 @@ ExportBatch::EnableDlgWindows(bool state)
 					 IDC_CHK_USEDBNAME, IDC_CHK_DROPTABLE, IDC_CHK_CREATEDB,
 					 IDC_CHK_LOCKFORREAD, IDC_CHK_FLUSHLOGS, IDC_CHK_LOCKAROUNDINSERT,
 					 IDC_SETUNIQUE, IDC_BULKINSERT,IDC_ONEROW,IDC_SINGLE_TRANSACTION, IDCANCEL, IDC_CHK_DROPPROCEDURES, IDC_CHK_DROPVIEWS,
-					 IDC_CHK_DROPFUNCTIONS, IDC_CHK_DROPTRIGGERS, IDC_CHK_DEFINER, IDC_CHK_VERSION
+					 IDC_CHK_DROPFUNCTIONS, IDC_CHK_DROPTRIGGERS, IDC_CHK_DEFINER, IDC_CHK_VERSION, IDC_TIMESTAMP_PREFIX, IDC_FILE_TABLE
 	};
 
 	wyInt32 i, count;
@@ -1706,7 +1808,7 @@ ExportBatch::IsExporting()
 
 //To expand treeview while click on treeview
 wyBool
-ExportBatch::OnItemExpandingHelper(HWND hwnd , LPNMTREEVIEW pnmtv)
+ExportBatch::OnItemExpandingHelper(HWND hwnd , LPNMTREEVIEW pnmtv, wyInt32 dataonly_chck)
 {
 	TVITEM			tvi, tviOB;
     wyWChar         filterText[70], str[70];
@@ -1824,22 +1926,30 @@ ExportBatch::OnItemExpandingHelper(HWND hwnd , LPNMTREEVIEW pnmtv)
                 TreeView_GetItem(hwnd, &tviOB);
                 if(!wcsicmp(tviOB.pszText, m_table.GetAsWideChar()))
                 {
-                    TreeView_SetCheckState(hwnd, hti, 1);
-                    atleastOneItemChecked = wyTrue;
-                }
-                else
-                {
-                    TreeView_SetCheckState(hwnd, hti, 0);
+					if(image1 == NTABLES)
+					{
+						TreeView_SetCheckState(hwnd, hti, 1);
+						atleastOneItemChecked = wyTrue;
+					}
                 }
             }
             if(atleastOneItemChecked)
             {
-                TreeView_SetCheckState(hwnd, tvi.hItem, 1);
-            }
-            else
-            {
-                TreeView_SetCheckState(hwnd, tvi.hItem, 0);
-            }
+				
+				if(dataonly_chck == BST_CHECKED)
+				{	
+					if(image1 == NTABLES)
+					{
+						TreeView_SetCheckState(hwnd, tvi.hItem, 1);
+					}
+					else
+					{
+						 TreeView_SetCheckState(hwnd, tvi.hItem, 0);
+					}
+				}
+				else
+					TreeView_SetCheckState(hwnd, tvi.hItem, 1);
+			}
         }
     }
 

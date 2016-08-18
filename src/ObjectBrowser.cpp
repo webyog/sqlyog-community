@@ -2224,7 +2224,9 @@ CQueryObject::CreateInsertStmt()
 	MDIWindow*	wnd;
 	EditorBase	*peditorbase = NULL;
     wyBool      isbacktick;
-
+	wyString	execquery;
+	MYSQL_RES  *fieldres = NULL;
+	MYSQL_ROW   row;
         
 	VERIFY(wnd = GetActiveWin());
 
@@ -2276,6 +2278,14 @@ CQueryObject::CreateInsertStmt()
                     IsBackTick(isbacktick), strtable.GetString(), IsBackTick(isbacktick));
 
     ncount = 0;
+	execquery.Sprintf("show full fields from `%s`.`%s`", strdbname.GetString(), strtable.GetString());
+	fieldres = ExecuteAndGetResult(wnd,wnd->m_tunnel, &wnd->m_mysql, execquery);
+	if(fieldres == NULL)
+	{
+		return wyFalse;
+	}
+
+	wyString temp;
 	for(hitem = TreeView_GetChild(m_hwnd, hitem); hitem != NULL; hitem = TreeView_GetNextSibling(m_hwnd, hitem))
 	{
 			GetNodeText(m_hwnd ,hitem, colname, SIZE_512);
@@ -2283,12 +2293,19 @@ CQueryObject::CreateInsertStmt()
 			GetColumnName(strtemp);
 			strcolname.SetAs(strtemp);
 			
+			row = wnd->m_tunnel->mysql_fetch_row(fieldres);
+			temp.SetAs(row[6]);
+			if(temp.CompareI("VIRTUAL") == 0 || temp.CompareI("Stored") == 0 || temp.CompareI("Persistent") == 0 || temp.CompareI("virtual generated") == 0 || temp.CompareI("stored generated") == 0 )
+			{
+				continue;
+			}
+				
 			columns.AddSprintf("%s%s%s", IsBackTick(isbacktick), strcolname.GetString(), IsBackTick(isbacktick));
 			columns1.AddSprintf("'%s'", strcolname.GetString());
-
+			
 			// now we check whether there is any more column.
-			htempitem = TreeView_GetNextSibling(m_hwnd, hitem);				
-		
+			htempitem = TreeView_GetNextSibling(m_hwnd, hitem);	
+
 			if(htempitem)
 			{
 				columns.Add(", ");
@@ -2297,14 +2314,23 @@ CQueryObject::CreateInsertStmt()
 
 			columns.Add("\r\n\t");
 			columns1.Add("\r\n\t");
+	}	
+	///if temp is virtual,last col is virtual..hence remove the leading commas
+	/// 5 for : ', ' characters added above and "\r\n\t" added above.
+
+	if(temp.CompareI("VIRTUAL") == 0 || temp.CompareI("Stored") == 0 || temp.CompareI("Persistent") == 0 || temp.CompareI("virtual generated") == 0 || temp.CompareI("stored generated") == 0)
+	{
+		columns.Strip(5);
+		columns1.Strip(5);
 	}
-	
-    compquery.Add(query.GetString());
+	wnd->m_tunnel->mysql_free_result(fieldres);
+    
+	compquery.Add(query.GetString());
 	compquery.Add(columns.GetString());
 	compquery.Add(")\r\n\tvalues\r\n\t(");
-    compquery.Add(columns1.GetString());
+    
+	compquery.Add(columns1.GetString());
     compquery.Add(");\r\n");
-
 
 	if(wnd->GetActiveTabEditor() == NULL)
         {
@@ -2363,14 +2389,17 @@ CQueryObject::CreateUpdateStmt()
 	wyInt32		ret;
 	wyString    query, strdbname, strtable, strcolname;
     wyWChar     colname[SIZE_512];
+	wyWChar		coltype[SIZE_512];
     wyString    columns, columns1, compquery, primary, colvalue; 
 	TVITEM		tvi;
 	HTREEITEM	hitem, htempitem;
 	MDIWindow*	wnd;
 	EditorBase	*peditorbase = NULL;
     wyBool      isbacktick;
-
-        
+	wyString	execquery;
+	MYSQL_RES  *fieldres = NULL;
+	MYSQL_ROW   row;
+    int x;   // Flag variable to modify the where clause if it contains JSON    
 	VERIFY(wnd = GetActiveWin());
 
 	VERIFY(hitem = TreeView_GetSelection(m_hwnd));
@@ -2421,36 +2450,65 @@ CQueryObject::CreateUpdateStmt()
    
 	//if there is no primary key then we need to add all fields. if primary key exists then we will add primary key
 	GetPrimaryKeyInfo(wnd, primary, isbacktick); 
-	
+	execquery.Sprintf("show full fields from `%s`.`%s`", strdbname.GetString(), strtable.GetString());
+	fieldres = ExecuteAndGetResult(wnd,wnd->m_tunnel, &wnd->m_mysql, execquery);
+	if(fieldres == NULL)
+	{
+		return wyFalse;
+	}
+	wyString    temp;
 	for(hitem = TreeView_GetChild(m_hwnd, hitem); hitem != NULL; hitem = TreeView_GetNextSibling(m_hwnd, hitem))
 		{
 			TreeView_GetItem(m_hwnd, &tvi);
 
             GetNodeText(m_hwnd, hitem, colname, SIZE_512);
+
 			
 			GetColumnName(colname);
 			strcolname.SetAs(colname);
+
+			GetNodeText(m_hwnd, hitem, coltype, SIZE_512);
+			x=IsColumnTypeJson(coltype);
+			row = wnd->m_tunnel->mysql_fetch_row(fieldres);
+			temp.SetAs(row[6]);
+			if(temp.CompareI("VIRTUAL") == 0 || temp.CompareI("Stored") == 0 || temp.CompareI("Persistent") == 0 || temp.CompareI("virtual generated") == 0 || temp.CompareI("stored generated") == 0)
+			{
+				continue;
+			}
 			colvalue.Sprintf("%s%s%s = '%s'", IsBackTick(isbacktick), strcolname.GetString(), IsBackTick(isbacktick), strcolname.GetString());
 			columns.Add(colvalue.GetString());
+			if(x==1)
+			{    // changing the where clause in the pasted statement if it is JSON
+				colvalue.Sprintf("JSON_CONTAINS('%s',`%s`)",strcolname.GetString(), strcolname.GetString());
+			}
+			// columns1 is for where clause
 			columns1.Add(colvalue.GetString());
-			
 			// now we check whether there is any more column.
 			htempitem = TreeView_GetNextSibling(m_hwnd, hitem);				
 		
 			if(htempitem)
 			{
-				columns.Add(" , ");
-				columns1.Add(" and ");
+				columns.Add(", ");
+				columns1.Add("and ");
 			}
 
 			columns.Add("\r\n\t");
 			columns1.Add("\r\n\t");
 		}
-	
+	///if temp is virtual,last col is virtual..hence remove the leading commas
+	/// 5 for : ', ' characters added above and "\r\n\t" added above.
+	/// 7 for : 'and ' characters added above and "\r\n\t" added above.
+	if(temp.CompareI("VIRTUAL") == 0 || temp.CompareI("Stored") == 0 || temp.CompareI("Persistent") == 0 || temp.CompareI("virtual generated") == 0 || temp.CompareI("stored generated") == 0)
+	{
+		columns.Strip(5);
+		columns1.Strip(7);
+	}
+	wnd->m_tunnel->mysql_free_result(fieldres);
 
     compquery.Add(query.GetString());
     compquery.Add(columns.GetString());
 	compquery.Add("\r\n\twhere\r\n\t");
+
     if(primary.GetLength() != 0)
 		compquery.Add(primary.GetString());
 	else
@@ -2514,14 +2572,14 @@ CQueryObject::CreateDeleteStmt()
 	wyUInt32	item;
 	wyInt32		ret;
 	wyString    query, strdbname, strtable, strcolname,primary;
-    wyWChar     colname[SIZE_512];
+    wyWChar     colname[SIZE_512],coltype[SIZE_512];
     wyString    columns, columns1, compquery; 
 	TVITEM		tvi;
 	HTREEITEM	hitem, htempitem;
 	MDIWindow*	wnd;
 	EditorBase	*peditorbase = NULL;
     wyBool      isbacktick;
-
+	int x;   // Flag variable to modify the where clause if it contains JSON
         
 	VERIFY(wnd = GetActiveWin());
 
@@ -2583,8 +2641,15 @@ CQueryObject::CreateDeleteStmt()
 			
 			GetColumnName(colname);
 			strcolname.SetAs(colname);
+
+			GetNodeText(m_hwnd, hitem, colname, SIZE_512);
+			x=IsColumnTypeJson(coltype);
+			if(x==0)
 			columns.AddSprintf("%s%s%s = '%s'", IsBackTick(isbacktick), strcolname.GetString(), IsBackTick(isbacktick), strcolname.GetString() );
-			
+			if(x==1)
+			{    // changing the where clause in the pasted statement if it is JSON
+				columns.AddSprintf("JSON_CONTAINS('%s',`%s`)",strcolname.GetString(), strcolname.GetString());
+			}
 			// now we check whether there is any more column.
 			htempitem = TreeView_GetNextSibling(m_hwnd, hitem);				
 		

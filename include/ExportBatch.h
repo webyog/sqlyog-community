@@ -362,7 +362,7 @@ public:
 	@param hwnd      : IN treeview handle
     @param pnmtv     : IN Tree items containing notification message
     */
-	wyBool		OnItemExpandingHelper(HWND hwnd , LPNMTREEVIEW pnmtv);
+	wyBool		OnItemExpandingHelper(HWND hwnd , LPNMTREEVIEW pnmtv, wyInt32 dataonly_check);
     
     /// stops exporting
     /**

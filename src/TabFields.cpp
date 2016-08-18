@@ -126,6 +126,7 @@ TabFields::TabFields(HWND hwnd, TableTabInterfaceTabMgmt* ptabmgmt)
     m_ismysql41         =   IsMySQL41(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
 	m_ismariadb52       =   IsMariaDB52(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
     m_ismysql57			=   IsMySQL57(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
+	m_ismysql578        =   IsMySQL578(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
     m_p = new Persist;
 	m_p->Create("TabbedInterface");
 }
@@ -1103,13 +1104,20 @@ TabFields::InitGrid()
     wyInt32			counter;		// normal counter
 	wyInt32			num_cols;		// number of columns
 	GVCOLUMN		gvcol;			// structure used to create columns for grid
-
-	// all the data types that are supported by MySQL. entend it as new data types come into
-	wyWChar			type[][20] =	{	L"tinyint", L"smallint", L"mediumint", L"int", L"bigint", L"real", L"bit", L"bool", L"boolean",
+	//wyWChar	 		(*type)[33][20]; 
+	wyWChar			type[33][20] =	{	L"tinyint", L"smallint", L"mediumint", L"int", L"bigint", L"real", L"bit", L"bool", L"boolean",
 										L"float", L"double", L"decimal", L"date", L"datetime", L"timestamp", L"numeric",  L"time", L"year", L"char", 
-										L"varchar", L"tinyblob", L"tinytext", L"text",L"blob", L"mediumblob", L"mediumtext", L"longblob", L"longtext", 
-										L"enum", L"set", L"binary", L"varbinary" };  
+										L"varchar", L"tinyblob", L"tinytext", L"text",L"blob" ,L"mediumblob", L"mediumtext", L"longblob", L"longtext", 
+										L"enum", L"set", L"binary", L"varbinary" };
+	if(m_ismysql578)
+	{
+		type[32][0]='j';
+		type[32][1]='s';
+		type[32][2]='o';
+		type[32][3]='n';
+	}
 
+	
 	wyWChar virtuallity[3][20]= {  L"(none)", L"VIRTUAL",NULL};
 	
 	if(m_ismariadb52)
@@ -1121,10 +1129,6 @@ TabFields::InitGrid()
 	wyChar		    *heading[] = {_("Column Name"), _("Data Type"), _("Length"), _("Default"),  _("PK?"), _("Binary?"), _("Not Null?"), 
 		                          _("Unsigned?"), _("Auto Incr?"), _("Zerofill?"), _("Charset"), _("Collation"), _("On Update"), _("Comment"),  _("Virtuality"),_("Expression")};			
 	
-		VOID		    *listtype[] = {NULL, (VOID*)type, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, (void*)virtuallity,NULL};
-
-	wyInt32			elemsize[] = {  0, sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,sizeof(virtuallity[0]),0};
-	wyInt32			elemcount[] = {0, sizeof(type)/sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, sizeof(virtuallity)/sizeof(virtuallity[0]),0};
 	wyInt32			mask[] = {GVIF_TEXT, GVIF_LIST, GVIF_TEXT, GVIF_TEXT,  GVIF_BOOL, GVIF_BOOL, GVIF_BOOL, GVIF_BOOL, 
 		                      GVIF_BOOL, GVIF_BOOL, GVIF_LIST, GVIF_LIST, GVIF_BOOL, GVIF_TEXT,GVIF_LIST,GVIF_TEXT};
 	
@@ -1136,12 +1140,18 @@ TabFields::InitGrid()
 	wyInt32			width = 0;
 	wyString		colname, dbname(RETAINWIDTH_DBNAME), tblname("__create_table");
 	HFONT			hfont;
-    
-	m_ptabmgmt->m_tabinterfaceptr->SetFont(m_hgridfields);
+    m_ptabmgmt->m_tabinterfaceptr->SetFont(m_hgridfields);
 	hfont = CustomGrid_GetColumnFont(m_hgridfields);
 
 	cx[1] = GetTextSize(L"mediumblob ", m_hgridfields, hfont).right + 15; //default min size for datatype col
 	num_cols = sizeof (heading)/sizeof(heading[0]);
+	
+	VOID		    *listtype[] = {NULL, (VOID*)type, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, (void*)virtuallity,NULL};
+	wyInt32			elemsize[] = {  0, sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,sizeof(virtuallity[0]),0};
+	wyInt32			elemcount[] = {0, sizeof(type)/sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, sizeof(virtuallity)/sizeof(virtuallity[0]),0};
+	
+	if(! m_ismysql578)   // to avoid extra counting of the new datatype json
+		elemcount[1]=elemcount[1]-1;
 	
 	for (counter=0; counter < num_cols ; counter++ )
     {
@@ -1190,10 +1200,7 @@ TabFields::InitGrid()
 		CustomGrid_InsertColumn(m_hgridfields, &gvcol);
     
     }
-
-    //m_ptabmgmt->m_tabinterfaceptr->SetFont(m_hgridfields);
-
-    if(!((TableTabInterface*)m_ptabmgmt->m_tabinterfaceptr)->m_isaltertable)
+	if(!((TableTabInterface*)m_ptabmgmt->m_tabinterfaceptr)->m_isaltertable)
     {
 	    CreateInitRows();
     }
@@ -1695,7 +1702,7 @@ void
 
 	// first get the default value.
 	if((cwrapobj->m_oldval) && (fieldattr->m_datatype.CompareI("timestamp")== 0) && (fieldattr->m_onupdate))
-		onupdate.SetAs(" on update CURRENT_TIMESTAMP");
+		onupdate.SetAs(" on update CURRENT_TIMESTAMP ");
 
 	GetDefaultValue(defvalue, cwrapobj);
 
@@ -1745,7 +1752,8 @@ void
 		);
 
 	if(fieldattr->m_default.GetLength() || fieldattr->m_onupdate )
-		newcolumns.AddSprintf("%s ", defvalue.GetString());
+		newcolumns.AddSprintf("%s", defvalue.GetString());
+
 	if(!skip)
 	{
 		newcolumns.AddSprintf("%s%s", 
@@ -1764,7 +1772,7 @@ void
 	GetCommentValue(_comment, fieldattr);
 
 	if(_comment.GetLength())
-		newcolumns.AddSprintf(" %s", _comment.GetString());
+		newcolumns.AddSprintf("%s", _comment.GetString());
 
 	newcolumns.RTrim();
 	coldef.Add(newcolumns.GetString());
@@ -1917,9 +1925,9 @@ TabFields::GetDefaultValue(wyString& query, FieldStructWrapper* cwrapobj)
 			
 		{
 			if(len.GetLength()!=0)
-				query.AddSprintf("%s(%s)","ON UPDATE CURRENT_TIMESTAMP",len.GetString());
+				query.AddSprintf("%s(%s)","ON UPDATE CURRENT_TIMESTAMP ",len.GetString());
 			else 
-			query.AddSprintf("ON UPDATE CURRENT_TIMESTAMP");
+			query.AddSprintf("ON UPDATE CURRENT_TIMESTAMP ");
 		
 		}
 		
@@ -1989,7 +1997,7 @@ void TabFields::GetVirtualOrPersistentValue(wyString& query, FieldStructWrapper*
 
 
 
-		query.AddSprintf(") %s", virtuality.GetString());
+		query.AddSprintf(") %s ", virtuality.GetString());
 	
 	}
 }
@@ -2932,7 +2940,7 @@ TabFields::OnGVNEndLabelEdit(WPARAM wParam, LPARAM lParam)
             if(!((curdatastr.CompareI("CHAR") == 0 || curdatastr.CompareI("VARCHAR") == 0 || 
                   curdatastr.CompareI("TINYTEXT") == 0 || curdatastr.CompareI("TEXT") == 0 || 
                   curdatastr.CompareI("MEDIUMTEXT") == 0 || curdatastr.CompareI("LONGTEXT") == 0 || 
-                  curdatastr.CompareI("blob") == 0 || curdatastr.CompareI("tinyblob") == 0 ) ||
+                  curdatastr.CompareI("blob") == 0 || curdatastr.CompareI("JSON") == 0 || curdatastr.CompareI("tinyblob") == 0 ) ||
                   curdatastr.CompareI("longblob") == 0 || curdatastr.CompareI("mediumblob") == 0 ))
             {
                 /// Modifies Index-Length when user sets datatype other than above
@@ -4380,6 +4388,9 @@ TabFields::HandleAllBlobTextValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &
         CustomGrid_SetText(hwndgrid, row, CHARSET, "");
         CustomGrid_SetText(hwndgrid, row, COLLATION, "");
 	}
+//	if(stricmp(datatype,"json"))
+	//	CustomGrid_SetColumnReadOnly(hwndgrid, row, PRIMARY, wyTrue);
+		
     /*
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, PRIMARY, wyTrue);
 	CustomGrid_SetBoolValue     (hwndgrid, row, PRIMARY, GV_FALSE);
@@ -4401,7 +4412,13 @@ TabFields::HandleAllBlobTextValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &
 	CustomGrid_SetText			(hwndgrid, row, LENGTH, "" );
 	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
 	CustomGrid_SetBoolValue     (hwndgrid, row, ONUPDATECT, GV_FALSE);
-    if(m_autoincrowid == row)
+	if(stricmp(datatype,"json")==0)
+	{
+		CustomGrid_SetColumnReadOnly(hwndgrid, row, PRIMARY+ index, wyTrue );
+	    CustomGrid_SetBoolValue     (hwndgrid, row, PRIMARY+ index, GV_FALSE );
+	
+	}
+	if(m_autoincrowid == row)
         m_autoincrowid = -1;
 
     cwrapobj = (FieldStructWrapper *)CustomGrid_GetRowLongData(m_hgridfields, row);
@@ -4432,6 +4449,7 @@ TabFields::HandleBlobTextValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &ind
 {
     FieldStructWrapper *cwrapobj = NULL;
 	// makes the charset and collation column readonly for the "text" datatype
+	//if((stricmp (datatype, "text") == 0) || (stricmp (datatype, "json") == 0) )
 	if((stricmp (datatype, "text") == 0))
 	{
 		CustomGrid_SetColumnReadOnly(hwndgrid, row, CHARSET, wyFalse);
@@ -4628,9 +4646,12 @@ TabFields::SetValidation(wyUInt32 row, wyChar* datatype)
 	
 
 	if ((stricmp (datatype , "blob" ) == 0 )  ||
-		 (stricmp (datatype , "text" ) == 0) )
+		 (stricmp (datatype , "text" ) == 0) ) 
          return HandleBlobTextValidation(hwndgrid, row, index, datatype);
-	
+
+	if(stricmp (datatype , "json" ) == 0)
+		return HandleAllBlobTextValidation(hwndgrid, row, index, datatype);
+
 	if ((stricmp (datatype , "set" )  == 0 )  ||
 		 (stricmp (datatype , "enum" )  == 0 ) )
          return HandleSetEnumValidation(hwndgrid, row, index);
