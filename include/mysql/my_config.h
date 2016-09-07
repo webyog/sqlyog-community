@@ -44,6 +44,7 @@
 /* #undef HAVE_SYSENT_H */
 /* #undef HAVE_TERMIO_H */
 /* #undef HAVE_TERMIOS_H */
+/* #undef HAVE_UCONTEXT_H */
 /* #undef HAVE_UNISTD_H */
 /* #undef HAVE_UTIME_H */
 
@@ -272,7 +273,7 @@
  * various other defines
  */
 #define HAVE_THREADS 1
-#define SHAREDIR "share"
-#define DEFAULT_CHARSET_HOME "C:/Program Files (x86)/mariadb-client"
-#define PLUGINDIR "C:/Program Files (x86)/mariadb-client/lib/plugin"
+/* #undef SHAREDIR */
+#define DEFAULT_CHARSET_HOME "C:/Program Files (x86)/mariadb-connector-c"
+#define PLUGINDIR "/lib/plugin"
 

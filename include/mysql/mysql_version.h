@@ -7,16 +7,16 @@
 #include <custom_conf.h>
 #else
 #define PROTOCOL_VERSION		10
-#define MYSQL_CLIENT_VERSION		"5.5.0"
-#define MYSQL_SERVER_VERSION		"5.5.0"
+#define MYSQL_CLIENT_VERSION		"5.5.1"
+#define MYSQL_SERVER_VERSION		"5.5.1"
 #define MYSQL_SERVER_SUFFIX		""
 #define FRM_VER				
-#define MYSQL_VERSION_ID		50500
+#define MYSQL_VERSION_ID		50501
 #define MYSQL_PORT			3306
 #define MYSQL_UNIX_ADDR			"/tmp/mysql.sock"
 #define MYSQL_CONFIG_NAME		"my"
 
-#define MARIADB_PACKAGE_VERSION "2.0.0"
+#define MARIADB_PACKAGE_VERSION "2.3.1"
 #define MARIADB_SYSTEM_TYPE "Windows"
 #define MARIADB_MACHINE_TYPE "AMD64"
 

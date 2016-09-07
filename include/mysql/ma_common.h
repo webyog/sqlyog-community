@@ -49,6 +49,9 @@ struct st_mysql_options_extension {
                           const char *proc_info,
                           unsigned int proc_info_length);
   MARIADB_DB_DRIVER       *db_driver;
+  char *ssl_fp; /* finger print of server certificate */
+  char *ssl_fp_list; /* white list of finger prints */
+  int (*verify_local_infile)(void *data, const char *filename);
 };
 
 

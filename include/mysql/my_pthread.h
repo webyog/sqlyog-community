@@ -62,10 +62,12 @@ typedef struct {
 } pthread_cond_t;
 
 #ifndef _TIMESPEC_DEFINED
+#if (!defined(_MSC_VER) || _MSC_VER < 1900)
 struct timespec {		/* For pthread_cond_timedwait() */
     time_t tv_sec;
     long tv_nsec;
 };
+#endif
 #endif
 
 typedef int pthread_mutexattr_t;

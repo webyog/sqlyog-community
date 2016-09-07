@@ -21,7 +21,6 @@
 #ifndef _global_h
 #define _global_h
 
-
 #ifdef _WIN32
 #include <config-win.h>
 #else
@@ -318,7 +317,6 @@ typedef unsigned short ushort;
 */
 #define _VARARGS(X) X
 #define _STATIC_VARARGS(X) X
-#define _PC(X)	X
 
 #if defined(DBUG_ON) && defined(DBUG_OFF)
 #undef DBUG_OFF
@@ -364,15 +362,11 @@ typedef int	(*qsort_cmp)(const void *,const void *);
 #else
 #define qsort_t RETQSORTTYPE	/* Broken GCC cant handle typedef !!!! */
 #endif
-typedef SOCKET_SIZE_TYPE size_socket;
-
-#ifndef SOCKOPT_OPTLEN_TYPE
-#define SOCKOPT_OPTLEN_TYPE size_socket
-#endif
 
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
+typedef SOCKET_SIZE_TYPE size_socket;
 
 #ifndef SOCKOPT_OPTLEN_TYPE
 #define SOCKOPT_OPTLEN_TYPE size_socket
@@ -459,7 +453,10 @@ typedef SOCKET_SIZE_TYPE size_socket;
 #ifdef _WIN32
 #define NO_DIR_LIBRARY		/* Not standar dir-library */
 #define USE_MY_STAT_STRUCT	/* For my_lib */
+#ifdef _MSC_VER
+  
 typedef SSIZE_T ssize_t;
+#endif
 #endif
 
 /* Some things that this system does have */
@@ -528,7 +525,7 @@ extern double		my_atof(const char*);
 #define HAVE_LONG_LONG 1
 #endif
 
-#if defined(HAVE_LONG_LONG) && !defined(LONGLONG_MIN)
+#if defined(HAVE_LONG_LONG) && !defined(LONGLONG_IN)
 #define LONGLONG_MIN	((long long) 0x8000000000000000LL)
 #define LONGLONG_MAX	((long long) 0x7FFFFFFFFFFFFFFFLL)
 #endif
@@ -647,6 +644,13 @@ typedef unsigned long	ulonglong;	/* ulong or unsigned long long */
 typedef long		longlong;
 #endif
 #define longlong_defined
+#endif
+
+#ifndef HAVE_INT64
+typedef longlong int64;
+#endif
+#ifndef HAVE_UINT64
+typedef ulonglong uint64;
 #endif
 
 #ifndef MIN
@@ -1082,7 +1086,7 @@ do { doubleget_union _tmp; \
 #elif defined(HAVE_DLFCN_H)
 #include <dlfcn.h>
 #endif
-#if HAVE_DLERROR
+#ifndef HAVE_DLERROR
 #define dlerror() ""
 #endif
 #endif

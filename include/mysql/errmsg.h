@@ -66,6 +66,7 @@ extern const char *client_errors[];	/* Error messages */
 #define CR_PARAMS_NOT_BOUND     2031
 #define CR_INVALID_PARAMETER_NO  2034
 #define CR_UNSUPPORTED_PARAM_TYPE 2036
+#define CR_SECURE_AUTH          2049
 #define CR_NO_DATA              2051
 #define CR_NO_STMT_METADATA     2052
 #define CR_NOT_IMPLEMENTED      2054

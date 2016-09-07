@@ -87,7 +87,8 @@ size_t vio_write(Vio* vio, const gptr buf, size_t size);
  * Whenever the socket is set to blocking mode or not.
  */
 int		vio_blocking(		Vio*		vio,
-					my_bool    	onoff);
+					my_bool    	onoff,
+                                        my_bool         *prevmode);
 my_bool		vio_is_blocking(	Vio*		vio);
 /*
  * setsockopt TCP_NODELAY at IPPROTO_TCP level, when possible.
@@ -135,6 +136,7 @@ void vio_in_addr(Vio *vio, struct in_addr *in);
 
   /* Return 1 if there is data to be read */
 my_bool vio_poll_read(Vio *vio,uint timeout);
+int vio_wait_or_timeout(Vio *vio, my_bool is_read, int timeout);
 
 
 struct st_vio
@@ -146,7 +148,8 @@ struct st_vio
   struct sockaddr_in local; /* Local internet address */
   struct sockaddr_in remote; /* Remote internet address */
   struct mysql_async_context *async_context; /* For non-blocking API */
-
+  int write_timeout;
+  int read_timeout;
   enum enum_vio_type type; /* Type of connection */
   char desc[30]; /* String description */
 #ifdef HAVE_OPENSSL

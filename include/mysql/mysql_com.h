@@ -32,8 +32,8 @@
 #define NAME_CHAR_LEN   64
 #define NAME_LEN	256		/* Field/table name length */
 #define HOSTNAME_LENGTH 60
-#define SYSTEM_MB_MAX_CHAR_LENGTH 3
-#define USERNAME_CHAR_LENGTH 16
+#define SYSTEM_MB_MAX_CHAR_LENGTH 4
+#define USERNAME_CHAR_LENGTH 128
 #define USERNAME_LENGTH USERNAME_CHAR_LENGTH * SYSTEM_MB_MAX_CHAR_LENGTH
 #define SERVER_VERSION_LENGTH 60
 #define SQLSTATE_LENGTH 5
@@ -173,8 +173,9 @@ enum enum_server_command
                                  CLIENT_MULTI_STATEMENTS |\
                                  CLIENT_MULTI_RESULTS |\
                                  CLIENT_PROGRESS |\
-		                             CLIENT_SSL_VERIFY_SERVER_CERT |\
+		                 CLIENT_SSL_VERIFY_SERVER_CERT |\
                                  CLIENT_REMEMBER_OPTIONS |\
+                                 CLIENT_PLUGIN_AUTH |\
                                  CLIENT_CONNECT_ATTRS)
 
 #define CLIENT_CAPABILITIES	(CLIENT_LONG_PASSWORD |\
@@ -283,7 +284,7 @@ enum enum_field_types { MYSQL_TYPE_DECIMAL, MYSQL_TYPE_TINY,
                         MYSQL_TYPE_TINY_BLOB=249,
                         MYSQL_TYPE_MEDIUM_BLOB=250,
                         MYSQL_TYPE_LONG_BLOB=251,
-                        MYSQL_TYPE_BLOB=252,MYSQL_TYPE_JSON=245,
+                        MYSQL_TYPE_BLOB=252,
                         MYSQL_TYPE_VAR_STRING=253,
                         MYSQL_TYPE_STRING=254,
                         MYSQL_TYPE_GEOMETRY=255,
@@ -313,7 +314,6 @@ enum enum_field_types { MYSQL_TYPE_DECIMAL, MYSQL_TYPE_TINY,
 #define FIELD_TYPE_MEDIUM_BLOB MYSQL_TYPE_MEDIUM_BLOB
 #define FIELD_TYPE_LONG_BLOB MYSQL_TYPE_LONG_BLOB
 #define FIELD_TYPE_BLOB MYSQL_TYPE_BLOB
-#define FIELD_TYPE_JSON MYSQL_TYPE_JSON
 #define FIELD_TYPE_VAR_STRING MYSQL_TYPE_VAR_STRING
 #define FIELD_TYPE_STRING MYSQL_TYPE_STRING
 #define FIELD_TYPE_GEOMETRY MYSQL_TYPE_GEOMETRY
@@ -385,7 +385,6 @@ char *scramble_323(char *to,const char *message,const char *password);
 void my_scramble_41(const unsigned char *buffer, const char *scramble, const char *password);
 my_bool check_scramble(const char *, const char *message,
 		       unsigned long *salt,my_bool old_ver);
-char *get_tty_password(char *opt_message);
 void hash_password(unsigned long *result, const char *password, size_t len);
 
 /* Some other useful functions */

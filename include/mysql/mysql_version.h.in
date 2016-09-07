@@ -1,0 +1,28 @@
+/* Copyright Abandoned 1996, 1999, 2001 MySQL AB
+   This file is public domain and comes with NO WARRANTY of any kind */
+
+/* Version numbers for protocol & mysqld */
+
+#ifdef _CUSTOMCONFIG_
+#include <custom_conf.h>
+#else
+#define PROTOCOL_VERSION		@PROTOCOL_VERSION@
+#define MYSQL_CLIENT_VERSION		"@MYSQL_CLIENT_VERSION@"
+#define MYSQL_SERVER_VERSION		"@MYSQL_CLIENT_VERSION@"
+#define MYSQL_SERVER_SUFFIX		"@MYSQL_SERVER_SUFFIX@"
+#define FRM_VER				@DOT_FRM_VERSION@
+#define MYSQL_VERSION_ID		@MYSQL_VERSION_ID@
+#define MYSQL_PORT			@MYSQL_PORT@
+#define MYSQL_UNIX_ADDR			"@MYSQL_UNIX_ADDR@"
+#define MYSQL_CONFIG_NAME		"my"
+
+#define MARIADB_PACKAGE_VERSION "@CPACK_PACKAGE_VERSION@"
+#define MARIADB_SYSTEM_TYPE "@CMAKE_SYSTEM_NAME@"
+#define MARIADB_MACHINE_TYPE "@CMAKE_SYSTEM_PROCESSOR@"
+
+/* mysqld compile time options */
+#ifndef MYSQL_CHARSET
+#define MYSQL_CHARSET			"@default_charset@"
+#endif
+#endif
+

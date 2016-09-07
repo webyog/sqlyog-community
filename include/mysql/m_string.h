@@ -224,6 +224,16 @@ extern ulonglong strtoull(const char *str, char **ptr, int base);
 #endif
 #endif
 
+typedef enum {
+  MY_GCVT_ARG_FLOAT,
+  MY_GCVT_ARG_DOUBLE
+} my_gcvt_arg_type;
+
+size_t ma_fcvt(double x, int precision, char *to, my_bool *error);
+size_t ma_gcvt(double x, my_gcvt_arg_type type, int width, char *to,
+               my_bool *error);
+
+
 #if defined(__cplusplus)
 }
 #endif

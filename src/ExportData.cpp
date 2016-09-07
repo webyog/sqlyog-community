@@ -1742,6 +1742,7 @@ CExportResultSet::DisableOtherOptions()
     EnableWindow(GetDlgItem(m_hwnd, IDC_HTML), FALSE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_EXCEL), FALSE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_SQL), FALSE);
+	EnableWindow(GetDlgItem(m_hwnd, IDC_JSON), FALSE);
     
     EnableWindow(GetDlgItem(m_hwnd, IDC_EXPORTFILENAME), FALSE);
 
@@ -1763,6 +1764,7 @@ CExportResultSet::EnableOtherOptions()
     EnableWindow(GetDlgItem(m_hwnd, IDC_HTML), TRUE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_EXCEL), TRUE);
     EnableWindow(GetDlgItem(m_hwnd, IDC_SQL), TRUE);
+	EnableWindow(GetDlgItem(m_hwnd, IDC_JSON), TRUE);
 
     EnableWindow(GetDlgItem(m_hwnd, IDC_EXPORTFILENAME), TRUE);
 

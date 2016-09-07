@@ -39,6 +39,18 @@ extern "C" {
 #endif
 #include <mysql.h>
 
+#ifndef longlong_defined
+#if defined(HAVE_LONG_LONG) && SIZEOF_LONG != 8
+typedef unsigned long long int ulonglong; /* ulong or unsigned long long */
+typedef long long int longlong;
+#else
+typedef unsigned long	ulonglong;	/* ulong or unsigned long long */
+typedef long		longlong;
+#endif
+#define longlong_defined
+#endif
+
+
 #ifndef _my_sys_h
 typedef struct st_dynamic_string
 {

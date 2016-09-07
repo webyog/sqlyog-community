@@ -170,7 +170,7 @@ MDIWindow::~MDIWindow()
     delete m_acinterface;
 	delete m_pcqueryobject;
 	delete m_pcqueryvsplitter;
-	delete m_listtabeditor;
+	// delete m_listtabeditor;
     if(m_tunnel)
         delete m_tunnel;
 

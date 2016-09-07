@@ -122,11 +122,11 @@ extern int NEAR my_errno;		/* Last error in mysys */
 extern gptr my_malloc(size_t Size,myf MyFlags);
 #define my_malloc_ci(SZ,FLAG) my_malloc( SZ, FLAG )
 extern gptr my_realloc(gptr oldpoint, size_t Size,myf MyFlags);
-extern void my_no_flags_free(gptr ptr);
+extern void my_no_flags_free(void *ptr);
 extern gptr my_memdup(const unsigned char *from, size_t length,myf MyFlags);
 extern my_string my_strdup(const char *from,myf MyFlags);
 extern my_string my_strndup(const char *from, size_t length, myf MyFlags);
-#define my_free(PTR,FG) my_no_flags_free(PTR)
+#define my_free(PTR) my_no_flags_free(PTR)
 #define CALLER_INFO_PROTO   /* nothing */
 #define CALLER_INFO         /* nothing */
 #define ORIG_CALLER_INFO    /* nothing */
@@ -144,7 +144,7 @@ extern my_string my_strndup(const char *from, size_t length, myf MyFlags);
 #define my_afree(PTR) {}
 #else
 #define my_alloca(SZ) my_malloc(SZ,MYF(0))
-#define my_afree(PTR) my_free(PTR,MYF(MY_WME))
+#define my_afree(PTR) my_free(PTR)
 #endif /* HAVE_ALLOCA */
 
 #ifdef MSDOS

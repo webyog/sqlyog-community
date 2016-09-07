@@ -1193,7 +1193,7 @@ wyIni::RemoveSection(const wyChar *sec)
 	
 	while (esection != NULL)
 	{	
-        if(strcmp(esection->m_next->m_name.GetString(),sec) == 0)
+        if(esection->m_next != NULL && strcmp(esection->m_next->m_name.GetString(),sec) == 0)
 		{
 			RemoveAll(esection->m_next);
 			temp = esection->m_next;				
