@@ -1,4 +1,4 @@
-<sqlyogtheme name="Twilight">
+<sqlyogtheme name="Twilight" sysmenu="no">
 	<framewindow>
 		<background color1="14339524" />
 		<!-- text active="16777215" inactive="16777215" / -->

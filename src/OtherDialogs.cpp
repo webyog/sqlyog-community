@@ -1914,9 +1914,9 @@ CCopyTable::FillData()
 wyBool
 CCopyTable::DoCopy()
 {
-	wyInt32		fieldcount;
+	wyInt32		fieldcount, query_for_virtuality_length, isintransaction = 1;;
 	wyBool		relation, isssel, isindex, success, ret;
-	wyString    query, keys, select;
+	wyString    query, keys, select, query_for_virtuality;
 	MYSQL_RES	*res;
     wyWChar     newtable[SIZE_512]={0};
     wyChar      *tbuff;
@@ -1957,20 +1957,32 @@ CCopyTable::DoCopy()
 		}
 	}
 
-	ret = GetSelectStmt(select);
+	ret = GetSelectStmt(select, query_for_virtuality,newtable);
 	if(!ret)	
 	{
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
 		return wyFalse;
 	}
+	query_for_virtuality_length = query_for_virtuality.GetLength();
+	if(query_for_virtuality_length)
+	{
+		query_for_virtuality.Strip(2);
+		query.AddSprintf("%s)", query_for_virtuality.GetString());
+	}
 
 	if(keys.GetLength() == 0)
-	{
+	{  
+		if(query_for_virtuality_length == 0)
         query.Strip(2);
 	}
 	else
+	{	
+		query.Strip(1);
+		if(query_for_virtuality_length)
+			query.Add(",");
 		query.AddSprintf("%s", keys.GetString());
-
+	}
+	
 	//Collation, Engine type, Create table options(min_rows, max_rows, checksum, delay_key_write, row_format)
 	if(IsMySQL41(m_tunnel, m_mysql))
 		query.AddSprintf("engine=%s %s collate = %s comment = '%s' ", m_type.GetString(), m_createoptions.GetString(), m_collate.GetString(), m_comment.GetString());
@@ -1979,7 +1991,13 @@ CCopyTable::DoCopy()
 
 	query.AddSprintf("%s", select.GetString());
 
-	res = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
+	res = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction, GetActiveWindow());
+
+	if(isintransaction == 1)
+		return wyFalse;
+
+	
+//	res = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
 
 	if(!res && m_tunnel->mysql_affected_rows(*m_mysql)== -1)
 	{
@@ -1987,6 +2005,7 @@ CCopyTable::DoCopy()
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
 		return wyFalse;
 	}
+	query.Clear();
 
     success = AddTimestampDefault(m_newtable.GetString());
     if(!success)
@@ -2044,7 +2063,7 @@ CCopyTable::AddTimestampDefault(const wyChar *newtable)
 	wyString	query, primary;
 	MYSQL_RES	*myres, *res;
 	MYSQL_ROW	myrow;
-    wyInt32     typeval, defaultval, index, ret, fieldno = 0;
+    wyInt32     typeval, defaultval, index, ret, fieldno = 0, isintransaction = 1;
     wyChar      *escapecomment;
 	wyString	strcreate = "";
 
@@ -2089,7 +2108,11 @@ CCopyTable::AddTimestampDefault(const wyChar *newtable)
                 free(escapecomment);
             }
             
-            res = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, primary);
+            res = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, primary, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+			if(isintransaction == 1)
+				return wyFalse;
+
 			if(!res && m_tunnel->mysql_affected_rows(*m_mysql)== -1)
 			{
 				ShowMySQLError(m_hwnd, m_tunnel, m_mysql, primary.GetString());
@@ -2117,6 +2140,7 @@ CCopyTable::CopyTriggers(const wyChar *database, const wyChar *table, const wyCh
 	wyString	query, triggername;
 	wyString	name_buff;
 	wyString	msg;
+	wyInt32		isintransaction = 1;
 
 	query.Sprintf("show triggers from `%s` like %s", database,
         quote_for_like(table,(wyChar *)name_buff.GetString()));
@@ -2135,7 +2159,10 @@ CCopyTable::CopyTriggers(const wyChar *database, const wyChar *table, const wyCh
 							 newtable,
 							 row[3]			 /* Statement */);
 		
-        res1 = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
+        res1 = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+		if(isintransaction == 1)
+			return wyFalse;
 
 		if(!res1 && m_tunnel->mysql_affected_rows(*m_mysql)== -1)
 		{
@@ -2362,7 +2389,7 @@ CCopyTable::AddExtraInfo(const wyChar *newtable)
 	wyString	query, primary;
 	MYSQL_RES	*myres, *res;
 	MYSQL_ROW	myrow;
-    wyInt32     extraval, index, ret;
+    wyInt32     extraval, index, ret, isintransaction = 1;
     wyChar      *escapecomment;
 	wyString	myrowstr, myrowstr1;
 	wyBool		ismysql41 = IsMySQL41(m_tunnel, m_mysql);
@@ -2402,7 +2429,11 @@ CCopyTable::AddExtraInfo(const wyChar *newtable)
 				m_db.GetString(), newtable, myrowstr.GetString(), myrowstr.GetString(), myrowstr1.GetString()); 
              }
 
-            res = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, primary, wyFalse);
+            res = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, primary, wyFalse, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+			if(isintransaction == 1)
+				return wyFalse;
+
 			if(!res && m_tunnel->mysql_affected_rows(*m_mysql)== -1)
 			{
 				ShowMySQLError(m_hwnd, m_tunnel, m_mysql, primary.GetString());
@@ -2420,26 +2451,93 @@ CCopyTable::AddExtraInfo(const wyChar *newtable)
 	return wyTrue;
 }
 
+
 // Function prepares the select stmt and stores it in the buffer passed as parameter.
 wyBool
-CCopyTable::GetSelectStmt(wyString &select)
+CCopyTable::GetSelectStmt(wyString &select, wyString &query_for_virtuality,wyWChar new_table[])
 {
-	wyInt32	    state, count, itemcount;
+	wyInt32	    state, count, itemcount, extraval, pos1 = 0, pos2 = 0, comment_index;
     wyWChar     temptext[SIZE_512] = {0};
-	wyString	tempstr;
+	wyString	tempstr, query, create_query;
+	MYSQL_RES *myres, *myres1;
+	MYSQL_ROW myrow;
+	query.Sprintf("show full fields from `%s`.`%s`", m_db.GetString(), m_table.GetString());
+ 	myres = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
+ 
+ 	if(!myres)
+ 	{
+ 		ShowMySQLError(m_hwnd, m_tunnel, m_mysql, query.GetString());
+ 		return wyFalse;
+ 	}
+
+	query.Sprintf("Show create table `%s`.`%s`",m_db.GetString(), m_table.GetString());
+ 	myres1 = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
+
+	if(!myres)
+ 	{
+ 		ShowMySQLError(m_hwnd, m_tunnel, m_mysql, query.GetString());
+ 		return wyFalse;
+ 	}
 	
+	extraval = GetFieldIndex(myres, "extra", m_tunnel, m_mysql);
+ 	comment_index = GetFieldIndex(myres, "Comment", m_tunnel, m_mysql);
+ 	myrow=m_tunnel ->mysql_fetch_row(myres1);
+ 	create_query.Sprintf(myrow[1]);
+
 	state = SendMessage(m_hwndallfield, BM_GETCHECK, 0, 0);
 	itemcount = ListView_GetItemCount(m_hwndlist);
     select.SetAs("select ");
 
 	for(count = 0; count < itemcount; count++)
-	{
+	{   
+		myrow = m_tunnel->mysql_fetch_row(myres);
 		state = ListView_GetCheckState(m_hwndlist, count);
-
+	/*
+		Refer this if some issue comes regarding backticks http://dev.mysql.com/doc/refman/5.7/en/server-system-variables.html#sysvar_sql_quote_show_create
+	execute the required query , save the previous state and execute it again 
+	issue may come only when sql_quote_show_create is set to 0
+	
+	*/
 		if(state)
 		{
 			ListView_GetItemText(m_hwndlist, count, 0, temptext, SIZE_512-1);
 			tempstr.SetAs(temptext);
+			if(strstr(myrow[extraval], "VIRTUAL") || strstr(myrow[extraval], "VIRTUAL GENERATED") || strstr(myrow[extraval], "STORED GENERATED") || strstr(myrow[extraval], "STORED") || strstr(myrow[extraval], "PERSISTENT"))
+			{
+				wyString temp("");
+				temp.AddSprintf("`%s`",tempstr.GetString());
+				pos1 = create_query.Find(temp.GetString(),pos2+1);
+				wyInt32 temp_length = temp.GetLength();
+				pos2 = pos1 + temp_length; 
+				if(strstr(myrow[extraval], "VIRTUAL")|| strstr(myrow[extraval], "VIRTUAL GENERATED"))
+				pos2 =  create_query.Find("VIRTUAL",pos2);
+				else if	(strstr(myrow[extraval], "STORED GENERATED") || strstr(myrow[extraval], "STORED"))
+				pos2 =  create_query.Find("STORED",pos2);
+				else
+				pos2 =  create_query.Find("PERSISTENT",pos2);
+
+				//pos2 = create_query.Find("Comment",pos1+1);
+				wyInt32 pos3 = create_query.FindChar(',',pos2);
+				wyInt32 pos4 = create_query.FindChar(')',pos2);
+				//pos2 = ( (pos3 < pos2) && (pos3 >= 0) ) ? pos3 : pos2;
+				if( comment_index >=0 )
+				{
+					temp.SetAs(myrow[comment_index]);
+					int comment_length = temp.GetLength();
+					if(comment_length)
+					{
+						pos2 =  (create_query.Find(temp.GetString(),pos2)) + comment_length;
+					}
+				else
+					pos2 = ( (pos3 < pos4) && (pos3 > 0) ) ? (pos3-1) : (pos4-1);
+				}
+				else
+					pos2 = ( (pos3 < pos4) && (pos3 > 0) ) ? (pos3-1) : (pos4-1);
+				
+				
+				query_for_virtuality.AddSprintf("%s, ",create_query.Substr(pos1, pos2-pos1+1));
+				continue;
+			}
 			select.AddSprintf("`%s`, ", tempstr.GetString());
 		}
 	}
@@ -2449,6 +2547,9 @@ CCopyTable::GetSelectStmt(wyString &select)
 
 	// now see if only structure is selected or not.
 	state = SendMessage(m_hwndstrucdata, BM_GETCHECK, 0, 0);
+
+	mysql_free_result(myres);
+	mysql_free_result(myres1);
 
 	// this causes only structure to be copied.
 	if(!(state & BST_CHECKED))
@@ -2513,6 +2614,7 @@ CCopyTable::AddRelation()
 	wyChar		seps[] = ";";
     MYSQL_RES	*res;
 	wyString	newtextstr;
+	wyInt32		isintransaction = 1;
 	
     if(m_type.CompareI("InnoDB") != 0 && m_type.CompareI("pbxt") != 0 && m_type.CompareI("soliddb") != 0 )
 		return wyTrue;
@@ -2542,7 +2644,10 @@ CCopyTable::AddRelation()
 
 		query.Sprintf("alter table `%s`.`%s` add foreign key %s", m_db.GetString(), m_newtable.GetString(), newtextstr.GetString());
 
-        res = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
+        res = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+		if(isintransaction == 1)
+			return wyFalse;
 		if(!res && m_tunnel->mysql_affected_rows(*m_mysql))
 		{
             if(comment)
@@ -3065,7 +3170,7 @@ TableDiag::GetDBName(wyString &dbname)
 wyBool
 TableDiag::DiagOptimize()
 {
-	wyInt32		count, ret, itemcount, checkeditemcount = 0, binlog;
+	wyInt32		count, ret, itemcount, checkeditemcount = 0, binlog, isintransaction = 1;
 	wyString	query, dbname, tablestr;
     wyWChar     table[SIZE_512]= {0};
 	LVITEM		lvi;
@@ -3107,7 +3212,10 @@ TableDiag::DiagOptimize()
 
 	query.Strip(2);
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
-    myres = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
+    myres = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction, GetActiveWindow());
+
+	if(isintransaction == 1)
+		return wyFalse;
 	if(!myres)
 	{
 		ShowMySQLError(m_hwndparent, m_tunnel, m_mysql, query.GetString());
@@ -3128,7 +3236,7 @@ TableDiag::DiagOptimize()
 wyBool
 TableDiag::DiagAnalyze()
 {
-	wyInt32		count, ret, itemcount, checkeditemcount = 0, binlog;
+	wyInt32		count, ret, itemcount, checkeditemcount = 0, binlog, isintransaction = 1;
 	wyString	query, dbname, tablestr;
     wyWChar     table[SIZE_512] = {0};
 	LVITEM		lvi;
@@ -3166,7 +3274,10 @@ TableDiag::DiagAnalyze()
     query.Strip(2);
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
 
-    myres = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
+    myres = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction, GetActiveWindow());
+
+	if(isintransaction == 1)
+		return wyFalse;
 	if(!myres)
 	{
 		ShowMySQLError(m_hwndparent, m_tunnel, m_mysql, query.GetString());
@@ -3236,7 +3347,7 @@ TableDiag::DiagCheckAddOptions(wyString &query, CShowInfo *csi)
 {
     // now add the option things.
 	// but first we get the text.
-    wyInt32		cursel;
+    wyInt32		cursel, isintransaction = 1;
     wyWChar      option[SIZE_512];
     MYSQL_RES   *myres;
 	wyString	optionstr;
@@ -3254,7 +3365,11 @@ TableDiag::DiagCheckAddOptions(wyString &query, CShowInfo *csi)
 
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
 
-    myres = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
+    myres = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction, GetActiveWindow());
+
+	if(isintransaction == 1)
+		return wyFalse;
+
 	if(!myres)
 	{
 		ShowMySQLError(m_hwndparent, m_tunnel, m_mysql, query.GetString());
@@ -3343,6 +3458,7 @@ MYSQL_RES *
 TableDiag::DiagRepairOther(wyString &query)
 {
     MYSQL_RES *myres;
+	wyInt32 isintransaction = 1;
 
     if(SendMessage(GetDlgItem(m_hwnd, IDC_DIAG_QUICKREPAIR), BM_GETCHECK, 0, 0))
 		query.Add(" QUICK ");
@@ -3355,7 +3471,10 @@ TableDiag::DiagRepairOther(wyString &query)
 
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
 
-    myres = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
+    myres = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction, GetActiveWindow());
+
+	if(isintransaction == 1)
+		return NULL;
 
 	if(!myres)
 	{
@@ -4425,6 +4544,27 @@ EmptyDB::EmptyDatabase()
             pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
 		return wyFalse;
 	}	
+#ifndef COMMUNITY
+	wyInt32 presult = 6;
+	if(wnd->m_ptransaction && wnd->m_ptransaction->m_starttransactionenabled == wyFalse)
+	{
+		if(pGlobals->m_pcmainwin->m_topromptonimplicit)
+			presult = MessageBox(GetActiveWindow(), _(L"You have an active transaction. This operation will cause Transaction to commit and end. Do you want to Continue?"), 
+						_(L"Warning"), MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2);
+		if(presult == 6)
+		{
+			wyString	query;
+			wyInt32		isintransaction =	1;
+			query.Sprintf("COMMIT");
+			ExecuteAndGetResult(wnd, m_tunnel, m_mysql, query, wyFalse, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+				
+			if(isintransaction == 1)
+				return wyFalse;
+		} 
+		else
+			return wyFalse;
+	}
+#endif
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
 
     SetGroupProcess(wnd, wyTrue);

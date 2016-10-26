@@ -825,6 +825,10 @@ class DataView
         */
         void                    OnSplitterMove(wyInt32 col);
 
+		void					OnColNameMouseHover(WPARAM wparam, wyString&);
+
+		void					ResetDataViewTooltip();
+		////void				ResettingTooltip(WPARAM wparam,LPARAM lparam);
         ///Function creates the outer frame window 
         /**
         @returns void

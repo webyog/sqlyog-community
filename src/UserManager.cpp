@@ -888,7 +888,7 @@ UserManager::OnWMCommand(WPARAM wparam, LPARAM lparam)
         return wyTrue;
     }
 	if(m_initcompleted == wyTrue && 
-       (HIWORD(wparam) == CBN_SELCHANGE))
+       (HIWORD(wparam) == CBN_SELCHANGE && LOWORD(wparam) == IDC_USERCOMBO))
 	{
 		if(!SendMessage(GetDlgItem(m_hwnd,IDC_USERCOMBO), CB_GETDROPPEDSTATE, NULL, NULL))
 			OnUserComboChange();
@@ -2257,7 +2257,7 @@ wyBool
 UserManager::ApplyLimitations()
 {
     wyString    query, tempuser, temphost;
-    wyInt32     temp[4], i;
+    wyInt32     temp[4], i, isintransaction = 1;
     wyBool      flag = wyFalse;
 
     wyChar* limitations[] = {
@@ -2293,7 +2293,10 @@ UserManager::ApplyLimitations()
     }
 
     SetCursor(LoadCursor(NULL, IDC_WAIT));
-    ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query);
+    ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction, GetActiveWindow());
+
+	if(isintransaction == 1)
+		return wyFalse;
 
     if(m_hmdi->m_tunnel->mysql_affected_rows(m_hmdi->m_mysql))
     {
@@ -2549,12 +2552,17 @@ UserManager::PrepareGrantRevokeQuery(sqlite3_stmt** privstmt, sqlite3_stmt** pri
 wyBool
 UserManager::ExecuteGrantRevoke(wyString* grantquery, wyString* revokequery)
 {
+	wyInt32 isintransaction = 1;
+
     SetCursor(LoadCursor(NULL, IDC_WAIT));
 
     //if grant query is present
     if(grantquery && grantquery->GetLength())
     {
-        ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, *grantquery);;
+        ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, *grantquery, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction, GetActiveWindow());
+
+		if(isintransaction == 1)
+			return wyFalse;
 
         if(m_hmdi->m_tunnel->mysql_affected_rows(m_hmdi->m_mysql))
         {
@@ -2566,7 +2574,11 @@ UserManager::ExecuteGrantRevoke(wyString* grantquery, wyString* revokequery)
     //if revoke query is present
     if(revokequery && revokequery->GetLength())
     {
-	    ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, *revokequery);;
+		isintransaction = 1;
+	    ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, *revokequery, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction, GetActiveWindow());
+
+		if(isintransaction == 1)
+			return wyFalse;
 
         if(m_hmdi->m_tunnel->mysql_affected_rows(m_hmdi->m_mysql))
         {
@@ -2856,9 +2868,13 @@ wyBool
 UserManager::ExecuteUMQuery(wyString& query)
 {
     MYSQL_RES*  myres;
+	wyInt32 isintransaction = 1;
 
     SetCursor(LoadCursor(NULL, IDC_WAIT));
-    myres = ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query);
+    myres = ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction, GetActiveWindow());
+
+	if(isintransaction == 1)
+		return wyFalse;
 
     if(!myres && m_hmdi->m_tunnel->mysql_affected_rows(m_hmdi->m_mysql) == -1)
     {

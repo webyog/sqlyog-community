@@ -3153,8 +3153,10 @@ ObjectInfo::AddColumnDataInformation(wyString &strindex, wyInt32 keytype, wyStri
 			{
 				data.SetAs(myrow[index], wnd->m_ismysql41);
                 
-				//Conver the 'Rows' & 'Avg_Row_Lengt' numeric values to Format(T, G, M, K)
-				if(isnumericdata == wyTrue && obj == OBJECT_TABLES && stricmp(tok, "0") != 0)
+				//Convert the 'Rows' & 'Avg_Row_Lengt' numeric values to Format(T, G, M, K)
+                // stricmp(tok, "4") added to fix the issue with display of no. of rows. From now we will show no. of rows 
+                // as   it is 
+				if(isnumericdata == wyTrue && obj == OBJECT_TABLES && stricmp(tok, "0") != 0  && stricmp(tok, "4") != 0)
 				{
 					valueint = data.GetAsInt64();
 					

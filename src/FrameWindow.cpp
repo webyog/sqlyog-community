@@ -69,6 +69,7 @@
 #include "DatabaseSearch.h"
 #include "VisualDataDiff.h"
 #include "QueryAnalyzerEnt.h"
+#include "Transactions.h"
 #endif
 
 #ifdef COMMUNITY
@@ -95,6 +96,8 @@ extern	PGLOBALS		pGlobals;
 #define         MNU_SCHEMADESIGNER				9
 #define         MNU_REBUILDTAGS     12
 #define			ZERO				0
+#define			TRIAL_DAYS_LEFT		14
+#define			IN_TRANSACTION		-10
 
 
 #define			FIRSTTOOLICONCOUNT	6
@@ -155,7 +158,10 @@ FrameWindow::FrameWindow(HINSTANCE hinstance)
 		pGlobals->m_prefpersist=wyIni::IniGetInt(GENERALPREFA, "PrefPersist",   GENERALPREF_PAGE, dirstr.GetString());
         wyIni::IniGetString(GENERALPREFA, "EdgeColumn", "0", &section, dirstr.GetString());
         m_editorcolumnline = section.GetAsInt32();
-
+#ifndef COMMUNITY
+		m_topromptonimplicit = wyIni::IniGetInt(GENERALPREFA, "PromptinTransaction", 1, dirstr.GetString())? wyTrue: wyFalse;
+		m_topromptonclose = wyIni::IniGetInt(GENERALPREFA, "PromptinTransactionClose", 1, dirstr.GetString())? wyTrue: wyFalse;
+#endif
         wyIni::IniGetString("UserInterface", "Language", "en", &section, dirstr.GetString());
         count = GetModuleFileName(NULL, directory, MAX_PATH - 1);
 	    directory[count - pGlobals->m_modulenamelength] = '\0';
@@ -219,6 +225,10 @@ FrameWindow::FrameWindow(HINSTANCE hinstance)
 	m_trialtextfont = NULL;
 	m_trialbuyfont = NULL;
 	m_mouseoverbuy = wyFalse;
+#ifndef COMMUNITY
+	m_closealltrans = 0; 
+	m_intransaction = 0;
+#endif
 #ifdef COMMUNITY
 	m_commribbon    =  NULL;
 #endif
@@ -872,6 +882,11 @@ FrameWindow::CreateMainWindow(HINSTANCE hinstance)
     MoveToInitPos(hwnd);	
 
      val = m_connection->CheckRegistration(m_hwndmain, this);
+	
+	 if(!pGlobals->m_entlicense.CompareI("Professional"))
+	 {
+		 RemoveMenu(GetMenu(hwnd), MNUTRANSACTION_INDEX - 1, MF_BYPOSITION);
+	 }
 
 	 ///Handle UUID for upgrade check
 	 m_connection->HandleApplicationUUID();
@@ -1717,7 +1732,7 @@ FrameWindow::CreateToolBarWindow()
 	wyUInt32 exstyle = NULL;
 	wyUInt32 style   = TBSTYLE_CUSTOMERASE | WS_CHILD | CCS_NORESIZE | CCS_NOPARENTALIGN | TBSTYLE_FLAT | TBSTYLE_TOOLTIPS | TBSTYLE_TRANSPARENT | CCS_NODIVIDER;
 	WNDPROC wndproc;
-	wyUInt32 daysleft = 14;
+	wyUInt32 daysleft = TRIAL_DAYS_LEFT;
 	static const char * (CDECL *pwine_get_version)(void);
 	HMODULE hntdll;
 	//Make sure destroy all toolbar resources during the chage of icon size
@@ -2451,6 +2466,7 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 	HMENU			hmenu;
 #ifndef COMMUNITY
 	TabDbSearch		*ptabdbsearch = NULL;
+	Transactions	*ptransaction = NULL;
 #endif
 
 	if(hwndactive)
@@ -2481,6 +2497,8 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 		{
 			ptabdbsearch = (TabDbSearch*) pcquerywnd->m_pctabmodule->GetActiveTabType();
 		}
+		ptransaction = (Transactions*) GetActiveWin()->m_ptransaction;
+		 
 #endif
 
 		//connection tab object
@@ -2626,7 +2644,67 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 	case IDC_TOOLCOMBO:
         HandleToolCombo(wParam);
 		break;
+#ifndef COMMUNITY
 
+	case ID_TRANSACTION_SETAUTOCOMMIT:
+			VERIFY(hmenu = GetMenu(m_hwndmain));
+			ptransaction->EnabledisableAutoCommit(hmenu, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+	case ID_TRX_REPEATABLEREAD:
+	case ID_TRX_READCOMMITED:             
+	case ID_TRX_READUNCOMMITED:           
+	case ID_TRX_SERIALIZABLE:
+			VERIFY(hmenu = GetMenu(m_hwndmain));
+			ptransaction->HandletrxIsolationmode(LOWORD(wParam), hmenu, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql); 
+
+		break;
+
+	case ID_STARTTRANSACTION_WITHNOMODIFIER:
+	case ID_WITHCONSISTENTSNAPSHOT_READONLY:
+	case ID_WITHCONSISTENTSNAPSHOT_READWRITE:
+	case ID_STARTTRANSACTION_READONLY:
+	case ID_STARTTRANSACTION_READWRITE:
+		ptransaction->HandleStartTransaction(LOWORD(wParam), pcquerywnd->m_tunnel, &pcquerywnd->m_mysql); 
+
+		break;
+
+	case ID_COMMIT_WITHNOMODIFIER:
+	case ID_COMMIT_ANDCHAIN:
+	case ID_COMMIT_ANDNOCHAIN:
+	case ID_COMMIT_RELEASE:
+	case ID_COMMIT_NORELEASE:
+		VERIFY(hmenu = GetMenu(m_hwndmain));
+		ptransaction->HandleCommit(LOWORD(wParam), hmenu, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql); 
+
+		break;
+
+	case ID_ROLLBACK_TRANSACTION:
+	case ID_ROLLBACK_ANDCHAIN:
+	case ID_ROLLBACK_ANDNOCHAIN:
+	case ID_ROLLBACK_RELEASE:
+	case ID_ROLLBACK_NORELEASE:
+		VERIFY(hmenu = GetMenu(m_hwndmain));
+		ptransaction->HandleRollback(LOWORD(wParam), hmenu, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql); 
+
+		break;
+
+	case ID_SAVEPOINT_CREATESAVEPOINT:
+
+		if(hwndactive)
+		{
+			ptransaction->HandleCreateSavepoint(hwndactive, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		}
+			break;
+		
+	case ID_SAVEPOINT_RELEASESAVEPOINT:
+		ptransaction->HandleReleaseSavepoint(hwndactive, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+	case ID_ROLLBACK_TOSAVEPOINT:
+		ptransaction->HandleRollbackTo(hwndactive, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
+		break;
+
+#endif
 	case IDM_EXECUTE:
 	case ACCEL_QUERYUPDATE:
 	case ACCEL_QUERYUPDATE_KEY:
@@ -2732,8 +2810,27 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 		}
 		break;
 	case ACCEL_OPENSESSION:
-	case ID_OPENSESSION:
-		//Dialog to save current session
+	case ID_OPENSESSION:	
+		{
+#ifndef COMMUNITY
+			if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+			{
+				MDIWindow *wnd = GetActiveWin();
+				wyInt32 presult = 6;
+				if(wnd && wnd->m_ptransaction && wnd->m_ptransaction->m_starttransactionenabled == wyFalse && pGlobals->m_pcmainwin->m_topromptonclose == wyTrue)
+				{
+					presult = MessageBox(wnd->m_hwnd , _(L"One or more session(s) have (a) transaction(s) running. Do you still want to continue? The transaction will be rolled back by the server."), 
+					_(L"Warning"), MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2); 
+					if(presult != 6)
+					{
+						break;
+					}
+					pGlobals->m_pcmainwin->m_closealltrans = IN_TRANSACTION;
+					pGlobals->m_pcmainwin->m_intransaction = 0;
+				}
+			}
+#endif
+			//Dialog to save current session
 		wyInt32 msgreturn;
 		if(hwndactive)
 			if(WaitForSingleObject(m_sessionchangeevent, 0) == WAIT_OBJECT_0)
@@ -2749,15 +2846,43 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 					break;
 			}
 		OpenSessionFile();
+#ifndef COMMUNITY
+pGlobals->m_pcmainwin->m_closealltrans = 1;
+#endif
+		}
 		break;
 	case ACCEL_ENDSESSION:
 	case ID_CLOSESESSION:
+		{
+		#ifndef COMMUNITY
+			if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+			{
+				MDIWindow *wnd = GetActiveWin();
+				wyInt32 presult = 6;
+				if(wnd && wnd->m_ptransaction && pGlobals->m_pcmainwin->m_intransaction != 0 && wnd->m_ptransaction->m_starttransactionenabled == wyFalse && pGlobals->m_pcmainwin->m_topromptonclose == wyTrue)
+				{
+					presult = MessageBox(wnd->m_hwnd , _(L"One or more session(s) have (a) transaction(s) running. Do you still want to continue? The transaction will be rolled back by the server."), 
+					_(L"Warning"), MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2); 
+					if(presult != 6)
+					{
+						break;
+					}
+					pGlobals->m_pcmainwin->m_closealltrans = IN_TRANSACTION;
+					pGlobals->m_pcmainwin->m_intransaction = 0;
+				}
+			}
+#endif
 		m_sessionfile.Clear();
 		m_sessionname.Clear();
 		VERIFY(hmenu = GetMenu(m_hwndmain));
 		EnableMenuItem(hmenu, ID_CLOSESESSION, MF_GRAYED | MF_BYCOMMAND);
 		if(hwndactive)
 			pcquerywnd->SetQueryWindowTitle();
+
+#ifndef COMMUNITY
+pGlobals->m_pcmainwin->m_closealltrans = 1;
+#endif
+		}
 		break;
 	case ID_FILE_CLOSETAB:
 	case ACCEL_CLOSETAB:
@@ -4829,7 +4954,13 @@ FrameWindow::OnActiveConn()
 								ID_OBJECT_DROPFIELD, ID_COLUMNS_DROPINDEX, ID_OBJECT_MAINMANINDEX, IDM_TABLE_RELATION,
 								IDM_WINDOW_CASCADE, IDM_WINDOW_TILE, IDM_WINDOWS_ICONARRANGE, ID_OPEN_COPYTABLE, 
 								ID_IMPORTEXPORT_DBEXPORTTABLES2, ID_IMEX_TEXTFILE2, ID_REBUILDTAGS, ID_ORGANIZEFAVORITES, ID_REFRESHFAVORITES,
-                                ID_EXPORT_EXPORTTABLEDATA, ID_OBJECT_EXPORTVIEW, IDM_DB_REFRESHOBJECT, ID_DATASEARCH};
+                                ID_EXPORT_EXPORTTABLEDATA, ID_OBJECT_EXPORTVIEW, IDM_DB_REFRESHOBJECT, ID_DATASEARCH, ID_TRANSACTION_SETAUTOCOMMIT, ID_TRX_REPEATABLEREAD, ID_TRX_READCOMMITED, ID_TRX_READUNCOMMITED,
+								ID_TRX_SERIALIZABLE, ID_WITHCONSISTENTSNAPSHOT_READONLY,
+								ID_WITHCONSISTENTSNAPSHOT_READWRITE, ID_STARTTRANSACTION_READONLY, ID_STARTTRANSACTION_READWRITE,
+								ID_COMMIT_ANDCHAIN, ID_COMMIT_ANDNOCHAIN, ID_COMMIT_RELEASE,
+								ID_COMMIT_NORELEASE, ID_ROLLBACK_TOSAVEPOINT, ID_ROLLBACK_ANDCHAIN,
+								ID_ROLLBACK_ANDNOCHAIN, ID_ROLLBACK_RELEASE, ID_ROLLBACK_NORELEASE, ID_SAVEPOINT_CREATESAVEPOINT,
+								ID_SAVEPOINT_RELEASESAVEPOINT};
 
 	if(pGlobals->m_conncount == 0)
 	{
@@ -4846,6 +4977,10 @@ FrameWindow::OnActiveConn()
 				
 		EnableMenuItem(hmenu, ID_QUERYBUILDER, MF_GRAYED | MF_BYCOMMAND);
 		EnableMenuItem(hmenu, ID_SCHEMADESIGNER, MF_GRAYED | MF_BYCOMMAND);
+
+		EnableMenuItem(hmenu, ID_STARTTRANSACTION_WITHNOMODIFIER, MF_GRAYED | MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ID_COMMIT_WITHNOMODIFIER, MF_GRAYED | MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ID_ROLLBACK_TRANSACTION, MF_GRAYED | MF_BYCOMMAND);
 
 		//disable format query options
 		EnableMenuItem(hmenu, ACCEL_FORMATALLQUERIES, MF_GRAYED | MF_BYCOMMAND);
@@ -4912,6 +5047,21 @@ FrameWindow::OnActiveConn()
 wyBool
 FrameWindow::StopQuery(HWND hwndactive, MDIWindow * wnd)
 {
+#ifndef COMMUNITY
+	wyInt32		presult = 6;
+	
+	if(pGlobals->m_entlicense.CompareI("Professional") != 0 && wnd->m_ptransaction && !wnd->m_ptransaction->m_starttransactionenabled)
+	{
+		presult = MessageBox(wnd->m_pcqueryobject->m_hwnd, _(L"The session has an active transaction. Stopping the execution will cause transaction to rollback and end. Do you want to continue?"), 
+                    _(L"Warning"), MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2);
+		if(presult == 6)
+			wnd->m_ptransaction->CallOnCommit();
+	}
+		if(presult != 6) //dosent matter for professional, as initial value of presult is 6
+		{
+			return wyFalse;
+		}
+#endif
     VERIFY(SetCursor(LoadCursor(NULL, IDC_WAIT)));
 
 	if(hwndactive && wnd->m_executing && wnd->m_tunnel->IsTunnel())
@@ -5333,6 +5483,7 @@ FrameWindow::HandleCreateDatabase(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *dbn
     wyString    query;
 	wyString	dbnamestr, tempcharset;
 	MDIWindow	*wnd = NULL;
+	wyInt32		isintransaction = 1;
 
 	VERIFY(wnd = GetActiveWin());
 	if(!wnd)
@@ -5376,13 +5527,18 @@ FrameWindow::HandleCreateDatabase(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *dbn
         query.AddSprintf("collate %s", pcquerywnd->m_pcqueryobject->m_dbcollation.GetString());
     }
 
-    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse,
+								0, wyFalse, &isintransaction, hwnd);
+	
+	if(isintransaction == 1)
+		return wyFalse;
+	
 	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
 	{
 		ShowMySQLError(hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
 		return wyFalse;
 	}
-
+	
 	pcquerywnd->m_tunnel->mysql_free_result(res);
 
 	///New db select and insert into db combo only if database(s) not specified in Con.window
@@ -5433,6 +5589,7 @@ FrameWindow::HandleAlterDatabase(HWND hwnd, MDIWindow *pcquerywnd, wyWChar *dbna
 	MYSQL_RES	*res;
     wyString    query;
 	wyString	dbnamestr, tempcharset;
+	wyInt32 isintransaction = 1;
 
 	hwndedit = GetDlgItem(hwnd, IDC_DBEDIT);
 	CQueryObject *pcqueryobject=pcquerywnd->m_pcqueryobject;
@@ -5457,9 +5614,12 @@ FrameWindow::HandleAlterDatabase(HWND hwnd, MDIWindow *pcquerywnd, wyWChar *dbna
        pcqueryobject->m_dbcollation.CompareI(STR_DEFAULT) != 0)
     {
         query.AddSprintf("collate %s", pcqueryobject->m_dbcollation.GetString());
-    }
+    } 
 
-    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
+    res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse,
+								0, wyFalse, &isintransaction, GetActiveWindow());
+	if(isintransaction == 1)
+		return wyFalse;
 
 	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql) == -1)
 	{
@@ -5756,9 +5916,7 @@ FrameWindow::PrepareCreateProcedure(MDIWindow *pcquerywnd, const wyChar *procedu
     | [NOT] DETERMINISTIC\r\n\
     | { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }\r\n\
     | SQL SECURITY { DEFINER | INVOKER }\r\n\
-    | COMMENT 'string'*/\r\n\
-    BEGIN\r\n\r\n\
-    END",
+    | COMMENT 'string'*/\r\n\tBEGIN\r\n\r\n\tEND",
     db.GetString(), procedurename, db.GetString(), procedurename);
 
 	return;
@@ -6819,6 +6977,8 @@ FrameWindow::OnWmClose(HWND hwnd)
 #ifndef COMMUNITY
     HWND    hwndvdd;
 	wyString  vddmsg;
+	if(pGlobals->m_pcmainwin->m_closealltrans != IN_TRANSACTION);
+		pGlobals->m_pcmainwin->m_closealltrans = 1;
 #endif
 
 	wyBool retval = wyTrue;
@@ -6953,10 +7113,10 @@ FrameWindow::OnWmInitPopup(WPARAM wparam, LPARAM lparam)
 		} 
 
 		RecursiveMenuEnable((HMENU)wparam, iswindowmenu, MF_ENABLED);
-		if(wyTheme::m_theme->IsSysmenuEnabled())
-        m_connection->HandleMenu(menuindex, (HMENU)wparam);//if system menu is not enabled we need to move one extra in menu
+		if(wyTheme::m_theme->IsSysmenuEnabled(GetActiveWin()->m_hwnd))
+			m_connection->HandleMenu(menuindex, (HMENU)wparam);//if system menu is not enabled we need to move one extra in menu
 		else
-		 m_connection->HandleMenu(menuindex+1, (HMENU)wparam);
+			m_connection->HandleMenu(menuindex+1, (HMENU)wparam);
 
 	}
 
@@ -7064,7 +7224,18 @@ FrameWindow::HandleMenuOnNoConnection(WPARAM wparam, LPARAM lparam)
             RemoveMenu((HMENU)wparam, ID_VDDTOOL, MF_BYCOMMAND);
         }
 	}
-
+	else if((LOWORD(lparam)) == MNUTRANSACTION_INDEX - 1)
+    {
+			wyUInt32 mitems[] ={ID_TRANSACTION_SETAUTOCOMMIT, ID_TRX_REPEATABLEREAD, ID_TRX_READCOMMITED, ID_TRX_READUNCOMMITED,
+								ID_TRX_SERIALIZABLE, ID_STARTTRANSACTION_WITHNOMODIFIER, ID_WITHCONSISTENTSNAPSHOT_READONLY,
+								ID_WITHCONSISTENTSNAPSHOT_READWRITE, ID_STARTTRANSACTION_READONLY, ID_STARTTRANSACTION_READWRITE,
+								ID_COMMIT_WITHNOMODIFIER, ID_COMMIT_ANDCHAIN, ID_COMMIT_ANDNOCHAIN, ID_COMMIT_RELEASE,
+								ID_COMMIT_NORELEASE, ID_ROLLBACK_TOSAVEPOINT, ID_ROLLBACK_TRANSACTION, ID_ROLLBACK_ANDCHAIN,
+								ID_ROLLBACK_ANDNOCHAIN, ID_ROLLBACK_RELEASE, ID_ROLLBACK_NORELEASE, ID_SAVEPOINT_CREATESAVEPOINT,
+								ID_SAVEPOINT_RELEASESAVEPOINT};
+			for(int i = 0; mitems[i] != NULL; i++) 
+				EnableMenuItem((HMENU)wparam, mitems[i], MF_GRAYED);
+	}
     return;
 }
 
@@ -8975,7 +9146,10 @@ FrameWindow::EnableToolButtonsAndCombo(HWND hwndtool, HWND hwndsecondtool, HWND 
         ID_FORMATCURRENTQUERY,
         IDC_DIFFTOOL,
         ID_QUERYBUILDER,
-        ID_SCHEMADESIGNER
+        ID_SCHEMADESIGNER,
+		ID_ROLLBACK_TRANSACTION,
+		ID_STARTTRANSACTION_WITHNOMODIFIER,
+		ID_COMMIT_WITHNOMODIFIER
     };
 
     wyInt32	tb3id[] = {	IDM_DATASYNC, ID_IMPORT_EXTERNAL_DATA, IDC_TOOLS_NOTIFY, ID_POWERTOOLS_SCHEDULEEXPORT};
@@ -9031,7 +9205,27 @@ FrameWindow::EnableToolButtonsAndCombo(HWND hwndtool, HWND hwndsecondtool, HWND 
                     state = TBSTATE_INDETERMINATE;
                 }
             }
-
+#ifndef COMMUNITY
+			else if(tb2id[i] == ID_STARTTRANSACTION_WITHNOMODIFIER || tb2id[i] == ID_ROLLBACK_TRANSACTION || tb2id[i] == ID_COMMIT_WITHNOMODIFIER )
+			{
+				HWND hwnd = wnd->GetHwnd();
+				if(wnd->m_ptransaction)
+				{
+					if(tb2id[i] == ID_STARTTRANSACTION_WITHNOMODIFIER)
+					{
+						if(wnd->m_ptransaction->m_starttransactionenabled)
+							state = TBSTATE_ENABLED;
+						else
+							state = TBSTATE_INDETERMINATE;
+					}
+					else
+						if(!wnd->m_ptransaction->m_starttransactionenabled)
+							state = TBSTATE_ENABLED;
+						else
+							state = TBSTATE_INDETERMINATE;
+				}
+			}
+#endif
             SendMessage(hwndsecondtool, TB_SETSTATE, (WPARAM)tb2id[i], state);
         }
 

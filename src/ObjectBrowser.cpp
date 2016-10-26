@@ -1731,6 +1731,7 @@ CQueryObject::DropDatabase(Tunnel * tunnel, PMYSQL mysql)
 	HTREEITEM		hitem;
     MYSQL_RES		*res;
 	MDIWindow		*wnd = GetActiveWin();
+	wyInt32			isintransaction = 1;
 
 	item	= GetSelectionImage();
 	VERIFY(hitem = TreeView_GetSelection(m_hwnd));
@@ -1786,7 +1787,11 @@ CQueryObject::DropDatabase(Tunnel * tunnel, PMYSQL mysql)
 	// prepare drop database query
 	query.Sprintf("drop database `%s`", m_seldatabase.GetString());
 
-    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query);
+    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
+
 	if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 	{
 		ShowMySQLError(m_hwnd, tunnel, mysql, query.GetString());
@@ -1823,6 +1828,7 @@ CQueryObject::DropTable(Tunnel * tunnel, PMYSQL mysql)
 	wyString        query, message;
 	HTREEITEM		hitem, hitemdb = NULL;
     MYSQL_RES		*res;
+	wyInt32 isintransaction = 1;
 
 	VERIFY(hitem	=	TreeView_GetSelection(m_hwnd));
 	item = GetSelectionImage();
@@ -1873,7 +1879,11 @@ CQueryObject::DropTable(Tunnel * tunnel, PMYSQL mysql)
 	// prepare drop table query.
 	query.Sprintf("drop table `%s`.`%s`", m_seldatabase.GetString(), m_seltable.GetString());
 
-    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query);
+    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
+
 	if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 	{
 		ShowMySQLError(m_hwnd, tunnel, mysql, query.GetString());
@@ -1897,7 +1907,7 @@ CQueryObject::DropTable(Tunnel * tunnel, PMYSQL mysql)
 wyBool
 CQueryObject::DropField(Tunnel * tunnel, PMYSQL mysql)
 {
-	wyInt32			ret, tabicon = 0;
+	wyInt32			ret, tabicon = 0, isintransaction = 1;
 	wyString        query, message, fieldstr;
     wyWChar         field[SIZE_512] = {0};
 	TVITEM			tvi;
@@ -1959,7 +1969,11 @@ CQueryObject::DropField(Tunnel * tunnel, PMYSQL mysql)
 
 	// prepare drop table query.
 	query.Sprintf("alter table `%s`.`%s` drop `%s`", m_seldatabase.GetString(), m_seltable.GetString(), fieldname.GetString());
-    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query);
+    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
+
 	if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 	{
 		ShowMySQLError(m_hwnd, tunnel, mysql, query.GetString());
@@ -2016,7 +2030,7 @@ CQueryObject::DropField(Tunnel * tunnel, PMYSQL mysql)
 wyBool
 CQueryObject::DropIndex(Tunnel * tunnel, PMYSQL mysql)
 {
-	wyInt32			ret, indexcounter, tabicon = 0;
+	wyInt32			ret, indexcounter, tabicon = 0, isintransaction = 1;
 	wyString        query, message, indexstr;
     wyWChar         index[SIZE_512] = {0}; 
 	TVITEM			tvi;
@@ -2074,7 +2088,11 @@ CQueryObject::DropIndex(Tunnel * tunnel, PMYSQL mysql)
 	// prepare drop table query.
 	query.Sprintf("alter table `%s`.`%s` drop index `%s`", m_seldatabase.GetString(), m_seltable.GetString(), indexstr.GetString());
 		
-    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query);
+    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
+
 	if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 	{
 		ShowMySQLError(m_hwnd, tunnel, mysql, query.GetString());
@@ -2122,7 +2140,7 @@ CQueryObject::DropIndex(Tunnel * tunnel, PMYSQL mysql)
 wyBool
 CQueryObject::EmptyTable(Tunnel * tunnel, PMYSQL mysql)
 {
-	wyInt32		    ret,item;
+	wyInt32		    ret,item, isintransaction = 1;
 	wyString        query, message;
 	HTREEITEM		hitem;
     MYSQL_RES*      res;
@@ -2177,7 +2195,11 @@ CQueryObject::EmptyTable(Tunnel * tunnel, PMYSQL mysql)
 	query.Sprintf("truncate table `%s`.`%s`", m_seldatabase.GetString(), m_seltable.GetString());
 
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
-    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query);
+    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
+
 	if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 	{
 		ShowMySQLError(m_hwnd, tunnel, mysql, query.GetString());
@@ -5414,7 +5436,7 @@ CQueryObject::OnDBLClick(WPARAM wParam, LPARAM lParam)
 wyBool
 CQueryObject::ChangeTableType(Tunnel * tunnel, PMYSQL mysql, const wyWChar *newtabletype)
 {
-	wyInt32			item = 0;
+	wyInt32			item = 0, isintransaction = 1;
 	wyString		query;
 	HTREEITEM		hitem;
     MYSQL_RES		*res = NULL;
@@ -5437,7 +5459,11 @@ CQueryObject::ChangeTableType(Tunnel * tunnel, PMYSQL mysql, const wyWChar *newt
 	else
 		query.Sprintf("alter table `%s`.`%s` type = %s", m_seldatabase.GetString(), m_seltable.GetString(), newtabtypestr.GetString());
     		
-    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query);
+    res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
+
 	if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 	{
 		ShowMySQLError(m_hwnd, tunnel, mysql, query.GetString());
@@ -5815,12 +5841,16 @@ CQueryObject::HandleExecuteQuery(Tunnel *tunnel, PMYSQL mysql, wyString &query, 
 {
 	MYSQL_RES   *res;
 	wyBool force, batch, isfkchbatch;
+	wyInt32 isintransaction = 1;
 
 	force = batch = isfkchbatch = ((istunnel == wyTrue) ? wyTrue : wyFalse);
 		
 	//For http batch = true, force = true, isimporthtttp = true(thia makes SET SQL-MODE and SET FK-CHECK add to each script)
 	res = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query, wyTrue, batch, wyTrue, 
-		                      false, force, wyFalse, 0, isfkchbatch);
+		                      false, force, wyFalse, 0, isfkchbatch, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
 
 	if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 	{
@@ -5846,7 +5876,7 @@ CQueryObject::DropViews(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *
     MYSQL_RES   *res;
     MDIWindow   *wnd = GetActiveWin();
 	wyBool		ismysql41 = IsMySQL41(tunnel, mysql);
-	wyInt32     count = 0;
+	wyInt32     count = 0, isintransaction = 1;
 	wyString	dbname(db);
 
     GetSelectViewStmt(db, query);
@@ -5864,7 +5894,10 @@ CQueryObject::DropViews(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *
 	{
 		myrowstr.SetAs(myrow[0], ismysql41);
 		query.Sprintf("drop view `%s`.`%s`", m_seldatabase.GetString(), myrowstr.GetString());
-        res = ExecuteAndGetResult(wnd, tunnel, mysql, query);
+        res = ExecuteAndGetResult(wnd, tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+		if(isintransaction == 1)
+			return count;
 
 		if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 		{
@@ -5888,7 +5921,7 @@ CQueryObject::DropProcedures(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyC
 	MYSQL_RES	*myres, *res;
 	MYSQL_ROW	myrow;
 	wyString    query, myrowstr;
-	wyInt32     count = 0 ;
+	wyInt32     count = 0, isintransaction = 1;
     MDIWindow   *wnd = GetActiveWin();
 	wyString	dbname(db);
 	wyBool		ismysql41 = IsMySQL41(tunnel, mysql);
@@ -5911,7 +5944,10 @@ CQueryObject::DropProcedures(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyC
 	{
 		myrowstr.SetAs(myrow[0], ismysql41);
 		query.Sprintf("drop procedure `%s`.`%s`", m_seldatabase.GetString(), myrowstr.GetString());
-        res = ExecuteAndGetResult(wnd, tunnel, mysql, query);
+        res = ExecuteAndGetResult(wnd, tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+		if(isintransaction == 1)
+			return count;
 		if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 		{
 			ShowMySQLError(m_hwnd, tunnel, mysql, query.GetString());
@@ -5930,7 +5966,7 @@ CQueryObject::DropProcedures(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyC
 wyInt32
 CQueryObject::DropEvents(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *db)
 {
-	wyInt32     count = 0;
+	wyInt32     count = 0, isintransaction = 1;
 	MYSQL_RES   *myres, *res;
 	MYSQL_ROW   myrow;
 	wyBool		ismysql41 = IsMySQL41(tunnel, mysql);
@@ -5958,7 +5994,10 @@ CQueryObject::DropEvents(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar 
 	{	
 		myrowstr.SetAs(myrow[0], ismysql41);
 		query.Sprintf("drop event `%s`.`%s`", m_seldatabase.GetString(), myrowstr.GetString());
-        res = ExecuteAndGetResult(wnd, tunnel, mysql, query);
+        res = ExecuteAndGetResult(wnd, tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+		if(isintransaction == 1)
+			return count;
 
 		if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 		{
@@ -5979,7 +6018,7 @@ CQueryObject::DropEvents(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar 
 wyInt32
 CQueryObject::DropFunctions(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *db)
 {
-	wyInt32     count = 0;
+	wyInt32     count = 0, isintransaction = 1;
 	MYSQL_RES   *myres, *res;
 	MYSQL_ROW   myrow;
 	wyBool		ismysql41 = IsMySQL41(tunnel, mysql);
@@ -6007,7 +6046,10 @@ CQueryObject::DropFunctions(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyCh
 	{	
 		myrowstr.SetAs(myrow[0], ismysql41);
 		query.Sprintf("drop function `%s`.`%s`", m_seldatabase.GetString(), myrowstr.GetString());
-        res = ExecuteAndGetResult(wnd, tunnel, mysql, query);
+        res = ExecuteAndGetResult(wnd, tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+		if(isintransaction == 1)
+			return count;
 
 		if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 		{
@@ -6407,7 +6449,7 @@ CQueryObject::DropDatabaseObject(Tunnel * tunnel, PMYSQL mysql, wyChar *objectty
 {
 	MYSQL_RES   *myres;
 	wyString    query;
-	wyInt32     ret;
+	wyInt32     ret, isintransaction = 1;
 	HTREEITEM	hitem, hitemtemp;
 	wyString    objectname;
 
@@ -6431,7 +6473,11 @@ CQueryObject::DropDatabaseObject(Tunnel * tunnel, PMYSQL mysql, wyChar *objectty
 
 	query.Sprintf("drop %s `%s`.`%s`",objectname.GetString(), m_seldatabase.GetString(), m_seltable.GetString());
 	
-    myres = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query);
+    myres = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
+
 	if(!myres && tunnel->mysql_affected_rows(*mysql)== -1)
 	{
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
@@ -6454,7 +6500,7 @@ CQueryObject::DropTrigger(Tunnel * tunnel, PMYSQL mysql)
 {
 	MYSQL_RES	*myres;
     wyString    query;
-	wyInt32     ret;
+	wyInt32     ret, isintransaction = 1;
 	HTREEITEM	hitem, hitemtemp;
 
 	VERIFY(hitem = TreeView_GetSelection(m_hwnd));
@@ -6476,7 +6522,11 @@ CQueryObject::DropTrigger(Tunnel * tunnel, PMYSQL mysql)
 
 	query.Sprintf("drop trigger /*!50032 if exists */ `%s`.`%s`", m_seldatabase.GetString(), m_seltable.GetString());
 	
-    myres = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query);
+    myres = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
+
 	if(!myres && tunnel->mysql_affected_rows(*mysql)== -1)
 	{
 		SetCursor(LoadCursor(NULL, IDC_ARROW));
@@ -6502,6 +6552,7 @@ CQueryObject::EndRenameTable(LPNMTVDISPINFO ptvdi)
     MYSQL_RES   *myres;
 	wyString	itemtextstr;
     TabEditor   *ptabeditor = NULL;
+	wyInt32		isintransaction = 1;
 
 	MDIWindow*	wnd = (MDIWindow*)GetWindowLongPtr(m_hwndparent, GWLP_USERDATA);
 	_ASSERT(wnd);
@@ -6512,7 +6563,11 @@ CQueryObject::EndRenameTable(LPNMTVDISPINFO ptvdi)
 					 m_seldatabase.GetString(), m_seltable.GetString(), 
 					 m_seldatabase.GetString(), itemtextstr.GetString());
 	
-    myres = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
+    myres = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
+
 	if(!myres && wnd->m_tunnel->mysql_affected_rows(wnd->m_mysql)== -1)
 	{
 		ShowMySQLError(m_hwnd, wnd->m_tunnel, &wnd->m_mysql, query.GetString());
@@ -6619,7 +6674,12 @@ and you are not the DEFINER"), pGlobals->m_appname.GetAsWideChar(), MB_ICONERROR
 
 	strview.Sprintf("create view `%s`.`%s` as %s", m_seldatabase.GetString(), myrowstr.GetString(), myrowsecstr.GetString());
 
-    res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, strview);
+	wyInt32 isintransaction = 1;
+
+    res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, strview, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
 
 	if(!res && wnd->m_tunnel->mysql_affected_rows(wnd->m_mysql)== -1)
 	{
@@ -6649,6 +6709,8 @@ CQueryObject::EndRenameEvent(LPNMTVDISPINFO ptvdi)
 	MYSQL_RES   *res;	
 	wyBool		iscollate = wyFalse;	
 	MDIWindow*	wnd = (MDIWindow*)GetWindowLongPtr(m_hwndparent, GWLP_USERDATA);
+	wyInt32 isintransaction = 1;
+
 	_ASSERT(wnd);
 	
 	if(GetmySQLCaseVariable(wnd) == 0)
@@ -6683,7 +6745,11 @@ CQueryObject::EndRenameEvent(LPNMTVDISPINFO ptvdi)
 
    query.Sprintf("alter event `%s`.`%s` rename to `%s`.`%s`", m_seldatabase.GetString(), m_seltable.GetString(), 
 															m_seldatabase.GetString(), renameevent.GetString());
-   res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
+   res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
+
 
    if(!res && wnd->m_tunnel->mysql_affected_rows(wnd->m_mysql)== -1)
 	{
@@ -6833,7 +6899,11 @@ CQueryObject::EndRenameTrigger(LPNMTVDISPINFO ptvdi)
 	/* Drop trigger otherwise you may not create another with same constraint */
 	dropquery.Sprintf("drop trigger /*!50032 if exists */ `%s`.`%s`", m_seldatabase.GetString(), m_seltrigger.GetString());
 
-    res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, dropquery);
+	wyInt32 isintransaction = 1;
+    res = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, dropquery, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+	if(isintransaction == 1)
+		return wyFalse;
 
 	if(!res && wnd->m_tunnel->mysql_affected_rows(wnd->m_mysql)== -1)
 	{
@@ -7538,7 +7608,7 @@ CQueryObject::DropTriggers(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyCha
     MYSQL_RES   *res;
     MDIWindow   *wnd = GetActiveWin();
 	wyBool		ismysql41 = IsMySQL41(tunnel, mysql);
-	wyInt32     count = 0;
+	wyInt32     count = 0, isintransaction = 1;
 	wyString	dbname(db);
 
 	GetSelectTriggerStmt(db, query);
@@ -7556,7 +7626,10 @@ CQueryObject::DropTriggers(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyCha
 	{
 		myrowstr.SetAs(myrow[0], ismysql41);
 		query.Sprintf("drop trigger `%s`.`%s`", m_seldatabase.GetString(), myrowstr.GetString());
-        res = ExecuteAndGetResult(wnd, tunnel, mysql, query);
+        res = ExecuteAndGetResult(wnd, tunnel, mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+
+		if(isintransaction == 1)
+			return count;
 
 		if(!res && tunnel->mysql_affected_rows(*mysql)== -1)
 		{

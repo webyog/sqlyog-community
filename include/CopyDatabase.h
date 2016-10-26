@@ -291,6 +291,9 @@ public:
 	wyBool				m_iscreatedb;
 
 	DB_LIST				*m_dblist;			/* List of Db in temporary array */
+
+	int					m_defaultdbindex; // variable to set the index of dropdown for target db 
+
 	wyUInt32			m_countdb;
 private:
 

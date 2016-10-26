@@ -1091,6 +1091,9 @@ HandleFileMenuOptionsProEnt(HMENU hmenu)
 		{
 			RemoveMenu(hmenu, ID_QUERYBUILDER, MF_BYCOMMAND);
 			RemoveMenu(hmenu, ID_SCHEMADESIGNER, MF_BYCOMMAND);	
+			RemoveMenu(hmenu, ID_STARTTRANSACTION_WITHNOMODIFIER, MF_BYCOMMAND);
+			RemoveMenu(hmenu, ID_COMMIT_WITHNOMODIFIER, MF_BYCOMMAND);
+			RemoveMenu(hmenu, ID_ROLLBACK_TRANSACTION, MF_BYCOMMAND);
 		}
 		if(pGlobals->m_pcmainwin->m_connection->m_enttype == ENT_PRO ||
 			pGlobals->m_pcmainwin->m_connection->m_enttype == ENT_NORMAL)
@@ -2867,6 +2870,25 @@ ChangeCRToLF(wyChar * text)
 		if(text[i] == C_CARRIAGE)
 			text[i] = '\n';
 
+		i++;
+	}
+	return wyTrue;
+}
+
+wyBool
+AddCRToLF(wyChar * text, wyChar * temp)
+{
+	wyUInt32	i=0;
+	wyUInt32	j=0;
+
+	while(text[i])
+	{
+		temp[j++] = text[i];
+		if(text[i+1])
+		{
+		if(text[i+1] == C_NEWLINE && text[i] != C_CARRIAGE)
+			temp[j++] = '\r';
+		}
 		i++;
 	}
 	return wyTrue;
@@ -7885,10 +7907,15 @@ SeekCurrentRowFromMySQLResult(MYSQL_RES *res, MYSQL_ROWS **rowswalker, Tunnel *t
 wyBool
 OnDrawConnNameCombo(HWND hwndcombo, LPDRAWITEMSTRUCT lpds,  wyBool isconndbname)
 {
-	wyInt32		ncount, i, j;
+	wyInt32		ncount, i, j, ret;
 	wyString	connstr, dirstr, conncount;
 	wyInt32		topindex;
+	wyWChar     directory[MAX_PATH + 1], *lpfileport=0;
     
+	ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+	if(ret == 0)
+		return wyFalse;
+	dirstr.SetAs(directory);
 	//fill the combobox with options
 	ncount = SendMessage(hwndcombo, CB_GETCOUNT, 0, 0);
 
@@ -7906,7 +7933,7 @@ OnDrawConnNameCombo(HWND hwndcombo, LPDRAWITEMSTRUCT lpds,  wyBool isconndbname)
 						topindex = 0;
 						j = ncount;
 					}
-					
+					pGlobals->m_pcmainwin->m_connection->PopulateColorArray(hwndcombo, &dirstr);
 					for(i = topindex; i < j; i++)
 					{
 						if(isconndbname == wyTrue)

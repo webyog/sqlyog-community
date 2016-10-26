@@ -1725,7 +1725,12 @@ public:
 	wyBool				m_mouseoverbuy;
 	wyString			m_trialtext;
 	wyBool				m_issessionedited;
-
+#ifndef COMMUNITY
+	wyInt32				m_closealltrans;
+	wyInt32				m_intransaction;
+	wyBool				m_topromptonimplicit;
+	wyBool				m_topromptonclose;
+#endif
 };
 
 /// Function to rstore connections

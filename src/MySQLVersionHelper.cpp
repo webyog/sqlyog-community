@@ -417,6 +417,19 @@ IsMySQL564MariaDB53(Tunnel *tunnel, PMYSQL mysql)
 		return wyFalse;
 }
 
+wyBool
+IsMySQL553MariaDB55(Tunnel *tunnel, PMYSQL mysql)
+{
+    long me = mysql_get_server_version(*mysql);/* Only available from MySQLv4.1*/
+    const char *dbString = mysql_get_server_info(*mysql);
+
+	if((me >= 50503 && !strstr(dbString, "MariaDB"))||(me >= 50500 && strstr(dbString, "MariaDB")))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
+
 void GetVersionInfoforAutoComplete(MYSQL *mysql, wyString &VersionS)
 {
 	long me = mysql_get_server_version(mysql);

@@ -82,6 +82,7 @@ CopyDatabase::CopyDatabase()
 	m_iscopytrigger=wyFalse;
 	m_dblist  = NULL;
 	m_countdb =	0;
+	m_defaultdbindex = 0;
 }
 
 CopyDatabase::~CopyDatabase()
@@ -100,6 +101,7 @@ CopyDatabase::~CopyDatabase()
 	{
 		free(m_dblist);
 		m_countdb=0;
+		m_defaultdbindex = 0;
 	}
 }
 
@@ -2388,9 +2390,10 @@ CopyDatabase::ExportData(LPGUI_COPYDB_UPDATE_ROUTINE gui_routine, void * lpParam
 			
 			virt_query.Sprintf("SHOW FIELDS FROM `%s`.`%s`",m_srcdb.GetString(), table->m_tablefld.GetString());
 			virt_res = SjaExecuteAndGetResult(m_newsrctunnel, &m_newsrcmysql, virt_query);
+			if(virt_res)
 			no_rows =  m_newsrctunnel->mysql_num_rows(virt_res);
 
-			if(!virt_res  && no_rows == -1) 
+			if(!virt_res  || no_rows == -1) 
 			{
 			ShowMySQLError(m_hwnddlg, m_newsrctunnel, &m_newsrcmysql);
 			return wyFalse;
@@ -3793,7 +3796,8 @@ CopyDatabase::CheckTargetDB(HWND m_hwnddlg)
 		//m_iscreatedb = wyTrue;
 	//}
 
-	SendMessage(m_hwndcombodb, CB_SETCURSEL , 0, 0);
+	SendMessage(m_hwndcombodb, CB_SETCURSEL , m_defaultdbindex , 0);
+	m_defaultdbindex = 0;
 	VERIFY(m_targetmysql = lpdiff->mysql);
 	VERIFY(m_targettunnel = lpdiff->tunnel);
 	VERIFY(m_tgtinfo = lpdiff->info);
@@ -3814,22 +3818,33 @@ CopyDatabase::CheckTargetDB(HWND m_hwnddlg)
 }
 
 void
-	CopyDatabase::FillDbList(){
-		 wyWChar     lbStr[70] = {0};
-			if(m_dblist)
-		{
+	CopyDatabase::FillDbList()
+{
+	wyString temp;
+	wyString temp1;
+	wyWChar     lbStr[70] = {0};
+	temp.SetAs(m_srcdb.GetString());
+		
+	if(m_dblist)
+	{
 		free(m_dblist);
-		m_countdb=0;
-		}
+		m_countdb = 0;
+	}
+	
 	m_countdb = SendMessage(m_hwndcombodb, CB_GETCOUNT, 0, 0);
 	m_dblist = (DB_LIST*)calloc(m_countdb,sizeof(DB_LIST));
 
-	for(int i=0;i< m_countdb ; i++){
+	for(int i=0;i< m_countdb ; i++)
+	{
 	SendMessage(m_hwndcombodb, CB_GETLBTEXT , i, (LPARAM)lbStr);
 	m_dblist[i].m_dbname.SetAs(lbStr);
+	temp1.SetAs(lbStr);
 	m_dblist[i].m_dropdown = wyTrue;
+	if(temp.CompareI(temp1.GetString())==0)
+	{
+		m_defaultdbindex = i;
 	}
-
+	}
 }
 wyBool 
 CopyDatabase::CreateTemporaryTables(const wyChar *db, const wyChar *view)

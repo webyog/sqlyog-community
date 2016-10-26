@@ -1511,7 +1511,7 @@ DataView::CreateGrid()
 	m_hwndgrid = CreateCustomGridEx(m_hwndframe, 
 									0, 0, 0, 0, 
 									m_gridwndproc, 
-									GV_EX_ROWCHECKBOX | GV_EX_OWNERDATA, (LPARAM)this);
+									GV_EX_ROWCHECKBOX | GV_EX_OWNERDATA | GV_EX_COL_TOOLTIP, (LPARAM)this);
     
 	CustomGrid_SetOwnerData(m_hwndgrid, wyTrue);
 	SetGridFont();
@@ -2872,6 +2872,18 @@ DataView::ThreadStopStatus(wyInt32 stop)
 wyBool
 DataView::Stop(wyInt32 buttonid)
 {
+	wyInt32 presult = 6;
+#ifndef COMMUNITY
+	if(pGlobals->m_entlicense.CompareI("Professional") != 0 && m_wnd->m_ptransaction && !m_wnd->m_ptransaction->m_starttransactionenabled)
+	{
+		presult = MessageBox(m_wnd->m_pcqueryobject->m_hwnd, _(L"The session has an active transaction. Stopping the execution will cause transaction to rollback and end. Do you want to continue?"), 
+                    _(L"Warning"), MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2);
+		if(presult == 6)
+			m_wnd->m_ptransaction->CallOnCommit();
+	}
+	if(presult != 6)
+		return wyFalse; //dosent matter for professional, as initial value of presult is 6	
+#endif
     //set the thread stop status and disable the button
     ThreadStopStatus(1);
     EnableToolButton(wyFalse, buttonid);
@@ -7039,6 +7051,7 @@ DataView::CreateColumns(wyBool isupdate)
         //get the original column name
         GetColumnName(column, k);
 
+		
         //if we are recreating the columns
         if(isupdate == wyFalse)
         {
@@ -7552,9 +7565,18 @@ LRESULT CALLBACK
 DataView::GridWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
 	DataView* pviewdata = (DataView*)CustomGrid_GetLongData(hwnd);
+	static wyString tooltip;
 
 	switch(message)
 	{
+		case GVN_MOUSELEAVE:
+			return TRUE;
+
+		case GVN_TOOLTIP:
+			pviewdata->OnColNameMouseHover(wparam, tooltip);
+			*((wyWChar**)lparam) =  tooltip.GetAsWideChar();
+			return TRUE;
+
         //handle draw select all check
         case GVN_DRAWSELECTALL:
             pviewdata->OnDrawSelectAllCheck(lparam);
@@ -7708,9 +7730,26 @@ DataView::GridWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
         //handle sys key down
         case GVN_SYSKEYDOWN:
             return pviewdata->OnSysKeyDown(wparam, lparam);
+			break;
 	}
 
 	return TRUE;
+}
+
+void 
+DataView::OnColNameMouseHover(WPARAM wparam, wyString& column)
+{	
+	wyString columntype;
+	GetColumnName(column, wparam);
+	
+	if(!m_data->m_fieldres)
+		return;
+
+	columntype.SetAs(GetDataType(m_wnd->m_tunnel, m_data->m_fieldres, (wyChar*)column.GetString()));
+	if(columntype.GetLength() == 0)
+		return;
+	column.AddSprintf("-");
+	column.AddSprintf(columntype.GetString());
 }
 
 //function to persist the width of a column, typically called when the splitter in grid moves

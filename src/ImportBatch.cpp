@@ -146,7 +146,32 @@ ImportBatch::OnWMCommand(HWND hwnd, WPARAM wParam)
 		break;
 
 	case IDOK:
-		ImportDump();
+		{
+#ifndef COMMUNITY
+		MDIWindow* wnd = GetActiveWin();
+		wyInt32 presult = 6;
+		wyInt32			isintransaction = 1;
+
+			if(wnd->m_ptransaction && wnd->m_ptransaction->m_starttransactionenabled == wyFalse)
+			{
+				if(pGlobals->m_pcmainwin->m_topromptonimplicit)
+						presult = MessageBox(GetActiveWindow(), _(L"You have an active transaction. This operation will cause Transaction to commit and end. Do you want to Continue?"), 
+						_(L"Warning"), MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2);
+			if(presult == 6)
+			{
+				wyString query;
+				query.Sprintf("COMMIT");
+				ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query, wyFalse, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+				
+				if(isintransaction == 1)
+					break;
+			} 
+			}
+			if(presult == 6)
+#endif
+			ImportDump();
+		}
+
 		break;	
 
 	case IDDONE:

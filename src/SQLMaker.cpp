@@ -27,6 +27,8 @@
 #include "FrameWindowHelper.h"
 #include "ClientMySQLWrapper.h"
 
+#define IN_TRANSACTION  -10
+
 
 wyUInt32 
 GetTableStatusStmt(wyString &query, const wyChar *dbname)
@@ -72,10 +74,13 @@ GetSelectTableStmt(wyString &query, const wyChar *dbname)
 MYSQL_RES *
 ExecuteAndGetResult(MDIWindow *wnd, Tunnel *tunnel, PMYSQL mysql, wyString &query, 
 					wyBool isprofile, wyBool isbatch, wyBool currentwnd, bool isread, 
-					bool isforce, wyBool isimport, wyInt32 *stop, wyBool isimporthttp)
+					bool isforce, wyBool isimport, wyInt32 *stop, wyBool isimporthttp, 
+					wyInt32 *isintransaction, HWND fortransactionprompt)
 {
     wyInt32     retcode;
     MYSQL_RES   *myres = NULL;
+	if(isintransaction)
+		*isintransaction = 0;
 
 	if(wnd)
 		wnd->SetThreadBusy(wyTrue);
@@ -83,7 +88,7 @@ ExecuteAndGetResult(MDIWindow *wnd, Tunnel *tunnel, PMYSQL mysql, wyString &quer
     //if(isprofile == wyTrue)
     //{
         retcode = my_query(wnd, tunnel, mysql, query.GetString(), query.GetLength(), isbatch, 
-			wyFalse, stop, 0, isprofile, currentwnd, isread, isimport, isimporthttp);
+			wyFalse, stop, 0, isprofile, currentwnd, isread, isimport, isimporthttp, fortransactionprompt);
     //}
     /*else
     {
@@ -91,8 +96,15 @@ ExecuteAndGetResult(MDIWindow *wnd, Tunnel *tunnel, PMYSQL mysql, wyString &quer
 		retcode = HandleMySQLRealQuery(tunnel, *mysql, query.GetString(), query.GetLength(), isbadforxml ? true : false, isbatch,
 			                           false, 0, isread);
     }*/
-
-    if(retcode)
+		
+	if(retcode == IN_TRANSACTION && isintransaction)
+	{
+		*isintransaction = 1;
+		if(wnd)
+			wnd->SetThreadBusy(wyFalse);
+		return myres;
+	}
+	if(retcode)
 	{
 		if(wnd)
 			wnd->SetThreadBusy(wyFalse);

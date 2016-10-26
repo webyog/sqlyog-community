@@ -721,6 +721,57 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Rebuild tags",               ID_REBUILDTAGS
     END
+    POPUP "T&ransactions"
+    BEGIN
+        MENUITEM "Set Autocommit",              ID_TRANSACTION_SETAUTOCOMMIT, CHECKED
+        POPUP "Isolation Level"
+        BEGIN
+            MENUITEM "Repeatable Read",             ID_TRX_REPEATABLEREAD, CHECKED
+            MENUITEM "Read Committed",              ID_TRX_READCOMMITED
+            MENUITEM "Read Uncommitted",             ID_TRX_READUNCOMMITED
+            MENUITEM "Serializable",                ID_TRX_SERIALIZABLE
+        END
+        MENUITEM SEPARATOR
+        POPUP "Start Transaction"
+        BEGIN
+            MENUITEM "With no modifier",            ID_STARTTRANSACTION_WITHNOMODIFIER
+            POPUP "With Consistent Snapshot"
+            BEGIN
+                MENUITEM "Read only",                   ID_WITHCONSISTENTSNAPSHOT_READONLY
+                MENUITEM "Read Write",                  ID_WITHCONSISTENTSNAPSHOT_READWRITE
+            END
+            MENUITEM SEPARATOR
+            MENUITEM "Read only",                   ID_STARTTRANSACTION_READONLY
+            MENUITEM "Read Write",                  ID_STARTTRANSACTION_READWRITE
+        END
+        POPUP "Commit"
+        BEGIN
+            MENUITEM "With no modifier",            ID_COMMIT_WITHNOMODIFIER
+            MENUITEM SEPARATOR
+            MENUITEM "And Chain",                   ID_COMMIT_ANDCHAIN
+            MENUITEM "And No Chain",                ID_COMMIT_ANDNOCHAIN
+            MENUITEM SEPARATOR
+            MENUITEM "Release",                     ID_COMMIT_RELEASE
+            MENUITEM "No Release",                  ID_COMMIT_NORELEASE
+        END
+        POPUP "Rollback"
+        BEGIN
+            MENUITEM "To Savepoint",                ID_ROLLBACK_TOSAVEPOINT
+            MENUITEM "Transaction",                 ID_ROLLBACK_TRANSACTION
+            MENUITEM SEPARATOR
+            MENUITEM "And Chain",                   ID_ROLLBACK_ANDCHAIN
+            MENUITEM "And No Chain",                ID_ROLLBACK_ANDNOCHAIN
+            MENUITEM SEPARATOR
+            MENUITEM "Release",                     ID_ROLLBACK_RELEASE
+            MENUITEM "No Release",                  ID_ROLLBACK_NORELEASE
+        END
+        POPUP "Savepoint"
+        BEGIN
+            MENUITEM "Create Savepoint",            ID_SAVEPOINT_CREATESAVEPOINT
+            MENUITEM SEPARATOR
+            MENUITEM "Release Savepoint",           ID_SAVEPOINT_RELEASESAVEPOINT
+        END
+    END
     POPUP "&Window"
     BEGIN
         MENUITEM "&Cascade",                    IDM_WINDOW_CASCADE
@@ -1583,7 +1634,7 @@ BEGIN
     LTEXT           "&Blob viewer",IDC_EDITOR3,8,41,60,9
     LTEXT           " ",IDC_BLOBFONT,76,41,120,10,SS_WORDELLIPSIS
     PUSHBUTTON      "Change...",IDC_BLOBCHANGE,205,40,41,12
-      LTEXT           "Ob&ject Browser",IDC_EDITOR5,8,54,60,10
+    LTEXT           "Ob&ject Browser",IDC_EDITOR5,8,54,60,10
     LTEXT           " ",IDC_OBFONT,76,54,120,10,SS_WORDELLIPSIS
     PUSHBUTTON      "Change...",IDC_OBCHANGE,205,54,41,12
     LTEXT           "&Others",IDC_EDITOR4,8,68,60,10
@@ -1780,13 +1831,18 @@ BEGIN
     EDITTEXT        IDC_HIGHLIMIT,95,141,49,12,ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "Remember setting for each &query",IDC_RESUTTABPAGERETAIN,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,169,127,10
-    GROUPBOX        "Toolbar Size ",IDC_STATIC,4,185,80,29
-    COMBOBOX        IDC_ICONSIZE,8,195,71,44,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    GROUPBOX        "Theme ",IDC_STATIC,88,185,163,29
-    COMBOBOX        IDC_THEMECOMBO,93,195,153,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Toolbar Size ",IDC_STATIC,1,225,80,29
+    COMBOBOX        IDC_ICONSIZE,6,236,71,44,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Theme ",IDC_STATIC,85,225,163,29
+    COMBOBOX        IDC_THEMECOMBO,90,236,153,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Restore &All Defaults",IDC_OTHERSRESTOREALL,97,262,75,15
     PUSHBUTTON      "Restore &Tab Defaults",IDC_OTHERSRESTORETAB,176,262,75,15
     CONTROL         "R&estore session on startup",IDC_CONRESTORE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,74,216,9
+    GROUPBOX        "Transaction Options",IDC_TRANSACTION,4,185,247,36
+    CONTROL         "Prompt when query causing implicit commit is executed",IDC_PROMPTTRANSACTION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,196,197,10
+	CONTROL         "Prompt when closing sessing or program if transaction is active.",IDC_PROMPTCLOSETRANSACTION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,208,212,10
 END
 
 IDD_PREFGENERAL DIALOGEX 0, 0, 255, 280
@@ -1810,8 +1866,7 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,71,225,10
     CONTROL         "&Show Warning(s) in Messages tab",IDC_SHOWWARNING,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,82,124,10
-    CONTROL         "Halt Execution of Queries on Error",IDC_HALTEXEC,
-					"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,93,124,10
+    CONTROL         "Halt Execution of Queries on Error",IDC_HALTEXEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,93,124,10
     GROUPBOX        "Export Options ",IDC_STATIC,4,106,247,99
     GROUPBOX        "Max. size (in KB) for BULK INSERT statement(s)",IDC_STATIC,9,116,237,40
     CONTROL         "&Get server default",IDC_DEF_BULK_SIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,127,112,8
@@ -2158,6 +2213,39 @@ BEGIN
     LTEXT           "",IDC_CONNECTION_NAME,7,7,302,8,SS_ENDELLIPSIS
 END
 
+IDD_CREATESAVEPOINT DIALOGEX 0, 0, 206, 69
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION " Create Savepoint"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Enter new savepoint name",IDC_STATIC,7,7,130,8
+    EDITTEXT        IDC_SAVEPOINTEDIT,7,20,188,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "&Create",IDOK,89,41,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,145,42,50,14
+END
+
+IDD_RELEASESAVEPOINT DIALOGEX 0, 0, 174, 72
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Release Savepoint"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Release",IDC_STATIC,7,7,61,8
+    COMBOBOX        IDC_SAVEPOINTRELEASE_COMBO,7,22,155,14,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "&Release",IDOK,56,44,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,113,44,50,14
+END
+
+IDD_ROLLBACKTO DIALOGEX 0, 0, 171, 72
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Rollback to Savepoint"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Rollback To",IDC_STATIC,7,7,61,8
+    COMBOBOX        IDC_ROLLBACKTO_COMBO,7,23,154,14,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "&Rollback",IDOK,55,44,50,14
+    PUSHBUTTON      "Cance&l",IDCANCEL,111,44,50,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -2237,6 +2325,9 @@ IDI_TRUNCDB             ICON                    "..\\include\\bitmaps\\truncated
 IDI_VIEWDATA            ICON                    "..\\include\\bitmaps\\viewdata.ico"
 IDI_SORTASC             ICON                    "..\\include\\bitmaps\\sortasc.ico"
 IDI_DBSYNC              ICON                    "..\\include\\bitmaps\\dbsync.ico"
+IDI_COMMIT				ICON					"..\\include\\bitmaps\\commit.ico"
+IDI_ROLLBACK			ICON					"..\\include\\bitmaps\\rollback.ico"					
+IDI_START_TRANSACTION	ICON					"..\\include\\bitmaps\\start_transaction.ico"
 IDI_PREF                ICON                    "..\\include\\bitmaps\\preferences.ico"
 IDI_REORDERCOL          ICON                    "..\\include\\bitmaps\\reordercol.ico"
 IDI_EMPTYTABLE          ICON                    "..\\include\\bitmaps\\emptytable.ico"
@@ -2319,6 +2410,9 @@ IDI_FUNCTION            ICON                    "bitmaps\\function.ico"
 IDI_CONNECT_16          ICON                    "bitmaps\\connect_16.ico"
 IDI_COPYDATABASE_16     ICON                    "bitmaps\\copy_data_16.ico"
 IDI_DBSYNC_16           ICON                    "bitmaps\\dbsync_16.ico"
+IDI_COMMIT_16			ICON					"bitmaps\\commit_16.ico"
+IDI_ROLLBACK_16			ICON					"bitmaps\\rollback_16.ico"
+IDI_START_TRANSACTION_16	ICON				"bitmaps\\start_transaction_16.ico"
 IDI_EXECUTEALL_16       ICON                    "bitmaps\\execall_16.ico"
 IDI_EXECUTE_16          ICON                    "bitmaps\\execute_16.ico"
 IDI_EXECUTEFORUPD_16    ICON                    "bitmaps\\execforupd_16.ico"
@@ -2747,6 +2841,30 @@ BEGIN
         RIGHTMARGIN, 309
         TOPMARGIN, 7
         BOTTOMMARGIN, 35
+    END
+
+    IDD_CREATESAVEPOINT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 203
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 62
+    END
+
+    IDD_RELEASESAVEPOINT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 171
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 65
+    END
+
+    IDD_ROLLBACKTO, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 168
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 65
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -3368,6 +3486,13 @@ STRINGTABLE
 BEGIN
     ID_SCHEMADESIGNER       "Add a new Schema Designer"
     ID_QUERYBUILDER         "Add a new Query Builder"
+END
+
+STRINGTABLE
+BEGIN
+	ID_STARTTRANSACTION_WITHNOMODIFIER  "Start a new Transaction"
+	ID_COMMIT_WITHNOMODIFIER			"Commit the ongoing transacton"	
+	ID_ROLLBACK_TRANSACTION				"Rollback the transaction"
 END
 
 STRINGTABLE

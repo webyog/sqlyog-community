@@ -151,9 +151,12 @@ EditorProcs::ExecuteAllQuery(wyInt32 * stop)
 	GetCompleteText(query);
     wyChar *tmp = AllocateBuff(query.GetLength() + 1);
     strcpy(tmp,query.GetString());
-	ChangeCRToLF(tmp);
-    query.SetAs(tmp);
+	wyChar *tmp1 = AllocateBuff(query.GetLength() * 2 + 1);
+	AddCRToLF(tmp, tmp1);
+	//ChangeCRToLF(tmp);
+    query.SetAs(tmp1);
     free(tmp);
+	free(tmp1);
 	/* set the flag to executing */
 	wnd->SetExecuting(wyTrue);
 	*stop = 0;

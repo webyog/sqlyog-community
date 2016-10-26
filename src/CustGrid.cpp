@@ -164,7 +164,6 @@ HWND CreateCustomGrid(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width,
 {
 
 	HWND	hwndgrid;
-	
 	hwndgrid = CreateWindowEx(WS_EX_WINDOWEDGE,  customname, TEXT("Custom Grid Control"),
                                 WS_VISIBLE | WS_CHILD | WS_TABSTOP, 
 								x, y, width, height, hwndparent, NULL, 
@@ -174,9 +173,7 @@ HWND CreateCustomGrid(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width,
 		return NULL;
 
 	SendMessage(hwndgrid, GVM_SETLONGDATA, 0, lparam);
-
     CustomGrid_ShowGrid(hwndgrid, isvisible);
-
 	return hwndgrid;
 }
 
@@ -184,7 +181,9 @@ HWND CreateCustomGridEx(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width, wy
                         GVWNDPROC m_lpgvwndproc, DWORD styles, LPARAM lparam, wyBool isvisible, wyBool flip)
 {
 	HWND	hwndgrid;
-	
+	HWND	pct;
+	CCustGrid *pcg;
+	TOOLINFO toolinfo;
 	hwndgrid = CreateWindowEx(WS_EX_WINDOWEDGE,  customname, TEXT("Custom Grid Control"), 
                                     WS_VISIBLE | WS_CHILD | WS_TABSTOP, 
 								    x, y, width, height, hwndparent, NULL, 
@@ -199,6 +198,37 @@ HWND CreateCustomGridEx(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width, wy
 
     CustomGrid_ShowGrid(hwndgrid, isvisible);
 	
+	
+	if(styles & GV_EX_COL_TOOLTIP) {
+		memset(&toolinfo, 0, sizeof(toolinfo));
+		pcg = GetCustCtrlData(hwndgrid);
+
+		pcg->m_hwndtooltip = CreateWindowEx(WS_EX_TOPMOST,
+			TOOLTIPS_CLASS,
+			NULL,
+			WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,		
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			hwndgrid,
+			NULL,
+			GetModuleHandle(0),
+			NULL);		
+
+		SetWindowPos(pcg->m_hwndtooltip, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+
+		toolinfo.cbSize = sizeof(TOOLINFO);
+		toolinfo.uFlags =  TTF_SUBCLASS | TTF_ABSOLUTE | TTF_IDISHWND;
+		toolinfo.hinst = GetModuleHandle(0);
+		toolinfo.hwnd = hwndgrid;
+		toolinfo.lpszText = LPSTR_TEXTCALLBACK;
+		toolinfo.uId = (UINT_PTR)hwndgrid;
+		GetClientRect(hwndgrid, &toolinfo.rect);
+		SendMessage(pcg->m_hwndtooltip, TTM_ADDTOOL, 0, (LPARAM) (LPTOOLINFO)&toolinfo);
+		SendMessage(pcg->m_hwndtooltip, TTM_SETDELAYTIME, TTDT_AUTOMATIC, 800);
+	}
+
 	return hwndgrid;
 }
 
@@ -894,11 +924,16 @@ CCustGrid::CCustGrid(HWND hwnd)
 	m_pointlbuttondown.y = 0;
 
     m_ispressed = wyFalse;
+	g_bMouseTrack = wyFalse;
 	m_tox = 0;
     m_selallinfo.checkstate = BST_UNCHECKED;
     m_checkcount = 0;
 
     m_hItalicsFont = NULL;
+	m_hwndtooltip = NULL;
+	m_mouseprevpt.x = 0;
+	m_mouseprevpt.y = 0;
+	m_tooltipidindex = 0; //  Tooltip unique id is set to zero 
 }
 
 CCustGrid::~CCustGrid()
@@ -914,15 +949,24 @@ CCustGrid::~CCustGrid()
 
     if(m_hItalicsFont)
         DeleteObject(m_hItalicsFont);
+
+	if(m_hwndtooltip)
+		DestroyWindow(m_hwndtooltip);
+
+	m_tooltipidindex = 0; // restting the tooltip unique id to zero so they are reassigned from zero again
 }
+
 
 LRESULT CALLBACK
 CCustGrid::CustomGridWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+	wyInt32		x;
     LRESULT     ret;
 	//retrieve the custom structure POINTER for THIS window 
   	CCustGrid   *pcg = GetCustCtrlData(hwnd);
     wyBool      ikeypressshandled = wyFalse;
+	wyWChar*   tooltip = NULL;
+	RECT		rect;
 
 	switch(msg)
 	{
@@ -961,13 +1005,24 @@ CCustGrid::CustomGridWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	case WM_MOUSEMOVE:
         {
             pcg->GetMouseMovement();
-            if(wparam & MK_LBUTTON)
+			if(wparam & MK_LBUTTON)
             {
                 pcg->m_lpgvwndproc(hwnd, GVN_LBUTTONMOUSEMOVE, (WPARAM)0, (LPARAM)lparam);
                 break;
             }
 
-		    return pcg->OnMouseMove(wparam, lparam);
+			if(!pcg->g_bMouseTrack)
+			{
+ 				TRACKMOUSEEVENT tme = {0};
+ 				DWORD dwPos = GetMessagePos();
+ 				POINTS pts = MAKEPOINTS(dwPos);
+ 				tme.cbSize = sizeof(TRACKMOUSEEVENT);
+ 				tme.dwFlags = TME_HOVER | TME_LEAVE;
+ 				tme.hwndTrack = hwnd;
+ 				tme.dwHoverTime = 300;//HOVER_DEFAULT;
+ 				pcg->g_bMouseTrack = (wyBool)TrackMouseEvent(&tme);
+ 			}
+			return pcg->OnMouseMove(wparam, lparam);
         }
 
 	case WM_NOTIFY:
@@ -991,8 +1046,9 @@ CCustGrid::CustomGridWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         else
 		    ret = pcg->OnHScroll(hwnd, wparam, lparam);
 
-        pcg->m_lpgvwndproc(hwnd, GVN_HSCROLL, wparam, lparam);
-        return ret;
+		pcg->m_lpgvwndproc(hwnd, GVN_HSCROLL, wparam, lparam);
+
+		return ret;
 
 	case WM_LBUTTONDOWN:
         SetFocus(hwnd);
@@ -1064,6 +1120,15 @@ CCustGrid::CustomGridWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
   
     case WM_MOUSELEAVE:
         pcg->m_lpgvwndproc(hwnd, GVN_MOUSELEAVE, wparam, lparam);
+		pcg->g_bMouseTrack = wyFalse;
+		/*if(pcg->m_hwndtooltip)
+			{
+			//	SendMessage(pcg->m_hwndtooltip, TTM_DELTOOL, 0, (LPARAM) (LPTOOLINFO) &pcg->m_toolinfo);
+		//	pcg->m_hwndtooltip = NULL;
+			}
+	//	DestroyWindow(pcg->m_hwndtooltip);
+	//	pcg->m_hwndtooltip = NULL;
+	*/
 		break;
 
 	case WM_SIZE:
@@ -1090,7 +1155,19 @@ CCustGrid::CustomGridWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 void
 CCustGrid::GetMouseMovement()
 {
-    TRACKMOUSEEVENT	 te;
+	POINT pnt;
+	TRACKMOUSEEVENT	 te;
+
+	if(m_hwndtooltip)
+    {
+		GetCursorPos(&pnt);
+		ScreenToClient(m_hwnd, &pnt);
+
+		if(pnt.x != m_mouseprevpt.x || pnt.y != m_mouseprevpt.y) {
+			m_mouseprevpt = pnt;
+			SendMessage(m_hwndtooltip, TTM_POP, 0, 0);
+		}
+    }
 
     //Here Throwing the WM_MOUSELEAVE Message
 	te.cbSize    = sizeof(TRACKMOUSEEVENT);
@@ -1210,6 +1287,7 @@ CCustGrid::SplitterWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 	case WM_LBUTTONUP:
 		pcg->OnSplitterButtonUp(wparam, lparam); 
 		ReleaseCapture();
+		pcg->m_lpgvwndproc(hwnd, GVN_RESETDATAVIEWTOOLTIP, 0, 0); // To Reset the tooltip
 		break;
 	}
 	return(DefWindowProc(hwnd, msg, wparam, lparam));
@@ -1737,8 +1815,11 @@ LRESULT
 CCustGrid::OnWMNotify(WPARAM wparam, LPARAM lparam)
 {
 	LPNMLVKEYDOWN	lpnmlv =(LPNMLVKEYDOWN)lparam;
+	LPNMTTDISPINFO  lpnmttd = (LPNMTTDISPINFO)lparam;
 	LONG			ret;
 	wyString		moldcoltextstr;
+	wyInt32			x;
+	RECT			rect;
 	
 	if(lpnmlv->hdr.code == LVN_KEYDOWN)
     {
@@ -1771,6 +1852,14 @@ CCustGrid::OnWMNotify(WPARAM wparam, LPARAM lparam)
 			ShowWindow(m_hwndcurcombo, FALSE);
 			//ProcessTabPress();
 		} 
+	} else if(lpnmlv->hdr.code == TTN_GETDISPINFO) {
+		x = GetHoveredColumn();
+		lpnmttd->szText[0] = '\0';
+
+	    if(x != -1)
+		{
+			m_lpgvwndproc(m_hwnd, GVN_TOOLTIP, x, (LPARAM)&lpnmttd->lpszText);
+		}
 	}
 
 	return 0;
@@ -2971,7 +3060,7 @@ CCustGrid::DrawRowButtons(HDC hdcmem, RECT *rect, RECT *recttemp, wyInt32 *rowco
 		}        
     }	
 }
-	
+
 wyInt32
 CCustGrid::GetRemainingRows(PRECT rectwin)
 {
@@ -4263,6 +4352,28 @@ CCustGrid::OnSplitterButtonUp(WPARAM wparam, LPARAM lparam)
 	return 1;
 }
 
+wyInt32 CCustGrid::GetHoveredColumn()
+ {
+ 	POINT		pnt;	
+	wyInt32		x;
+
+	GetCursorPos(&pnt);
+	ScreenToClient(m_hwnd, &pnt);
+
+    if(m_flip == wyTrue)
+        x = m_maxwidth;
+    else
+        x = GV_DEFWIDTH;
+ 
+	if(pnt.y <= m_hight && pnt.x > x)
+ 	{
+		return GetRowHeader(&pnt);
+    }
+   
+ 	return -1;
+ }
+ 
+ 
 
 LRESULT
 CCustGrid::OnLButtonDown(WPARAM wparam, LPARAM lparam)
@@ -9013,7 +9124,7 @@ CCustGrid::GetLinesToScrollUserSetting()
 
 
 wyInt32
-CCustGrid::GetRowHeader(POINT *pnt)
+CCustGrid::GetRowHeader(POINT *pnt, RECT* rect)
 {
     PGVCOLNODE  pgvnode = m_collist;
     PGVROWNODE  pgvrownode = m_rowlist;
@@ -9039,8 +9150,16 @@ CCustGrid::GetRowHeader(POINT *pnt)
         count = 0;
         while(pgvrownode != NULL)
 	    {
-		    if(pnt->x >= x && pnt->x <= x + pgvrownode->rowcx)
+		    if(pnt->x >= x && pnt->x <= x + pgvrownode->rowcx) {
+				if(rect) {
+					rect->left = x;
+					rect->right = x + pgvrownode->rowcx;
+					rect->top = 0;
+					rect->bottom = m_hight;
+				}
+
                 return m_initrow + count;
+			}
             
             count++;
 
@@ -9061,8 +9180,16 @@ CCustGrid::GetRowHeader(POINT *pnt)
         count = 0;
         while(pgvnode != NULL)
 	    {
-			if(pgvnode && pgvnode->isshow == wyTrue && pnt->x >= x && pnt->x <= x + pgvnode->pColumn.cx)
+			if(pgvnode && pgvnode->isshow == wyTrue && pnt->x >= x && pnt->x <= x + pgvnode->pColumn.cx) {
+				if(rect) {
+					rect->left = x;
+					rect->right = x + pgvnode->pColumn.cx;
+					rect->top = 0;
+					rect->bottom = m_hight;
+				}
+
                 return m_initcol + count;
+			}
             
             count++;
 

@@ -75,8 +75,9 @@ class wySQLite;
 #define MNUOBJ_INDEX			6
 #define MNUTOOL_INDEX			7
 #define MNUPTOOL_INDEX			8
-#define MNUWINDOW_INDEX			9
-#define MNUHELP_INDEX			10
+#define MNUTRANSACTION_INDEX	9
+#define MNUWINDOW_INDEX			10
+#define MNUHELP_INDEX			11
 #define MNUENGINE_INDEX			20
 
 #define DEF_TAB_SIZE			8

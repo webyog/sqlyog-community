@@ -143,6 +143,9 @@ MDIWindow::MDIWindow(HWND hwnd, ConnectionInfo * conninfo, wyString &dbname, wyS
 
 #ifndef COMMUNITY
 	m_constatusparm = NULL;
+	
+
+	m_ptransaction = NULL;
 #endif
 	m_acinitevent = NULL; 
 	m_threadidinit = NULL;
@@ -173,6 +176,10 @@ MDIWindow::~MDIWindow()
 	// delete m_listtabeditor;
     if(m_tunnel)
         delete m_tunnel;
+#ifndef COMMUNITY
+	if(pGlobals->m_entlicense.CompareI("Professional") != 0 )
+		delete m_ptransaction;
+#endif
 
     // Release resources used by the critical section object.
     DeleteCriticalSection(&m_cs);
@@ -240,8 +247,43 @@ MDIWindow::Create(wyBool iscon_res, ConnectionInfo* conninfo)
 	else if(m_tunnel->IsTunnel())
 	{
 		m_keepaliveinterval = 0;
-	}
+	} 
+#ifndef COMMUNITY
+	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+	{
+		wyString		query, resstr;
+		MYSQL_RES*      myres;
+		MYSQL_ROW       row;
+		MDIWindow*		wnd;
+		wnd = GetActiveWin();
 
+		query.Sprintf("SHOW GLOBAL VARIABLES WHERE variable_name =  \"AUTOCOMMIT\"");
+		myres = ExecuteAndGetResult(wnd, m_tunnel, &m_mysql, query);
+		if(!myres && m_tunnel->mysql_affected_rows(m_mysql) == -1)
+		{
+		}
+		row =  m_tunnel->mysql_fetch_row(myres);
+		if(!row)
+		{
+			if(myres)
+				wnd->m_tunnel->mysql_free_result(myres);
+			resstr.SetAs("ON");
+		}
+		else
+		{
+			resstr.SetAs(row[1], IsMySQL41(m_tunnel, &m_mysql));
+			mysql_free_result(myres);
+		}
+		if(resstr.CompareI("ON") == 0)
+		{
+			wnd->m_ptransaction->m_autocommit = wyTrue;
+		}
+		else if(resstr.CompareI("OFF") == 0)
+		{
+			wnd->m_ptransaction->m_autocommit = wyFalse;
+		}
+	}
+#endif
     return wyTrue;
 }
 
@@ -799,7 +841,6 @@ MDIWindow::OnWmCreate(HWND hwnd)
 	SetWindowPositions();
 	pGlobals->m_pcmainwin->AddTextInCombo(m_database.GetAsWideChar());
 	PostMessage(hwnd, UM_REFRESHOBJECT, 0, 0);
-
 	if(m_pctabmodule->GetActiveTabEditor())
     {
         peditorbase = m_pctabmodule->GetActiveTabEditor()->m_peditorbase;
@@ -811,13 +852,50 @@ MDIWindow::OnWmCreate(HWND hwnd)
             ShowCursor(TRUE);
         }
     }
-
+	#ifndef COMMUNITY
+	if(pGlobals->m_entlicense.CompareI("Professional") != 0 )
+	CreateTransactionhandler(hwnd);
+#endif
 	return;
 }
 
 wyInt32 
 MDIWindow::OnWmClose(HWND hwnd)
 {
+	wyInt32		presult = 6;
+	MDIWindow	*wnd = GetActiveWin();
+#ifndef COMMUNITY
+	FrameWindow*	    pcmainwin = (FrameWindow *)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+	{
+		if(pGlobals->m_pcmainwin->m_closealltrans == 1 && pGlobals->m_pcmainwin->m_intransaction > 0 && wnd->m_ptransaction && pGlobals->m_pcmainwin->m_topromptonclose == wyTrue)
+		{
+			presult = MessageBox(wnd->GetHwnd() , _(L"One or more session(s) have (a) transaction(s) running. Do you still want to close SQLyog? The transaction will be rolled back by the server."), 
+                   _(L"Warning"), MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2); 
+			if(presult != 6)
+			{
+				pGlobals->m_pcmainwin->m_closealltrans = 0;
+				return 0;
+			}
+			else
+				pGlobals->m_pcmainwin->m_closealltrans = -1;
+		}
+		if(wnd->m_ptransaction && wnd->m_ptransaction->m_starttransactionenabled == wyFalse && pGlobals->m_pcmainwin->m_closealltrans == 0 && pGlobals->m_pcmainwin->m_topromptonclose == wyTrue )
+		{
+			presult = MessageBox(wnd->GetHwnd() , _(L"The session has an active transaction. Do you want to close the connection? The transaction will be rolled back by the server. "), 
+                    _(L"Warning"), MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2);
+			
+			if(presult == 6)
+				pGlobals->m_pcmainwin->m_intransaction --;
+		}
+	}
+	if(presult != 6)
+	{
+		pGlobals->m_pcmainwin->m_closealltrans = 0;
+		return 0;
+	}
+		
+#endif
 	m_ismdiclosealltabs = wyTrue;
 
     wyInt32     tabcount, count;
@@ -947,7 +1025,7 @@ MDIWindow::OnWmClose(HWND hwnd)
 
 	SetCursor(LoadCursor(NULL, IDC_ARROW));       
     
-    return 1;    
+    return 1;
 }
 
 wyInt32 
@@ -1491,7 +1569,14 @@ MDIWindow::CreateTabController(HWND hwnd)
 	
 	return;
 }
-
+#ifndef COMMUNITY
+void
+MDIWindow::CreateTransactionhandler(HWND hwnd)
+{	
+    m_ptransaction = new Transactions();
+	return;
+}
+#endif
 void
 MDIWindow::CreateQueryStatus(HWND hwnd)
 {
@@ -3185,7 +3270,36 @@ MDIWindow::FlushWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 		switch(LOWORD(wparam))
 		{
 		case IDOK:
-             return pcquerywnd->OnFlushOK(hwnd);
+			{
+#ifndef COMMUNITY
+wyInt32		presult = 6;
+wyInt32		isintransaction = 1;
+
+	if(pcquerywnd->m_ptransaction && pcquerywnd->m_ptransaction->m_starttransactionenabled == wyFalse)
+	{
+		if(pGlobals->m_pcmainwin->m_topromptonimplicit)
+			presult = MessageBox(GetActiveWindow(), _(L"You have an active transaction. This operation will cause Transaction to commit and end. Do you want to Continue?"), 
+                    _(L"Warning"), MB_ICONWARNING | MB_YESNO | MB_DEFBUTTON2);
+		if(presult == 6)
+		{
+			wyString query;
+			query.Sprintf("COMMIT");
+			ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query, wyFalse, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
+				
+			if(isintransaction == 1)
+				break;
+		} 
+	}
+	if(presult == 6)
+	{
+#endif 
+            return pcquerywnd->OnFlushOK(hwnd);
+
+#ifndef COMMUNITY
+	}
+#endif
+			break;
+			}
 
 		case IDC_FLUSH_ALL:
 			/* if all is checked we need to enable disable all the buttons */
@@ -3228,13 +3342,14 @@ MDIWindow::FlushAll(HWND hwnd, HWND hwndtext, wyInt32 writetobin)
 			                             "tables", "status", "des_key_file",
 			                             "query cache", "user_resources",
 			                             "tables with read lock" };
+	wyInt32		isflush = 1;
 
     size = sizeof(flushquery) / sizeof(flushquery[0]);
 
     for(count = 0; count < size; count++)
     {
-        rc = ExecuteFlush(flushquery[count], hwndtext, writetobin, hwnd);
-        if(rc == wyFalse)
+        rc = ExecuteFlush(flushquery[count], hwndtext, writetobin, hwnd, &isflush);
+        if(rc == wyFalse || isflush == 1)
         {
 	        success = wyFalse;
 	        return 1;
@@ -3266,36 +3381,37 @@ MDIWindow::FlushSpecific(HWND hwnd, HWND hwndtext, wyInt32 writetobin)
 {
     MYSQL_RES   *res;
     wyString    query;
+	wyInt32		isflush = 1;
 
-    if((IsDlgButtonChecked(hwnd, IDC_FL_LOGS))== BST_CHECKED)
-		ExecuteFlush("logs", hwndtext, writetobin, hwnd);
+    if((IsDlgButtonChecked(hwnd, IDC_FL_LOGS))== BST_CHECKED && isflush != -1)
+		ExecuteFlush("logs", hwndtext, writetobin, hwnd, &isflush);
 
-	if((IsDlgButtonChecked(hwnd, IDC_FL_HOSTS))== BST_CHECKED)
-		ExecuteFlush("hosts", hwndtext, writetobin, hwnd);
+	if((IsDlgButtonChecked(hwnd, IDC_FL_HOSTS))== BST_CHECKED && isflush != -1)
+		ExecuteFlush("hosts", hwndtext, writetobin, hwnd, &isflush);
 
-	if((IsDlgButtonChecked(hwnd, IDC_FL_PRIV))== BST_CHECKED)
-		ExecuteFlush("privileges", hwndtext, writetobin, hwnd);
+	if((IsDlgButtonChecked(hwnd, IDC_FL_PRIV))== BST_CHECKED && isflush != -1)
+		ExecuteFlush("privileges", hwndtext, writetobin, hwnd, &isflush);
     
-    if((IsDlgButtonChecked(hwnd, IDC_FL_TABLES))== BST_CHECKED)
-	    ExecuteFlush("tables", hwndtext, writetobin, hwnd);
+    if((IsDlgButtonChecked(hwnd, IDC_FL_TABLES))== BST_CHECKED && isflush != -1)
+	    ExecuteFlush("tables", hwndtext, writetobin, hwnd, &isflush);
 
-	if((IsDlgButtonChecked(hwnd, IDC_FL_STATUS))== BST_CHECKED)
-		ExecuteFlush("status", hwndtext, writetobin, hwnd);
+	if((IsDlgButtonChecked(hwnd, IDC_FL_STATUS))== BST_CHECKED && isflush != -1)
+		ExecuteFlush("status", hwndtext, writetobin, hwnd, &isflush);
 
-	if((IsDlgButtonChecked(hwnd, IDC_FL_DES))== BST_CHECKED)
-        ExecuteFlush("des_key_file", hwndtext, writetobin, hwnd);
+	if((IsDlgButtonChecked(hwnd, IDC_FL_DES))== BST_CHECKED && isflush != -1)
+        ExecuteFlush("des_key_file", hwndtext, writetobin, hwnd, &isflush);
 
-	if((IsDlgButtonChecked(hwnd, IDC_FL_CACHE))== BST_CHECKED)
-        ExecuteFlush("query cache", hwndtext, writetobin, hwnd);
+	if((IsDlgButtonChecked(hwnd, IDC_FL_CACHE))== BST_CHECKED && isflush != -1)
+        ExecuteFlush("query cache", hwndtext, writetobin, hwnd, &isflush);
 
-	if((IsDlgButtonChecked(hwnd, IDC_FL_RESOURCE))== BST_CHECKED)
-        ExecuteFlush("user_resources", hwndtext, writetobin, hwnd);
+	if((IsDlgButtonChecked(hwnd, IDC_FL_RESOURCE))== BST_CHECKED && isflush != -1)
+        ExecuteFlush("user_resources", hwndtext, writetobin, hwnd, &isflush);
 
-	if((IsDlgButtonChecked(hwnd, IDC_FL_TABLESREAD))== BST_CHECKED)
+	if((IsDlgButtonChecked(hwnd, IDC_FL_TABLESREAD))== BST_CHECKED && isflush != -1)
 	{
 		if(IsNewMySQL(m_tunnel, &m_mysql))
         {
-			ExecuteFlush("tables with read lock", hwndtext, writetobin, hwnd);
+			ExecuteFlush("tables with read lock", hwndtext, writetobin, hwnd, &isflush);
 
 			/* if everything is ok then we need to unlock table for 
 				flush tables with read lock */
@@ -3313,7 +3429,7 @@ MDIWindow::FlushSpecific(HWND hwnd, HWND hwndtext, wyInt32 writetobin)
 
 		} 
         else 
-			ExecuteFlush("tables", hwndtext, BST_UNCHECKED, hwnd);
+			ExecuteFlush("tables", hwndtext, BST_UNCHECKED, hwnd, &isflush);
 	}
     return 1;
 }
@@ -3438,18 +3554,27 @@ MDIWindow::AddFlushPersistence(HWND hwnd)
 // whose HWND is sent as parameter.
 wyBool
 MDIWindow::ExecuteFlush(wyString  flushquery, HWND hwndEdit, 
-						  wyInt32 writetobin, HWND hwnddlg)
+						  wyInt32 writetobin, HWND hwnddlg, wyInt32 *isflush)
 {
 	wyString	query;
 	MYSQL_RES	*res;
+	wyInt32 isintransaction = 1;
+
+	if(isflush)
+		*isflush = 0;
 
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
 
 	query.Sprintf("flush %s",(BST_CHECKED==writetobin)?("NO_WRITE_TO_BINLOG "):(""));
 	query.Add(flushquery.GetString());
 	
-	res  = ExecuteAndGetResult(this, m_tunnel, &(m_mysql), query);
+	res  = ExecuteAndGetResult(this, m_tunnel, &(m_mysql), query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction, GetActiveWindow());
 	
+	if(isintransaction == 1)
+	{
+		*isflush = -1;
+		return wyFalse;
+	}
 	if(!res && m_tunnel->mysql_affected_rows(m_mysql)== -1)
 	{
 		ShowMySQLError(hwnddlg, m_tunnel, &(m_mysql), query.GetString());
@@ -4497,6 +4622,9 @@ MDIWindow::LoadQueryTabPlusMenu(LPARAM lparam)
         case ENT_PRO:
             DeleteMenu(htrackmenu, ID_QUERYBUILDER, MF_BYCOMMAND);
             DeleteMenu(htrackmenu, ID_SCHEMADESIGNER, MF_BYCOMMAND);
+			DeleteMenu(htrackmenu, ID_STARTTRANSACTION_WITHNOMODIFIER, MF_BYCOMMAND);
+			DeleteMenu(htrackmenu, ID_COMMIT_WITHNOMODIFIER, MF_BYCOMMAND);
+			DeleteMenu(htrackmenu, ID_ROLLBACK_TRANSACTION, MF_BYCOMMAND);
         case ENT_NORMAL:
             DeleteMenu(htrackmenu, ID_DATASEARCH, MF_BYCOMMAND);
     }
@@ -4505,6 +4633,9 @@ MDIWindow::LoadQueryTabPlusMenu(LPARAM lparam)
     {
         EnableMenuItem(htrackmenu, ID_QUERYBUILDER, MF_DISABLED);
         EnableMenuItem(htrackmenu, ID_SCHEMADESIGNER, MF_DISABLED);
+		EnableMenuItem(htrackmenu, ID_STARTTRANSACTION_WITHNOMODIFIER, MF_DISABLED);
+		EnableMenuItem(htrackmenu, ID_COMMIT_WITHNOMODIFIER, MF_DISABLED);
+		EnableMenuItem(htrackmenu, ID_ROLLBACK_TRANSACTION, MF_DISABLED);
         EnableMenuItem(htrackmenu, ID_DATASEARCH, MF_DISABLED);
         EnableMenuItem(htrackmenu, ID_NEW_EDITOR, MF_DISABLED);
         EnableMenuItem(htrackmenu, ID_HISTORY, MF_DISABLED);

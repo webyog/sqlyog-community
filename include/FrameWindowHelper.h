@@ -313,7 +313,7 @@
 #define		CELLBUTTONMINWIDTH							80
 
 //for appending the list of child window names to window menu
-#define		MDISUBMENU									8
+#define		MDISUBMENU									9
 
 // #defines for telling the advproperties what to show.
 #define		ADVPROP										1
@@ -562,7 +562,8 @@ wyInt32	compare		(const void *arg1, const void *arg2);
 */
 wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *query, wyUInt32 length, wyBool batch = wyFalse, 
                  wyBool isend = wyFalse, wyInt32 *stop = 0, wyInt32 querycount = 0, wyBool profile = wyTrue, 
-				 wyBool currentwnd = wyTrue, bool isread = false, wyBool isimport = wyFalse, wyBool fksethttpimport = wyFalse);
+				 wyBool currentwnd = wyTrue, bool isread = false, wyBool isimport = wyFalse, wyBool fksethttpimport = wyFalse, 
+				 HWND fortransactionprompt = NULL);
 
 /// Profiling the query or comment(SQLyog reconnected/failed) to history tab
 /**
@@ -755,7 +756,9 @@ const wyChar *LeftPadText(const wyChar *text);
 @param changeincombo : IN To change in combo box or not
 */
 wyBool	ChangeContextDB(Tunnel * tunnel, PMYSQL mysql, const wyChar *query, wyBool changeincombo = wyTrue);
-
+#ifndef COMMUNITY
+wyBool	ChangeTransactionState(MDIWindow *wnd, const wyChar *query);
+#endif
 /// Gets the database name from the query.
 /**
 @param query		: IN Query string

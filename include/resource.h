@@ -202,6 +202,9 @@
 #define IDI_SDTABLEVIEW                 813
 #define IDI_EXPORTASIMG                 815
 #define IDI_SDPRINT                     816
+#define IDI_COMMIT						817
+#define IDI_ROLLBACK					818
+#define IDI_START_TRANSACTION			819
 #define IDI_ADDTABLES                   820
 #define IDI_ALTERDB                     821
 #define IDI_PREVIOUS                    824
@@ -214,6 +217,9 @@
 #define IDI_EVENT                       838
 #define IDI_REFRESHCANVAS               839
 #define IDR_TABLESMENU                  840
+#define IDI_COMMIT_16					841
+#define IDI_ROLLBACK_16					842
+#define IDI_START_TRANSACTION_16		843
 #define IDI_SDZOOMIN                    845
 #define IDI_SDZOOMOUT                   846
 #define IDI_ALTEREVENT                  847
@@ -479,6 +485,7 @@
 #define IDC_ENABLEUPGRADE               1064
 #define IDD_GETSQLYOGULTIMATE           1064
 #define IDD_OBCOLOR                     1065
+#define IDC_TRANSACTION					1067
 #define IDC_EXPORTFILENAME              1081
 #define IDC_PROGRESS                    1082
 #define IDC_CHK_USEDBNAME               1083
@@ -944,6 +951,9 @@
 #define IDC_ISCLEARTEXT                 1708
 #define IDC_NEVEROPEN                   1708
 #define IDC_SELCHECK                    1708
+#define IDC_CH                          1708
+#define IDC_PROMPTTRANSACTION           1708
+#define	IDC_PROMPTCLOSETRANSACTION		1710
 #define IDC_OPENSEL                     1709
 #define IDC_PROGRESS2                   1712
 #define IDC_RESTORE_PROGRESS            1712
@@ -955,6 +965,9 @@
 #define IDC_TIMESTAMP_PREFIX            1751
 #define IDC_FILE_TABLE                  1752
 #define IDC_ROWSIDBY                    1753
+#define IDC_SAVEPOINTEDIT               1755
+#define IDC_SAVEPOINTRELEASE_COMBO      1756
+#define IDC_ROLLBACKTO_COMBO            1757
 #define IDC_INITCOMMANDHELP             2644
 #define IDC_COMBOCUSTOM                 2645
 #define ID_IMPORT_FROMXML               2655
@@ -1544,6 +1557,9 @@
 #define ACCEL_INFOTAB                   41748
 #define ID_QUERYINFO_FIND               41748
 #define ID_QUERYINFO_FINDNEXT           41749
+#define ID_TRANSACTION_SETAUTOCOMMIT    41751
+#define ID_TRANSACTION_TRX              41752
+#define ID_TRANSACTION_STARTTRANSACTION 41753
 #define ID_OPEN_SELECT                  41754
 #define ID_OPEN_COPYALL                 41755
 #define ID_OPEN_SELECTALL41756          41756
@@ -1564,6 +1580,33 @@
 #define ID_EDIT_EXPLAIN                 41791
 #define ID_VDDTOOL                      41793
 #define ACCEL_VDDTOOL                   41796
+#define ID_TRX_REPEATABLEREAD           41797
+#define ID_TRX_READCOMMITED             41798
+#define ID_TRX_READUNCOMMITED           41799
+#define ID_TRX_SERIALIZABLE             41800
+#define ID_STARTTRANSACTION_WITHNOMODIFIER 41801
+#define ID_STARTTRANSACTION_WITHCONSISTENTSNAPSHOT 41802
+#define ID_WITHCONSISTENTSNAPSHOT_READONLY 41803
+#define ID_WITHCONSISTENTSNAPSHOT_READWRITE 41804
+#define ID_STARTTRANSACTION_READONLY    41805
+#define ID_STARTTRANSACTION_READWRITE   41806
+#define ID_TRANSACTIONS_COMMIT          41807
+#define ID_COMMIT_WITHNOMODIFIER        41808
+#define ID_COMMIT_ANDCHAIN              41809
+#define ID_COMMIT_ANDNOCHAIN            41810
+#define ID_COMMIT_RELEASE               41811
+#define ID_COMMIT_NORELEASE             41812
+#define ID_TRANSACTIONS_ROLLBACK        41813
+#define ID_ROLLBACK_TOSAVEPOINT         41814
+#define ID_ROLLBACK_TRANSACTION         41815
+#define ID_ROLLBACK_ANDCHAIN            41816
+#define ID_ROLLBACK_ANDNOCHAIN          41817
+#define ID_ROLLBACK_RELEASE             41818
+#define ID_ROLLBACK_NORELEASE           41819
+#define ID_TRANSACTIONS_SAVEPOINT       41820
+#define ID_SAVEPOINT_CREATESAVEPOINT    41821
+#define ID_SAVEPOINT_RELEASESAVEPOINT   41822
+#define ID_Menu                         41823
 #define IDC_INITCOMMAND                 44114
 #define IDC_EDITINITCOMMAND             44115
 #define IDC_INVISIBLE                   44116
@@ -1588,6 +1631,9 @@
 #define ACCEL_ENDSESSION                44135
 #define ACCEL_CREATETABLE               44136
 #define ID_UNSORT                       44137
+#define IDD_CREATESAVEPOINT             44140
+#define IDD_RELEASESAVEPOINT            44141
+#define IDD_ROLLBACKTO                  44142
 
 // Next default values for new objects
 // 
@@ -1595,7 +1641,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        1018
-#define _APS_NEXT_COMMAND_VALUE         41797
+#define _APS_NEXT_COMMAND_VALUE         41825
 #define _APS_NEXT_CONTROL_VALUE         1716
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

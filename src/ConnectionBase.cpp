@@ -1568,7 +1568,8 @@ ConnectionBase::CreateOtherToolButtons(HWND hwndsecondtool, HIMAGELIST hsecondim
 						 IDM_DATASYNC, IDC_DIFFTOOL,  
                          ID_IMPORT_EXTERNAL_DATA, IDC_TOOLS_NOTIFY, 
                          ID_POWERTOOLS_SCHEDULEEXPORT, ID_QUERYBUILDER,
-						 ID_SCHEMADESIGNER 
+						 ID_SCHEMADESIGNER , IDM_SEPARATOR, ID_STARTTRANSACTION_WITHNOMODIFIER,
+						 ID_COMMIT_WITHNOMODIFIER, ID_ROLLBACK_TRANSACTION,
                          };
 
 	wyUInt32 states[][2] = { 
@@ -1579,14 +1580,17 @@ ConnectionBase::CreateOtherToolButtons(HWND hwndsecondtool, HIMAGELIST hsecondim
 							{TBSTATE_ENABLED, TBSTYLE_BUTTON}, {TBSTATE_ENABLED, TBSTYLE_BUTTON},
 							{TBSTATE_ENABLED, TBSTYLE_BUTTON}, {TBSTATE_ENABLED, TBSTYLE_BUTTON}, 
                             {TBSTATE_ENABLED, TBSTYLE_BUTTON}, {TBSTATE_ENABLED, TBSTYLE_BUTTON},  
-                            {TBSTATE_ENABLED, TBSTYLE_BUTTON}, {TBSTATE_ENABLED, TBSTYLE_BUTTON}}; 
+                            {TBSTATE_ENABLED, TBSTYLE_BUTTON}, {TBSTATE_ENABLED, TBSTYLE_BUTTON},
+							{TBSTATE_ENABLED, BTNS_SEP}, {TBSTATE_ENABLED, TBSTYLE_BUTTON},
+							{TBSTATE_ENABLED, TBSTYLE_BUTTON}, {TBSTATE_ENABLED, TBSTYLE_BUTTON}}; 
 
 	
 	wyInt32 imgres[] = {   
 						 IDI_USERMANAGER, IDI_EXPORTDATA, IDI_EXECBATCH, 
 						 IDI_COPYDATABASE, IDI_XMLHTML, IDI_MANINDEX, IDI_MANREL, IDI_USERS,   
 						 IDI_FORMATQUERY, IDI_DBSYNC, IDI_DIFFTOOL, IDI_ODBC,  
-                         IDI_NOTIFICATION, IDI_SCHDEXPORT, IDI_QUERYBUILDER, IDI_SCHEMADESIGNER
+                         IDI_NOTIFICATION, IDI_SCHDEXPORT, IDI_QUERYBUILDER, IDI_SCHEMADESIGNER, 
+						 IDI_USERS, IDI_START_TRANSACTION, IDI_COMMIT, IDI_ROLLBACK 
 					 };   
    
 
@@ -1921,6 +1925,15 @@ ConnectionBase::OnToolTipInfo(LPNMTTDISPINFO lpnmtdi, wyWChar *string)
 	case ID_SCHEMADESIGNER:
 		wcscpy(string, _(L"New Schema Designer (Ctrl+Alt+D)"));
 		break;
+	case ID_STARTTRANSACTION_WITHNOMODIFIER:
+		wcscpy(string, _(L"Start Transaction"));
+		break;
+	case ID_COMMIT_WITHNOMODIFIER:
+		wcscpy(string, _(L"Commit Transaction"));
+		break;
+	case ID_ROLLBACK_TRANSACTION:
+		wcscpy(string, _(L"Rollback Transaction"));
+		break;
     }
 
 	return;
@@ -1944,8 +1957,9 @@ ConnectionBase::EnableToolButtonsAndCombo(HWND hwndtool, HWND hwndsecondtool, HW
 							ID_OBJECT_MAINMANINDEX, 		ACCEL_MANREL,
 							ID_FORMATCURRENTQUERY,			IDC_DIFFTOOL,					 
 							ID_QUERYBUILDER,				ID_SCHEMADESIGNER,
-							IDM_TOOL_ADDUSER
-	};
+							IDM_TOOL_ADDUSER,				ID_STARTTRANSACTION_WITHNOMODIFIER,
+							ID_COMMIT_WITHNOMODIFIER,		ID_ROLLBACK_TRANSACTION	
+						};
 	
 	/* Enable/Disable all the toolbuttons */
 	for(itemcount = 0; itemcount < (sizeof(tbid)/sizeof(tbid[0])); itemcount++)

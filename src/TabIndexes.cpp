@@ -31,6 +31,8 @@ extern PGLOBALS		pGlobals;
 #define INDEXNAME       0
 #define INDEXCOLUMNS    1
 #define INDEXTYPE       2
+#define INDEXCOMMENT	3
+
 #define UM_SETINITFOCUS 545
 
 #define			HNDLEIDXMGWD		    400
@@ -133,6 +135,7 @@ TabIndexes::TabIndexes(HWND hwnd, TableTabInterfaceTabMgmt* ptabmgmt)
     m_ptabmgmt              =   ptabmgmt;
     m_ismysql41             =   IsMySQL41(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
 	m_ismariadb52           =   IsMySQL564MariaDB53(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
+	m_ismysql553			=	IsMySQL553MariaDB55(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
     
     m_automatedindexrow		=	-1;
     m_lastclickindgrid      =   -1;
@@ -175,14 +178,15 @@ TabIndexes::FetchIndexValuesIntoWrapper()
     MYSQL_RES	*myres;
 	MYSQL_ROW	myrow;
     wyString    tblname(""), dbname("");
-    wyString    colstr, indexname(""), indcolsstr(""), indexlength("");
+    wyString    colstr, indexname(""), indcolsstr(""), indexlength(""),indexcomment("");
     wyBool	    isunique = wyFalse, isfulltext = wyFalse;
-    wyInt32     ind_keyname = -1, ind_colname = -1, ind_subpart = -1, ind_nonunique = -1, ind_indextype = -1;
+    wyInt32     ind_keyname = -1, ind_colname = -1, ind_subpart = -1, ind_nonunique = -1, ind_indextype = -1,ind_indexcomment= -1;
     IndexesStructWrapper   *cwrapobj = NULL;
     IndexInfo                *iindex = NULL;
     IndexColumn           *indcols = NULL;
     List                    *listindcols = NULL;
     FieldStructWrapper      *fieldswrap = NULL;
+	wyChar* temp;	
 
     //..Escaping table name and database name
     tblname.SetAs(m_ptabmgmt->m_tabinterfaceptr->m_origtblname);
@@ -206,6 +210,7 @@ TabIndexes::FetchIndexValuesIntoWrapper()
     ind_subpart     =   GetFieldIndex(myres,"sub_part", m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
     ind_nonunique   =   GetFieldIndex(myres,"non_unique", m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
     ind_indextype   =   GetFieldIndex(myres,"index_type", m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
+	ind_indexcomment=   GetFieldIndex(myres,"Index_comment", m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
 
     while(myrow = m_mdiwnd->m_tunnel->mysql_fetch_row(myres))
     {
@@ -239,6 +244,8 @@ TabIndexes::FetchIndexValuesIntoWrapper()
                 listindcols = new List();
 
             listindcols->Insert(indcols);
+	//	if(m_ismysql553 && myrow[ind_indexcomment])
+	//			indexcomment.SetAs(myrow[ind_indexcomment]);
 		}
         else
         {
@@ -250,7 +257,8 @@ TabIndexes::FetchIndexValuesIntoWrapper()
 
                 indexname.SetAs(myrow[ind_keyname], m_ismysql41);
                 colstr.SetAs(myrow[ind_colname], m_ismysql41);
-
+				if(m_ismysql553 && myrow[ind_indexcomment])
+					indexcomment.SetAs(myrow[ind_indexcomment], m_ismysql41);
                 fieldswrap = m_ptabmgmt->m_tabfields->GetWrapperObjectPointer(colstr);
                 //..If fieldwrapper not found, then return false
                 if(!fieldswrap)
@@ -298,7 +306,10 @@ TabIndexes::FetchIndexValuesIntoWrapper()
                 iindex->m_name.SetAs(indexname);
                 iindex->m_colsstr.SetAs(indcolsstr);
                 iindex->m_listcolumns = listindcols;
-                if(isunique)
+				if(m_ismysql553)
+					iindex->m_indexcomment.SetAs(indexcomment.GetString());
+
+				if(isunique)
                 {
                     if(iindex->m_name.CompareI("PRIMARY") == 0)
                         iindex->m_indextype.SetAs("PRIMARY");
@@ -314,6 +325,7 @@ TabIndexes::FetchIndexValuesIntoWrapper()
 
                 indcolsstr.Clear();
 				indexname.Clear();
+				indexcomment.Clear();
 					
 				isunique = wyFalse;
 				isfulltext = wyFalse;
@@ -324,6 +336,11 @@ TabIndexes::FetchIndexValuesIntoWrapper()
                 indexname.SetAs(myrow[ind_keyname], m_ismysql41);
                 colstr.SetAs(myrow[ind_colname], m_ismysql41);
 
+				if(m_ismysql553)
+				{
+					temp = (wyChar *) myrow[ind_indexcomment];
+					indexcomment.SetAs(temp, m_ismysql41);
+				}
                 fieldswrap = m_ptabmgmt->m_tabfields->GetWrapperObjectPointer(colstr);
                 //..If fieldwrapper not found, then return false
                 if(!fieldswrap)
@@ -375,6 +392,8 @@ TabIndexes::FetchIndexValuesIntoWrapper()
 		iindex->m_name.SetAs(indexname);
         iindex->m_colsstr.SetAs(indcolsstr);
         iindex->m_listcolumns = listindcols;
+		if(m_ismysql553)
+		iindex->m_indexcomment.SetAs(indexcomment.GetString());
         //..Sets the index type
         if(isunique)
         {
@@ -399,14 +418,14 @@ TabIndexes::InitGrid()
     wyInt32			counter;		// normal counter
     wyInt32			num_cols;		// number of columns
     GVCOLUMN		gvcol;			// structure used to create columns for grid
-    wyChar		    *heading[]      = { _("Index Name"), _("Columns"), _("Index Type")};
-    wyInt32			mask[]          = { GVIF_TEXT, GVIF_TEXTBUTTON , GVIF_LIST};
+    wyChar		    *heading[]      = { _("Index Name"), _("Columns"), _("Index Type"), _("Comment")};
+    wyInt32			mask[]          = { GVIF_TEXT, GVIF_TEXTBUTTON , GVIF_LIST, GVIF_TEXT};
     wyWChar			type[][20]      = { L"UNIQUE", L"PRIMARY", L"FULLTEXT"};
-    VOID		    *listtype[]     = { NULL, NULL, (VOID*)type};
-    wyInt32			elemsize[]      = {0, 10, sizeof(type[0]) };
-    wyInt32			elemcount[]     = {0, 8, sizeof(type)/sizeof(type[0]) };
-    wyInt32			cx[]            = { 150, 150, 150};
-    wyInt32			format[]        = { GVIF_LEFT, GVIF_LEFT, GVIF_LEFT };
+    VOID		    *listtype[]     = { NULL, NULL, (VOID*)type, NULL};
+    wyInt32			elemsize[]      = {0, 10, sizeof(type[0]), 0 };
+    wyInt32			elemcount[]     = {0, 8, sizeof(type)/sizeof(type[0]), 0 };
+    wyInt32			cx[]            = { 150, 150, 150 , 150};
+    wyInt32			format[]        = { GVIF_LEFT, GVIF_LEFT, GVIF_LEFT, GVIF_LEFT };
     wyInt32			width           = 0;
 
     wyString		colname, dbname(RETAINWIDTH_DBNAME), tblname("__create_table");
@@ -416,6 +435,8 @@ TabIndexes::InitGrid()
 	hfont = CustomGrid_GetColumnFont(m_hgridindexes);
 	
 	num_cols = sizeof (heading)/sizeof(heading[0]);
+	if(! m_ismysql553)
+		num_cols--;
 
     for (counter=0; counter < num_cols ; counter++ )
     {
@@ -444,15 +465,15 @@ TabIndexes::InitGrid()
 void
 TabIndexes::InitDlgGrid()
 {
-    wyInt32     i;
+    wyInt32     i,num_cols;
 	GVCOLUMN	gvcol;
 
-	wyChar      *heading[] = {_("Column"), _("Data Type"), _("Length")};
-	wyInt32     elemsize[] = {0 ,0 ,0 };
-	wyInt32     elemcount[] = {0, 0, 0 };
-	wyInt32     mask[] = {GVIF_TEXT, GVIF_TEXT, GVIF_TEXT };  
-	wyInt32     cx[] = {195, 98, 85 };
-	wyInt32     fmt[] = {GVIF_LEFT, GVIF_LEFT, GVIF_LEFT };
+	wyChar      *heading[] = {_("Column"), _("Data Type"), _("Length"), _("Comment")};
+	wyInt32     elemsize[] = {0 ,0 ,0, 0};
+	wyInt32     elemcount[] = {0, 0, 0, 0 };
+	wyInt32     mask[] = {GVIF_TEXT, GVIF_TEXT, GVIF_TEXT, GVIF_TEXT };  
+	wyInt32     cx[] = {195, 98, 85, 200};
+	wyInt32     fmt[] = {GVIF_LEFT, GVIF_LEFT, GVIF_LEFT, GVIF_LEFT };
 
 	wyInt32		width = 0;
 	wyString	colname, dbname(RETAINWIDTH_DBNAME), tblname("__create_index");
@@ -461,8 +482,11 @@ TabIndexes::InitDlgGrid()
     
     m_ptabmgmt->m_tabinterfaceptr->SetFont(m_hdlggrid);
     hfont = CustomGrid_GetRowFont(m_hdlggrid);
+	num_cols = sizeof(heading)/ sizeof(heading[0]);
+	if(! m_ismysql553)
+		num_cols-- ;
 
-	for(i=0; i < sizeof(heading)/ sizeof(heading[0]); i++)
+	for(i=0; i < num_cols ; i++)
 	{
 		//if retain user modified width(prefernce option) is checked or not
 		//if(isretaincolumnwidth == wyTrue)
@@ -717,12 +741,14 @@ TabIndexes::OnGVNBeginLabelEdit(HWND hwnd, WPARAM wParam, LPARAM lParam)
     wyUInt32		    row = wParam;
 	wyUInt32		    col = lParam;
     wyUInt32            count = -1;
-    wyString            celldata, indnamestr, indcolsstr;
+    wyString            celldata, indnamestr, indcolsstr, indexcomment;
 
     GetGridCellData(m_hgridindexes, row, INDEXNAME, indnamestr);
     GetGridCellData(m_hgridindexes, row, INDEXCOLUMNS, indcolsstr);
 
     GetGridCellData(m_hgridindexes, row, INDEXTYPE, celldata);
+	
+    GetGridCellData(m_hgridindexes, row, INDEXCOMMENT, indexcomment);
 
     //..Stoping user from setting the index-name of the PRIMARY index
     if(col == INDEXNAME && celldata.CompareI("primary") == 0)
@@ -826,6 +852,10 @@ TabIndexes::ScanEntireRow(wyUInt32  currentrow, wyInt32 currentcol, wyString& cu
             origtext.SetAs(indexes->m_indextype);
             break;
 
+		case INDEXCOMMENT:
+			origtext.SetAs(indexes->m_indexcomment);
+            break;
+
         default:
             origtext.SetAs("");
         }
@@ -875,12 +905,16 @@ TabIndexes::OnGVNEndLabelEdit(WPARAM wParam, LPARAM lParam)
     wyUInt32                row, col;
     wyString                currentdata;
     wyString                indexnamestr(""), indexcolsstr("");
-    
+    wyUInt32						no_of_columns;
     row = LOWORD(wParam);
     col = HIWORD(wParam);
 
+	if(m_ismysql553)
+		no_of_columns	=	3;
+	else
+		no_of_columns	=	2;
     //..Work-around to the cutsomgrid issue
-    if(!(col >= 0 && col <= 2))
+    if(!(col >= 0 && col <= no_of_columns))
         return wyTrue;
 
     if(!(row >= 0 && row <= CustomGrid_GetRowCount(m_hgridindexes)))
@@ -910,6 +944,11 @@ TabIndexes::OnGVNEndLabelEdit(WPARAM wParam, LPARAM lParam)
 
     case INDEXTYPE:
         if(!OnEndEditIndexType(wParam, lParam))
+            return wyFalse;
+        break;
+
+	case INDEXCOMMENT:
+		if(!OnEndEditIndexComment(wParam, lParam))
             return wyFalse;
         break;
     }
@@ -1226,7 +1265,7 @@ TabIndexes::OnEndEditIndexName(WPARAM wParam, LPARAM lParam)
 
     cwrapobj = (IndexesStructWrapper*) CustomGrid_GetRowLongData(m_hgridindexes, row);
 
-    //..If no wrapper is attached
+	//..If no wrapper is attached
     if(!cwrapobj)
     {
         iindexes = new IndexInfo();
@@ -1234,7 +1273,8 @@ TabIndexes::OnEndEditIndexName(WPARAM wParam, LPARAM lParam)
         iindexes->m_indextype.Clear();
         iindexes->m_listcolumns = NULL;
         iindexes->m_name.Clear();
-        
+		if(m_ismysql553)
+			iindexes->m_indexcomment.Clear();
         cwrapobj = new IndexesStructWrapper(iindexes, wyTrue);
         m_listwrapperstruct.Insert(cwrapobj);
     }
@@ -1299,16 +1339,119 @@ TabIndexes::OnEndEditIndexName(WPARAM wParam, LPARAM lParam)
                 GetGridCellData(m_hgridindexes, row, INDEXTYPE, cwrapobj->m_newval->m_indextype);
                 cwrapobj->m_newval->m_colsstr.Clear();
                 cwrapobj->m_newval->m_listcolumns = new List;
+				cwrapobj->m_newval->m_indexcomment.Clear();
             }
         }
     }
-    
     CustomGrid_SetRowLongData(m_hgridindexes, row, (LONG) cwrapobj);
     CustomGrid_SetItemLongValue(m_hgridindexes, row, col, (LONG) (cwrapobj && cwrapobj->m_newval ? cwrapobj->m_newval->m_listcolumns : NULL));
     
     //CustomGrid_SetItemLongValue(m_hgridindexes, row, INDEXCOLUMNS, (LONG)((cwrapobj && cwrapobj->m_newval) ? cwrapobj->m_newval->m_listcolumns : NULL));
     if(cwrapobj && cwrapobj->m_newval)
         cwrapobj->m_newval->m_name.SetAs(currentdata);
+
+    ScanEntireRow(row, col, currentdata);
+
+    return wyTrue;
+}
+
+
+wyBool
+	TabIndexes::OnEndEditIndexComment(WPARAM wParam, LPARAM lParam)
+{
+    wyChar                  *data = (wyChar*)lParam;
+    wyUInt32                row, col;
+    wyString                currentdata("");
+    IndexesStructWrapper   *cwrapobj = NULL;
+    IndexInfo                *iindexes = NULL;
+    wyString                indexcommstr("");
+	wyString                indexcolsstr("");
+
+    row = LOWORD(wParam);
+    col = HIWORD(wParam);
+    GetGridCellData(m_hgridindexes, row, INDEXCOLUMNS, indexcolsstr);
+	GetGridCellData(m_hgridindexes, row, INDEXCOMMENT, indexcommstr);
+
+	cwrapobj = (IndexesStructWrapper*) CustomGrid_GetRowLongData(m_hgridindexes, row);
+
+    if(data)
+        currentdata.SetAs(data);
+
+    currentdata.RTrim();
+	cwrapobj = (IndexesStructWrapper*) CustomGrid_GetRowLongData(m_hgridindexes, row);
+
+    //..If no wrapper is attached
+    if(!cwrapobj)
+    {
+        iindexes = new IndexInfo();
+        iindexes->m_colsstr.Clear();
+        iindexes->m_indextype.Clear();
+        iindexes->m_listcolumns = NULL;
+        iindexes->m_name.Clear();
+		if(m_ismysql553)
+			iindexes->m_indexcomment.Clear();
+        cwrapobj = new IndexesStructWrapper(iindexes, wyTrue);
+        m_listwrapperstruct.Insert(cwrapobj);
+    }
+    else
+    {
+       //..If the index-name is erased
+        if(!currentdata.GetLength())
+        {
+            //..If user has deleted index-name and index-columns values from existing index, this condition will be false
+            //      we need to proceed only when user has not cleared Existing index
+            if(cwrapobj->m_newval)
+            {
+                //..If Index-Columns are not selected, then set m_newval to NULL.
+                //..    if the index is new, then remove it from the m_listwrapper.
+                if(!indexcolsstr.GetLength())
+                {
+                    //..existing index (Alter table)
+                    if(cwrapobj->m_oldval)
+                    {
+                        if(cwrapobj->m_oldval != cwrapobj->m_newval)    //..true, if existing index is already modified
+                            delete cwrapobj->m_newval;
+                        cwrapobj->m_newval = NULL;
+                    }
+                    //..newly added index
+                    else if(cwrapobj->m_newval)
+                    {
+                        m_listwrapperstruct.Remove(cwrapobj);
+                        delete cwrapobj;
+                        cwrapobj = NULL;
+                    }
+                }
+                //.. If index-columns are selected,
+                else
+                {
+                    if(cwrapobj->m_newval == cwrapobj->m_oldval)
+                    {
+                        cwrapobj->m_newval = GetDuplicateIndexesStruct(cwrapobj->m_oldval);
+                        CustomGrid_SetItemLongValue(m_hgridindexes, row, INDEXCOLUMNS, (LONG)cwrapobj->m_newval->m_listcolumns);
+                    }
+                }
+            }
+        }
+        //.. if something is there as index-name
+        else
+        {
+            //..If user has not deleted all index-values from grid row
+            if(cwrapobj->m_newval)
+            {
+                //..If existing index is not yet modified
+                if(cwrapobj->m_newval == cwrapobj->m_oldval)
+                {
+                    cwrapobj->m_newval = GetDuplicateIndexesStruct(cwrapobj->m_oldval);
+                    CustomGrid_SetItemLongValue(m_hgridindexes, row, INDEXCOLUMNS, (LONG)cwrapobj->m_newval->m_listcolumns);
+                }
+            }
+        }
+    }
+    CustomGrid_SetRowLongData(m_hgridindexes, row, (LONG) cwrapobj);
+    CustomGrid_SetItemLongValue(m_hgridindexes, row, col, (LONG) (cwrapobj && cwrapobj->m_newval ? cwrapobj->m_newval->m_listcolumns : NULL));
+    
+    if(cwrapobj && cwrapobj->m_newval)
+		cwrapobj->m_newval->m_indexcomment.SetAs(currentdata);
 
     ScanEntireRow(row, col, currentdata);
 
@@ -1351,7 +1494,8 @@ TabIndexes::GetDuplicateIndexesStruct(IndexInfo* duplicateof)
         //..Setting index_name and index_type
         indexes->m_name.SetAs(duplicateof->m_name);
         indexes->m_indextype.SetAs(duplicateof->m_indextype);
-
+		if(m_ismysql553)
+			indexes->m_indexcomment.SetAs(duplicateof->m_indexcomment);
         //..Setting list_columns backup_copy and working_copy
         icols = (IndexColumn*) duplicateof->m_listcolumns->GetFirst();
         while(icols)
@@ -1383,6 +1527,10 @@ TabIndexes::SetValueToStructure(wyUInt32 row, wyUInt32 col, wyChar* data)
 
     case INDEXTYPE:
         cwrap->m_newval->m_indextype.SetAs(data);
+        break;
+
+	case INDEXCOMMENT:
+		cwrap->m_newval->m_indexcomment.SetAs(data);
         break;
     }
 }
@@ -1772,6 +1920,10 @@ TabIndexes::FillInitValues()
         CustomGrid_SetItemLongValue(m_hgridindexes, row, INDEXCOLUMNS, (LPARAM)cwrapobj->m_oldval->m_listcolumns);
 
         CustomGrid_SetText(m_hgridindexes, row, INDEXTYPE, cwrapobj->m_oldval->m_indextype.GetString());
+
+		if(m_ismysql553)
+		CustomGrid_SetText(m_hgridindexes, row, INDEXCOMMENT,cwrapobj->m_oldval->m_indexcomment.GetString());
+
         CustomGrid_SetRowLongData(m_hgridindexes, row, (LPARAM) cwrapobj);
 
 		if(cwrapobj->m_oldval->m_indextype.CompareI("PRIMARY KEY") == 0 || cwrapobj->m_oldval->m_name.CompareI("PRIMARY") == 0)
@@ -2281,7 +2433,7 @@ TabIndexes::GetNewAndModifiedIndexes(wyString &query, wyBool  execute)
 {
     wyInt32             count=0;
     wyBool              validflg = wyTrue;
-    wyString            tempstr(""), celldata, indexnamestr, temp, indextypestr, columnsstr;
+    wyString            tempstr(""), celldata, indexnamestr, temp, indextypestr, columnsstr, indexcomment= "";
     wyString            droppk(""), addpk("");
     IndexesStructWrapper *pwrapobj = NULL;
 
@@ -2314,7 +2466,8 @@ TabIndexes::GetNewAndModifiedIndexes(wyString &query, wyBool  execute)
         GetGridCellData(m_hgridindexes, row, INDEXNAME, indexnamestr);
         GetGridCellData(m_hgridindexes, row, INDEXCOLUMNS, columnsstr);
         GetGridCellData(m_hgridindexes, row, INDEXTYPE, indextypestr);
-
+		if(m_ismysql553)
+		GetGridCellData(m_hgridindexes, row, INDEXCOMMENT, indexcomment);
         if(!indextypestr.GetLength())
             indextypestr.SetAs("index");
         else
@@ -2326,15 +2479,26 @@ TabIndexes::GetNewAndModifiedIndexes(wyString &query, wyBool  execute)
         if(indextypestr.CompareI("primary") == 0)
         {
             if(columnsstr.GetLength())
-                addpk.AddSprintf("\r\n  add primary key (%s),", columnsstr.GetString());
+                addpk.AddSprintf("\r\n  add primary key (%s)", columnsstr.GetString());
+			if(m_ismysql553 && indexcomment.GetLength())
+			{
+            	addpk.AddSprintf("Comment \"%s\" ", indexcomment.GetString());
+			}
+			addpk.AddSprintf(",");
         }
         else
         {
             indexnamestr.FindAndReplace("`", "``");
-            if(indexnamestr.GetLength())
-                tempstr.AddSprintf("\r\n  add  %s `%s` (%s),", indextypestr.GetString(), indexnamestr.GetString(), columnsstr.GetString());
+			if(indexnamestr.GetLength())
+                tempstr.AddSprintf("\r\n  add  %s `%s` (%s)", indextypestr.GetString(), indexnamestr.GetString(), columnsstr.GetString());
             else
-                tempstr.AddSprintf("\r\n  add %s (%s),", indextypestr.GetString(), columnsstr.GetString());
+                tempstr.AddSprintf("\r\n  add %s (%s)", indextypestr.GetString(), columnsstr.GetString());
+			if(m_ismysql553 && indexcomment.GetLength())
+			{
+				indexcomment.LTrim();
+				tempstr.AddSprintf(" Comment \"%s\" ",indexcomment.GetString());
+			}
+				tempstr.AddSprintf(",");
         }
         if(pwrapobj->m_errmsg)
         {
@@ -2385,7 +2549,9 @@ TabIndexes::OnIDOK(HWND hwnd)
         indexstruct->m_name.SetAs("");
         indexstruct->m_colsstr.SetAs("");
         indexstruct->m_indextype.SetAs("");
+		indexstruct->m_indexcomment.SetAs("");
         indexstruct->m_listcolumns = listindexcolumns;
+
 
         //..Creating a new wrapper
         cindexeswrap = new IndexesStructWrapper(indexstruct, wyTrue);
@@ -2453,7 +2619,11 @@ TabIndexes::OnIDOK(HWND hwnd)
     refcols.RTrim();
 
     wyString indexnamestr("");
+	wyString indexcomment("");
     GetGridCellData(m_hgridindexes, row, INDEXNAME, indexnamestr);
+
+	if(m_ismysql553)
+		GetGridCellData(m_hgridindexes, row, INDEXCOMMENT, indexcomment);
 
     //..if no index name is there on the row and no ref-columns are selected, then treat that index as deleted
     if(!refcols.GetLength() && !indexnamestr.GetLength())
@@ -2485,13 +2655,14 @@ TabIndexes::OnIDOK(HWND hwnd)
     CustomGrid_SetText(m_hgridindexes, row, col, refcols.GetString());
     cindexeswrap->m_newval->m_colsstr.SetAs(refcols);
     cindexeswrap->m_newval->m_listcolumns = listindexcolumns;
-
+	cindexeswrap->m_newval->m_indexcomment.SetAs(indexcomment);
     //..This section checks for the equality of new and old values of index. If both are same, then we shall delete the newval and newval = oldval
     //..Applicable to Alter table only
     {
         if(cindexeswrap->m_oldval && cindexeswrap->m_newval &&                                             //..If all newval and oldval values are equal, then drop the newval;
                 cindexeswrap->m_oldval->m_name.CompareI(cindexeswrap->m_newval->m_name) == 0 &&                  
-                cindexeswrap->m_oldval->m_indextype.CompareI(cindexeswrap->m_newval->m_indextype) == 0 
+                cindexeswrap->m_oldval->m_indextype.CompareI(cindexeswrap->m_newval->m_indextype) == 0 &&
+				(m_ismysql553?(cindexeswrap->m_oldval->m_indexcomment.CompareI(cindexeswrap->m_newval->m_indexcomment) == 0) : 1)
                 )
         {
             IndexColumn *indcol = NULL, *tmpindcol = NULL;

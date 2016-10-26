@@ -72,7 +72,8 @@ wyUInt32 GetSelectTableStmt(wyString &query, const wyChar *dbname);
 MYSQL_RES *ExecuteAndGetResult(MDIWindow *wnd, Tunnel *tunnel, PMYSQL mysql, wyString &query, 
 							   wyBool isprofile = wyTrue, wyBool isbatch = wyFalse, wyBool currentwnd = wyTrue, 
 							   bool isread = false, bool isforce = false, wyBool isimport = wyFalse, 
-							   wyInt32 *stop = 0, wyBool isimporthttp = wyFalse);
+							   wyInt32 *stop = 0, wyBool isimporthttp = wyFalse, wyInt32 *isintransaction = NULL, 
+							   HWND fortransactionprompt = NULL);
 
 /// Executes the query and returns the result set
 /**

@@ -1535,7 +1535,7 @@ public:
 	/**
 	@param select : Selected items.
     */
-			wyBool			GetSelectStmt(wyString &select);
+			wyBool			GetSelectStmt(wyString &select, wyString &alterQuery , wyWChar new_table[]);
 
 	/// Function copies the initial field stmt. into the buffer.
 	/**
@@ -1640,7 +1640,7 @@ public:
     @param primary      : Primary key name.
     @param flgprimary   : Primary flag.
     */
-            wyBool          GetKeysPrimeKeyCheck(MYSQL_ROW *myrow, MYSQL_RES *myres, wyString &primary);
+            wyBool          GetKeysPrimeKeyCheck(MYSQL_ROW *myrow, MYSQL_RES *myres, wyString &primary );
 
     /// Handles Include index for getkey()
     /**

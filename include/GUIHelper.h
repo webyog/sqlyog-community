@@ -719,6 +719,8 @@ wyInt32                 GetKBShortcut(wyWChar *menustring, wyWChar *shortcut);
 */
 wyBool					ChangeCRToLF(wyChar * text);
 
+wyBool					AddCRToLF(wyChar * text, wyChar * temp);
+
 //Handles On treeview item expand
 /**
 @param treeparam : IN trview node struct handle

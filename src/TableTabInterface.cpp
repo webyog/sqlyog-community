@@ -1290,8 +1290,12 @@ wyBool
 TableTabInterface::ExecuteQuery(wyString &query)
 {
     MYSQL_RES		*res;
+	wyInt32 isintransaction = 1;
 
-    res = ExecuteAndGetResult(m_mdiwnd, m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), query);
+    res = ExecuteAndGetResult(m_mdiwnd, m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction,  GetActiveWindow());
+
+	if(isintransaction == 1)
+		return wyFalse;
         
     if(!res && m_mdiwnd->m_tunnel->mysql_affected_rows(m_mdiwnd->m_mysql) == -1)
     {
@@ -2444,7 +2448,8 @@ TableTabInterface::IsTableInnoDB(wyBool& error)
 	MDIWindow		*wnd = NULL;
 
 	VERIFY(wnd = GetActiveWin());
-
+	if(!m_myrestablestatus)
+		return wyFalse;
     m_mdiwnd->m_tunnel->mysql_data_seek(m_myrestablestatus, 0);
 	VERIFY(mystatusrow = m_mdiwnd->m_tunnel->mysql_fetch_row(m_myrestablestatus));
 	

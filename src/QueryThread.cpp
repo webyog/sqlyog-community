@@ -33,6 +33,8 @@ extern	PGLOBALS		 pGlobals;
 #define WARNINGMSG		_("Note: To see complete list of warning(s), enable Tools -> Preferences -> General -> Show Warning(s) in Messages Tab")
 #define SPACE_15		15
 #define			NO_QUERY_EXECUTED		_("No query(s) were executed. Please enter a query in the SQL window or place the cursor inside a query.")
+#define			NO_QUERY_EXECUTED_TRANS		_("No query(s) were executed.")
+#define IN_TRANSACTION  -10
 
 void
 AddErrorOrMsg(wyInt32 errstatus, wyString& buffer, Tunnel * tunnel, PMYSQL mysql, const wyChar* query, 
@@ -209,7 +211,8 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query,wyBool ismulti
 	ret		= my_query(param->wnd, param->tunnel, param->mysql, querytemp.GetString(), querytemp.GetLength(), 
                                         wyFalse, wyFalse, param->stop);
 	param->wnd->SetThreadBusy(wyFalse);
-	
+	if(ret == IN_TRANSACTION)
+		return IN_TRANSACTION;
 	if(ret)
 	{
 		elem = new QueryResultElem;
@@ -321,7 +324,12 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query,wyBool ismulti
 			}
 
 			ChangeContextDB(param->tunnel, param->mysql, query, wyTrue);
-
+			#ifndef COMMUNITY
+			if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+			{
+				ChangeTransactionState(param->wnd, query);
+			}
+			#endif
 			/* add the element to the linked list of result */
 			param->list->Insert(elem);
 
@@ -506,7 +514,12 @@ ExecuteQuery(QUERYTHREADPARAMS * param)
 				if(param->m_iseditor == wyTrue && pGlobals->m_resuttabpageenabled == wyTrue)
 					HandleLimitWithSelectQuery(dump2, param);
                 
-				if(HelperExecuteQuery(param, dump2,ismultiplequeries))
+				wyInt32 r = HelperExecuteQuery(param, dump2,ismultiplequeries);
+				if(r == IN_TRANSACTION)
+				{
+					break;
+				}
+				else if(r)
 				{
 					(*param->error)++;
 					param->wnd->m_isselectquery = wyFalse;
@@ -844,6 +857,12 @@ AddQueryResults(QueryResultList * queryresult, wyString &str, TabMgmt * tab, wyI
 	
 	if(str.GetLength() == 0)
     {
+#ifndef COMMUNITY
+		if(wnd->m_ptransaction && (wnd->m_ptransaction->m_stopquerytransaction == wyTrue) 
+			&& (wnd->m_ptransaction->m_starttransactionenabled == wyFalse))
+			str.SetAs(NO_QUERY_EXECUTED_TRANS);
+		else
+#endif
 		str.SetAs(NO_QUERY_EXECUTED);
 	}
     else

@@ -56,6 +56,7 @@
 #define GVN_LBUTTONMOUSEMOVE            0x00030
 #define GVN_LBUTTONUP                   0x00031 
 #define GVN_MOUSELEAVE                  0x00032
+#define GVN_TOOLTIP						0x00071
 #define	GVN_PREVTABORDERITEM			0x00033
 #define GVN_SPLITTERMOVE				0x00034
 #define GVN_LBUTTONDOWN                 0x00050
@@ -76,6 +77,7 @@
 #define GVN_MOUSEWHEEL                  0x00061
 #define GVN_DRAWWATERMARK               0x00062
 #define GVN_SETFOCUS                    0x00063
+#define GVN_RESETDATAVIEWTOOLTIP		0x00065
 
 #define GVKEY_HOME                        36
 #define GVKEY_END                         35
@@ -287,6 +289,23 @@ public:
 
 	CCustGrid(HWND h);
 	~CCustGrid();
+
+
+
+	
+	HWND            m_hwndtooltip;
+	POINT			m_mouseprevpt;
+
+	/// Stucture containing tooltip info
+	TOOLINFO		m_toolinfo;
+
+    //tooltip string
+	wyString        m_tooltipstr;
+
+	VOID			ToolTipInfo(HWND hwnd, LPNMTTDISPINFO lpnmtdi, wyString Text);
+
+	// Tool tip Unique ID for the tooltip of data view
+	wyInt32			m_tooltipidindex;
 
 	/// Inserts the column in the grid view
     /**
@@ -558,6 +577,7 @@ public:
     @returns void
     */
 	VOID		SetMaxRowCount(LONG count);
+
 
     /// Sets row long value data 
     /**
@@ -886,8 +906,9 @@ public:
     /// Gets the column header clicked
     /**
     @param pnt          : IN Mouse points
+	@param rect			: OUT Rectangle containing the row header
     */
-    wyInt32     GetRowHeader(POINT *pnt);
+    wyInt32     GetRowHeader(POINT *pnt, RECT* rect = NULL);
 
     /// Gets the row and column when a drag and drop accures on the grid cell
     /**
@@ -1041,6 +1062,8 @@ private:
 	LRESULT		OnLButtonDown(WPARAM wparam, LPARAM lparam);
 	//////////////////////////////////////////////////
 	void        GetSelectColumn(POINT pnt);
+
+	wyInt32		GetHoveredColumn();
 
 
 	///////////////////////////////////////////////
@@ -1814,7 +1837,7 @@ private:
     */
     void        DrawRowButtons(HDC hdcmem, RECT *rect, RECT *recttemp, wyInt32 *rowcount);
 
-    /// Draws the grey rectangle for the cell
+	/// Draws the grey rectangle for the cell
     /**
     @param hdcmem       : IN Device HANDLE
     @param greyrect     : IN The grey rectangle
@@ -2055,6 +2078,7 @@ private:
 
     //whether the browse button is pressed
     wyBool  m_ispressed;
+	wyBool	g_bMouseTrack;
 };
 
 #define GV_MARKTYPE_ICON        1
@@ -2083,6 +2107,7 @@ private:
 #define GV_EX_NO_VER_BORDER     16
 #define GV_EX_NO_HOR_BORDER     32
 #define GV_EX_STRETCH_LAST_COL  64
+#define GV_EX_COL_TOOLTIP		128
 
 #define	GV_DEFWIDTH				25
 #define	GV_DEFHIGHT				18
@@ -2181,6 +2206,18 @@ wyInt32		CustomGrid_RowPerPage			(HWND hwnd);
 @returns the new column size
 */
 wyInt32		CustomGrid_InsertColumn			(HWND hwnd, PGVCOLUMN pgvcol, wyBool repaint = wyTrue);
+
+///
+/***
+@param HWND			: IN Grid Window Handle
+@param int			: IN index of the column
+@param wyWChar*		: IN Text to be set
+
+Tool tip for column header to be set initially while loading table data
+***/
+void		SetToolTipForDataView(HWND, int, wyWChar*);
+
+void		RemoveToolTipForDataView(HWND);
 
 /// Inserts a row in between 
 /**

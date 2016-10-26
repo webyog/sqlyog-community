@@ -46,20 +46,22 @@ extern PGLOBALS		pGlobals;
 #define     HISTORY_POS_DEFAULT         0
 
 //Other Preference Default Values
-#define		COLUMNWIDTH_DEFAULT			0
-#define		REFRESHTABLEDATA_DEFAULT	0
-#define		GETINFOALWAYS_DEFAULT		0
-#define		GETINFOKW_DEFAULT			1
-#define		SWITCHSHORTCUT_DEFAULT		0
-#define		OPENTABLES_DEFAULT			0
-#define		CONRESTORE_DEFAULT			1
-#define		ENABLEUPGRADE_DEFAULT		1
-#define		UPDATEPROMPT_DEFAULT		1
-#define		SHOWALLINTABLEDATA_DEFAULT	0
-#define		LOWLIMIT_DEFAULT			0
-#define		RETAINCOLUMNWIDTH_DEFAULT	1
-#define		RESULTTABPAGE_DEFAULT		1
-#define     RESULTRETAINPAGE_DEFAULT	1
+#define		COLUMNWIDTH_DEFAULT				0
+#define		REFRESHTABLEDATA_DEFAULT		0
+#define		GETINFOALWAYS_DEFAULT			0
+#define		GETINFOKW_DEFAULT				1
+#define		SWITCHSHORTCUT_DEFAULT			0
+#define		OPENTABLES_DEFAULT				0
+#define		CONRESTORE_DEFAULT				1
+#define		ENABLEUPGRADE_DEFAULT			1
+#define		UPDATEPROMPT_DEFAULT			1
+#define		PROMPTTRANSACTION_DEFAULT		1
+#define		PROMPTTRANSACTIONCLOSE_DEFAULT	1
+#define		SHOWALLINTABLEDATA_DEFAULT		0
+#define		LOWLIMIT_DEFAULT				0
+#define		RETAINCOLUMNWIDTH_DEFAULT		1
+#define		RESULTTABPAGE_DEFAULT			1
+#define     RESULTRETAINPAGE_DEFAULT		1
 
 
 
@@ -1060,6 +1062,28 @@ PreferenceBase::OthersPrefHandleWmCommand(HWND hwnd, WPARAM wParam)
 {
     switch(LOWORD(wParam))
 	{	
+#ifndef COMMUNITY
+	case IDC_PROMPTTRANSACTION:
+		{
+			if(Button_GetCheck(GetDlgItem(hwnd, IDC_PROMPTTRANSACTION)) == BST_CHECKED)
+			{
+				pGlobals->m_pcmainwin->m_topromptonimplicit = wyTrue;
+			}
+			else
+				pGlobals->m_pcmainwin->m_topromptonimplicit = wyFalse;
+		}
+		break;
+	case IDC_PROMPTCLOSETRANSACTION:
+		{
+			if(Button_GetCheck(GetDlgItem(hwnd, IDC_PROMPTCLOSETRANSACTION)) == BST_CHECKED)
+			{
+				pGlobals->m_pcmainwin->m_topromptonclose = wyTrue;
+			}
+			else
+				pGlobals->m_pcmainwin->m_topromptonclose = wyFalse;
+		}
+		break;
+#endif
 	case IDC_OTHERSRESTORETAB:
 		SetOthersPrefDefaultValues(hwnd);
 		break;
@@ -1496,6 +1520,21 @@ PreferenceBase::InitOthersPrefValues()
 
 	GetOthersPrefSizeValues(m_hwnd);
 
+	if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_NORMAL && pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_ULTIMATE && pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_TRIAL)
+	{
+		SetWindowText(GetDlgItem(m_hwnd, IDC_TRANSACTION), _(L"Transaction options (Enterprise/Ultimate only)"));
+		EnableWindow(GetDlgItem(m_hwnd, IDC_PROMPTTRANSACTION), FALSE);
+		EnableWindow(GetDlgItem(m_hwnd, IDC_PROMPTCLOSETRANSACTION), FALSE);
+		return;
+	}
+	else
+	{
+		truncdata	= wyIni::IniGetInt(GENERALPREFA, "PromptinTransaction", PROMPTTRANSACTION_DEFAULT, dirstr.GetString());
+		SendMessage(GetDlgItem(m_hwnd, IDC_PROMPTTRANSACTION), BM_SETCHECK, truncdata, 0);
+		truncdata	= wyIni::IniGetInt(GENERALPREFA, "PromptinTransactionClose", PROMPTTRANSACTIONCLOSE_DEFAULT, dirstr.GetString());
+		SendMessage(GetDlgItem(m_hwnd, IDC_PROMPTCLOSETRANSACTION), BM_SETCHECK, truncdata, 0);
+	}
+
     return;
 }
 
@@ -1716,8 +1755,14 @@ PreferenceBase::SaveOthersPreferences(HWND hwndbase, wyInt32 page)
 	SetBoolProfileString(hwnd, GENERALPREF, L"UpdateCheck", IDC_ENABLEUPGRADE);
 
 	SetBoolProfileString(hwnd, GENERALPREF, L"PromptUpdate", IDC_UPDATEPROMPT);
-	/* starting from 4.0 RC1 we support lowlimit and high limit also */
-    
+#ifndef COMMUNITY
+	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+	{
+	SetBoolProfileString(hwnd, GENERALPREF, L"PromptinTransaction", IDC_PROMPTTRANSACTION);
+
+	SetBoolProfileString(hwnd, GENERALPREF, L"PromptinTransactionClose", IDC_PROMPTCLOSETRANSACTION);
+	}/* starting from 4.0 RC1 we support lowlimit and high limit also */
+#endif    
     SetIntProfileString(hwnd, GENERALPREF, L"ResulttabPageRows", IDC_HIGHLIMIT);
 	SetBoolProfileString(hwnd, GENERALPREF, L"ResuttabPaging", IDC_RESUTTABPAGE);
 	SetBoolProfileString(hwnd, GENERALPREF, L"ResuttabRetainsPage", IDC_RESUTTABPAGERETAIN);
@@ -1813,6 +1858,15 @@ PreferenceBase::SetBoolProfileString(HWND hwnd, wyWChar *appname, wyWChar *keyna
 
 	switch(id)
 	{
+#ifndef COMMUNITY
+	case IDC_PROMPTTRANSACTION:
+		pGlobals->m_pcmainwin->m_topromptonimplicit = (status ? wyTrue : wyFalse);
+		break;
+
+	case IDC_PROMPTCLOSETRANSACTION:
+		pGlobals->m_pcmainwin->m_topromptonclose = (status ? wyTrue : wyFalse);
+		break;
+#endif
 	case IDC_RESUTTABPAGE:
 		pGlobals->m_resuttabpageenabled = (status ? wyTrue : wyFalse);
 		break;
@@ -2184,7 +2238,14 @@ PreferenceBase::SetOthersPrefDefaultValues(HWND hwnd)
 	SendMessage(GetDlgItem(hwnd, IDC_REFRESHTABLEDATA), BM_SETCHECK, REFRESHTABLEDATA_DEFAULT, 0);
 	
 	SendMessage(GetDlgItem(hwnd, IDC_UPDATEPROMPT), BM_SETCHECK, UPDATEPROMPT_DEFAULT, 0);  
+#ifndef community
+	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+	{
+	SendMessage(GetDlgItem(hwnd, IDC_PROMPTTRANSACTION), BM_SETCHECK, PROMPTTRANSACTION_DEFAULT, 0);  
 
+	SendMessage(GetDlgItem(hwnd, IDC_PROMPTCLOSETRANSACTION), BM_SETCHECK, PROMPTTRANSACTIONCLOSE_DEFAULT, 0);
+	}
+#endif
 	//Iconsize combo box
     iconsize.SetAs(TOOLBARICONSIZE_DEFAULT);
 	//default theme
@@ -2445,6 +2506,10 @@ PreferenceBase::SaveDefaultOthersPreferences()
 	wyIni::IniWriteInt(GENERALPREFA, "RefreshTableData", REFRESHTABLEDATA_DEFAULT, dirstr.GetString());
 
 	wyIni::IniWriteInt(GENERALPREFA, "PromptUpdate", UPDATEPROMPT_DEFAULT, dirstr.GetString());
+
+	wyIni::IniWriteInt(GENERALPREFA, "PromptinTransaction", PROMPTTRANSACTION_DEFAULT, dirstr.GetString());
+
+	wyIni::IniWriteInt(GENERALPREFA, "PromptinTransactionClose", PROMPTTRANSACTION_DEFAULT, dirstr.GetString());
 		
 	wyIni::IniWriteInt(GENERALPREFA, "ResulttabPageRows", HIGHLIMIT_DEFAULT, dirstr.GetString());
 	pGlobals->m_highlimitglobal = HIGHLIMIT_DEFAULT;

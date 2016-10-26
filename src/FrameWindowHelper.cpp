@@ -50,8 +50,9 @@
 #define			ZERO					0
 #define			ONE						1
 #define			TWO						2
+#define			IN_TRANSACTION			-10
 
-extern PGLOBALS	pGlobals;
+extern PGLOBALS	pGlobals;		
 extern HACCEL	g_accel;
 
 // Function to compare two values sent by the qsort and binarysearch function.
@@ -66,9 +67,9 @@ wyInt32 compare(const void *arg1, const void *arg2)
 wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *query, 
                  wyUInt32 length, wyBool batch, wyBool isend, wyInt32 * stop, 
                  wyInt32 querycount, wyBool profile, wyBool currentwnd, 
-				 bool isread, wyBool isimport, wyBool fksethttpimport)
+				 bool isread, wyBool isimport, wyBool fksethttpimport, HWND fortransactionprompt)
 {
-	wyInt32     ret = 0, pos = 0;
+	wyInt32     ret = 0, pos = 0, transactioncheck = -1, presult = 6;
 	wyChar		*newquery = 0;
 	const wyChar *oldquery = query;
  	wyString    str, Query;
@@ -103,6 +104,21 @@ wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *qu
             }
             str.Clear();
         }		
+		#ifndef COMMUNITY
+		if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+		{
+			if(wnd->m_ptransaction && (wnd->m_ptransaction->m_starttransactionenabled == wyFalse))
+			{
+				if(newquery)
+					str.SetAs(newquery);
+				else
+					str.SetAs(query);
+				transactioncheck = wnd->m_ptransaction->TransactionContinue(&str, fortransactionprompt);
+			}
+		}
+		if(transactioncheck == 0) //dosent matter for professional, as initial value of transactioncheck is != 0
+			return IN_TRANSACTION;
+		#endif
 		//Its needed for encoding scheme with HTTP tunneling only
 		if(tunnel && tunnel->IsTunnel() == true)
 			isbadforxml = IsBadforXML(query);
@@ -138,26 +154,86 @@ wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *qu
 				{
 					//total time elapsed for reconnecting and execution(failed execution)
 					tsrecon = timetaken + (GetHighPrecisionTickCount() - tsrecon);
-					recstr.SetAs(_("  SQLyog reconnected"));
 
+					#ifndef COMMUNITY
+
+						if(pGlobals->m_entlicense.CompareI("Professional") != 0 && wnd->m_ptransaction && (wnd->m_ptransaction->m_starttransactionenabled == wyFalse))
+							recstr.SetAs(_("  SQLyog reconnected. The transaction has been rolled back due to connection error."));
+						else
+					#endif
+					recstr.SetAs(_("  SQLyog reconnected"));
 					//profile comment to history
 					my_queryprofile(wnd, tsrecon, recstr.GetString(), wyTrue); 
 				}
-				  
-				/* try to reexecute the query */
-				return my_query(wnd, tunnel, mysql, query, length, batch, isend, stop, 1, profile);			
+#ifndef COMMUNITY
+				if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+				{
+					if(wnd->m_ptransaction)
+					{
+						wnd->m_ptransaction->m_autocommit =			wyTrue;
+						wnd->m_ptransaction->m_isolationmode =		ID_TRX_REPEATABLEREAD;
+					}
+					if(wnd->m_ptransaction && (wnd->m_ptransaction->m_starttransactionenabled == wyFalse))
+					{
+						wnd->m_ptransaction->CallOnCommit();
+						presult = MessageBox(wnd->GetHwnd() , _(L"SQLyog reconnected. The transaction has been rolled back due to connection error."), 
+						   _(L"Warning"), MB_ICONWARNING | MB_OK | MB_DEFBUTTON2);
+					}
+				}
+#endif
+				/* try to reexecute the query */	
+					return my_query(wnd, tunnel, mysql, query, length, batch, isend, stop, 1, profile);
+				
 			}
 
 			if(profile == wyTrue)//profile the history tab with comment'SQLyog reconnect failed'
 			{				
 				//total time elapsed for reconnecting and execution(failed execution)
 				tsrecon = timetaken + (GetHighPrecisionTickCount() - tsrecon);
+				#ifndef COMMUNITY
+					if(pGlobals->m_entlicense.CompareI("Professional") != 0 && wnd->m_ptransaction)
+					{
+						wnd->m_ptransaction->m_autocommit =			wyTrue;
+						wnd->m_ptransaction->m_isolationmode =		ID_TRX_REPEATABLEREAD;
+					}
+					if(pGlobals->m_entlicense.CompareI("Professional") != 0 && wnd->m_ptransaction && (wnd->m_ptransaction->m_starttransactionenabled == wyFalse))
+					{
+						//wnd->m_ptransaction->CallOnCommit();
+						recstr.SetAs(_("  SQLyog reconnect failed. The Transaction has been rolled back due to connection error."));
+					}
+					else
+				#endif
 				recstr.SetAs(_("  SQLyog reconnect failed"));
 				
 				//profile comment to history
 				my_queryprofile(wnd, tsrecon, recstr.GetString(), wyTrue);  
-			}			
+			}	
+#ifndef COMMUNITY
+				if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+				{
+					if(wnd->m_ptransaction)
+					{
+						wnd->m_ptransaction->m_autocommit =			wyTrue;
+						wnd->m_ptransaction->m_isolationmode =		ID_TRX_REPEATABLEREAD;
+					}
+					if(wnd->m_ptransaction && (wnd->m_ptransaction->m_starttransactionenabled == wyFalse))
+					{
+						presult = MessageBox(wnd->GetHwnd() , _(L"SQLyog reconnect Failed. The Transaction has been rolled back due to connection error."), 
+						   _(L"Warning"), MB_ICONWARNING | MB_OK | MB_DEFBUTTON2);
+						wnd->m_ptransaction->CallOnCommit();
+					}
+				}
+#endif
 		}
+		#ifndef COMMUNITY
+		if(pGlobals->m_entlicense.CompareI("Professional") != 0 && !ret && wnd->m_ptransaction)
+		{
+			if(transactioncheck != -1 && !wnd->m_ptransaction->m_starttransactionenabled && wnd->m_ptransaction->m_autocommit)
+			{
+					wnd->m_ptransaction->CallOnCommit();
+			}		
+		}
+		#endif
 		
 		/* now we add the query for profiling */
 		/* if its tunneling then we dont add the profiling as it will be wrong */
@@ -179,6 +255,7 @@ wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *qu
           }
           
        }
+
 		free(newquery);
 	}
 	
@@ -1404,7 +1481,143 @@ LeftPadText(const wyChar *text)
 
 	return temp;
 }
+#ifndef COMMUNITY
+wyBool
+ChangeTransactionState(MDIWindow *wnd, const wyChar *query)
+{
+	SQLFormatter        formatter;
+	wyString			queryStr, newquery;
 
+	queryStr.SetAs(query);
+	formatter.GetQueryWtOutComments(&queryStr, &newquery);
+	newquery.RTrim();
+	newquery.LTrim();
+
+	if(newquery.GetLength() != -1 && (newquery.FindI("START") == 0 || newquery.FindI("SET") == 0 || newquery.FindI("BEGIN") == 0 || newquery.FindI("COMMIT") == 0 || newquery.FindI("ROLLBACK") == 0))
+	{
+		newquery.SetAs(wnd->m_ptransaction->RemoveExtraSpaces(newquery.GetString()));
+
+		if(newquery.FindI("START") != -1 )
+		{
+			if(newquery.FindI("TRANSACTION") == 6)
+				wnd->m_ptransaction->CallOnStart();
+		}
+		else if(newquery.FindI("COMMIT") == 0 && newquery.GetLength() > 7)
+		{
+			wyString tempquery = newquery.Substr(7, newquery.GetLength() - 7);
+			newquery.SetAs(wnd->m_ptransaction->RemoveExtraSpaces(tempquery.GetString()));
+			if(newquery.FindI("AND CHAIN") == 0)
+			{
+				wnd->m_ptransaction->CallOnCommit();
+				wnd->m_ptransaction->CallOnStart();
+			}
+		}
+		else if(newquery.FindI("ROLLBACK") == 0 && newquery.GetLength() > 9)
+		{
+			wyString tempquery = newquery.Substr(9, newquery.GetLength() - 9);
+			newquery.SetAs(wnd->m_ptransaction->RemoveExtraSpaces(tempquery.GetString()));
+			if(newquery.FindI("AND CHAIN") == 0)
+			{
+				wnd->m_ptransaction->CallOnCommit();
+				wnd->m_ptransaction->CallOnStart();
+			}
+			else if(newquery.FindI("TO") != -1)
+			{
+				if(newquery.FindI("TO") == 0)
+					wnd->m_ptransaction->HandleRollbackEditor(&newquery, 3);
+				else if(newquery.FindI("WORK") == 0)
+				{
+					wyString tempstr;
+					tempstr.SetAs(newquery.Substr(0, newquery.GetLength() - 0));
+					newquery.SetAs(wnd->m_ptransaction->RemoveExtraSpaces(tempstr.GetString()));
+					if(newquery.FindI("TO") == 5)
+						wnd->m_ptransaction->HandleRollbackEditor(&newquery, 8);
+				}
+			}
+		}
+		else if(newquery.FindI("BEGIN") != -1)
+		{
+			if(wnd->m_ptransaction->HandleBegin(newquery.GetString()))
+				wnd->m_ptransaction->CallOnStart();
+		}
+		else
+		{
+			if(newquery.FindI("autocommit") == 4)
+			{
+				if(!wnd->m_ptransaction->m_autocommit)
+				{
+					if(newquery.FindI("=") != -1 && newquery.FindI("1") != -1)
+					{
+						wnd->m_ptransaction->m_autocommit = wyTrue;
+						wnd->m_ptransaction->CallOnCommit();
+					}
+				}
+				else
+				{
+					if(newquery.FindI("=") != -1 && newquery.FindI("0") != -1)
+					{
+						wnd->m_ptransaction->m_autocommit = wyFalse;
+						wnd->m_ptransaction->CallOnStart();
+					}
+				}
+			}
+			else if(newquery.FindI("SESSION") == 4 && newquery.FindI("TRANSACTION") != -1 && 
+				newquery.FindI("ISOLATION") != -1 && newquery.FindI("LEVEL") != -1)
+			{
+				if(newquery.FindI("REPEATABLE") != -1 && newquery.FindI("READ") != -1)
+				{
+					wnd->m_ptransaction->m_isolationmode = ID_TRX_REPEATABLEREAD;
+				}
+				else if(newquery.FindI("COMMITTED") != -1 && newquery.FindI("READ") != -1 && newquery.FindI("UNCOMMITTED") == -1)
+				{
+					wnd->m_ptransaction->m_isolationmode = ID_TRX_READCOMMITED;
+				}
+				else if(newquery.FindI("UNCOMMITTED") != -1 && newquery.FindI("READ") != -1)
+				{
+					wnd->m_ptransaction->m_isolationmode = ID_TRX_READUNCOMMITED;
+				}
+				else if(newquery.FindI("SERIALIZABLE") != -1)
+				{
+					wnd->m_ptransaction->m_isolationmode = ID_TRX_SERIALIZABLE;
+				}
+			}
+		}
+
+	}
+	else if(wnd->m_ptransaction->m_starttransactionenabled == wyFalse && newquery.GetLength() != -1 && (newquery.FindI("SAVEPOINT") == 0 || newquery.FindI("RELEASE") == 0))
+	{
+		if(newquery.FindI("SAVEPOINT") == 0)
+		{
+			SQLFormatter        formatter;
+			wyString			queryStr, newquery;
+			queryStr.SetAs(query);
+			formatter.GetQueryWtOutComments(&queryStr, &newquery);
+			newquery.RTrim();
+			newquery.LTrim();
+			newquery.SetAs(wnd->m_ptransaction->RemoveExtraSpaces(newquery.GetString()));
+			wnd->m_ptransaction->HandleSavepointEditor(newquery.GetString());
+		}
+		else if(newquery.FindI("RELEASE") == 0)
+		{
+			SQLFormatter        formatter;
+			wyString			queryStr, newquery;
+			queryStr.SetAs(query);
+			formatter.GetQueryWtOutComments(&queryStr, &newquery);
+			newquery.RTrim();
+			newquery.LTrim();
+			newquery.SetAs(wnd->m_ptransaction->RemoveExtraSpaces(newquery.GetString()));
+			queryStr.SetAs(newquery);
+			newquery.SetAs(queryStr.Substr(8, queryStr.GetLength() - 8));
+			if(newquery.FindI("SAVEPOINT") == 0)
+			{
+				newquery.SetAs(wnd->m_ptransaction->RemoveExtraSpaces(newquery.GetString()));
+				wnd->m_ptransaction->HandleReleaseEditor(&newquery, 10);
+			}
+		}
+	}
+	return wyTrue;
+}
+#endif
 wyBool
 ChangeContextDB(Tunnel * tunnel, PMYSQL mysql, const wyChar *query, wyBool changeincombo)
 {
@@ -2332,10 +2545,15 @@ GetColumnName(wyWChar *field)
 int  IsColumnTypeJson(wyWChar *field)
 {
 	wchar_t* result=wcschr(field,L', ');
-	if(wcsncmp(result,L", json",6))
+	if(result)
+	{
+		if(wcsncmp(result,L", json",6))
+			return 0;
+		else 
+			return 1;
+	}
+	else
 		return 0;
-	else 
-		return 1;
 }
 
 wyBool

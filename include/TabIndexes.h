@@ -37,6 +37,7 @@ struct IndexInfo
     wyString    m_colsstr;
     List        *m_listcolumns;
     wyString    m_indextype;
+	wyString	m_indexcomment;
 };
 
 class IndexesStructWrapper : public wyElem
@@ -78,6 +79,7 @@ public:
 
     wyBool                          m_ismysql41;
 	wyBool                          m_ismariadb52;
+	wyBool							m_ismysql553;
 
     // used for Shift+Click functionality
     wyInt32                         m_lastclickindgrid;
@@ -169,7 +171,7 @@ public:
     wyBool                          OnEndEditIndexName(WPARAM wParam, LPARAM lParam);
     wyBool                          OnEndEditIndexColumns(WPARAM wParam, LPARAM lParam);
     wyBool                          OnEndEditIndexType(WPARAM wParam, LPARAM lParam);
-    
+    wyBool                          OnEndEditIndexComment(WPARAM wParam, LPARAM lParam);
 
     /// Shows the Columns Dialog
     /**

@@ -37,6 +37,7 @@
 
 #ifndef COMMUNITY
 #include "ProfilerAdvisors.h"
+#include "Transactions.h"
 #endif
 
 class TabMgmt;
@@ -398,6 +399,12 @@ public:
     */
 	void				CreateQueryStatus	(HWND hwnd);
 
+	///create the handler for the transaction
+	/**
+	@param hwnd     :Window HANDLE
+	@returns void
+	*/
+	void				CreateTransactionhandler(HWND hwnd);
     /// Create the vertical splitter
     /**
     @param hwnd     :Window HANDLE
@@ -588,7 +595,7 @@ public:
     @param hwnddlg      : Dialog window HANDLE
 	@returns wyTrue on success else wyFalse
     */
-	wyBool				ExecuteFlush(wyString query, HWND hwndedit, INT writetobin, HWND hwnddlg);
+	wyBool				ExecuteFlush(wyString query, HWND hwndedit, INT writetobin, HWND hwnddlg, wyInt32 *isflush = NULL);
 
     /// Enables or disables the option in flush window.
     /**
@@ -1028,8 +1035,13 @@ public:
 	/// Querytab object pointer
 	CQueryObject	*m_pcqueryobject;
 
+	///announcements object
 	Announcements	*m_announcements;
 
+	///transaction object pointer
+#ifndef COMMUNITY
+	Transactions	*m_ptransaction;
+#endif
 	///	TabModule object pointer
 	TabModule	*m_pctabmodule;
 
