@@ -7910,15 +7910,15 @@ OnDrawConnNameCombo(HWND hwndcombo, LPDRAWITEMSTRUCT lpds,  wyBool isconndbname)
 	wyInt32		ncount, i, j, ret;
 	wyString	connstr, dirstr, conncount;
 	wyInt32		topindex;
-	wyWChar     directory[MAX_PATH + 1], *lpfileport=0;
+	/*wyWChar     directory[MAX_PATH + 1], *lpfileport=0;
     
 	ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
 	if(ret == 0)
 		return wyFalse;
 	dirstr.SetAs(directory);
+	*/
 	//fill the combobox with options
 	ncount = SendMessage(hwndcombo, CB_GETCOUNT, 0, 0);
-
 	switch (lpds->itemAction)
 		{
 			case ODA_DRAWENTIRE:
@@ -7933,7 +7933,7 @@ OnDrawConnNameCombo(HWND hwndcombo, LPDRAWITEMSTRUCT lpds,  wyBool isconndbname)
 						topindex = 0;
 						j = ncount;
 					}
-					pGlobals->m_pcmainwin->m_connection->PopulateColorArray(hwndcombo, &dirstr);
+				//	pGlobals->m_pcmainwin->m_connection->PopulateColorArray(hwndcombo, &dirstr);
 					for(i = topindex; i < j; i++)
 					{
 						if(isconndbname == wyTrue)

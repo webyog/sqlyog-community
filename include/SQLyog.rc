@@ -1841,7 +1841,7 @@ BEGIN
     GROUPBOX        "Transaction Options",IDC_TRANSACTION,4,185,247,36
     CONTROL         "Prompt when query causing implicit commit is executed",IDC_PROMPTTRANSACTION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,196,197,10
-	CONTROL         "Prompt when closing sessing or program if transaction is active.",IDC_PROMPTCLOSETRANSACTION,
+	CONTROL         "Prompt when closing session or program if transaction is active.",IDC_PROMPTCLOSETRANSACTION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,208,212,10
 END
 
