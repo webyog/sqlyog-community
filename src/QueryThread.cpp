@@ -198,6 +198,15 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query,wyBool ismulti
     	
 	querytemp.SetAs(query);
 
+#ifndef COMMUNITY
+	if(pGlobals->m_entlicense.CompareI("Professional") != 0 && param->tunnel->IsTunnel() == wyTrue)
+	{
+		wyBool start_t = CheckTransactionStart(param->wnd, query);
+		if(start_t == wyTrue)
+			return IN_TRANSACTION;
+	}
+#endif
+
 	//if(param->m_highlimitvalue != -1 && param->m_lowlimitvalue != -1)
 	if(param->m_islimitpresent == wyFalse)
 		isselectrange = wyTrue;
@@ -327,6 +336,7 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query,wyBool ismulti
 			#ifndef COMMUNITY
 			if(pGlobals->m_entlicense.CompareI("Professional") != 0)
 			{
+				if(param->tunnel->IsTunnel() == false)
 				ChangeTransactionState(param->wnd, query);
 			}
 			#endif

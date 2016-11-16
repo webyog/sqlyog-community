@@ -1617,6 +1617,60 @@ ChangeTransactionState(MDIWindow *wnd, const wyChar *query)
 	}
 	return wyTrue;
 }
+wyBool
+CheckTransactionStart(MDIWindow *wnd, const wyChar *query)
+{
+	SQLFormatter        formatter;
+	wyString			queryStr, newquery;
+
+	queryStr.SetAs(query);
+	formatter.GetQueryWtOutComments(&queryStr, &newquery);
+	newquery.RTrim();
+	newquery.LTrim();
+
+	if(newquery.GetLength() != -1 && (newquery.FindI("START") == 0 || newquery.FindI("BEGIN") == 0 || newquery.FindI("COMMIT") == 0 || newquery.FindI("ROLLBACK") == 0))
+	{
+		newquery.SetAs(wnd->m_ptransaction->RemoveExtraSpaces(newquery.GetString()));
+
+		if(newquery.FindI("START") != -1 )
+		{
+			if(newquery.FindI("TRANSACTION") == 6)
+			{
+				wnd->m_ptransaction->OnTunnelMessage(wnd->m_hwnd);
+				return wyTrue;
+			}
+		}
+		else if(newquery.FindI("COMMIT") == 0 && newquery.GetLength() > 7)
+		{
+			wyString tempquery = newquery.Substr(7, newquery.GetLength() - 7);
+			newquery.SetAs(wnd->m_ptransaction->RemoveExtraSpaces(tempquery.GetString()));
+			if(newquery.FindI("AND CHAIN") == 0)
+			{
+				wnd->m_ptransaction->OnTunnelMessage(wnd->m_hwnd);
+				return wyTrue;
+			}
+		}
+		else if(newquery.FindI("ROLLBACK") == 0 && newquery.GetLength() > 9)
+		{
+			wyString tempquery = newquery.Substr(9, newquery.GetLength() - 9);
+			newquery.SetAs(wnd->m_ptransaction->RemoveExtraSpaces(tempquery.GetString()));
+			if(newquery.FindI("AND CHAIN") == 0)
+			{
+				wnd->m_ptransaction->OnTunnelMessage(wnd->m_hwnd);
+				return wyTrue;
+			}
+		}
+		else if(newquery.FindI("BEGIN") != -1)
+		{
+			if(wnd->m_ptransaction->HandleBegin(newquery.GetString()))
+			{
+				wnd->m_ptransaction->OnTunnelMessage(wnd->m_hwnd);
+				return wyTrue;
+			}
+		}
+	}
+	return wyFalse;
+}
 #endif
 wyBool
 ChangeContextDB(Tunnel * tunnel, PMYSQL mysql, const wyChar *query, wyBool changeincombo)

@@ -2665,8 +2665,10 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 	case ID_WITHCONSISTENTSNAPSHOT_READWRITE:
 	case ID_STARTTRANSACTION_READONLY:
 	case ID_STARTTRANSACTION_READWRITE:
+		if(pcquerywnd->m_tunnel->IsTunnel() == false)
 		ptransaction->HandleStartTransaction(LOWORD(wParam), pcquerywnd->m_tunnel, &pcquerywnd->m_mysql); 
-
+		else
+			ptransaction->OnTunnelMessage(GetActiveWindow());
 		break;
 
 	case ID_COMMIT_WITHNOMODIFIER:
@@ -2676,7 +2678,6 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 	case ID_COMMIT_NORELEASE:
 		VERIFY(hmenu = GetMenu(m_hwndmain));
 		ptransaction->HandleCommit(LOWORD(wParam), hmenu, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql); 
-
 		break;
 
 	case ID_ROLLBACK_TRANSACTION:
@@ -2686,7 +2687,6 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 	case ID_ROLLBACK_NORELEASE:
 		VERIFY(hmenu = GetMenu(m_hwndmain));
 		ptransaction->HandleRollback(LOWORD(wParam), hmenu, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql); 
-
 		break;
 
 	case ID_SAVEPOINT_CREATESAVEPOINT:

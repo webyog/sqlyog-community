@@ -249,7 +249,7 @@ MDIWindow::Create(wyBool iscon_res, ConnectionInfo* conninfo)
 		m_keepaliveinterval = 0;
 	} 
 #ifndef COMMUNITY
-	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+	if(pGlobals->m_entlicense.CompareI("Professional") != 0 && m_tunnel->IsTunnel() == false)
 	{
 		wyString		query, resstr;
 		MYSQL_RES*      myres;
@@ -257,10 +257,12 @@ MDIWindow::Create(wyBool iscon_res, ConnectionInfo* conninfo)
 		MDIWindow*		wnd;
 		wnd = GetActiveWin();
 
-		query.Sprintf("SHOW GLOBAL VARIABLES WHERE variable_name =  \"AUTOCOMMIT\"");
+		query.Sprintf("SHOW VARIABLES like 'AUTOCOMMIT'");
 		myres = ExecuteAndGetResult(wnd, m_tunnel, &m_mysql, query);
 		if(!myres && m_tunnel->mysql_affected_rows(m_mysql) == -1)
 		{
+			wnd->m_ptransaction->m_autocommit = wyTrue;
+			return wyTrue;
 		}
 		row =  m_tunnel->mysql_fetch_row(myres);
 		if(!row)
@@ -280,6 +282,7 @@ MDIWindow::Create(wyBool iscon_res, ConnectionInfo* conninfo)
 		}
 		else if(resstr.CompareI("OFF") == 0)
 		{
+			wnd->m_ptransaction->CallOnStart();
 			wnd->m_ptransaction->m_autocommit = wyFalse;
 		}
 	}

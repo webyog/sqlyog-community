@@ -979,7 +979,7 @@ DataView::IsColumnVirtual(wyInt32 col)
 			//get the db and table name 
 			if(GetDBName(db, col) == wyTrue && GetTableName(table, col) == wyTrue && GetColumnName(column, col) == wyTrue)
 			 {
-				query.Sprintf("show full fields from `%s`.`%s` WHERE FIELD=\"%s\" AND (Extra LIKE \"%%VIRTUAL%%\" OR Extra LIKE \"%%STORED%%\" OR Extra LIKE \"%%PERSISTENT%%\")", db.GetString(), table.GetString(),column.GetString());
+				query.Sprintf("show full fields from `%s`.`%s` WHERE FIELD='%s' AND (Extra LIKE '%%VIRTUAL%%' OR Extra LIKE '%%STORED%%' OR Extra LIKE '%%PERSISTENT%%')", db.GetString(), table.GetString(),column.GetString());
 				fieldres = SjaExecuteAndGetResult(m_wnd->m_tunnel,&m_wnd->m_mysql,query);
 
 				if(fieldres)
