@@ -130,6 +130,8 @@ wyBool IsMySQL553(Tunnel * tunnel, PMYSQL mysql);
 wyBool IsMySQL5510(Tunnel * tunnel, PMYSQL mysql);
 //MySQL 5.5.0
 wyBool IsMySQL5500(Tunnel * tunnel, PMYSQL mysql);
+//MySQL 5.6.0
+wyBool IsMySQL5600(Tunnel * tunnel, PMYSQL mysql);
 //MySQL 5.6.3
 wyBool IsMySQL563(Tunnel * tunnel, PMYSQL mysql);
 

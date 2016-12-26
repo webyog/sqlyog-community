@@ -8251,7 +8251,7 @@ SetParanthesisHighlighting(HWND hwnd)
 void
 EnableFolding(HWND hwnd)
 {
-    COLORREF forecolor = RGB(0,0,0), backcolor = COLOR_WHITE, texturecolor=COLOR_WHITE;
+	COLORREF forecolor = RGB(0,0,0), backcolor = COLOR_WHITE, texturecolor=COLOR_WHITE;
     wyWChar		*lpfileport = 0;
 	wyWChar		directory[MAX_PATH+1] = {0};
 
@@ -8262,7 +8262,7 @@ EnableFolding(HWND hwnd)
         
         forecolor   =   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginFgColor",   RGB(0,0,0), dirstr.GetString());
         backcolor   =   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginbackgroundColor",   DEF_MARGINNUMBER, dirstr.GetString());
-        texturecolor=   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginTextureColor",   COLOR_WHITE, dirstr.GetString());
+		texturecolor=   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginTextureColor",   COLOR_WHITE, dirstr.GetString());
     }
     SendMessage(hwnd, SCI_SETPROPERTY, (WPARAM)"fold", (LPARAM)"1");
     SendMessage(hwnd, SCI_SETPROPERTY, (WPARAM)"fold.comment", (LPARAM)"1");

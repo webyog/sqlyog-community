@@ -3287,6 +3287,7 @@ wyInt32		isintransaction = 1;
 		{
 			wyString query;
 			query.Sprintf("COMMIT");
+			pcquerywnd->m_ptransaction->m_implicitcommit = wyTrue;
 			ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query, wyFalse, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
 				
 			if(isintransaction == 1)

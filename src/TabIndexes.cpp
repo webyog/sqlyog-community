@@ -319,7 +319,7 @@ TabIndexes::FetchIndexValuesIntoWrapper()
 				else if(isfulltext)
                     iindex->m_indextype.SetAs("FULLTEXT");
 				else
-					iindex->m_indextype.SetAs("");
+					iindex->m_indextype.SetAs("KEY");
                 
                 listindcols = NULL;
 
@@ -405,7 +405,7 @@ TabIndexes::FetchIndexValuesIntoWrapper()
 		else if(isfulltext)
             iindex->m_indextype.SetAs("FULLTEXT");
 		else
-			iindex->m_indextype.SetAs("");
+			iindex->m_indextype.SetAs("KEY");
     }
     m_mdiwnd->m_tunnel->mysql_free_result(myres);
 
@@ -420,7 +420,7 @@ TabIndexes::InitGrid()
     GVCOLUMN		gvcol;			// structure used to create columns for grid
     wyChar		    *heading[]      = { _("Index Name"), _("Columns"), _("Index Type"), _("Comment")};
     wyInt32			mask[]          = { GVIF_TEXT, GVIF_TEXTBUTTON , GVIF_LIST, GVIF_TEXT};
-    wyWChar			type[][20]      = { L"UNIQUE", L"PRIMARY", L"FULLTEXT"};
+    wyWChar			type[][20]      = { L"UNIQUE", L"PRIMARY", L"FULLTEXT", L"KEY"};
     VOID		    *listtype[]     = { NULL, NULL, (VOID*)type, NULL};
     wyInt32			elemsize[]      = {0, 10, sizeof(type[0]), 0 };
     wyInt32			elemcount[]     = {0, 8, sizeof(type)/sizeof(type[0]), 0 };
@@ -2317,7 +2317,7 @@ TabIndexes::GenerateCreateQuery(wyString &query)
 {
     wyBool      flag = wyTrue;
     wyUInt32    rowcount = 0;
-    wyString    indexnamestr, columnsstr, indextypestr, indexstr;
+    wyString    indexnamestr, columnsstr, indextypestr, indexstr, indexcomment;
     wyString    tempstr;
     rowcount = CustomGrid_GetRowCount(m_hgridindexes);
     IndexesStructWrapper *indwrap = NULL;
@@ -2332,6 +2332,9 @@ TabIndexes::GenerateCreateQuery(wyString &query)
         GetGridCellData(m_hgridindexes, row, INDEXNAME, indexnamestr);
         GetGridCellData(m_hgridindexes, row, INDEXCOLUMNS, columnsstr);
         GetGridCellData(m_hgridindexes, row, INDEXTYPE, indextypestr);
+		
+		if(m_ismysql553)
+			GetGridCellData(m_hgridindexes, row, INDEXCOMMENT, indexcomment);
 
         if((!indexnamestr.GetLength()) && (!columnsstr.GetLength()))
             continue;
@@ -2345,7 +2348,7 @@ TabIndexes::GenerateCreateQuery(wyString &query)
             indextypestr.SetAs("index");
         else
         {
-            if(indextypestr.CompareI("primary") != 0)
+            if(indextypestr.CompareI("primary") != 0  && indextypestr.CompareI("key") != 0 )
                 indextypestr.Add(" index");
         }
 
@@ -2364,6 +2367,9 @@ TabIndexes::GenerateCreateQuery(wyString &query)
             else
                 indexstr.AddSprintf("\r\n  %s (%s)", indextypestr.GetString(), columnsstr.GetString());
         }
+
+		if(indexcomment.GetLength())
+			indexstr.AddSprintf(" Comment \"%s\" ", indexcomment.GetString());
 
         indexstr.Add(",");
 
@@ -2472,7 +2478,7 @@ TabIndexes::GetNewAndModifiedIndexes(wyString &query, wyBool  execute)
             indextypestr.SetAs("index");
         else
         {
-            if(indextypestr.CompareI("primary") != 0)
+            if(indextypestr.CompareI("primary") != 0 && indextypestr.CompareI("key") != 0 )
                 indextypestr.Add(" index");
         }
 

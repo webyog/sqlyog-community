@@ -3169,8 +3169,10 @@ MySQLDump::OnFlushMaster()
 {
     wyString    query;
     MYSQL_RES   *res;
-
-    query.SetAs("FLUSH MASTER");
+	if(IsMySQL5600(m_tunnel, &m_mysql) == wyTrue)
+		query.SetAs("RESET MASTER");
+	else
+		query.SetAs("FLUSH MASTER");
 
 	res = SjaExecuteAndGetResult(m_tunnel, &m_mysql, query);
 

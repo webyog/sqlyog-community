@@ -381,6 +381,18 @@ IsMySQL5500(Tunnel * tunnel, PMYSQL mysql)
 }
 
 wyBool
+IsMySQL5600(Tunnel * tunnel, PMYSQL mysql)
+{
+	long me = mysql_get_server_version(*mysql);/* Only available from MySQLv4.1*/
+	const char *dbString = mysql_get_server_info(*mysql);
+
+	if(me >= 50600 && !strstr(dbString, "MariaDB"))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
+wyBool
 IsMySQL563(Tunnel *tunnel, PMYSQL mysql)
 {
     long me = mysql_get_server_version(*mysql);/* Only available from MySQLv4.1*/

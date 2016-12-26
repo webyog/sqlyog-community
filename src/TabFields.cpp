@@ -5138,6 +5138,13 @@ TabFields::ExchangeRowValues(wyInt32 row1, wyInt32 row2)
         GetGridCellData(m_hgridfields, row2, COMMENT_, data2);
         CustomGrid_SetText(m_hgridfields, row1, COMMENT_, data2.GetString());
         CustomGrid_SetText(m_hgridfields, row2, COMMENT_, data1.GetString());
+
+		//on Update value
+
+		boolval1 = CustomGrid_GetBoolValue(m_hgridfields, row1, ONUPDATECT);
+        boolval2 = CustomGrid_GetBoolValue(m_hgridfields, row2, ONUPDATECT);
+        CustomGrid_SetBoolValue(m_hgridfields, row1, ONUPDATECT, boolval2 ? GV_TRUE : GV_FALSE);
+        CustomGrid_SetBoolValue(m_hgridfields, row2, ONUPDATECT, boolval1 ? GV_TRUE : GV_FALSE);
     }
 
     //..Row Long Data

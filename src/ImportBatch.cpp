@@ -161,6 +161,7 @@ ImportBatch::OnWMCommand(HWND hwnd, WPARAM wParam)
 			{
 				wyString query;
 				query.Sprintf("COMMIT");
+				wnd->m_ptransaction->m_implicitcommit = wyTrue;
 				ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query, wyFalse, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
 				
 				if(isintransaction == 1)

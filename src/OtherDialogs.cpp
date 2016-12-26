@@ -1910,6 +1910,8 @@ CCopyTable::FillData()
 	return wyTrue;
 }
 
+// If ANSI_QUOTES global value is set....double quotes will be resulting in an error 
+
 // Function to prepare the query to copy the table and execute it.
 wyBool
 CCopyTable::DoCopy()
@@ -1920,7 +1922,6 @@ CCopyTable::DoCopy()
 	MYSQL_RES	*res;
     wyWChar     newtable[SIZE_512]={0};
     wyChar      *tbuff;
-
 	if(SendMessage(GetDlgItem(m_hwnd, IDC_TABLENAME), WM_GETTEXTLENGTH, 0, 0)== 0)
     {
 		yog_message(m_hwnd, _(L"Please give a table name"), 
@@ -2270,8 +2271,12 @@ wyBool
 CCopyTable::GetKeysPrimeKeyCheck(MYSQL_ROW *myrow, MYSQL_RES *myres, wyString &primary)
 {
     wyBool      flgprimary = wyFalse;
-
     primary.Add("primary key(");
+	wyBool		ismysql553 ;
+	wyString comment;
+	ismysql553=   IsMySQL553(m_tunnel,m_mysql);
+	wyInt32		flag = 0; 	
+	comment.SetAs("");
 
 	while(*myrow = m_tunnel->mysql_fetch_row(myres))
 	{
@@ -2279,6 +2284,16 @@ CCopyTable::GetKeysPrimeKeyCheck(MYSQL_ROW *myrow, MYSQL_RES *myres, wyString &p
         {
 			primary.AddSprintf("`%s`", (*myrow)[GetFieldIndex(myres,"column_name", m_tunnel, m_mysql)]);
             
+			if(flag == 0)
+			{
+				flag++;			
+				if(ismysql553)
+				{
+				if((*myrow)[GetFieldIndex(myres,"Index_comment", m_tunnel, m_mysql)])
+					comment.SetAs((*myrow)[GetFieldIndex(myres,"Index_comment", m_tunnel, m_mysql)]);
+				}
+			}
+
             if((*myrow)[GetFieldIndex(myres,"sub_part", m_tunnel, m_mysql)])
                 primary.AddSprintf("(%s),", (*myrow)[GetFieldIndex(myres,"sub_part", m_tunnel, m_mysql)]);
             else
@@ -2298,7 +2313,10 @@ CCopyTable::GetKeysPrimeKeyCheck(MYSQL_ROW *myrow, MYSQL_RES *myres, wyString &p
 	else
 		primary.Clear();
 
-    return flgprimary;
+	if(comment.GetLength() != 0)
+		primary.AddSprintf(" Comment \"%s\" ", comment.GetString());
+
+	return flgprimary;
 }
 
 wyBool
@@ -2321,11 +2339,14 @@ CCopyTable::GetKeysOtherIndex(MYSQL_ROW *myrow, MYSQL_RES *myres, wyString &inde
 {
     wyInt32	 ftindex;
     wyString tempindex, myrowstr, myrowstr1;
-    wyBool   flgindex = wyFalse, ismysql41 = IsMySQL41(m_tunnel, m_mysql);
-
+    wyBool   flgindex = wyFalse, ismysql41 = IsMySQL41(m_tunnel, m_mysql), ismysql553=   IsMySQL553(m_tunnel,m_mysql);
+	wyString comment;
+	
     while(*myrow)
 	{
         flgindex = wyTrue;
+		comment.SetAs("");
+
 		tempindex.SetAs((*myrow)[GetFieldIndex(myres, "key_name", m_tunnel, m_mysql)], (GetActiveWin())->m_ismysql41);
 		
 		if(IsMySQL402(m_tunnel, m_mysql))
@@ -2342,6 +2363,12 @@ CCopyTable::GetKeysOtherIndex(MYSQL_ROW *myrow, MYSQL_RES *myres, wyString &inde
 			myrowstr1.SetAs((*myrow)[UNIQUECOL], ismysql41);
             index.AddSprintf("%s `%s`(",((stricmp(myrowstr1.GetString(), "0")==0)?("UNIQUE"): (!myrowstr.CompareI("SPATIAL") ? "SPATIAL KEY" : "KEY")), tempindex.GetString());		
 		}
+
+		if(ismysql553)
+			{
+				if((*myrow)[GetFieldIndex(myres,"Index_comment", m_tunnel, m_mysql)])
+					comment.SetAs((*myrow)[GetFieldIndex(myres,"Index_comment", m_tunnel, m_mysql)]);
+			}
 
 		while(1)
 		{
@@ -2364,7 +2391,10 @@ CCopyTable::GetKeysOtherIndex(MYSQL_ROW *myrow, MYSQL_RES *myres, wyString &inde
 			if((*myrow) && (tempindex.Compare(myrowstr1.GetString()) != 0))
 			{
 				index.Strip(1);
-				index.Add("), ");
+				index.Add(")");
+				if(comment.GetLength() != 0)
+					index.AddSprintf(" Comment \"%s\" ", comment.GetString());
+				index.Add(", ");
 				break;
 			}
 		}
@@ -2375,6 +2405,8 @@ CCopyTable::GetKeysOtherIndex(MYSQL_ROW *myrow, MYSQL_RES *myres, wyString &inde
     {
         index.Strip(1);
 		index.Add(")");
+		if(comment.GetLength() != 0)
+					index.AddSprintf(" Comment \"%s\" ", comment.GetString());
     }
 	else
 		index.Clear();
@@ -4505,6 +4537,7 @@ EmptyDB::OnWmCommand(WPARAM wParam)
         break;
 
     case IDOK:
+
 		ret = EmptyDatabase();
 		
         if(ret)
@@ -4555,6 +4588,7 @@ EmptyDB::EmptyDatabase()
 		{
 			wyString	query;
 			wyInt32		isintransaction =	1;
+			wnd->m_ptransaction->m_implicitcommit = wyTrue;
 			query.Sprintf("COMMIT");
 			ExecuteAndGetResult(wnd, m_tunnel, m_mysql, query, wyFalse, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction);
 				

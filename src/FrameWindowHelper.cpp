@@ -231,6 +231,12 @@ wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *qu
 			if(transactioncheck != -1 && !wnd->m_ptransaction->m_starttransactionenabled && wnd->m_ptransaction->m_autocommit)
 			{
 					wnd->m_ptransaction->CallOnCommit();
+					if(wnd->m_ptransaction->m_implicitcommit)
+					{
+						wnd->m_ptransaction->m_implicitcommit = wyFalse;
+						recstr.SetAs(_("An implicit commit occurred"));
+						my_queryprofile(wnd, 1, recstr.GetString(), wyTrue);
+					}
 			}		
 		}
 		#endif

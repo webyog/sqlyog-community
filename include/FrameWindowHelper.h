@@ -64,6 +64,8 @@
 #pragma once
 #endif
 
+#define		IS_FROM_WINDOWS_STORE	0
+
 // #defines of character constants for better readability using in lexer and editing things.
 #define		C_TAB										'\t'
 #define		C_SPACE										' '
@@ -394,7 +396,12 @@ All Files(*.*)\0*.*\0"
 #define		DEFAULT_NO_TABLE							_("(Read Only)")
 #define		DEFAULT_NO_TABLEW							_(L"(Read Only)")
 #define		DEFAULT_READONLY_RESULT						_(L"Read-only result")
+#define		BUYLABEL									"Buy SQLyog"
+#if			IS_FROM_WINDOWS_STORE == 1
+#define		BUYURL										"https://www.webyog.com/product/sqlyogpricing/?utm_source=sqlyogapp&utm_medium=referral&utm_campaign=windowsstore"
+#else
 #define		BUYURL										"http://www.webyog.com/product/sqlyogpricing"
+#endif
 #define		BUYURL_POWERTOOLS							"http://www.webyog.com/product/sqlyogpricing/?ref=community.powertools"
 ////#define		BUYURL_NAGBEGIN								"http://www.webyog.com/product/sqlyogpricing/?ref=community.nagbegin"
 #define		BUYURL_TOOLBARRIBBON						"http://www.webyog.com/product/sqlyogpricing/?ref=community.toolbarribbon"
@@ -406,7 +413,11 @@ All Files(*.*)\0*.*\0"
 #define		BUYURL_BUYNAGEND							"http://www.webyog.com/product/sqlyogpricing/?ref=community.buynagend"
 #define		SUPPORTURL									"https://www.webyog.com/customer?ref=sqlyog"
 
+#if			IS_FROM_WINDOWS_STORE == 1
+#define     BUYENT										"https://www.webyog.com/product/sqlyogpricing/?utm_source=sqlyogapp&utm_medium=referral&utm_campaign=windowsstore"
+#else
 #define     BUYENT										"http://www.webyog.com/product/sqlyogpricing"
+#endif
 #define		IMAGEURL									"http://www.webyog.com"
 #define     PRODUCTURL                                  "https://www.webyog.com/product/sqlyog"
 #define     COMMUNITYURL                                "https://www.webyog.com/community" 
