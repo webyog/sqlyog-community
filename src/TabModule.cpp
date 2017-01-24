@@ -666,7 +666,13 @@ TabModule::CreateTableTabInterface(MDIWindow *wnd, wyBool isaltertable, wyInt32 
     CTCITEM             item = {0};
     TableTabInterface   *ptabinterface = NULL;
     wyString            tabtitle, objectname, temptabname;
-    
+ 
+#ifndef COMMUNITY
+	if(wnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return wyTrue;
+	}
+#endif
     if(isaltertable)
     {
         if(!IsValidFocusInOB(setfocustotab))

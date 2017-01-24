@@ -34,7 +34,9 @@ extern	PGLOBALS		 pGlobals;
 #define SPACE_15		15
 #define			NO_QUERY_EXECUTED		_("No query(s) were executed. Please enter a query in the SQL window or place the cursor inside a query.")
 #define			NO_QUERY_EXECUTED_TRANS		_("No query(s) were executed.")
+#define			NO_QUERY_EXECUTED_READONLY		_("Only Read-Only query(s) are allowed for this connection.")
 #define IN_TRANSACTION  -10
+#define IN_READONLY  -20
 
 void
 AddErrorOrMsg(wyInt32 errstatus, wyString& buffer, Tunnel * tunnel, PMYSQL mysql, const wyChar* query, 
@@ -144,6 +146,21 @@ AddErrorOrMsg(wyInt32 errstatus, wyString& buffer, Tunnel * tunnel, PMYSQL mysql
 			GetWarning(tunnel, mysql, &msg);
 
 		break;
+	case ERROR_READONLY:
+		if(isembedformat == wyTrue)
+        {
+            msg.SetAs("<r>");
+        }
+
+        if(query)
+        {
+	        msg.AddSprintf(_("Query: %s"), querystr.GetString());
+        }
+
+        msg.Add("\r\n\r\n");
+		msg.Add(NO_QUERY_EXECUTED_READONLY);
+		msg.AddSprintf("\r\n");
+		break;
 
 	default:
 		VERIFY(0);		/* should never reach here */
@@ -152,7 +169,8 @@ AddErrorOrMsg(wyInt32 errstatus, wyString& buffer, Tunnel * tunnel, PMYSQL mysql
 
     if(query && buffer.GetLength() && msg.GetLength())
 	{
-        buffer.Add("--------------------------------------------------\r\n\r\n");
+
+        buffer.Add("-----------------------------------------------------------\r\n\r\n");
 	}
 
 	buffer.Add(msg.GetString());
@@ -201,8 +219,7 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query,wyBool ismulti
 #ifndef COMMUNITY
 	if(pGlobals->m_entlicense.CompareI("Professional") != 0 && param->tunnel->IsTunnel() == wyTrue)
 	{
-		wyBool start_t = CheckTransactionStart(param->wnd, query);
-		if(start_t == wyTrue)
+		if(CheckTransactionStart(param->wnd, query) == wyTrue)
 			return IN_TRANSACTION;
 	}
 #endif
@@ -222,7 +239,14 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query,wyBool ismulti
 	param->wnd->SetThreadBusy(wyFalse);
 	if(ret == IN_TRANSACTION)
 		return IN_TRANSACTION;
-	if(ret)
+	if(ret == IN_READONLY)
+	{
+		elem = new QueryResultElem;
+		elem->param = NULL;
+		AddErrorOrMsg(ERROR_READONLY, *param->str, param->tunnel, param->mysql, ptrquery, param->executestatus,  param->endpos, 0, param->wnd->m_lastquerytime, param->m_iseditor);
+		param->list->Insert(elem);	
+	}	
+	else if(ret)
 	{
 		elem = new QueryResultElem;
 		elem->param = NULL;

@@ -407,6 +407,10 @@ CShowValue::ShowValueDialogProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPAR
 		else if(pcshowvalue->m_valtype == PROCESSLIST)
 		{
 			ShowWindow(GetDlgItem(hwnd, IDC_KILL), SW_SHOW);
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+		EnableWindow(GetDlgItem(hwnd, IDC_KILL), FALSE); 
+#endif
 			SetInitPos(hwnd, SHOWVALUE_PROCESSLIST_SECTION);
 		}
 		else if(pcshowvalue->m_valtype == STATUS)
@@ -640,7 +644,12 @@ CShowValue::CreateColumns(MYSQL_RES *myres)
 			EnableWindow(GetDlgItem(m_hwnddlg, IDC_KILL), FALSE); 
 		else
 			EnableWindow(GetDlgItem(m_hwnddlg, IDC_KILL), TRUE); 
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+		EnableWindow(GetDlgItem(m_hwnddlg, IDC_KILL), FALSE); 
+#endif
 	}
+
 	// free the memory allocated
 	for(colcount--; colcount >= 0; colcount--)
 	{
@@ -745,7 +754,10 @@ CShowValue::KillProcess()
 			EnableWindow(GetDlgItem(m_hwnddlg, IDC_KILL), FALSE); 
 		else
 			EnableWindow(GetDlgItem(m_hwnddlg, IDC_KILL), TRUE); 
-	
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+		EnableWindow(GetDlgItem(m_hwnddlg, IDC_KILL), FALSE); 
+#endif
 
 	m_prow = -1;
 
@@ -3970,6 +3982,18 @@ TableDiag::TableDlgProcInit(HWND phwnd, LPARAM plparam)
 
 	GetCtrlRects(pctablediag);
 	PositionCtrls(pctablediag);
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+	//	EnableWindow(GetDlgItem(phwnd, IDC_DIAG_OPTIMIZE), wyFalse);
+	//	EnableWindow(GetDlgItem(phwnd, IDC_DIAG_OPTIMIZELOCAL), wyFalse);
+		EnableWindow(GetDlgItem(phwnd, IDC_DIAG_QUICKREPAIR), wyFalse);
+		EnableWindow(GetDlgItem(phwnd, IDC_DIAG_EXTENDEDREPAIR), wyFalse);
+		EnableWindow(GetDlgItem(phwnd, IDC_DIAG_USEFRMREPAIR), wyFalse);
+		EnableWindow(GetDlgItem(phwnd, IDC_DIAG_USELOCALREPAIR), wyFalse);
+		EnableWindow(GetDlgItem(phwnd, IDC_DIAG_REPAIR), wyFalse);
+	}
+#endif
 
 	return wyTrue;	
 }
@@ -4184,6 +4208,18 @@ TableDiag::EnableDisableTableDiag(HWND thwnd, BOOL flag)
 	EnableWindow(GetDlgItem(thwnd, IDC_DIAG_EXTENDEDREPAIR), flag);
 	EnableWindow(GetDlgItem(thwnd, IDC_DIAG_USELOCALREPAIR), flag);
 	EnableWindow(GetDlgItem(thwnd, IDC_CHECKOPTION), flag); 
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+	//	EnableWindow(GetDlgItem(thwnd, IDC_DIAG_OPTIMIZE), wyFalse);
+	//	EnableWindow(GetDlgItem(thwnd, IDC_DIAG_OPTIMIZELOCAL), wyFalse);
+		EnableWindow(GetDlgItem(thwnd, IDC_DIAG_QUICKREPAIR), wyFalse);
+		EnableWindow(GetDlgItem(thwnd, IDC_DIAG_EXTENDEDREPAIR), wyFalse);
+		EnableWindow(GetDlgItem(thwnd, IDC_DIAG_USEFRMREPAIR), wyFalse);
+		EnableWindow(GetDlgItem(thwnd, IDC_DIAG_USELOCALREPAIR), wyFalse);
+		EnableWindow(GetDlgItem(thwnd, IDC_DIAG_REPAIR), wyFalse);
+	}
+#endif
 
 	return;
 }

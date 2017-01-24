@@ -48,7 +48,7 @@
 
 
 extern PGLOBALS pGlobals;
-
+#define			READONLYUNCHECKTILLHERE 18
 #define         DEF_BULK_SIZE           1024
 
 DlgControl::DlgControl(HWND hwnd, wyInt32 id, RECT* rect, wyBool issizex, wyBool issizey)
@@ -725,6 +725,13 @@ ChangeEditMenuItem(HMENU hmenu)
 		}*/
 	}
 
+#ifndef COMMUNITY
+	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		VERIFY(EnableMenuItem(hmenu, ACCEL_QUERYUPDATE, MF_GRAYED)!= -1);
+	}
+#endif
+
 	// Check if UNDO, REDO and PASTE can be done.
 	if((hwnd == pceditorbase->m_hwnd)&&(SendMessage(hwnd, SCI_CANUNDO, 0, 0)))
 		VERIFY(EnableMenuItem(hmenu, IDM_EDIT_UNDO, MF_ENABLED)!= -1);
@@ -1184,6 +1191,13 @@ EnableToolItems(HMENU hmenu)
         EnableMenuItem(hmenu, IDM_IMEX_EXPORTDATA, MF_GRAYED | MF_BYCOMMAND);
     }
     EnableDisableExportMenuItem();
+#ifndef COMMUNITY
+	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		EnableMenuItem(hmenu, ID_TOOLS_FLUSH, MF_GRAYED | MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ID_IMEX_TEXTFILE2, MF_GRAYED | MF_BYCOMMAND);
+	}
+#endif
     return wyTrue;
 }
 
@@ -1228,6 +1242,17 @@ EnableDBItems(HMENU hmenu)
 	//first disable create event menu 
 	EnableMenuItem(hmenu, ID_DB_CREATEEVENT, MF_GRAYED| MF_BYCOMMAND);
 
+#ifndef COMMUNITY
+	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		EnableMenuItem(hmenu, ID_IMEX_TEXTFILE, MF_GRAYED| MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ID_IMPORT_EXTERNAL_DATA, MF_GRAYED| MF_BYCOMMAND);
+		EnableMenuItem(hmenu, IDM_CREATEDATABASE, MF_GRAYED| MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ID_OBJECT_CREATESCHEMA, MF_ENABLED| MF_BYCOMMAND);
+		//EnableMenuItem(hmenu, ID_OPEN_COPYDATABASE, MF_GRAYED| MF_BYCOMMAND);
+		return wyTrue;
+	}
+#endif
 	// check whether database item is selected or not.
 	image = pcquerywnd->m_pcqueryobject->GetSelectionImage();
 
@@ -1265,17 +1290,18 @@ EnableTableItems(HMENU hmenu)
 	MDIWindow   *pcquerywnd;
 	wyInt32 image, size, count, state, uptorelation = 5;
 	wyInt32 nid[] = {ID_OPEN_COPYTABLE, ID_TABLE_MAKER, ID_OBJECT_TABLEEDITOR, ID_OBJECT_MANINDEX, 
-                     IDM_TABLE_RELATION, ID_IMPORTEXPORT_TABLESEXPORTTABLES, ID_EXPORT_AS, 
-                     ID_IMPORT_FROMCSV, ID_IMPORT_FROMXML,
+                     IDM_TABLE_RELATION,  ID_IMPORT_FROMCSV, ID_IMPORT_FROMXML,
                      ID_OBJECT_COPYTABLE, ID_OBJECT_RENAMETABLE, ID_OBJECT_CLEARTABLE, ID_OBJECT_REORDER, 
-                     ID_OBJECT_DROPTABLE, ID_OBJECT_REORDER, ID_OBJECT_VIEWDATA, ID_TABLE_OPENINNEWTAB,
-                     ID_OBJECT_ADVANCED, ID_OBJECT_INSERTSTMT, ID_OBJECT_UPDATESTMT, ID_OBJECT_DELETESTMT, ID_TABLE_MAKER, ID_OBJECT_CREATETRIGGER, 
-                     ID_OBJECT_SELECTSTMT, ID_EXPORT_EXPORTTABLEDATA};
+                     ID_OBJECT_DROPTABLE, ID_OBJECT_REORDER, 
+                     ID_OBJECT_INSERTSTMT, ID_OBJECT_UPDATESTMT, ID_OBJECT_DELETESTMT, ID_TABLE_MAKER, ID_OBJECT_CREATETRIGGER, 
+					 ID_OBJECT_VIEWDATA, ID_TABLE_OPENINNEWTAB, ID_OBJECT_ADVANCED,
+                     ID_IMPORTEXPORT_TABLESEXPORTTABLES, ID_EXPORT_AS, ID_OBJECT_SELECTSTMT, ID_EXPORT_EXPORTTABLEDATA};
 
 	if(pGlobals->m_pcmainwin->m_connection->m_enttype == ENT_PRO)
 		HandleDBMenuOptionsPRO(hmenu);
-	    
+
 	VERIFY(pcquerywnd	=	GetActiveWin());
+
 	// first grey all the item
 	state = MF_GRAYED;
 
@@ -1290,9 +1316,13 @@ EnableTableItems(HMENU hmenu)
 	// check whether database item is selected or not.
 	image = pcquerywnd->m_pcqueryobject->GetSelectionImage();
 
-	if(image == NTABLES || image == NDATABASE)
+	if((image == NTABLES || image == NDATABASE ))
     {
+#ifndef COMMUNITY
+		if(pcquerywnd->m_conninfo.m_isreadonly == wyFalse)
         //For database enable only - 'Create Table' 
+		{
+#endif COMMUNITY
 		EnableMenuItem(hmenu, ID_TABLE_MAKER, MF_ENABLED | MF_BYCOMMAND);
 
         //for tables folder 
@@ -1301,12 +1331,19 @@ EnableTableItems(HMENU hmenu)
             EnableMenuItem(hmenu, ID_OPEN_COPYTABLE, MF_ENABLED | MF_BYCOMMAND);
             EnableMenuItem(hmenu, ID_IMPORTEXPORT_TABLESEXPORTTABLES, MF_ENABLED | MF_BYCOMMAND);
         }
+#ifndef COMMUNITY
+		}
+#endif COMMUNITY
     }	
 	else if(image == NTABLE || image == NCOLUMN || image == NPRIMARYKEY || image == NINDEX || image == NPRIMARYINDEX)
 	{
 		state = MF_ENABLED;
-		
-		for(count = 0; count < size; count++)
+		count = 0;
+#ifndef COMMUNITY
+	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+		count = READONLYUNCHECKTILLHERE; //nid before 18 must remain disabled for readonly
+#endif
+		for(; count < size; count++)
 			EnableMenuItem(hmenu, nid[count], state | MF_BYCOMMAND);
 
 		if(!IsMySQL5010(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql))
@@ -1317,8 +1354,12 @@ EnableTableItems(HMENU hmenu)
 	}
 	else if(image == NFOLDER)
 	{
+#ifndef COMMUNITY
+		if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+        state = MF_GRAYED;
+#else
 		state = MF_ENABLED;
-
+#endif
 		for(count = 0; count < uptorelation; count++)
 			VERIFY(EnableMenuItem(hmenu, nid[count], state | MF_BYCOMMAND)!= -1);
 	}
@@ -1331,7 +1372,12 @@ EnableTableItems(HMENU hmenu)
 		VERIFY(EnableMenuItem(hmenu, ID_OBJECT_DELETESTMT, MF_GRAYED | MF_BYCOMMAND)!= -1);
         VERIFY(EnableMenuItem(hmenu, ID_OBJECT_SELECTSTMT, MF_GRAYED | MF_BYCOMMAND)!= -1);        
     }  
-
+#ifndef COMMUNITY
+	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		EnableMenuItem(hmenu, ID_IMPORT_EXTERNAL_DATA, MF_GRAYED | MF_BYCOMMAND);
+	}
+#endif
 	
 	/*Adding Table engines to Table menu.
 	 Gets the 'Other Table Option' sub meno
@@ -1345,8 +1391,7 @@ EnableTableItems(HMENU hmenu)
 	if(!hmenuengine)
 		return wyFalse;
     
-	pcquerywnd->InsertEnginesMenuItems(hmenuengine);	
-  
+	pcquerywnd->InsertEnginesMenuItems(hmenuengine);	  
 	return wyTrue;
 }
 
@@ -1368,10 +1413,24 @@ EnableColumnItems(HMENU hmenu)
 	// if mysql version is below 5.1 then dissable all event menus	
 	if(!IsMySQL5010(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql))
 		DisableAdvMenu(hmenu);
-	
+
 	// check whether database item is selected or not.
 	image = pcquerywnd->m_pcqueryobject->GetSelectionImage();
-
+#ifndef COMMUNITY
+	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		DisableAdvMenu(hmenu);
+        EnableMenuItem(hmenu, ID_TABLE_OPENINNEWTAB, MF_ENABLED | MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ID_OBJECT_DROPFIELD, MF_GRAYED | MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ID_OBJECT_MAINMANINDEX, MF_GRAYED | MF_BYCOMMAND);
+		if(image == NVIEWSITEM)
+		{
+			EnableMenuItem(hmenu, ID_OBJECT_VIEWDATA, MF_ENABLED | MF_BYCOMMAND);
+			EnableMenuItem(hmenu, ID_OBJECT_EXPORTVIEW, MF_ENABLED | MF_BYCOMMAND);
+		}
+		return wyTrue;
+	}
+#endif	
 	if(image == NCOLUMN || image == NPRIMARYKEY)	
     {
         DisableAdvMenu(hmenu);
@@ -1452,7 +1511,6 @@ EnableColumnItems(HMENU hmenu)
 		EnableMenuItem(hmenu, ID_OBJECT_ALTERTRIGGER, MF_ENABLED | MF_BYCOMMAND); 
 		EnableMenuItem(hmenu, ID_OBJECT_DROPTRIGGER, MF_ENABLED | MF_BYCOMMAND);
 		EnableMenuItem(hmenu, ID_OBJECTS_RENAMETRIGGER, MF_ENABLED | MF_BYCOMMAND); 
-
 	} 
     else 
     {
@@ -1584,6 +1642,10 @@ InitConInfo(ConnectionInfo &consrc, ConnectionInfo &contgt)
 	contgt.m_port = consrc.m_port;
 
 	contgt.m_iscompress = consrc.m_iscompress;
+#ifndef COMMUNITY
+//	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+	contgt.m_isreadonly = consrc.m_isreadonly;
+#endif	
 	contgt.m_isdeftimeout = consrc.m_isdeftimeout;
 	contgt.m_strwaittimeout.SetAs(consrc.m_strwaittimeout);
 	//contgt.m_ispwdcleartext = consrc.m_ispwdcleartext;
@@ -9090,7 +9152,10 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo,
 
 	inimgr->IniGetString2(connstr.GetString(), "Database","", &conninfo->m_db, pathstr.GetString());
 	conninfo->m_iscompress = inimgr->IniGetInt2(connstr.GetString(), "compressedprotocol", 0, pathstr.GetString()) ? wyTrue: wyFalse;
-	
+#ifndef COMMUNITY
+//	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+		conninfo->m_isreadonly = inimgr->IniGetInt2(connstr.GetString(), "readonly", 0, pathstr.GetString()) ? wyTrue: wyFalse;
+#endif
 	//Wait_TimeOut
 	conninfo->m_isdeftimeout = inimgr->IniGetInt2(connstr.GetString(), "defaulttimeout", conninfo->m_isdeftimeout, pathstr.GetString())? wyTrue: wyFalse;
 	inimgr->IniGetString2(connstr.GetString(), "waittimeoutvalue", WAIT_TIMEOUT_SERVER, &conninfo->m_strwaittimeout, pathstr.GetString());
@@ -9522,6 +9587,13 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 			 conninfo->m_strwaittimeout.SetAs(WAIT_TIMEOUT_SERVER);
 
 #ifndef COMMUNITY
+		 colval = sqliteobj->GetText(&res , "readonly");
+		 if(colval)
+		//	 if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+			 conninfo->m_isreadonly = sqliteobj->GetInt(&res , "readonly") ? wyTrue:wyFalse;
+		 else
+			 conninfo->m_isreadonly = wyFalse;
+
 		 colval = sqliteobj->GetText(&res , "Tunnel");
 		 if(colval)
 			 conninfo->m_ishttp = sqliteobj->GetInt(&res , "Tunnel") ? wyTrue:wyFalse;
@@ -9694,6 +9766,7 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 		 if(colval)
 			 conninfo->m_cipher.SetAs(colval);
 #endif
+
 		 colval = sqliteobj->GetText(&res , "ObjectbrowserBkcolor");
 		 if(colval)
 			 conninfo->m_rgbconn = sqliteobj->GetInt(&res , "ObjectbrowserBkcolor");
@@ -9824,6 +9897,9 @@ WriteFullSectionToFile(FILE *out_stream, wyInt32 conno, ConnectionInfo *coninfo,
 	fputs(temp.GetString(), out_stream);
 
 #ifndef COMMUNITY
+	temp.Sprintf("readonly=%d\r\n", coninfo->m_isreadonly);
+	fputs(temp.GetString(), out_stream);
+
 	temp.Sprintf("Tunnel=%d\r\n", coninfo->m_ishttp);
 	fputs(temp.GetString(), out_stream);
 	
@@ -10023,9 +10099,9 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 	sqlite3_stmt*   stmt;
 	wySQLite	*sqliteobj;
 	sqliteobj = ssnsqliteobj ? ssnsqliteobj : pGlobals->m_sqliteobj;
-	sqlitequery->Sprintf("INSERT INTO conndetails (Id ,position ,ObjectbrowserBkcolor  ,ObjectbrowserFgcolor  ,isfocussed ,Name   ,Host   ,User   ,Password   ,Port  ,StorePassword  ,keep_alive  ,Database   ,compressedprotocol  ,defaulttimeout  ,waittimeoutvalue  ,Tunnel  ,Http   ,HTTPTime  ,HTTPuds  ,HTTPudsPath   , Is401  ,IsProxy  ,Proxy   , ProxyUser  , ProxyPwd   , ProxyPort   , User401 , Pwd401 , ContentType , HttpEncode  ,SSH  ,SshUser  ,SshPwd  ,SshHost  ,SshPort  ,SshForHost  ,SshPasswordRadio  ,SSHPrivateKeyPath  ,SshSavePassword  ,SslChecked  ,SshAuth  ,Client_Key  ,Client_Cert  ,CA  ,Cipher  ,sqlmode_global  ,sqlmode_value ,init_command ) VALUES \
-												  (?   ,?       ,?						,?						  ,?	     ,?       ,?       ,?       ,?       ,?       ,?           ,?          ,?          ,?			       ,?				       ,?			 ,?       ,?       ,?       ,?       ,?					,?       ,?       ,?       ,?		       ,?	       ,?	       ,?	       ,?	       ,?	       ,?       ,?       ,?       ,?       ,?       ,?       ,?				 ,?			       ,?			       ,?			       ,?		    ,?       ,?          ,?           ,?     ,?       ,?			  ,?			,?)");
-	
+
+	sqlitequery->Sprintf("INSERT INTO conndetails (Id ,position ,ObjectbrowserBkcolor  ,ObjectbrowserFgcolor  ,isfocussed ,Name   ,Host   ,User   ,Password   ,Port  ,StorePassword  ,keep_alive  ,Database   ,compressedprotocol  ,defaulttimeout  ,waittimeoutvalue  ,Tunnel  ,Http   ,HTTPTime  ,HTTPuds  ,HTTPudsPath   , Is401  ,IsProxy  ,Proxy   , ProxyUser  , ProxyPwd   , ProxyPort   , User401 , Pwd401 , ContentType , HttpEncode  ,SSH  ,SshUser  ,SshPwd  ,SshHost  ,SshPort  ,SshForHost  ,SshPasswordRadio  ,SSHPrivateKeyPath  ,SshSavePassword  ,SslChecked  ,SshAuth  ,Client_Key  ,Client_Cert  ,CA  ,Cipher  ,sqlmode_global  ,sqlmode_value ,init_command ,readonly ) VALUES \
+												  (?   ,?       ,?						,?						  ,?	     ,?       ,?       ,?       ,?       ,?       ,?           ,?          ,?          ,?			       ,?				       ,?			 ,?       ,?       ,?       ,?       ,?					,?       ,?       ,?       ,?		       ,?	       ,?	       ,?	       ,?	       ,?	       ,?       ,?       ,?       ,?       ,?       ,?       ,?				 ,?			       ,?			       ,?			       ,?		    ,?       ,?          ,?           ,?     ,?       ,?			  ,?			,?			,?)");
 	
 	sqliteobj->Prepare(&stmt,sqlitequery->GetString());
 	
@@ -10195,6 +10271,8 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 	sqliteobj->SetText(&stmt, 48,  coninfo->m_sqlmode.GetLength()?coninfo->m_sqlmode.GetString():"");
 
 	sqliteobj->SetText(&stmt, 49,  coninfo->m_initcommand.GetLength()?coninfo->m_initcommand.GetString():"");
+
+	sqliteobj->SetInt(&stmt, 50, coninfo->m_isreadonly);
 
 	sqliteobj->Step(&stmt, wyFalse);
 	sqliteobj->Finalize(&stmt);

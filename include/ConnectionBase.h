@@ -124,7 +124,11 @@ public:
 	@returns wyTrue if ent else wyFalse
 	*/
 	wyBool IsEnt();
-	
+
+	static  LRESULT		CALLBACK StaticDlgProcLinkCursor (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+	WNDPROC			m_wpstaticorigproc;
+
     void    OnInitConnDialog(HWND hwnd);
 
     /// Helps to show the user name (Registered) in the about window
@@ -286,6 +290,8 @@ public:
 	@returns zero
 	*/
 	wyInt32 OnWmCtlColorStatic(HWND hwnd, WPARAM wparam, LPARAM lparam);
+
+
 
 	/// Handles the color static for status bar
 	/**

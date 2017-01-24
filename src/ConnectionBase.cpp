@@ -107,6 +107,25 @@ ConnectionBase::OnInitDialog(HWND hwnd, LPARAM lparam)
 
     SendMessage(GetDlgItem(hwnd, IDC_PINGINTERVAL), EM_LIMITTEXT, 6, 0);
 
+	ShowWindow(GetDlgItem(hwnd, IDC_LINK), SW_SHOW);
+
+#ifndef COMMUNITY 
+		//	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+		//	{	
+				ShowWindow(GetDlgItem(hwnd, IDC_COMPRESSHELP), SW_SHOW);
+				ShowWindow(GetDlgItem(hwnd, IDC_READONLY), SW_SHOW);
+		//	}
+		/*	else
+			{
+			ShowWindow(GetDlgItem(hwnd, IDC_COMPRESSHELP), SW_HIDE);
+			ShowWindow(GetDlgItem(hwnd, IDC_READONLY), SW_HIDE);
+			}
+		*/
+#else
+				ShowWindow(GetDlgItem(hwnd, IDC_COMPRESSHELP), SW_HIDE);
+				ShowWindow(GetDlgItem(hwnd, IDC_READONLY), SW_HIDE);
+#endif
+
 	PostMessage(hwnd, WM_INITCONNDIALOG, 0, 0);
     return;
 }
@@ -178,6 +197,21 @@ ConnectionBase::OnAboutInitDialog(HWND hwnd)
 	AboutRegInfo(hwnd);
 
 	return 0;
+}
+
+LRESULT CALLBACK
+	ConnectionBase::StaticDlgProcLinkCursor (HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	ConnectionBase * pdb = (ConnectionBase*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+
+	switch(message)
+	{
+	case WM_MOUSEMOVE:
+		SetCursor(LoadCursor(NULL, MAKEINTRESOURCE(32649)));
+		return 0;
+	}
+
+	return CallWindowProc(pdb->m_wpstaticorigproc, hwnd, message, wParam, lParam);
 }
 
 wyInt32
@@ -316,6 +350,23 @@ ConnectionBase::CreateConnectDialogWindows(HWND hwnd, wyBool ispowertools)
                                                     pGlobals->m_hinstance, NULL);
 	VERIFY(geninfo);
 	ShowWindow(geninfo, SW_SHOW);
+	ShowWindow(GetDlgItem(hwndtab, IDC_LINK), SW_SHOW);
+
+/*#ifndef COMMUNITY 
+	if(pGlobals->m_entlicense.CompareI("Professional") == 0)
+	{
+		ShowWindow(GetDlgItem(hwndtab, IDC_COMPRESSHELP), SW_HIDE);
+		ShowWindow(GetDlgItem(hwndtab, IDC_READONLY), SW_HIDE);
+	}
+#else
+	ShowWindow(GetDlgItem(hwndtab, IDC_COMPRESSHELP), SW_HIDE);	
+	ShowWindow(GetDlgItem(hwndtab, IDC_READONLY), SW_HIDE);
+#endif
+*/
+	#ifdef COMMUNITY
+		ShowWindow(GetDlgItem(hwndtab, IDC_COMPRESSHELP), SW_HIDE);	
+		ShowWindow(GetDlgItem(hwndtab, IDC_READONLY), SW_HIDE);
+	#endif
 
 	return wyTrue;
 }
@@ -536,7 +587,32 @@ ConnectionBase::OnValidConNameChngState(HWND hdlg, BOOL state)
 		VERIFY(hctrl = GetDlgItem(hdlg, id_arr[count])); 
 		EnableWindow(hctrl, state);
 	}
-
+VERIFY(hctrl = GetDlgItem(hdlg, IDC_READONLY));
+/*
+#ifndef COMMUNITY 
+	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+	{	
+		ShowWindow(GetDlgItem(hdlg, IDC_COMPRESSHELP), SW_SHOW);
+		ShowWindow(GetDlgItem(hdlg, IDC_READONLY), SW_SHOW);
+	}	//	EnableWindow(hctrl, state);
+	else
+	{
+		ShowWindow(GetDlgItem(hdlg, IDC_COMPRESSHELP), SW_HIDE);
+		ShowWindow(GetDlgItem(hdlg, IDC_READONLY), SW_HIDE);
+	}	//EnableWindow(hctrl, FALSE);
+#else
+		EnableWindow(hctrl, FALSE);
+#endif
+*/
+/*
+#ifndef COMMUNITY
+		ShowWindow(GetDlgItem(hdlg, IDC_COMPRESSHELP), SW_SHOW);
+		ShowWindow(GetDlgItem(hdlg, IDC_READONLY), SW_SHOW);
+#else
+		ShowWindow(GetDlgItem(hdlg, IDC_COMPRESSHELP), SW_HIDE);
+		ShowWindow(GetDlgItem(hdlg, IDC_READONLY), SW_HIDE);
+#endif
+		*/
     if(m_conndetaildirty == wyTrue)
     {
        EnableWindow(GetDlgItem(hdlg, IDC_SAVE), state);
@@ -565,7 +641,7 @@ ConnectionBase::ChangeConnStates(HWND hdlg, wyBool state)
 							 IDC_DLGCONNECT_PORT, IDC_MYSQLDEFSRVST, IDOK, IDC_TESTCONN,
 							 IDC_COMPRESS, IDC_COMPRESSHELP, IDC_TIMEOUT, IDC_TIMEOUTDEF, 
 							 IDC_TIMEOUTOPT, IDC_TIMEOUTHELP, IDC_TIMESEC , 
-							 IDC_KEEPALIVE, IDC_KEEPALIVESEC, IDC_PINGINTERVAL
+							 IDC_KEEPALIVE, IDC_KEEPALIVESEC, IDC_PINGINTERVAL, IDC_READONLY
 							};
 	HWND		hctrl;
 
@@ -575,7 +651,19 @@ ConnectionBase::ChangeConnStates(HWND hdlg, wyBool state)
 		VERIFY(hctrl = GetDlgItem(hdlg, id_arr[count])); 
 		EnableWindow(hctrl, state);
 	}
+VERIFY(hctrl = GetDlgItem(hdlg, IDC_READONLY));
+#ifndef COMMUNITY 
+//	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+		EnableWindow(hctrl, state);
+//	else
+//		EnableWindow(hctrl, FALSE);
+	//ShowWindow(GetDlgItem(hwnd, IDC_READONLY), state);
+#else
+		//EnableWindow(hctrl, FALSE);
+	ShowWindow(GetDlgItem(hdlg, IDC_READONLY), SW_HIDE);
+	ShowWindow(GetDlgItem(hdlg, IDC_COMPRESSHELP), SW_HIDE);
 
+#endif
 	if(state == wyFalse)
 	{
 		EnableWindow(GetDlgItem(hdlg, IDC_TIMEOUTEDIT), FALSE); 
@@ -1040,11 +1128,16 @@ ConnectionBase::ShowSeverTabOptions(HWND hwnd, wyBool enable)
                             IDC_DLGCONNECT_DATABASE, IDC_COLONST, IDC_MYSQLPORTST, IDC_DLGCONNECT_PORT, 
 							IDC_MYSQLDEFSRVST, IDC_COMPRESS, IDC_COMPRESSHELP, IDC_TIMEOUT, 
 							IDC_TIMEOUTDEF, IDC_TIMEOUTOPT, IDC_TIMESEC, IDC_TIMEOUTEDIT, IDC_TIMEOUTHELP, 
-							 IDC_KEEPALIVE, IDC_KEEPALIVESEC, IDC_PINGINTERVAL}; 
+							IDC_KEEPALIVE, IDC_KEEPALIVESEC, IDC_PINGINTERVAL, IDC_READONLY, IDC_LINK}; 
 
     wyInt32 count = sizeof(serverids)/ sizeof(serverids[0]);
 
     ShowOrHide(hwnd, serverids, count, enable);
+#ifdef COMMUNITY
+	ShowWindow(GetDlgItem(hwnd, IDC_READONLY), SW_HIDE);
+	ShowWindow(GetDlgItem(hwnd, IDC_COMPRESSHELP), SW_HIDE);
+
+#endif
 }
 			
 void 
@@ -1079,8 +1172,14 @@ ConnectionBase::ShowHttpTabOptions(HWND hwnd, wyBool enable)
 
     //enabling the help button
     EnableWindow(GetDlgItem(hwnd, IDC_TUNNELHELP), TRUE);
-    
+#else
+	if(enable == wyTrue)
+	{
+		ShowWindow(GetDlgItem(hwnd, IDC_COMPRESSHELP), SW_HIDE);
+		ShowWindow(GetDlgItem(hwnd, IDC_READONLY), SW_HIDE);
+	}
 #endif
+
 }
 
 void 
@@ -1117,7 +1216,12 @@ ConnectionBase::ShowSshTabOptions(HWND hwnd, wyBool enable)
 
     //enabling the help button
     EnableWindow(GetDlgItem(hwnd, IDC_SSHHELP), TRUE);
-    
+	#else
+	if(enable == wyTrue)
+	{
+		ShowWindow(GetDlgItem(hwnd, IDC_COMPRESSHELP), SW_HIDE);
+		ShowWindow(GetDlgItem(hwnd, IDC_READONLY), SW_HIDE);
+	}
 #endif
 } 
 
@@ -1154,6 +1258,12 @@ ConnectionBase::ShowSslTabOptions(HWND hwnd, wyBool enable)
 
     //enabling the help button
     EnableWindow(GetDlgItem(hwnd, IDC_SSLHELP), TRUE);
+	#else
+	if(enable == wyTrue)
+	{
+		ShowWindow(GetDlgItem(hwnd, IDC_COMPRESSHELP), SW_HIDE);
+		ShowWindow(GetDlgItem(hwnd, IDC_READONLY), SW_HIDE);
+	}
 #endif
 }
 
@@ -1173,7 +1283,7 @@ ConnectionBase::ShowOrHide(HWND hwnd, wyInt32 array[], wyInt32 arraycount, wyBoo
             else
                 ShowWindow(hwndc, SW_HIDE);
 		}
-	}	
+	}
 }
 
 void 
@@ -1412,7 +1522,7 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
 	wyWChar     directory[MAX_PATH+1]={0}, *lpfileport=0;
 	wyChar	 	pwd[SIZE_512]={0};
 	wyBool      decodepwd = wyTrue;
-	wyUInt32    ret, usecompress = 1, isdefwaittimeout = 1/*, usecleartext = 0*/;
+	wyUInt32    ret, usecompress = 1, isdefwaittimeout = 1, readonly = 0/*, usecleartext = 0*/;
 	ConnectionInfo  conninfo;
 	
 	// Get the complete path.
@@ -1459,7 +1569,23 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
 	//Compressed prtocol
 	usecompress = wyIni::IniGetInt(conn.GetString(), "compressedprotocol", 1, dirstr.GetString());
 	Button_SetCheck(GetDlgItem(hdlg, IDC_COMPRESS), usecompress);
-
+#ifndef COMMUNITY
+//if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+//{
+	readonly = wyIni::IniGetInt(conn.GetString(), "readonly", 0, dirstr.GetString());
+	Button_SetCheck(GetDlgItem(hdlg, IDC_READONLY), readonly);
+//}
+//else
+//{
+//	readonly = 0;
+//	Button_SetCheck(GetDlgItem(hdlg, IDC_READONLY), readonly);
+//}
+#else
+{
+	readonly = 0;
+	Button_SetCheck(GetDlgItem(hdlg, IDC_READONLY), readonly);
+}
+#endif
 	/*usecleartext = wyIni::IniGetInt(conn.GetString(), "cleartextpwd", 0, dirstr.GetString());
 	Button_SetCheck(GetDlgItem(hdlg, IDC_ISCLEARTEXT), usecleartext);*/
 
@@ -2278,7 +2404,12 @@ ConnectionBase::FillAdvancedTab(HWND hwnd, ConnectionInfo *conninfo)
     EnableWindow(GetDlgItem(hwnd, IDC_INITCOMMAND), TRUE);
     EnableWindow(GetDlgItem(hwnd, IDC_EDITINITCOMMAND), TRUE);
     EnableWindow(GetDlgItem(hwnd, IDC_INITCOMMANDDETAIL), TRUE);
-	
+	/*
+#ifndef COMMUNITY
+	ShowWindow(GetDlgItem(hwnd, IDC_COMPRESSHELP), SW_HIDE);
+	ShowWindow(GetDlgItem(hwnd, IDC_READONLY), SW_HIDE);
+#endif
+	*/
 	//fill connection color
 	ColorComboInitValues(GetDlgItem(hwnd, IDC_COLORCOMBO));
 	ColorComboFgInitValues(GetDlgItem(hwnd, IDC_COLORCOMBO3));
@@ -2419,7 +2550,12 @@ ConnectionBase::SaveServerDetails(HWND hwnd, const wyChar *conn, const wyChar *d
 	ret = Button_GetState(GetDlgItem(hwnd, IDC_COMPRESS));
 	(ret == BST_CHECKED) ? value = 1 : value = 0;
 	ret =	wyIni::IniWriteInt(conn, "compressedprotocol", value, directory);
-
+#ifndef COMMUNITY
+	//readonly
+	ret = Button_GetState(GetDlgItem(hwnd, IDC_READONLY));
+	(ret == BST_CHECKED) ? value = 1 : value = 0;
+	ret =	wyIni::IniWriteInt(conn, "readonly", value, directory);
+#endif
 	//Clear text pwd
 	/*ret = Button_GetState(GetDlgItem(hwnd, IDC_ISCLEARTEXT));
 	(ret == BST_CHECKED) ? value = 1 : value = 0;
@@ -2448,6 +2584,19 @@ ConnectionBase::HandleCommonConnectOptions(HWND hwnd, ConnectionInfo *dbname, wy
 {
 	switch(id)
 	{
+#ifndef COMMUNITY
+	case IDC_READONLY:
+		if(SendMessage(GetDlgItem(hwnd, IDC_READONLY), BM_GETCHECK, 0, 0)== BST_CHECKED)
+		//	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+				dbname->m_isreadonly = wyTrue;
+		else
+			dbname->m_isreadonly = wyFalse;
+
+		EnableWindow(GetDlgItem(hwnd, IDC_SAVE), TRUE);	
+		EnableWindow(GetDlgItem(hwnd, IDC_CLONECONN), FALSE);	
+		m_conndetaildirty = wyTrue;
+		break;
+#endif
 	case IDC_COMPRESS:
 		if(SendMessage(GetDlgItem(hwnd, IDC_COMPRESS), BM_GETCHECK, 0, 0)== BST_CHECKED)
 			dbname->m_iscompress = wyTrue;
@@ -2528,7 +2677,6 @@ ConnectionBase::HandleCommonConnectOptions(HWND hwnd, ConnectionInfo *dbname, wy
         break;
 
 	}
-
 	return;
 }
 
@@ -2589,6 +2737,9 @@ void ConnectionBase::WriteMysqlDefValues(HWND hdlg)
 	SendMessage(GetDlgItem(hdlg, IDC_DLGCONNECT_DATABASE), WM_SETTEXT, 0, (LPARAM)L"");
 	SendMessage(GetDlgItem(hdlg, IDC_DLGCONNECT_PORT), WM_SETTEXT, 0, (LPARAM)L"3306");
 	Button_SetCheck(GetDlgItem(hdlg, IDC_COMPRESS), 1);
+#ifndef COMMUNITY
+	Button_SetCheck(GetDlgItem(hdlg, IDC_READONLY), 0);
+#endif
 	//Button_SetCheck(GetDlgItem(hdlg, IDC_ISCLEARTEXT), 0);
 	Button_SetCheck(GetDlgItem(hdlg, IDC_TIMEOUTDEF), 1);
 	Button_SetCheck(GetDlgItem(hdlg, IDC_TIMEOUTOPT), 0);

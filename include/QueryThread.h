@@ -37,6 +37,7 @@
 #define		ERROR_ERROR					1
 #define		ERROR_RESULT				2
 #define		ERROR_NONRESULT				3
+#define		ERROR_READONLY				4
 
 
 class QueryResultList : public List

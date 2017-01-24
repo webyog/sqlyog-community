@@ -160,7 +160,6 @@ MySQLDump::MySQLDump()
 
 	m_mysqlwaittimeout.SetAs(WAIT_TIMEOUT_SERVER);
 	m_compressedprotocol = wyTrue;
-	
  	/* initialize MySQLDump and set to default values */
 	Initialize();
 }
@@ -929,7 +928,7 @@ MySQLDump::SetOtherConnectionInfo(ConnectionInfo *conn)
 		m_mysqlwaittimeout.SetAs(WAIT_TIMEOUT_SERVER);
 	}
 
-	m_compressedprotocol = conn->m_iscompress;
+	m_compressedprotocol = conn->m_iscompress;	
 }
 
 /* This function allow user to select tables to be dumped*/

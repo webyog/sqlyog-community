@@ -51,6 +51,7 @@
 #define			ONE						1
 #define			TWO						2
 #define			IN_TRANSACTION			-10
+#define			IN_READONLY				-20
 
 extern PGLOBALS	pGlobals;		
 extern HACCEL	g_accel;
@@ -105,8 +106,17 @@ wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *qu
             str.Clear();
         }		
 		#ifndef COMMUNITY
-		if(pGlobals->m_entlicense.CompareI("Professional") != 0)
-		{
+	//	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+	//	{
+			if(wnd->m_conninfo.m_isreadonly == wyTrue)
+			{
+				if(newquery)
+					str.SetAs(newquery);
+				else
+					str.SetAs(query);
+				if(ReadOnlyQueryAllow(&str) == wyFalse)
+					return IN_READONLY;				
+			}
 			if(wnd->m_ptransaction && (wnd->m_ptransaction->m_starttransactionenabled == wyFalse))
 			{
 				if(newquery)
@@ -115,7 +125,7 @@ wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *qu
 					str.SetAs(query);
 				transactioncheck = wnd->m_ptransaction->TransactionContinue(&str, fortransactionprompt);
 			}
-		}
+	//	}
 		if(transactioncheck == 0) //dosent matter for professional, as initial value of transactioncheck is != 0
 			return IN_TRANSACTION;
 		#endif
@@ -1676,6 +1686,120 @@ CheckTransactionStart(MDIWindow *wnd, const wyChar *query)
 		}
 	}
 	return wyFalse;
+}
+wyBool
+ReadOnlyQueryAllow(wyString *str)
+{
+	wyBool ret  = wyFalse;
+	if(str->FindI("SHOW") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("Select") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("Describe") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("Explain") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("use") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("set") == 0)
+	{
+		str->SetAs(RemoveExtraSpaces(str->GetString()));
+		if(str->FindI("global") == 4)
+			ret = wyFalse;
+		else if(str->FindI("@@global") == 4)
+			ret = wyFalse;
+		else
+			ret = wyTrue;
+	}
+	else if(str->FindI("help") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("handler") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("call") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("Start") == 0)
+	{
+		str->SetAs(RemoveExtraSpaces(str->GetString()));
+		if(str->FindI("Transaction") == 6)
+			ret = wyTrue;
+	}
+	else if(str->FindI("commit") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("rollback") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("do") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("savepoint") == 0)
+	{
+		ret = wyTrue;
+	}
+	/*
+		With create we change return to wyFalse since begin will be present in procedures which we shouldn't allow..
+		Begin for starting a transaction should be allowed
+	*/
+	else if(str->FindI("create") == 0)
+	{
+		ret = wyFalse;
+	}
+	else if(str->FindI("begin") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("check") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("analyze") == 0)
+	{
+		ret = wyTrue;
+	}
+	else if(str->FindI("optimize") == 0)
+	{
+		ret = wyTrue;
+	}
+	return ret;
+}
+wyString
+RemoveExtraSpaces(wyString query)
+{
+	wyInt32 len = query.GetLength();
+	for(int i = 0; i < len; i++)
+	{
+		if(query.GetCharAt(i) == ' ')
+		{
+			wyInt32 j = i + 1;
+			while(query.GetCharAt(j) == ' ')
+				j++;
+			if(j > i+1)
+			{
+				query.Replace( i , j - i, " ");
+			}
+			break;
+		}
+	}
+	return query.GetString();
 }
 #endif
 wyBool

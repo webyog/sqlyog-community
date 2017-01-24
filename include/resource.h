@@ -772,6 +772,7 @@
 #define IDC_TIMEOUTOPT                  1526
 #define IDC_TIMEOUTEDIT                 1527
 #define IDC_COMPRESSHELP                1533
+#define IDC_READONLY					10289
 #define IDC_TIMEOUTHELP                 1534
 #define IDC_TIMESEC                     1535
 #define IDC_SHOWWARNING                 1536

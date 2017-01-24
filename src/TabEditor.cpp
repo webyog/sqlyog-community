@@ -234,6 +234,13 @@ TabEditor::OnTabSelChange()
     else
 	{
         SendMessage(hwndtoolbar, TB_SETSTATE,(WPARAM)IDM_EXECUTE, TBSTATE_ENABLED);
+#ifndef COMMUNITY
+	if(pcmdiwindow->m_conninfo.m_isreadonly == wyTrue)
+	{
+		SendMessage(hwndtoolbar, TB_SETSTATE,ACCEL_QUERYUPDATE, TBSTATE_INDETERMINATE);
+	}
+	else
+#endif
 		SendMessage(hwndtoolbar, TB_SETSTATE, (WPARAM)ACCEL_QUERYUPDATE, TBSTATE_ENABLED);
 		SendMessage(hwndsecondtool, TB_SETSTATE, (WPARAM)ID_FORMATCURRENTQUERY, TBSTATE_ENABLED);
 	}

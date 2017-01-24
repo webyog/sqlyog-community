@@ -417,6 +417,12 @@ ConnectionCommunity::ConnectToMySQL(HWND hdlg, ConnectionInfo *coninfo)
 	coninfo->m_isssh         = wyFalse;
 	coninfo->m_origmysqlport = 0;
 
+#ifndef COMMUNITY	
+	//read only settings
+	ret =(SendMessage(GetDlgItem(hdlg, IDC_READONLY), BM_GETCHECK, 0, 0));
+//	if(pGlobals->m_entlicense.CompareI("Professional") != 0)
+	(ret == BST_CHECKED) ? coninfo->m_isreadonly = wyTrue : coninfo->m_isreadonly = wyFalse;
+#endif
 	//Compress protocol settings
 	ret =(SendMessage(GetDlgItem(hdlg, IDC_COMPRESS), BM_GETCHECK, 0, 0));
 	(ret == BST_CHECKED) ? coninfo->m_iscompress = wyTrue : coninfo->m_iscompress = wyFalse;
@@ -740,6 +746,11 @@ ConnectionCommunity::OnWmCommandConnDialog(HWND hwnd, WPARAM wparam, LPARAM lpar
 		 ShowHelp("http://sqlyogkb.webyog.com/article/153-direct-connection-using-mysql-c-api");
 		 break;
 	}
+	if((HIWORD(wparam)== STN_CLICKED))
+    {
+	    if(LOWORD(wparam)== IDC_LINK)
+			ShowHelp("http://sqlyogkb.webyog.com/article/153-direct-connection-using-mysql-c-api");
+	}
 }
 
 wyBool 
@@ -815,8 +826,13 @@ ConnectionCommunity::ConnectDialogProc(HWND hwnd, UINT message, WPARAM wParam, L
 
 	case WM_INITCONNDIALOG:
 		pGlobals->m_pcmainwin->m_connection->OnInitConnDialog(hwnd);
+		pGlobals->m_pcmainwin->m_connection->m_wpstaticorigproc =(WNDPROC)SetWindowLongPtr(GetDlgItem(hwnd, IDC_LINK), GWLP_WNDPROC,(LONG_PTR)StaticDlgProcLinkCursor);	
+		SetWindowLongPtr(GetDlgItem(hwnd, IDC_LINK), GWLP_USERDATA,(LONG_PTR)pGlobals->m_pcmainwin->m_connection);
 		break;
 
+	case WM_CTLCOLORSTATIC:
+		return pGlobals->m_pcmainwin->m_connection->OnWmCtlColorStatic(hwnd, wParam, lParam);
+	
 	case SHOW_CONFIRM:
 		pGlobals->m_pcmainwin->m_connection->ConfirmAndSaveConnection(hwnd);
 		break;
@@ -1414,9 +1430,12 @@ ConnectionCommunity::DlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
 
     case WM_INITDLGVALUES:
 		hwndactive = GetDlgItem(hwnd, IDC_COMLINK);
-        pcomm->m_wporigstaticproc = (WNDPROC)SetWindowLongPtr(hwndactive, GWLP_WNDPROC,(LONG_PTR)StaticDlgProc);	
+        pcomm->m_wporigstaticproc = (WNDPROC)SetWindowLongPtr(hwndactive, GWLP_WNDPROC,(LONG_PTR)StaticDlgProc);
 		SetWindowLongPtr(hwndactive, GWLP_USERDATA,(LONG_PTR)pcomm);
 		break;
+
+	case WM_CTLCOLORSTATIC:
+		return pGlobals->m_pcmainwin->m_connection->OnWmCtlColorStatic(hwnd, wparam, lparam);
 
 	case WM_COMMAND:
         pcomm->OnDlgWmCommand(hwnd, wparam);

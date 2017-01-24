@@ -1635,6 +1635,13 @@ CQueryObject::LoadTablesMenu(POINT *pnt)
 	
 	// Set menu draw property for drawing icon
 	wyTheme::SetMenuItemOwnerDraw(htrackmenu);
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		EnableMenuItem(hmenu, ID_OPEN_COPYTABLE, MF_GRAYED | MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ID_TABLE_MAKER, MF_GRAYED | MF_BYCOMMAND);
+	}
+#endif
 
     VERIFY(TrackPopupMenu(htrackmenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, pnt->x, pnt->y, 0, pGlobals->m_pcmainwin->m_hwndmain, NULL));
 
@@ -1732,6 +1739,12 @@ CQueryObject::DropDatabase(Tunnel * tunnel, PMYSQL mysql)
     MYSQL_RES		*res;
 	MDIWindow		*wnd = GetActiveWin();
 	wyInt32			isintransaction = 1;
+#ifndef COMMUNITY
+	if(wnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return wyTrue;
+	}
+#endif
 
 	item	= GetSelectionImage();
 	VERIFY(hitem = TreeView_GetSelection(m_hwnd));
@@ -1830,6 +1843,12 @@ CQueryObject::DropTable(Tunnel * tunnel, PMYSQL mysql)
     MYSQL_RES		*res;
 	wyInt32 isintransaction = 1;
 
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return wyTrue;
+	}
+#endif
 	VERIFY(hitem	=	TreeView_GetSelection(m_hwnd));
 	item = GetSelectionImage();
 	
@@ -1919,7 +1938,12 @@ CQueryObject::DropField(Tunnel * tunnel, PMYSQL mysql)
     TabObject	*pinfotab   = NULL;
 	TabMgmt     *ptabmgmt   = NULL;
 	TabEditor   *ptabeditor = NULL;
-
+#ifndef COMMUNITY
+	if(wnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return wyTrue;
+	}
+#endif
 	VERIFY(hitem	=	TreeView_GetSelection(m_hwnd));
 
 	//Checks whether there is only one column in the table if yes cant delete that.		
@@ -3317,6 +3341,13 @@ CQueryObject::OnSelChanged(HTREEITEM hitem, LPNMTREEVIEW pnmtv)
         {
             ptabmgmt->m_pqueryobj->Refresh();
         }
+#ifndef COMMUNITY
+		if(wnd->m_conninfo.m_isreadonly == wyTrue)
+		{
+			SendMessage(pGlobals->m_pcmainwin->m_hwndsecondtool, TB_SETSTATE,ID_OBJECT_MAINMANINDEX, TBSTATE_INDETERMINATE);
+			SendMessage(pGlobals->m_pcmainwin->m_hwndsecondtool, TB_SETSTATE,ACCEL_MANREL, TBSTATE_INDETERMINATE);
+		}
+#endif
     }
 
     else if(image == NSPITEM)
@@ -3607,6 +3638,14 @@ CQueryObject::OnSelChanged(HTREEITEM hitem, LPNMTREEVIEW pnmtv)
                 ptabmgmt->m_pqueryobj->Refresh();
             }
 		} 
+#ifndef COMMUNITY
+		if(wnd->m_conninfo.m_isreadonly == wyTrue)
+		{
+			SendMessage(pGlobals->m_pcmainwin->m_hwndsecondtool, TB_SETSTATE,ID_OBJECT_MAINMANINDEX, TBSTATE_INDETERMINATE);
+			SendMessage(pGlobals->m_pcmainwin->m_hwndsecondtool, TB_SETSTATE,ACCEL_MANREL, TBSTATE_INDETERMINATE);
+			SendMessage(pGlobals->m_pcmainwin->m_hwndsecondtool, TB_SETSTATE,ID_OPEN_COPYDATABASE, TBSTATE_INDETERMINATE);
+		}
+#endif
 	}
 
 	// now change the default db.
@@ -4398,6 +4437,12 @@ CQueryObject::RenameObject()
 	wyInt32     item;
 	HTREEITEM   hitem, temp;
     wyString    strtemp;
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return wyTrue;
+	}
+#endif
 	
 	VERIFY(hitem = TreeView_GetSelection(m_hwnd));
 	temp = hitem;
@@ -5078,7 +5123,12 @@ CQueryObject::ProcessF6()
 	
 	VERIFY(wnd = GetActiveWin());
 	image = GetSelectionImage();
-    
+#ifndef COMMUNITY
+	if(wnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return wyTrue;
+	}
+#endif
 	switch(image)
 	{
 	case NDATABASE:
@@ -5142,7 +5192,12 @@ CQueryObject::ProcessF4()
 	
 	VERIFY(wnd = GetActiveWin());
 	image = GetSelectionImage();
-    
+#ifndef COMMUNITY
+	if(wnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return wyTrue;
+	}
+#endif
 	switch(image)
 	{
 	case NDATABASE:
@@ -5636,6 +5691,12 @@ CQueryObject::TruncateDatabase(HWND hwnd, Tunnel * tunnel, PMYSQL mysql)
     MDIWindow   *wnd = GetActiveWin();
 	wyBool		ismysql41 = IsMySQL41(tunnel, mysql);
 	wyBool      flag = wyFalse, istunnel = wyFalse, retval = wyTrue;
+#ifndef COMMUNITY
+	if(wnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return wyTrue;
+	}
+#endif
 
 	VERIFY(hitem = TreeView_GetSelection(m_hwnd));
 	image = GetSelectionImage();
@@ -6453,6 +6514,13 @@ CQueryObject::DropDatabaseObject(Tunnel * tunnel, PMYSQL mysql, wyChar *objectty
 	HTREEITEM	hitem, hitemtemp;
 	wyString    objectname;
 
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return wyTrue;
+	}
+#endif
+
 	objectname.SetAs(objecttype);
 	VERIFY(hitem = TreeView_GetSelection(m_hwnd));
 	hitemtemp = hitem;
@@ -6502,6 +6570,12 @@ CQueryObject::DropTrigger(Tunnel * tunnel, PMYSQL mysql)
     wyString    query;
 	wyInt32     ret, isintransaction = 1;
 	HTREEITEM	hitem, hitemtemp;
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return wyTrue;
+	}
+#endif
 
 	VERIFY(hitem = TreeView_GetSelection(m_hwnd));
 	hitemtemp = hitem;
@@ -7534,6 +7608,12 @@ CQueryObject::OnWmCommand(WPARAM wparam)
             break;
 
 		case ID_IMPORT_EXTERNAL_DATA:
+#ifndef COMMUNITY
+	if(wnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		break;
+	}
+#endif
             conbase->OnSchdOdbcImport();
 			break;
 		

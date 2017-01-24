@@ -105,9 +105,9 @@ extern	PGLOBALS		pGlobals;
 #define			TABBED_INTERFACE_HEIGHT	25
 #define         TABBED_INTERFACE_TOP_PADDING    10
 
-#define			SCHEMA_DESCRIPTION "11.52"
-#define			SCHEMA_MAJOR_VERSION "11"
-#define			SCHEMA_MINOR_VERSION "52"
+#define			SCHEMA_DESCRIPTION "12.34"
+#define			SCHEMA_MAJOR_VERSION "12"
+#define			SCHEMA_MINOR_VERSION "34"
 
 #define			CONSAVE_INTERVAL	10000
 /* some of the features are not available when you connect using tunneling feature */
@@ -122,7 +122,8 @@ extern	PGLOBALS		pGlobals;
 #define TABLE_SCHEMADETAILS "CREATE TABLE schema_version (description TEXT, major_version TEXT, minor_version TEXT)"
 #define TABLE_CONNDETAILS "CREATE TABLE conndetails (Id INTEGER PRIMARY KEY  NOT NULL, position  INTEGER, ObjectbrowserBkcolor TEXT, ObjectbrowserFgcolor TEXT, isfocussed INTEGER, \
 							Name TEXT , Host TEXT , User TEXT ,Password TEXT ,Port TEXT, StorePassword TEXT,keep_alive TEXT,Database TEXT ,compressedprotocol TEXT,defaulttimeout TEXT,\
-							waittimeoutvalue TEXT,Tunnel TEXT,Http TEXT ,HTTPTime TEXT,HTTPuds TEXT,HTTPudsPath TEXT , Is401 TEXT,IsProxy TEXT,Proxy TEXT , ProxyUser TEXT, ProxyPwd TEXT , ProxyPort TEXT , User401 TEXT , Pwd401 TEXT  , ContentType TEXT  , HttpEncode TEXT,SSH TEXT,SshUser TEXT,SshPwd TEXT,SshHost TEXT,SshPort TEXT,SshForHost TEXT,SshPasswordRadio TEXT,SSHPrivateKeyPath TEXT,SshSavePassword TEXT,SslChecked TEXT,SshAuth TEXT,Client_Key TEXT,Client_Cert TEXT,CA TEXT,Cipher TEXT,sqlmode_global TEXT,sqlmode_value TEXT,init_command TEXT)"
+							waittimeoutvalue TEXT,Tunnel TEXT,Http TEXT ,HTTPTime TEXT,HTTPuds TEXT,HTTPudsPath TEXT , Is401 TEXT,IsProxy TEXT,Proxy TEXT , ProxyUser TEXT, ProxyPwd TEXT , ProxyPort TEXT , User401 TEXT , Pwd401 TEXT  , ContentType TEXT  , HttpEncode TEXT,SSH TEXT,SshUser TEXT,SshPwd TEXT,SshHost TEXT,SshPort TEXT,SshForHost TEXT,SshPasswordRadio TEXT,SSHPrivateKeyPath TEXT,SshSavePassword TEXT,SslChecked TEXT,SshAuth TEXT,Client_Key TEXT,Client_Cert TEXT,CA TEXT,Cipher TEXT,sqlmode_global TEXT,sqlmode_value TEXT,init_command TEXT,readonly TEXT)"
+
 #define TABLE_TABDETAILS "CREATE TABLE tabdetails (Id INTEGER ,\
 							Tabid INTEGER, Tabtype INTEGER DEFAULT 0, isedited INTEGER DEFAULT 0,position INTEGER, leftortoppercent  INTEGER, title TEXT,tooltip TEXT,isfile INTEGER, isfocussed INTEGER, content TEXT, \
 							FOREIGN KEY(Id) REFERENCES conndetails(Id) ON DELETE CASCADE ) "
@@ -2403,9 +2404,9 @@ FrameWindow::AddTextInCombo(const wyWChar * text)
 	
 	seldb.SetAs(text);
 	if(pGlobals->m_pcmainwin->m_sessionname.GetLength())
-		title.Sprintf("%s-%s/%s %s",pGlobals->m_pcmainwin->m_sessionname.GetString(), wnd->m_title.GetString(), seldb.GetString(), wnd->m_tunneltitle.GetString());
+		title.Sprintf("%s-%s/%s %s %s",pGlobals->m_pcmainwin->m_sessionname.GetString(), wnd->m_title.GetString(), seldb.GetString(), wnd->m_tunneltitle.GetString(), wnd->m_conninfo.m_isreadonly == wyTrue?"- Read-Only":"" );
 	else
-		title.Sprintf("%s/%s %s", wnd->m_title.GetString(), seldb.GetString(), wnd->m_tunneltitle.GetString());
+		title.Sprintf("%s/%s %s %s", wnd->m_title.GetString(), seldb.GetString(), wnd->m_tunneltitle.GetString(), wnd->m_conninfo.m_isreadonly == wyTrue?"- Read-Only":"" );
 
 	SetWindowText(wnd->m_hwnd, title.GetAsWideChar());
 	
@@ -2498,7 +2499,9 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 			ptabdbsearch = (TabDbSearch*) pcquerywnd->m_pctabmodule->GetActiveTabType();
 		}
 		ptransaction = (Transactions*) GetActiveWin()->m_ptransaction;
-		 
+		
+	//	if(pcquerywnd && pGlobals->m_entlicense.CompareI("Professional") == 0)
+	//		pcquerywnd->m_conninfo.m_isreadonly = wyFalse;
 #endif
 
 		//connection tab object
@@ -2705,9 +2708,15 @@ FrameWindow::OnWmCommand(WPARAM wParam)
 		break;
 
 #endif
-	case IDM_EXECUTE:
 	case ACCEL_QUERYUPDATE:
 	case ACCEL_QUERYUPDATE_KEY:
+#ifndef COMMUNITY
+	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		break;
+	}
+#endif
+	case IDM_EXECUTE:
 	case ACCEL_EXECUTE_MENU:
         if(!ptabeditor)
             break;
@@ -3197,11 +3206,15 @@ pGlobals->m_pcmainwin->m_closealltrans = 1;
 
 	case ACCEL_IMPORTCSV:
 	case ID_IMPORT_FROMCSV:
+		if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+			break;
 		if(hwndactive)
 			pcquerywnd->m_pcqueryobject->ImportFromCSV(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
 		break;
 	case ACCEL_IMPORTXML:	
 	case ID_IMPORT_FROMXML:
+		if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+			break;
 		if(hwndactive)
 			pcquerywnd->m_pcqueryobject->ImportFromXML(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
 		break;
@@ -3216,6 +3229,12 @@ pGlobals->m_pcmainwin->m_closealltrans = 1;
 	
 	case ACCEL_FLUSH:
 	case ID_TOOLS_FLUSH:
+#ifndef COMMUNITY
+	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		break;
+	}
+#endif
 		if(hwndactive)
 			pcquerywnd->ShowFlushDlg();
 		break;
@@ -3276,6 +3295,12 @@ pGlobals->m_pcmainwin->m_closealltrans = 1;
 
 	case ACCEL_REORDER:
 	case ID_OBJECT_REORDER:
+#ifndef COMMUNITY
+	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		break;
+	}
+#endif
 		if(hwndactive )
             pcquerywnd->m_pctabmodule->CreateTableTabInterface(pcquerywnd, wyTrue, TABCOLUMNS);
 			//pcquerywnd->m_pcqueryobject->ReorderColumns();
@@ -3416,7 +3441,7 @@ pGlobals->m_pcmainwin->m_closealltrans = 1;
 
 	case ID_OBJECT_INSERTSTMT:
 	case ACCEL_INSERT:
-		if(hwndactive && peditorbase)
+		if(hwndactive && peditorbase && pcquerywnd->m_conninfo.m_isreadonly == wyFalse)
 		{
 			pcquerywnd->m_pcqueryobject->CreateInsertStmt();
 			EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);    
@@ -3425,7 +3450,7 @@ pGlobals->m_pcmainwin->m_closealltrans = 1;
 
 	case ID_OBJECT_DELETESTMT:
 	case ACCEL_DELETE:
-		if(hwndactive && peditorbase)
+		if(hwndactive && peditorbase && pcquerywnd->m_conninfo.m_isreadonly == wyFalse)
 		{
 			pcquerywnd->m_pcqueryobject->CreateDeleteStmt();
 			EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);    
@@ -3434,7 +3459,7 @@ pGlobals->m_pcmainwin->m_closealltrans = 1;
 
 	case ID_OBJECT_UPDATESTMT:
 	case ACCEL_UPDATE:
-		if(hwndactive && peditorbase)
+		if(hwndactive && peditorbase && pcquerywnd->m_conninfo.m_isreadonly == wyFalse)
 		{
 			pcquerywnd->m_pcqueryobject->CreateUpdateStmt();
 			EditorFont::SetLineNumberWidth(peditorbase->m_hwnd);    
@@ -4921,13 +4946,7 @@ FrameWindow::OnActiveConn()
     wyInt32     itemcount, size;
 	HMENU       hmenu;
 
-	wyInt32		menugrayitems[] = { IDM_FILE_NEWSAMECONN, IDM_FILE_CLOSECONNECTION, ID_NEW_EDITOR,
-								ID_OBJECT_CREATEVIEW, ID_DB_CREATEVIEW, ID_OBJECT_CREATESTOREDPROCEDURE, ID_DB_CREATESTOREDPROCEDURE,
-								ID_OBJECT_CREATEFUNCTION,ID_DB_CREATEFUNCTION, ID_OBJECT_CREATEEVENT, ID_DB_CREATEEVENT,
-								ID_OBJECT_CREATETRIGGER,ID_DB_CREATETRIGGER, ID_OBJECT_ALTERVIEW, ID_OBJECT_ALTERSTOREDPROCEDURE,
-								ID_OBJECT_ALTERFUNCTION, ID_OBJECT_ALTERTRIGGER, ID_OBJECT_DROPVIEW,
-								ID_OBJECT_DROPSTOREDPROCEDURE,ID_OBJECT_DROPFUNCTION, ID_OBJECT_DROPTRIGGER,
-								ID_OBJECTS_RENAMEVIEW, ID_OBJECTS_RENAMETRIGGER,ID_FILE_RENAMETAB,
+	wyInt32		menugrayitems[] = { IDM_FILE_NEWSAMECONN, IDM_FILE_CLOSECONNECTION, ID_NEW_EDITOR, ID_FILE_RENAMETAB,
 								ID_FILE_CLOSETAB, IDM_FILE_CLOSECONNECTION, IDM_FILE_CLOASEALL, 
 								IDM_FILE_OPENSQL, IDM_FILE_OPENSQLNEW, 
 								IDM_FILE_SAVESQL, IDM_FILE_SAVEAS,
@@ -4936,25 +4955,33 @@ FrameWindow::OnActiveConn()
 								IDM_EDIT_REPLACE, IDM_EDIT_GOTO, IDM_REFRESHOBJECT, IDM_OBCOLOR , ID_EDIT_INSERTTEMPLATES, 
 								IDM_EDIT_RESULT_TEXT, IDC_EDIT_SHOWOBJECT, IDC_EDIT_SHOWRESULT, 
 								IDC_EDIT_SHOWEDIT, IDM_EDIT_ADVANCED_UPPER, IDM_EDIT_ADVANCED_LOWER,
-								IDM_EDIT_ADVANCED_COMMENT, IDM_EDIT_ADVANCED_REMOVE, 
-								IDM_EDIT_MANPF, IDM_EDIT_ADDSQL, 
-								IDM_IMEX_EXPORTDATA, ID_IMPORTEXPORT_EXPORTTABLES,ID_IMEX_TEXTFILE, ID_TOOLS_FLUSH, IDM_TOOLS_TABLEDIAG, ID_HISTORY, ID_INFOTAB,
-								ID_SHOW_STATUS, ID_SHOW_VARIABLES, ID_SHOW_PROCESSLIST, ID_TOOLS_USERMANAGER, IDC_DIFFTOOL, 
+								IDM_EDIT_ADVANCED_COMMENT, IDM_EDIT_ADVANCED_REMOVE, IDM_DB_REFRESHOBJECT, ID_DATASEARCH,
+								IDM_EDIT_MANPF, IDM_EDIT_ADDSQL, IDM_TOOLS_TABLEDIAG, ID_HISTORY, ID_INFOTAB,
+								ID_SHOW_STATUS, ID_SHOW_VARIABLES, ID_SHOW_PROCESSLIST, ID_TOOLS_USERMANAGER, ID_IMPORTEXPORT_DBEXPORTTABLES, 
+								IDM_WINDOW_CASCADE, IDM_WINDOW_TILE, IDM_WINDOWS_ICONARRANGE, ID_REFRESHFAVORITES, ID_OBJECT_SELECTSTMT,
+								ID_REBUILDTAGS, ID_ORGANIZEFAVORITES, IDM_IMEX_EXPORTDATA, ID_IMPORTEXPORT_EXPORTTABLES,ID_IMEX_TEXTFILE,
+								ID_OBJECT_MANINDEX, ID_IMPORTEXPORT_TABLESEXPORTTABLES, ID_OBJECT_MAINMANINDEX, IDM_TABLE_RELATION,
+								ID_IMPORTEXPORT_DBEXPORTTABLES2, ID_IMEX_TEXTFILE2, 
+                                ID_EXPORT_EXPORTTABLEDATA, ID_OBJECT_EXPORTVIEW,
+								ID_EXPORT_AS, ID_EXPORT_ASXML, ID_EXPORT_ASHTML, ID_OBJECT_VIEWDATA, ID_TABLE_OPENINNEWTAB, ID_OBJECT_ADVANCED,
+								ID_OBJECT_CREATEVIEW, ID_DB_CREATEVIEW, ID_OBJECT_CREATESTOREDPROCEDURE, ID_DB_CREATESTOREDPROCEDURE,
+								ID_OBJECT_CREATEFUNCTION,ID_DB_CREATEFUNCTION, ID_OBJECT_CREATEEVENT, ID_DB_CREATEEVENT,
+								ID_OBJECT_CREATETRIGGER,ID_DB_CREATETRIGGER, ID_OBJECT_ALTERVIEW, ID_OBJECT_ALTERSTOREDPROCEDURE,
+								ID_OBJECT_ALTERFUNCTION, ID_OBJECT_ALTERTRIGGER, ID_OBJECT_DROPVIEW,
+								ID_OBJECT_DROPSTOREDPROCEDURE,ID_OBJECT_DROPFUNCTION, ID_OBJECT_DROPTRIGGER,
+								ID_OBJECTS_RENAMEVIEW, ID_OBJECTS_RENAMETRIGGER,
+								ID_TOOLS_FLUSH, IDC_DIFFTOOL, 
 								IDM_CREATEDATABASE,ID_OBJECT_TRUNCATEDATABASE, ID_DB_TABLE_MAKER, ID_TABLE_MAKER, IDM_ALTERDATABASE,ID_OPEN_COPYDATABASE, 
-								ID_IMPORTEXPORT_DBEXPORTTABLES, 
 								ID_OBJECT_DROPDATABASE, ID_OBJECT_EMPTYDATABASE, ID_OBJECT_CREATESCHEMA, 
-								ID_OBJECT_TABLEEDITOR, ID_OBJECT_MANINDEX, ID_IMPORTEXPORT_TABLESEXPORTTABLES, 
-								ID_EXPORT_AS, ID_EXPORT_ASXML, ID_EXPORT_ASHTML, 
+								ID_OBJECT_TABLEEDITOR,  
 								ID_OBJECT_COPYTABLE, ID_IMPORT_FROMCSV,ID_IMPORT_FROMXML, ID_OBJECT_RENAMETABLE, ID_OBJECT_CLEARTABLE, 
 								ID_OBJECT_DROPTABLE, ID_OBJECT_REORDER, ID_OBJECT_CHANGETABLETYPE_ISAM, 
 								ID_OBJECT_CHANGETABLETYPE_MYISAM, ID_OBJECT_CHANGETABLETYPE_HEAP, 
 								ID_OBJECT_CHANGETABLETYPE_MERGE, ID_OBJECT_CHANGETABLETYPE_INNODB, ID_OBJECT_CHANGETABLETYPE_BDB, 
 								ID_OBJECT_CHANGETABLETYPE_GEMINI,
-								ID_OBJECT_VIEWDATA, ID_TABLE_OPENINNEWTAB, ID_OBJECT_ADVANCED, ID_OBJECT_INSERTSTMT, ID_OBJECT_UPDATESTMT,ID_OBJECT_DELETESTMT, ID_OBJECT_SELECTSTMT,
-								ID_OBJECT_DROPFIELD, ID_COLUMNS_DROPINDEX, ID_OBJECT_MAINMANINDEX, IDM_TABLE_RELATION,
-								IDM_WINDOW_CASCADE, IDM_WINDOW_TILE, IDM_WINDOWS_ICONARRANGE, ID_OPEN_COPYTABLE, 
-								ID_IMPORTEXPORT_DBEXPORTTABLES2, ID_IMEX_TEXTFILE2, ID_REBUILDTAGS, ID_ORGANIZEFAVORITES, ID_REFRESHFAVORITES,
-                                ID_EXPORT_EXPORTTABLEDATA, ID_OBJECT_EXPORTVIEW, IDM_DB_REFRESHOBJECT, ID_DATASEARCH, ID_TRANSACTION_SETAUTOCOMMIT, ID_TRX_REPEATABLEREAD, ID_TRX_READCOMMITED, ID_TRX_READUNCOMMITED,
+								ID_OBJECT_INSERTSTMT, ID_OBJECT_UPDATESTMT,ID_OBJECT_DELETESTMT, 
+								ID_OBJECT_DROPFIELD, ID_COLUMNS_DROPINDEX, ID_OPEN_COPYTABLE, 
+								ID_TRANSACTION_SETAUTOCOMMIT, ID_TRX_REPEATABLEREAD, ID_TRX_READCOMMITED, ID_TRX_READUNCOMMITED,
 								ID_TRX_SERIALIZABLE, ID_WITHCONSISTENTSNAPSHOT_READONLY,
 								ID_WITHCONSISTENTSNAPSHOT_READWRITE, ID_STARTTRANSACTION_READONLY, ID_STARTTRANSACTION_READWRITE,
 								ID_COMMIT_ANDCHAIN, ID_COMMIT_ANDNOCHAIN, ID_COMMIT_RELEASE,
@@ -5010,7 +5037,7 @@ FrameWindow::OnActiveConn()
 	else
 	{
 		hmenu = GetMenu(m_hwndmain);
-		
+
 		for(itemcount = 0; itemcount < (sizeof(menugrayitems)/sizeof(menugrayitems[0])); itemcount++)
 			EnableMenuItem(hmenu, menugrayitems[itemcount], MF_ENABLED);
 
@@ -5323,6 +5350,12 @@ FrameWindow::HandleFirstToolBar()
         for(count = 0; count < size; count++)
     	    SendMessage(m_hwndtool, TB_SETSTATE,(WPARAM)nid[count], TBSTATE_ENABLED);
     }
+	#ifndef COMMUNITY
+	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		SendMessage(m_hwndtool, TB_SETSTATE,ACCEL_QUERYUPDATE, TBSTATE_INDETERMINATE);
+	}
+#endif
 }
 
 void 
@@ -7948,6 +7981,12 @@ FrameWindow::OnCreateDatabase(HWND hwndactive, MDIWindow *wnd)
 {
 	wyWChar     *dbname;
 	wyInt32		ret;
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return;
+	}
+#endif
 
 	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_CREATEDB), 
 			hwndactive, FrameWindow::CreateObjectDlgProc,(LPARAM)"CreateDB" );
@@ -8552,6 +8591,12 @@ FrameWindow::OnTableDiag(MDIWindow *wnd)
 void 
 FrameWindow::OnImportFromSQL(MDIWindow *wnd)
 {
+#ifndef COMMUNITY
+	if(wnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return;
+	}
+#endif
     ImportBatch *cib = new ImportBatch();
 
 	if(cib)
@@ -9163,7 +9208,12 @@ FrameWindow::EnableToolButtonsAndCombo(HWND hwndtool, HWND hwndsecondtool, HWND 
         for(i = 0; i < count; ++i)
         {
             state = TBSTATE_ENABLED;
-
+#ifndef COMMUNITY
+			if(wnd->m_conninfo.m_isreadonly == wyTrue && 
+				(tb2id[i] == IDC_DIFFTOOL || tb2id[i] == ID_IMEX_TEXTFILE ||  
+				 tb2id[i] == ID_OBJECT_MAINMANINDEX || tb2id[i] == ID_OPEN_COPYDATABASE || tb2id[i] == ACCEL_MANREL))
+				state = TBSTATE_INDETERMINATE;
+#endif
             if(tb2id[i] == ID_EXPORT_AS || tb2id[i] == ID_OBJECT_MAINMANINDEX || tb2id[i] == ACCEL_MANREL)
             {      
                 id = image;
@@ -9251,7 +9301,12 @@ FrameWindow::EnableToolButtonsAndCombo(HWND hwndtool, HWND hwndsecondtool, HWND 
                     state = TBSTATE_INDETERMINATE;
                 }
             }
-
+#ifndef COMMUNITY
+			if(wnd->m_conninfo.m_isreadonly == wyTrue && tb1id[i] == ACCEL_QUERYUPDATE)
+			{
+				state = TBSTATE_INDETERMINATE;
+			}
+#endif
             SendMessage(hwndtool, TB_SETSTATE, (WPARAM)tb1id[i], state);
         }
 
@@ -9259,7 +9314,12 @@ FrameWindow::EnableToolButtonsAndCombo(HWND hwndtool, HWND hwndsecondtool, HWND 
 
         for(i = 0; i < count; ++i)
         {
-            SendMessage(hwndsecondtool, TB_SETSTATE, (WPARAM)tb3id[i], TBSTATE_ENABLED);
+#ifndef COMMUNITY
+			if(wnd->m_conninfo.m_isreadonly == wyTrue && (tb3id[i] != ID_POWERTOOLS_SCHEDULEEXPORT && tb3id[i] != IDC_TOOLS_NOTIFY ))
+				SendMessage(hwndsecondtool, TB_SETSTATE, (WPARAM)tb3id[i], TBSTATE_INDETERMINATE);
+			else
+#endif
+				SendMessage(hwndsecondtool, TB_SETSTATE, (WPARAM)tb3id[i], TBSTATE_ENABLED);
         }
 	}
     else
@@ -11570,6 +11630,29 @@ sessionsavesproc(void *arg)
 	}
 	else
 	{
+		const wyChar *desc, *majorver , *minorver ;
+		sqlitequery.Sprintf("SELECT * from schema_version");
+		pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString()); 
+		if(pGlobals->m_sqliteobj->Step(&res, wyFalse) && pGlobals->m_sqliteobj->GetLastCode() == SQLITE_ROW)
+		{
+			desc = pGlobals->m_sqliteobj->GetText(&res, 0);
+			majorver = pGlobals->m_sqliteobj->GetText(&res, 1);
+			minorver = pGlobals->m_sqliteobj->GetText(&res, 2);
+		}
+
+		if(desc != NULL && (strcmp(SCHEMA_MAJOR_VERSION, majorver) != 0 || strcmp(SCHEMA_MINOR_VERSION, minorver) != 0 ))
+		{
+			//common option for version changre
+			sqlitequery.SetAs("");
+			sqlitequery.Sprintf("UPDATE schema_version set description = \"%s\", major_version=\"%s\", minor_version = \"%s\"  where description = \"%s\"", SCHEMA_DESCRIPTION, SCHEMA_MAJOR_VERSION, SCHEMA_MINOR_VERSION, desc);
+			pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+			if(strcmp(SCHEMA_DESCRIPTION, "12.34") == 0)//adding cloumn for readonly in version 12.34
+			{
+				sqlitequery.SetAs("");
+				sqlitequery.Sprintf("ALTER TABLE conndetails ADD COLUMN 'readonly' INTEGER default 0");
+				pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+			}
+		}
 		sqlitequery.Sprintf("SELECT type FROM sqlite_master WHERE name='sessiondetails'");
 		pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());
 		if(!pGlobals->m_sqliteobj->Step(&res, wyFalse) || pGlobals->m_sqliteobj->GetLastCode() != SQLITE_ROW)

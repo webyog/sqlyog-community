@@ -1103,7 +1103,6 @@ ResultView::UpdateTableComboItem(wyInt32 index)
 
     count = SendMessage(m_hwndtablecombo, CB_GETCOUNT, 0, 0);
     hfont = (HFONT)SendMessage(m_hwndtablecombo, WM_GETFONT, 0, 0);
-
     //get dc and select the font
     hdc = GetDC(m_hwndtablecombo);
     hfont = SelectFont(hdc, hfont);
@@ -1113,7 +1112,6 @@ ResultView::UpdateTableComboItem(wyInt32 index)
     {
         //get the elements associated with the item
         pelem = (ResultTabTableElem*)SendMessage(m_hwndtablecombo, CB_GETITEMDATA, i, 0);
-
         //if it is valid
         if(pelem)
         {
@@ -1227,7 +1225,12 @@ ResultView::SetTablesCombo()
     {
         dropdownwidth = rect.right;
     }
-
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		 SendMessage(m_hwndtablecombo, CB_RESETCONTENT, 0, 0);
+	}
+#endif
     //insert (read-only) in the begining
     SendMessage(m_hwndtablecombo, CB_INSERTSTRING, 0, (LPARAM)_(L"(Read Only)"));
     SendMessage(m_hwndtablecombo, CB_SETITEMDATA, 0, NULL);
@@ -1311,6 +1314,10 @@ ResultView::EnableToolButtons()
 void 
 ResultView::EnableDMLButtons(wyBool isenable)
 {
+#ifndef COMMUNITY
+	if(m_wnd->m_conninfo.m_isreadonly == wyTrue)
+		return;
+#endif
     EnableToolButton(isenable, ID_RESULT_INSERT);
     EnableToolButton(isenable, ID_RESULT_DELETE);
     EnableToolButton(ErrorFlagState() != EFS_MODIFIED ? wyFalse : isenable, ID_RESULT_SAVE);

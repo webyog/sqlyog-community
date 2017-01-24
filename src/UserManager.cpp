@@ -257,7 +257,13 @@ UserManager::DlgProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPARAM lparam)
                 //set the initiate flag
                 m_initcompleted = wyTrue;
             }
-
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		EnableWindow(GetDlgItem(hwnd, IDC_DELUSER), wyFalse);
+		EnableWindow(GetDlgItem(hwnd, IDC_NEWUSER), wyFalse);
+	}
+#endif
             break;
 
         case WM_COMMAND:
@@ -1019,8 +1025,9 @@ UserManager::OnSaveChanges()
         //reset the flags
         m_isnewuser = wyFalse;
         EnableDisableSaveCancel();
-		SendMessage(hwndcombo, CB_DELETESTRING, m_selindex, 0);
-        SetFocus(GetDlgItem(m_hwnd, IDC_OBTREE));
+//		SendMessage(hwndcombo, CB_DELETESTRING, m_selindex, 0);
+		SendMessage(hwndcombo, CB_SETCURSEL,(WPARAM)m_selindex, 0);
+		SetFocus(GetDlgItem(m_hwnd, IDC_OBTREE));
     }
     else
     {
@@ -1112,7 +1119,8 @@ UserManager::AddNewUser()
 
 	USERLIST *tempnode = new USERLIST; 
 	tempnode->m_uname.SetAs(temp.GetString());
-	tempnode->m_dropdown = wyFalse;
+	//tempnode->m_dropdown = wyFalse;
+	tempnode->m_dropdown = wyTrue;
 	tempnode->m_itemvalue.Sprintf("%d",m_usercount);
 	tempnode->next = NULL;
 
@@ -1271,6 +1279,13 @@ wyBool
 UserManager::SavePrompt()
 {
     wyInt32 ret;
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		ApplyChanges(wyFalse);
+		return wyTrue;
+	}
+#endif
 
     //check whether there is an unsaved change
     if(m_isedited == wyTrue)
@@ -1341,6 +1356,12 @@ UserManager::EnableChildren(HWND hwnd, LPARAM lparam)
     if(ctrlid != IDC_SAVE_CHANGES && ctrlid != IDC_CANCEL_CHANGES)
     {
         EnableWindow(hwnd, enable);
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue && (ctrlid == IDC_DELUSER || ctrlid == IDC_NEWUSER))
+	{
+		EnableWindow(hwnd, wyFalse);
+	}
+#endif
     }
 
     return TRUE;
@@ -1415,10 +1436,10 @@ UserManager::OnUserComboChange()
     SendMessage(hwndusercombo, CB_GETLBTEXT, (WPARAM)m_selindex, (LPARAM)buffer);
     curruser.SetAs(buffer);
     delete[] buffer;
-	len =  curruser.FindChar('@');
-    temp = curruser.Substr(0, len);
+	len =  curruser.FindIWithReverse("@", 0 , wyTrue);
+    temp = curruser.Substr(0, curruser.GetLength() - len - 1);
     m_username.SetAs(temp ? temp : "");
-    temp = curruser.Substr(len + 1, curruser.GetLength() - len - 1);
+    temp = curruser.Substr(curruser.GetLength() - len, len);
     m_host.SetAs(temp ? temp : "");
 
     //delete the user level items
@@ -1454,7 +1475,7 @@ UserManager::OnHandleEditChange()
 	len = GetWindowText(hwndusercombo, str, 65);
 	int ret = wcstombs ( str1, str, sizeof(str1) ); 
 	if(len)
-	{
+	{	
 		while(itr)
 		{	 
 			if(itr->m_uname.GetLength() == 0)
@@ -1487,6 +1508,7 @@ UserManager::OnHandleEditChange()
 	
 	
 	}
+	
 	if(!len || status == 0)
 	{
 		SendMessage(hwndusercombo, CB_SETCURSEL, -1, 0);
@@ -2114,6 +2136,13 @@ UserManager::EnableDisableSaveCancel()
 {
     EnableWindow(GetDlgItem(m_hwnd, IDC_SAVE_CHANGES), m_isedited);
     EnableWindow(GetDlgItem(m_hwnd, IDC_CANCEL_CHANGES), m_isedited);
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		EnableWindow(GetDlgItem(m_hwnd, IDC_SAVE_CHANGES), wyFalse);
+		EnableWindow(GetDlgItem(m_hwnd, IDC_CANCEL_CHANGES), wyFalse);
+	}
+#endif
 }
 
 //handler function for Cancel button

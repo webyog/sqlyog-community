@@ -392,7 +392,7 @@ struct ConnectionInfo
 	//wyBool		m_ispwdcleartext;
 	wyBool		m_isdeftimeout;
 	wyString	m_strwaittimeout;
-
+	wyBool		m_isreadonly;
 	wyString	m_title;
 	MYSQL		*m_mysql;
 	Tunnel		*m_tunnel;

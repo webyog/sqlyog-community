@@ -768,8 +768,10 @@ const wyChar *LeftPadText(const wyChar *text);
 */
 wyBool	ChangeContextDB(Tunnel * tunnel, PMYSQL mysql, const wyChar *query, wyBool changeincombo = wyTrue);
 #ifndef COMMUNITY
-wyBool	ChangeTransactionState(MDIWindow *wnd, const wyChar *query);
-wyBool	CheckTransactionStart(MDIWindow *wnd, const wyChar *query);
+wyBool		ChangeTransactionState(MDIWindow *wnd, const wyChar *query);
+wyBool		CheckTransactionStart(MDIWindow *wnd, const wyChar *query);
+wyBool		ReadOnlyQueryAllow(wyString *str);
+wyString	RemoveExtraSpaces(wyString query);
 #endif
 /// Gets the database name from the query.
 /**

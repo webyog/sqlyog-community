@@ -4091,7 +4091,8 @@ InitConnectionDetails(ConnectionInfo *conn)
     conn->m_issslchecked        = wyFalse;
 	conn->m_iscompress			= wyTrue;	
 	conn->m_isdeftimeout			= wyTrue;
-	conn->m_strwaittimeout.SetAs("28800");
+	conn->m_strwaittimeout.SetAs("28800"); 
+	conn->m_isreadonly			= wyFalse;
 	//conn->m_ispwdcleartext		= wyFalse;
 
 #ifdef _WIN32	

@@ -791,12 +791,12 @@ DataView::UpdateViewButtons()
                 SendMessage(hwnd, TB_SETSTATE, (WPARAM)ID_VIEW_GRIDVIEW, TBSTATE_ENABLED | TBSTATE_PRESSED);
                 break;
 
-            case FORM:
-                SendMessage(hwnd, TB_SETSTATE, (WPARAM)ID_VIEW_GRIDVIEW, TBSTATE_ENABLED);
-                SendMessage(hwnd, TB_SETSTATE, (WPARAM)ID_VIEW_TEXTVIEW, TBSTATE_ENABLED);
-                SendMessage(hwnd, TB_SETSTATE, (WPARAM)ID_VIEW_FORMVIEW, TBSTATE_ENABLED | TBSTATE_PRESSED);
-                break;
-        }
+			case FORM:
+				SendMessage(hwnd, TB_SETSTATE, (WPARAM)ID_VIEW_GRIDVIEW, TBSTATE_ENABLED);
+				SendMessage(hwnd, TB_SETSTATE, (WPARAM)ID_VIEW_TEXTVIEW, TBSTATE_ENABLED);
+				SendMessage(hwnd, TB_SETSTATE, (WPARAM)ID_VIEW_FORMVIEW, TBSTATE_ENABLED | TBSTATE_PRESSED);
+				break;
+        }		
     }
 }
 
@@ -2778,7 +2778,7 @@ DataView::IsCurrRowDuplicatable()
     }
     
     //if it can be ediited
-    if(m_data->m_db.GetLength() && m_data->m_table.GetLength())
+	if(m_data->m_db.GetLength() && m_data->m_table.GetLength() && GetActiveWin()->m_conninfo.m_isreadonly == wyFalse)
     {
         return wyTrue;
     }
@@ -3461,8 +3461,11 @@ DataView::HandleBlobValue(WPARAM wparam, LPARAM lparam)
     pib.m_data = GetCellValue(row, col, &len, wyFalse);
 
     //check whether the column is readonly or not
-    isedit = (IsColumnReadOnly(col) || IsColumnVirtual(col)==1 )? wyFalse : wyTrue;
-	
+#ifndef COMMUNITY
+    isedit = (IsColumnReadOnly(col) || IsColumnVirtual(col)==1 || GetActiveWin()->m_conninfo.m_isreadonly)? wyFalse : wyTrue;
+#else
+	isedit = (IsColumnReadOnly(col) || IsColumnVirtual(col)==1)? wyFalse : wyTrue;
+#endif
 	//if chardown is true then lparam = 1, else 0.
 	if(!pib.m_data)
     {
@@ -4185,6 +4188,16 @@ DataView::EnableToolButtons()
 
     //enable/disable the duplicate button
     EnableToolButton((IsCurrRowDuplicatable() && isenable) ? wyTrue : wyFalse, IDM_DUPLICATE_ROW);
+#ifndef COMMUNITY
+	if(m_wnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		EnableToolButton(wyFalse, IDM_DUPLICATE_ROW);
+		EnableToolButton(wyFalse, ID_RESULT_SAVE);
+        EnableToolButton(wyFalse, ID_RESULT_CANCEL);
+		EnableToolButton(wyFalse, ID_RESULT_DELETE);
+        EnableToolButton(wyFalse, ID_RESULT_INSERT);
+	}
+#endif
 }
 
 //function to enable toolbar
@@ -7649,6 +7662,12 @@ DataView::GridWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
         //begin label edit
 	    case GVN_BEGINLABELEDIT:
             //allow only if the column is not read-only
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		return FALSE;
+	}
+#endif
             if(pviewdata->IsColumnReadOnly(lparam))
             {
                 return FALSE;
@@ -7914,6 +7933,20 @@ DataView::ShowContextMenu(wyInt32 row, wyInt32 col, LPPOINT pt)
 			}
 		}
 	EnableMenuItem(htrackmenu, ID_UNSORT, isunsort == wyFalse ? MF_GRAYED : MF_ENABLED);
+
+#ifndef COMMUNITY
+	if(m_wnd->m_conninfo.m_isreadonly == wyTrue)
+	{
+		EnableMenuItem(htrackmenu, ID_RESULT_INSERT,MF_GRAYED); 
+		EnableMenuItem(htrackmenu, ID_RESULT_SAVE,MF_GRAYED); 
+		EnableMenuItem(htrackmenu, ID_RESULT_DELETE,MF_GRAYED); 
+		EnableMenuItem(htrackmenu, ID_RESULT_CANCEL,MF_GRAYED); 
+		EnableMenuItem(htrackmenu, IDC_SETEMPTY,MF_GRAYED); 
+		EnableMenuItem(htrackmenu, IDC_SETDEF,MF_GRAYED); 
+		EnableMenuItem(htrackmenu, IDC_SETNULL,MF_GRAYED); 
+		EnableMenuItem(htrackmenu, IDM_DUPLICATE_ROW,MF_GRAYED);
+	}
+#endif
     //set owner draw property and show menu
     m_htrackmenu = htrackmenu;
     wyTheme::SetMenuItemOwnerDraw(m_htrackmenu);
@@ -8443,7 +8476,7 @@ DataView::OnTextContextMenu(LPARAM lParam)
 	hmenu = LoadMenu(pGlobals->m_hinstance, MAKEINTRESOURCE(IDR_INFOTABMENU));
     LocalizeMenu(hmenu);
     htrackmenu = GetSubMenu(hmenu, 0);
-	
+
     if(IsWindowVisible(m_hwndtext) && IsWindowEnabled(m_hwndtext))
     {
         if(SendMessage(m_hwndtext, SCI_GETSELECTIONSTART, 0, 0) == SendMessage(m_hwndtext, SCI_GETSELECTIONEND, 0, 0))
@@ -8459,7 +8492,6 @@ DataView::OnTextContextMenu(LPARAM lParam)
     {
         DisableMenuItems(htrackmenu);
     }
-
 	m_htrackmenu = htrackmenu;
     wyTheme::SetMenuItemOwnerDraw(m_htrackmenu);
 

@@ -143,7 +143,6 @@ MDIWindow::MDIWindow(HWND hwnd, ConnectionInfo * conninfo, wyString &dbname, wyS
 
 #ifndef COMMUNITY
 	m_constatusparm = NULL;
-	
 
 	m_ptransaction = NULL;
 #endif
@@ -343,9 +342,9 @@ MDIWindow::CreateQueryWindow(HWND hwnd, PMYSQL mysql)
 		title.Sprintf("%s-",pGlobals->m_pcmainwin->m_sessionname.GetString());
 
 	if(m_filterdb.GetLength())
-		title.AddSprintf("%s/%s %s", m_title.GetString(), m_filterdb.GetString(), m_tunneltitle.GetString());
+		title.AddSprintf("%s/%s %s %s", m_title.GetString(), m_filterdb.GetString(), m_tunneltitle.GetString(), GetActiveWin()->m_conninfo.m_isreadonly == wyTrue?"- Read-Only":"" );
 	else
-		title.AddSprintf("%s %s", m_title.GetString(), m_tunneltitle.GetString());
+		title.AddSprintf("%s %s %s", m_title.GetString(), m_tunneltitle.GetString(),GetActiveWin()? (GetActiveWin()->m_conninfo.m_isreadonly == wyTrue?"- Read-Only":""):"");
 
 	SetWindowText(hwndquery, title.GetAsWideChar());
 		
@@ -3982,9 +3981,9 @@ MDIWindow::SetQueryWindowTitle()
 	if(pGlobals->m_pcmainwin->m_sessionname.GetLength())
 		mdititle.Sprintf("%s-",pGlobals->m_pcmainwin->m_sessionname.GetString());
 	if(m_pcqueryobject->m_seldatabase.GetLength())
-		mdititle.AddSprintf("%s/%s %s", m_title.GetString(), m_pcqueryobject->m_seldatabase.GetString(), m_tunneltitle.GetString());
+		mdititle.AddSprintf("%s/%s %s %s", m_title.GetString(), m_pcqueryobject->m_seldatabase.GetString(), m_tunneltitle.GetString(), GetActiveWin()->m_conninfo.m_isreadonly == wyTrue?"- Read-Only":"");
 	else
-		mdititle.AddSprintf("%s %s", m_title.GetString(), m_tunneltitle.GetString());
+		mdititle.AddSprintf("%s %s %s", m_title.GetString(), m_tunneltitle.GetString(), GetActiveWin()?(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue?"- Read-Only":""):"");
 
 	// Setting the MDI window title
 	SetWindowText(m_hwnd, mdititle.GetAsWideChar());
@@ -4310,7 +4309,10 @@ MDIWindow::InsertEnginesMenuItems(HMENU hmenu)
         state = MFS_GRAYED;
     else
         state = MFS_ENABLED;
-		
+#ifndef COMMUNITY
+	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+		state = MFS_GRAYED;
+#endif		
     // remove all existing table engines
     while(DeleteMenu(hmenu, 0, MF_BYPOSITION));
 
