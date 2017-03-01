@@ -385,7 +385,9 @@ ExportBatch::EnableDisableOptions(wyInt32 id)
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_CREATEDB), FALSE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DROPOBJECT), FALSE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DEFINER), FALSE);
+				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_HEXBLOB), TRUE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_BULKINSERT), TRUE);
+				
 				//If Bulk Insert is Checked then enable "One Row Per line option"
 				if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd, IDC_BULKINSERT), BM_GETCHECK, 0, 0))
 					EnableWindow(GetDlgItem(m_hwnd, IDC_ONEROW), TRUE);
@@ -413,6 +415,7 @@ ExportBatch::EnableDisableOptions(wyInt32 id)
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_CREATEDB), TRUE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DROPOBJECT), TRUE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DEFINER), TRUE);
+				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_HEXBLOB), FALSE);
 				
 			}
 			else
@@ -446,6 +449,7 @@ ExportBatch::EnableDisableOptions(wyInt32 id)
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DROPOBJECT), TRUE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_LOCKAROUNDINSERT), TRUE);
 				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_DEFINER), TRUE);
+				EnableWindow(GetDlgItem(m_hwnd, IDC_CHK_HEXBLOB), TRUE);
 			}
 		}
 		break;
@@ -814,7 +818,7 @@ ExportBatch::HandleDlgPersistance(HWND hwnd)
 	m_p->Add(hwnd, IDC_ONEROW, "OneRowPerline", "1", CHECKBOX);
 	m_p->Add(hwnd, IDC_SINGLE_TRANSACTION, "SingleTransaction", "0", CHECKBOX);
 	m_p->Add(hwnd, IDC_CHK_VERSION, "Version", "1", CHECKBOX);
-
+	m_p->Add(hwnd, IDC_CHK_HEXBLOB, "Hexblob", "0", CHECKBOX);
 	return;
 }
 
@@ -1597,6 +1601,11 @@ ExportBatch::SetOtherValues(MySQLDump *dump)
 		dump->SetDefiner(wyTrue);
 	else
 		dump->SetDefiner(wyFalse);
+
+	if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd, IDC_CHK_HEXBLOB), BM_GETCHECK, 0, 0))
+		dump->SetHexBlob(wyTrue);
+	else
+		dump->SetHexBlob(wyFalse);
 	
 	if(BST_CHECKED == SendMessage(GetDlgItem(m_hwnd, IDC_ONEROW), BM_GETCHECK, 0, 0))
 		dump->SetOneRowPerLine(wyTrue);
@@ -1637,7 +1646,7 @@ ExportBatch::EnableDlgWindows(bool state)
 					 IDC_CHK_USEDBNAME, IDC_CHK_DROPTABLE, IDC_CHK_CREATEDB,
 					 IDC_CHK_LOCKFORREAD, IDC_CHK_FLUSHLOGS, IDC_CHK_LOCKAROUNDINSERT,
 					 IDC_SETUNIQUE, IDC_BULKINSERT,IDC_ONEROW,IDC_SINGLE_TRANSACTION, IDCANCEL, IDC_CHK_DROPPROCEDURES, IDC_CHK_DROPVIEWS,
-					 IDC_CHK_DROPFUNCTIONS, IDC_CHK_DROPTRIGGERS, IDC_CHK_DEFINER, IDC_CHK_VERSION, IDC_TIMESTAMP_PREFIX, IDC_FILE_TABLE
+					 IDC_CHK_DROPFUNCTIONS, IDC_CHK_DROPTRIGGERS, IDC_CHK_DEFINER, IDC_CHK_VERSION, IDC_CHK_HEXBLOB,IDC_TIMESTAMP_PREFIX, IDC_FILE_TABLE
 	};
 
 	wyInt32 i, count;
@@ -1991,6 +2000,7 @@ ExportBatch::GetCtrlRects()
 		IDC_CHK_DROPOBJECT, 0, 0,
 		IDC_CHK_DEFINER, 0, 0,
 		IDC_CHK_VERSION, 0, 0,
+		IDC_CHK_HEXBLOB, 0, 0,
 		IDC_GROUP4, 0, 0,
         IDC_TIMESTAMP_PREFIX, 0, 0,
         IDC_FILE_TABLE, 0, 0,

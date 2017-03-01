@@ -94,6 +94,7 @@ UpgradeCheck::HandleUpgradeCheck(wyBool isexplict)
 	m_ischecked		= wyFalse;
 	
 	m_isupgradeexplicit = isexplict;	
+
 			
 	//For explicit check for upgrade
 	if(isexplict == wyTrue)
@@ -206,6 +207,9 @@ UpgradeCheck::HandleHttpRequest(LPVOID param)
 	if(!upgrd)
 		return 1;
 
+#if	IS_FROM_WINDOWS_STORE == 1
+	return 1;
+#endif
 	//Gets the product id(Ent, Commmunity or Trial)
 #ifdef COMMUNITY
 	upgrd->m_productid.SetAs("SQLyog Community");

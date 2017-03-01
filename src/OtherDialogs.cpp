@@ -3289,9 +3289,10 @@ TableDiag::DiagAnalyze()
     
 	itemcount =	ListView_GetItemCount(m_hwndlisttables);
 	/* whether to issue write to bin log option */
-	binlog = SendMessage(GetDlgItem(m_hwnd, IDC_DIAG_OPTIMIZELOCAL), BM_GETCHECK, 0, 0);
-
-	query.Sprintf("analyze %s table ", (BST_CHECKED==binlog)?("NO_WRITE_TO_BINLOG"):(""));
+	binlog = SendMessage(GetDlgItem(m_hwnd, IDC_DIAG_ANALYZELOCAL), BM_GETCHECK, 0, 0);
+	
+	query.Sprintf("analyze %s table ", (BST_CHECKED==binlog)?("LOCAL"):("NO_WRITE_TO_BINLOG"));
+	
 	GetDBName(dbname);
 	
 	for(count = 0; count < itemcount; count++)

@@ -83,7 +83,8 @@ EditorQuery::ExecuteAllQuery(wyInt32 *stop)
 	wyString		 query;
     wyChar           *tmp;
     wyBool           selquery = wyFalse;
-	
+    wyString         temp;
+
 	MDIWindow		 *wnd;
 	HWND			 hwnd;
 	TabMgmt			 *ptabmgmt = NULL;
@@ -131,9 +132,20 @@ EditorQuery::ExecuteAllQuery(wyInt32 *stop)
 		SendMessage(m_hwnd, SCI_GETSELTEXT, 0, (LPARAM)tmp);
     }
     // Commented Because to Solve an Extra '\n' appending bug in http://www.webyog.com/forums//index.php?showtopic=3556
-    ChangeCRToLF(tmp);
-    query.SetAs(tmp);
-    free(tmp);
+   // ChangeCRToLF(tmp);
+    //query.SetAs(tmp);
+
+	temp.SetAs(tmp);
+    /*
+    All stored procedures created via workbench will contain /n as new line character between BEGIN and END which will 
+    disturb the formatting when altered via SQLyog hence changing all \n to \r\n and then changing \r\r back to \r
+    Previously this was done via function AddCRTOLF in editorproc which disturbed the schema when executed via query editor instead of 
+    EditorProc
+    */
+	temp.FindAndReplace("\n","\r\n");
+	temp.FindAndReplace("\r\r","\r");
+	query.SetAs(temp.GetString());
+	free(tmp);
 
 	/* set the flag to executing */
 	wnd->SetExecuting(wyTrue);

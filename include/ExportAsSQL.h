@@ -126,6 +126,7 @@ typedef struct __schdextra_options
 	wyBool	  m_flushslave;
 	wyBool	  m_autocommit;
 	wyBool	  m_locktablewrite;
+	wyBool	  m_hextoblob;
 	wyBool	  m_singletransaction;  //single transaction
 	wyBool	  m_struconly;
 	wyBool	  m_completeinsert;
@@ -485,6 +486,9 @@ private:
 
 	/// Flag to set fk_checks = 0 and 1
 	wyBool			m_setfkchecks;	
+
+	/// Flag to set hex to blob conversion to  0 or 1
+	wyBool			m_sethexblob;	
 
 	///Flag to set all databases
 	wyBool			m_alldb;
@@ -955,6 +959,14 @@ public:
 	@returns void
 	*/
 	void			SetFKChecks				(wyBool flag);
+
+	/// Sets the hex to blob in export dialog
+	/**
+	@param flag			: IN  set hex to blob ?
+	@returns void
+	*/
+
+	void			SetHexBlob				(wyBool flag);
 
 	/// Enables or disables the file append mode
 	/**

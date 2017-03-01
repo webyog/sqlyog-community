@@ -507,6 +507,7 @@
 #define IDC_CHK_VERSION                 1096
 #define IDC_ONEROW                      1097
 #define IDC_NULLREPLACEBY               1098
+#define IDC_CHK_HEXBLOB                 1098
 #define IDC_OBFONT                      1099
 #define IDC_NULLCHAR                    1099
 #define IDC_COMBO                       1101

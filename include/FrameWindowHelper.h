@@ -396,9 +396,9 @@ All Files(*.*)\0*.*\0"
 #define		DEFAULT_NO_TABLE							_("(Read Only)")
 #define		DEFAULT_NO_TABLEW							_(L"(Read Only)")
 #define		DEFAULT_READONLY_RESULT						_(L"Read-only result")
-#define		BUYLABEL									"Buy SQLyog"
+#define		BUYLABEL									"click here"
 #if			IS_FROM_WINDOWS_STORE == 1
-#define		BUYURL										"https://www.webyog.com/product/sqlyogpricing/?utm_source=sqlyogapp&utm_medium=referral&utm_campaign=windowsstore"
+#define		BUYURL										"https://www.webyog.com/product/sqlyog/?utm_source=sqlyogapp&utm_medium=referral&utm_campaign=windowsstore"
 #else
 #define		BUYURL										"http://www.webyog.com/product/sqlyogpricing"
 #endif
@@ -414,7 +414,7 @@ All Files(*.*)\0*.*\0"
 #define		SUPPORTURL									"https://www.webyog.com/customer?ref=sqlyog"
 
 #if			IS_FROM_WINDOWS_STORE == 1
-#define     BUYENT										"https://www.webyog.com/product/sqlyogpricing/?utm_source=sqlyogapp&utm_medium=referral&utm_campaign=windowsstore"
+#define     BUYENT										"https://www.webyog.com/product/sqlyog/?utm_source=sqlyogapp&utm_medium=referral&utm_campaign=windowsstore"
 #else
 #define     BUYENT										"http://www.webyog.com/product/sqlyogpricing"
 #endif

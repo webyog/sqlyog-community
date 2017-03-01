@@ -3458,6 +3458,11 @@ MDIWindow::EnableDisableFlushOptions(HWND hwnd, wyInt32 state)
 			EnableWindow(GetDlgItem(hwnd, IDOK), TRUE);
 		else
 			uncheckcount++;
+		if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue && id[counter] == IDC_FL_TABLESREAD)
+		{
+			EnableWindow(GetDlgItem(hwnd, id[counter]), wyFalse);
+			continue;
+		}
 
 		EnableWindow(GetDlgItem(hwnd, id[counter]), state);
 	}
@@ -3537,6 +3542,15 @@ MDIWindow::AddFlushPersistence(HWND hwnd)
 
 	m_p_flush->Add(hwnd, IDC_FLUSH_ALL, "FlushAll", "0", CHECKBOX);
 	m_p_flush->Add(hwnd, IDC_FL_BINLOG, "FlushBinLog", "0", CHECKBOX);
+
+	#ifndef COMMUNITY
+	if(GetActiveWin() && GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	{
+		EnableWindow(GetDlgItem(hwnd, IDC_FL_TABLESREAD), wyFalse);
+	}
+#endif
+
+
 	
 	/* if all is selected then we need to disable everything */
 	ret = SendMessage(GetDlgItem(hwnd, IDC_FLUSH_ALL), BM_GETCHECK, 0, 0);

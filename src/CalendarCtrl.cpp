@@ -241,6 +241,7 @@ wyInt32	CALLBACK CalendarCtrl::CalendarProc(HWND hwnd, UINT message, WPARAM wPar
 		case WM_LBUTTONDOWN:
 			SendMessage(pcc->m_hwnd, WM_NEXTDLGCTL, (WPARAM)GetDlgItem(pcc->m_hwnd,IDC_DATETIMEPICKER1), TRUE);
 			SetFocus(GetDlgItem(pcc->m_hwnd,IDC_DATETIMEPICKER1));
+			EnableWindow(GetDlgItem(pcc->m_hwnd,IDOK), TRUE);
 			break;
 	}
 	return pcc->m_calproc(hwnd,message,wParam,lParam);
@@ -294,37 +295,77 @@ CalendarCtrl::ConvertCtrlValues()
 void
 CalendarCtrl::InitCalendarValues()
 {
+	wyInt32 iszerodateflag=0;
 	wyString temp,temp2;
 	m_row = CustomGrid_GetCurSelRow(m_hwndparent);
 	m_col = CustomGrid_GetCurSelCol(m_hwndparent);
 	wyChar tempchar[5]= "";
-	
-	
-	if(m_orgdata.Substr(0,4)==NULL)
-		strcpy(tempchar,"0");
+	wyString year,month,day;
+	wyChar * tempstr = NULL;
+
+// Year Section
+	tempstr = m_orgdata.Substr(0,4);
+	if(tempstr !=NULL)
+	{	
+		year.SetAs(tempstr);
+		if(year.CompareI("0000")==0)
+		{
+			strcpy(tempchar,"1970");
+			iszerodateflag=-1;
+		}
+		else
+			strcpy(tempchar,year.GetString());	
+	}
 	else
-		strcpy(tempchar,m_orgdata.Substr(0,4));
+	{
+		strcpy(tempchar,"0");
+	}
 	temp.Add(tempchar);
 	m_datetime.wYear=temp.GetAsUInt32();
 	temp.Clear();
-	
-	
-	if(m_orgdata.Substr(5,2)==NULL)
-		strcpy(tempchar,"0");
+
+// Month Section
+	tempstr = m_orgdata.Substr(5,2);
+	if(tempstr !=NULL)
+	{	
+		month.SetAs(tempstr);
+		if(month.CompareI("00")==0)
+		{
+			strcpy(tempchar,"01");
+			iszerodateflag=-1;
+		}
+		else
+			strcpy(tempchar,month.GetString());	
+	}
 	else
-		strcpy(tempchar,m_orgdata.Substr(5,2));
+	{
+		strcpy(tempchar,"0");
+	}
 	temp.Add(tempchar);
 	m_datetime.wMonth=temp.GetAsUInt32();
 	temp.Clear();
+// Date Section
 	
-	if(m_orgdata.Substr(8,2)==NULL)
-		strcpy(tempchar,"0");
+	tempstr = m_orgdata.Substr(8,2);
+	if(tempstr !=NULL)
+	{	
+		day.SetAs(tempstr);
+		if(day.CompareI("00")==0)
+		{
+			strcpy(tempchar,"01");
+			iszerodateflag=-1;
+		}
+		else
+			strcpy(tempchar,day.GetString());	
+	}
 	else
-		strcpy(tempchar,m_orgdata.Substr(8,2));
+	{
+		strcpy(tempchar,"0");
+	}
 	temp.Add(tempchar);
 	m_datetime.wDay=temp.GetAsUInt32();
 	temp.Clear();
-		
+
 	
 	if(m_orgdata.Substr(11,2)==NULL)
 		strcpy(tempchar,"0");
@@ -354,6 +395,13 @@ CalendarCtrl::InitCalendarValues()
 	m_datetime.wMilliseconds=0;
 	
 	
+
+	/* to check if the user has entered a date containg year as zero or month as zero or day as zero*/
+
+	if(iszerodateflag==-1){
+	EnableWindow(GetDlgItem(m_hwnd, IDOK), FALSE);
+	}
+
 	MonthCal_SetCurSel(GetDlgItem(m_hwnd,IDC_MONTHCALENDAR1), &m_datetime);
 	if(!m_isDate)
 	{
@@ -524,6 +572,7 @@ CalendarCtrl::OnClickNow()
 	wyString    temp;
 	SYSTEMTIME seltime;
 	GetLocalTime(&seltime);
+	EnableWindow(GetDlgItem(m_hwnd, IDOK), TRUE);
 	MonthCal_SetCurSel(GetDlgItem(m_hwnd,IDC_MONTHCALENDAR1), &seltime);
 	DateTime_SetFormat(GetDlgItem(m_hwnd,IDC_DATETIMEPICKER1), L"HH:mm:ss");
 	DateTime_SetSystemtime(GetDlgItem(m_hwnd,IDC_DATETIMEPICKER1),GDT_VALID, &seltime);

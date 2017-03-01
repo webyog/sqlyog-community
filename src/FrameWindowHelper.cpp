@@ -1739,6 +1739,24 @@ ReadOnlyQueryAllow(wyString *str)
 		if(str->FindI("Transaction") == 6)
 			ret = wyTrue;
 	}
+	else if(str->FindI("Unlock") == 0)
+	{
+	str->SetAs(RemoveExtraSpaces(str->GetString()));
+	if(str->FindI("Tables") == 7)
+			ret = wyFalse;
+	else
+			ret=wyTrue;
+	
+	}
+
+	else if(str->FindI("flush") == 0)
+	{  
+		str->SetAs(RemoveExtraSpaces(str->GetString()));
+		 if(str->FindI("tables with read lock")==6 || str->FindI("NO_WRITE_TO_BINLOG TABLES WITH READ LOCK") == 6)
+			ret=wyFalse;
+		else
+		ret = wyTrue;
+	}
 	else if(str->FindI("commit") == 0)
 	{
 		ret = wyTrue;
@@ -3668,12 +3686,14 @@ AddXMLToBuffer(wyString * buffer, const wyChar * text, wyBool crlf)
 			break;
 
 		default:
-			if(crlf == wyTrue && *text == '\r' && *(text+1)== '\n')
+			if(*text == '\r' && *(text+1)== '\n')
 			{
+				if(crlf == wyTrue)
 				buffer->Add("<br>");
-				
 				//fixed a bug, export as html was truncating data
 				//text += 2;
+				else
+				buffer->Add("&#10;");
 				text ++;
 			} 
 			else

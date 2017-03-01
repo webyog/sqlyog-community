@@ -1194,7 +1194,7 @@ EnableToolItems(HMENU hmenu)
 #ifndef COMMUNITY
 	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
 	{
-		EnableMenuItem(hmenu, ID_TOOLS_FLUSH, MF_GRAYED | MF_BYCOMMAND);
+		EnableMenuItem(hmenu, ID_TOOLS_FLUSH,  MF_BYCOMMAND);
 		EnableMenuItem(hmenu, ID_IMEX_TEXTFILE2, MF_GRAYED | MF_BYCOMMAND);
 	}
 #endif
@@ -1376,6 +1376,10 @@ EnableTableItems(HMENU hmenu)
 	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
 	{
 		EnableMenuItem(hmenu, ID_IMPORT_EXTERNAL_DATA, MF_GRAYED | MF_BYCOMMAND);
+	}
+	else
+	{
+		EnableMenuItem(hmenu, ID_IMPORT_EXTERNAL_DATA, MF_BYCOMMAND);
 	}
 #endif
 	

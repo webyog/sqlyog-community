@@ -151,12 +151,22 @@ EditorProcs::ExecuteAllQuery(wyInt32 * stop)
 	GetCompleteText(query);
     wyChar *tmp = AllocateBuff(query.GetLength() + 1);
     strcpy(tmp,query.GetString());
-	wyChar *tmp1 = AllocateBuff(query.GetLength() * 2 + 1);
-	AddCRToLF(tmp, tmp1);
+	wyString temp;
+    /*
+    All stored procedures created via workbench will contain /n as new line character between BEGIN and END which will 
+    disturb the formatting when altered via SQLyog hence changing all \n to \r\n and then changing \r\r back to \r
+    Previously this was done via function AddCRToLF/ChangeCRtoLF
+    */
+	temp.SetAs(tmp);
+	temp.FindAndReplace("\n","\r\n");
+	temp.FindAndReplace("\r\r","\r");
+	//wyChar *tmp1 = AllocateBuff(query.GetLength() * 2 + 1);
+	//AddCRToLF(tmp, tmp1);
 	//ChangeCRToLF(tmp);
-    query.SetAs(tmp1);
+    //query.SetAs(tmp1);
+	query.SetAs(temp.GetString());
     free(tmp);
-	free(tmp1);
+	//free(tmp1);
 	/* set the flag to executing */
 	wnd->SetExecuting(wyTrue);
 	*stop = 0;

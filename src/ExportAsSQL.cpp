@@ -382,6 +382,14 @@ MySQLDump::SetFKChecks(wyBool val)
 	return;
 }
 
+
+void
+MySQLDump::SetHexBlob(wyBool val)
+{
+	m_sethexblob = val;
+	return;
+}
+
 void
 MySQLDump::SetFlushSlave(wyBool val)
 {
@@ -3763,7 +3771,11 @@ MySQLDump::PrintFieldValue(wyString * buffer, MYSQL_RES *res, MYSQL_ROW row, wyI
 	wyInt32     *lengths;
 	wyInt32     to, count, firstcol =0;
 	MYSQL_FIELD	*field;
-
+	int isBlob, i, len;
+	wyString	blob_temp;
+	wyString	hex_tmp;
+	wyString	hex_data;
+	wyUInt32      hex_datalen;
 	lengths = (wyInt32 *)sja_mysql_fetch_lengths(m_tunnel, res);
 
 	for(count = 0; count < fcount; count++)		
@@ -3784,7 +3796,56 @@ MySQLDump::PrintFieldValue(wyString * buffer, MYSQL_RES *res, MYSQL_ROW row, wyI
 			
 		else if(!IS_NUM_FIELD(field)) 
         {
-
+			if(m_tunnel->IsTunnel())
+				isBlob= (field->type == MYSQL_TYPE_BIT ||
+						   field->type == MYSQL_TYPE_STRING ||
+						   field->type == MYSQL_TYPE_VAR_STRING ||
+						   field->type == MYSQL_TYPE_VARCHAR ||
+						   field->type == MYSQL_TYPE_BLOB ||
+						   field->type == MYSQL_TYPE_LONG_BLOB ||
+						   field->type == MYSQL_TYPE_MEDIUM_BLOB ||
+						   field->type == MYSQL_TYPE_TINY_BLOB) ? 1 : 0;
+			else
+						isBlob= (field->charsetnr == 63 &&
+						  (field->type == MYSQL_TYPE_BIT ||
+						   field->type == MYSQL_TYPE_STRING ||
+						   field->type == MYSQL_TYPE_VAR_STRING ||
+						   field->type == MYSQL_TYPE_VARCHAR ||
+						   field->type == MYSQL_TYPE_BLOB ||
+						   field->type == MYSQL_TYPE_LONG_BLOB ||
+						   field->type == MYSQL_TYPE_MEDIUM_BLOB ||
+						   field->type == MYSQL_TYPE_TINY_BLOB)) ? 1 : 0;
+		
+		if(m_sethexblob && isBlob)
+		{
+				hex_datalen=lengths[count]+1;
+				hex_data.SetAs(row[count]);
+				if(hex_datalen==1)
+				{
+					buffer->AddSprintf("''");
+					firstcol++;
+					continue;
+				}
+				len=hex_data.GetLength();
+				blob_temp.SetAs(hex_data.GetString());
+				buffer->AddSprintf("0x");
+				hex_tmp.SetAs("");
+				for (i = 0; i < len; i++) 
+				{
+					if((i+3) < len && blob_temp.GetCharAt(i) == '\\' && blob_temp.GetCharAt(i+1)=='r' && blob_temp.GetCharAt(i+2)=='\\' && blob_temp.GetCharAt(i+3) == 'n')
+					{
+						hex_tmp.Add("0D0A");
+						i += 3;
+					}
+					else
+					{
+						hex_tmp.AddSprintf("%02x",blob_temp.GetCharAt(i));
+					}
+				}
+				buffer->AddSprintf(hex_tmp.GetString());
+				firstcol ++;
+				continue;
+			}
 			/*check wether the fieild value is a string 
 			if it is string make it quoted */
 
@@ -4457,7 +4518,14 @@ wyBool
 MySQLDump::WriteBufferToFile(wyString * buffer, wyBool  isforce)
 {
 	wyInt32 ret;
+    /*
+    buffer->FindAndReplace("\r\n","\n"); added to solve community issue 2128
+    0xOD is additionally attached at every end of lines.
+    Reason : fprintf handles \n as \r\n when working in windows and simply as \n when in UNIX
+    hence \r\n will change to \r\r\n
+    */
 
+    buffer->FindAndReplace("\r\n","\n");
 	//If buffer size is more than 8K or dumping end has reached , write data to file
 	if((isforce == wyTrue && buffer->GetLength()) || buffer->GetLength()  >= SIZE_8K)
 	{

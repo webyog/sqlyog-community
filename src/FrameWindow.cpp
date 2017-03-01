@@ -1402,7 +1402,7 @@ FrameWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 		{
             PostMessage(pcmainwin->m_hwndrestorestatus, UM_CLOSE_RESTORE_STATUS, 0, 0);
 			KillTimer(hwnd, CONRESTORE_TIMER);
-			if(pGlobals->m_pcquerywnd !=NULL)
+			if(pGlobals->m_pcquerywnd !=NULL && pGlobals->m_pcquerywnd->m_pcqueryobject!=NULL)
 			{
 				if(pGlobals->m_database.GetLength())
 				{
@@ -1933,7 +1933,11 @@ FrameWindow::ToolbarWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpara
 			prevbk = SetBkMode(lpdis->hDC, TRANSPARENT);
 			prevobj = SelectObject(lpdis->hDC, pGlobals->m_pcmainwin->m_trialbuyfont);
 			SetTextColor(lpdis->hDC, RGB(255, 255, 255));
+#if IS_FROM_WINDOWS_STORE == 1
+			prevcolor = DrawText(lpdis->hDC, _(L"Visit Us"), -1, &lpdis->rcItem, DT_CENTER | DT_SINGLELINE | DT_VCENTER );
+#else
 			prevcolor = DrawText(lpdis->hDC, _(L"BUY"), -1, &lpdis->rcItem, DT_CENTER | DT_SINGLELINE | DT_VCENTER );
+#endif
 			SelectObject(lpdis->hDC, prevobj);
 			SetBkMode(lpdis->hDC, prevbk);
 			SetTextColor(lpdis->hDC, prevcolor);
@@ -2080,9 +2084,14 @@ FrameWindow::CreateTrialBuy(HWND hwndtool)
 	RECT rcmain;
 	GetClientRect((HWND)GetHwnd(), &rcmain);
 	wyUInt32    style = WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | BS_TEXT | BS_CENTER | BS_OWNERDRAW  ;
-		
+
+#if IS_FROM_WINDOWS_STORE == 1
+	VERIFY(hwndtrialbuy = CreateWindowEx(0, WC_BUTTON, TEXT("Visit Us"), style, rcmain.right-84, 2, 64, 26,
+												m_hwndsecondtool,(HMENU)IDC_TRIALBUY,(HINSTANCE)GetHinstance(), NULL));
+#else
 	VERIFY(hwndtrialbuy = CreateWindowEx(0, WC_BUTTON, TEXT("BUY"), style, rcmain.right-84, 2, 64, 26,
 												m_hwndsecondtool,(HMENU)IDC_TRIALBUY,(HINSTANCE)GetHinstance(), NULL));
+#endif
 	return hwndtrialbuy;
 }
 
@@ -3229,12 +3238,6 @@ pGlobals->m_pcmainwin->m_closealltrans = 1;
 	
 	case ACCEL_FLUSH:
 	case ID_TOOLS_FLUSH:
-#ifndef COMMUNITY
-	if(pcquerywnd->m_conninfo.m_isreadonly == wyTrue)
-	{
-		break;
-	}
-#endif
 		if(hwndactive)
 			pcquerywnd->ShowFlushDlg();
 		break;
@@ -9017,6 +9020,11 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 		GetSystemTime(&systime);		
 		currntday = upg.HandleSetDayFormat(systime.wDay, systime.wMonth, systime.wYear);
 		currentdate.Sprintf("%lu", currntday);
+
+#if IS_FROM_WINDOWS_STORE == 1
+			lastchkdday = 0;
+#endif
+
 		if(currntday > lastchkdday && currntday - lastchkdday >= 1)
 		//if(TRUE)
 		{
@@ -9428,6 +9436,9 @@ FrameWindow::OnCreateObjectWmHelp(HWND hwnd, wyChar *object)
 void
 FrameWindow::CheckForUpgrade(wyBool isexplict)
 {	
+#if IS_FROM_WINDOWS_STORE == 1
+	return;
+#endif
 	UpgradeCheck *upgradeexplicit = NULL;
 		
 	if(isexplict == wyTrue)
@@ -11482,7 +11493,13 @@ Htmlannouncementsproc(void *arg)
 	productid.SetAs("Trial");
 	GetTimeDifference(&daysleft);
 #endif
-	
+
+// showing the announcements only if installation passed over 7 days
+#if IS_FROM_WINDOWS_STORE == 1
+	if(daysleft >= 7)
+		goto cleanup;
+#endif
+
 	productid.EscapeURL();
 	//Major and minor version num
 	appmajorversion.SetAs(MAJOR_VERSION);
@@ -11512,6 +11529,11 @@ Htmlannouncementsproc(void *arg)
 	if(daysleft > 0 && daysleft <= 7)
 		url.AddSprintf("&trialends=1");
     //no of days left 
+
+#if IS_FROM_WINDOWS_STORE == 1
+	url.AddSprintf("&FromWindowsStore=1");
+#endif
+
 	http.SetUrl(url.GetAsWideChar());
 	http.SetContentType(L"text/xml");
 	
