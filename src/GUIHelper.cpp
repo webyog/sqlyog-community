@@ -1209,7 +1209,7 @@ EnableDBItems(HMENU hmenu)
 {
 	wyInt32	image, size, advsize, count, itemcount, state;
 	wyInt32	nid[] = {ID_DB_TABLE_MAKER,IDM_ALTERDATABASE, ID_OPEN_COPYDATABASE, ID_OBJECT_TRUNCATEDATABASE, 
-                     ID_OBJECT_DROPDATABASE, ID_OBJECT_EMPTYDATABASE, ID_OBJECT_CREATESCHEMA };
+                     ID_OBJECT_DROPDATABASE, ID_OBJECT_EMPTYDATABASE, ID_OBJECT_CREATESCHEMA/*, ID_DATABASE_REBUILDTAGS vgladcode*/};
 	wyInt32	advnid[] = { ID_DB_CREATEVIEW, ID_DB_CREATESTOREDPROCEDURE, ID_DB_CREATEFUNCTION , ID_DB_CREATETRIGGER};
 
 	MDIWindow   *pcquerywnd;
@@ -1239,6 +1239,8 @@ EnableDBItems(HMENU hmenu)
 	for(count = 0; count < advsize; count++)
 		EnableMenuItem(hmenu, advnid[count], state | MF_BYCOMMAND);
 
+
+
 	//first disable create event menu 
 	EnableMenuItem(hmenu, ID_DB_CREATEEVENT, MF_GRAYED| MF_BYCOMMAND);
 
@@ -1249,6 +1251,8 @@ EnableDBItems(HMENU hmenu)
 		EnableMenuItem(hmenu, ID_IMPORT_EXTERNAL_DATA, MF_GRAYED| MF_BYCOMMAND);
 		EnableMenuItem(hmenu, IDM_CREATEDATABASE, MF_GRAYED| MF_BYCOMMAND);
 		EnableMenuItem(hmenu, ID_OBJECT_CREATESCHEMA, MF_ENABLED| MF_BYCOMMAND);
+	/*	EnableMenuItem(hmenu, ID_DATABASE_REBUILDTAGS, MF_ENABLED| MF_BYCOMMAND); vgladcode*/
+
 		//EnableMenuItem(hmenu, ID_OPEN_COPYDATABASE, MF_GRAYED| MF_BYCOMMAND);
 		return wyTrue;
 	}
@@ -1264,6 +1268,9 @@ EnableDBItems(HMENU hmenu)
 
 		for(count = 0; count < size; count++)
 			EnableMenuItem(hmenu, nid[count], state | MF_BYCOMMAND);
+
+		//if(pGlobals->m_isautocomplete == wyFalse)				vgladcode
+		//EnableMenuItem(hmenu, ID_DATABASE_REBUILDTAGS, MF_GRAYED| MF_BYCOMMAND);
 
 		if(! IsMySQL41(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql ))
 			EnableMenuItem(hmenu, IDM_ALTERDATABASE, MF_GRAYED);
@@ -2272,7 +2279,16 @@ ChangeMenuItemOnPref(HMENU hmenu,  wyInt32 menuindex)
 			pGlobals->m_menuallquery = wcsdup(_(L"Execute &All Queries\tCtrl+F5"));
 		}
 		SetMenuOnPreferenceChange(hmenu, pGlobals->m_menuallquery, ACCEL_EXECUTEALL);
-	}	
+	}
+
+	//if(pGlobals->m_isautocomplete == wyFalse)
+	//{
+	//VERIFY(EnableMenuItem(hmenu, ID_DATABASE_REBUILDTAGS, MF_GRAYED | MF_BYCOMMAND) != -1);
+	//}
+	//else
+	//{
+	//
+	//}
     		
 }
 //setting menu item information

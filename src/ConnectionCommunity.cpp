@@ -1072,7 +1072,8 @@ ConnectionCommunity::CreateIconList(HWND hwndmain, wyUInt32 *numicons)
 		ID_ROLLBACK_TOSAVEPOINT,		ID_ROLLBACK_TRANSACTION,
 		ID_ROLLBACK_ANDCHAIN,			ID_ROLLBACK_RELEASE,
 		ID_ROLLBACK_ANDNOCHAIN,			ID_ROLLBACK_NORELEASE,
-		ID_SAVEPOINT_CREATESAVEPOINT,	ID_SAVEPOINT_RELEASESAVEPOINT
+		ID_SAVEPOINT_CREATESAVEPOINT,	ID_SAVEPOINT_RELEASESAVEPOINT/*,
+		ID_DATABASE_REBUILDTAGS*/
 
 
 
@@ -1385,11 +1386,22 @@ ConnectionCommunity::CheckRegistration(HWND hwnd, void *main)
 	HKEY		key;
 	DWORD       dwdisposition;
 
+#if IS_FROM_WINDOWS_STORE == 1
+	CRegInfoCommunity    creg;
+	wyInt32		ret;
+#endif
+	
 	 //ShowDialog(hwnd);
 	
 	// create the registry.
 	VERIFY((RegCreateKeyEx(HKEY_CURRENT_USER, TEXT(REGKEY), 0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ | KEY_WRITE, NULL, &key, &dwdisposition))== ERROR_SUCCESS);
-	
+
+#if IS_FROM_WINDOWS_STORE == 1
+	ret = creg.Show(hwnd, 0);
+	if(ret == 2)
+		return wyFalse;
+#endif
+
 	return wyTrue;
 }
 

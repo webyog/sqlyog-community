@@ -507,6 +507,20 @@ wyBool IsMySQL578(Tunnel * tunnel, PMYSQL mysql)
 	else
 		return wyFalse;
 }
+
+// Mysql 5.7.6 and MariaDb 5.2 for virtual column support
+wyBool IsMySQL576Maria52(Tunnel * tunnel, PMYSQL mysql)
+{
+	long me = mysql_get_server_version(*mysql);
+	const char *dbString = mysql_get_server_info(*mysql);
+
+	if((me >= 50706 && !strstr(dbString, "MariaDB") ) || (me >= 50200 && strstr(dbString, "MariaDB") ))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
+
 /*
 wyBool IsClusterDb(Tunnel * tunnel, PMYSQL mysql)
 {

@@ -416,4 +416,44 @@ public:
 	wyBool			 m_isapclose;		
 };
 
+class CRegInfoCommunity
+{
+public:
+	CRegInfoCommunity();
+	~CRegInfoCommunity();
+
+	static INT_PTR	CALLBACK DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam); 		
+	static LRESULT	CALLBACK StaticDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam); 		
+	static LRESULT	CALLBACK ImageDlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
+	
+	wyInt32         OnWmCtlcolorStatic(WPARAM wparam, LPARAM lparam);
+    void            OnWmInitDlgValues(HWND hwnd);
+    void            OnWmCommand(HWND hwnd, WPARAM wparam);
+	wyInt32         Show(HWND hwndParent, wyInt32 isRegistered=1);
+	wyInt32			Registered();
+	void			InitValues();
+	wyInt32			CheckValidEmail();
+	wyInt32			GeneratePasscode();
+	wyInt32			SendPasscodeRequest();
+	wyInt32			SendPasscodeVerifiedStatus();
+	wyInt32			PasscodeVerification();
+	void			ShowPasscodeWindow();
+	void			ShowEmailWindow();
+	wyBool			AddVerifiedToRegistry();
+
+	HWND			m_hwnddlg;
+	HWND			m_hwndedit;
+	HFONT			m_hlinkfont;
+    HFONT           m_hlinkfont2;
+	WNDPROC			m_wporigstaticproc;
+    WNDPROC			m_wporigimageproc;
+	wyBool			m_tracking;
+	wyInt32			m_isRegistered;
+	wyString		m_oldmail;
+	wyString		m_newmail;
+	wyString		m_passcode;
+	wyString		m_httpreqcode;
+};
+
+
 #endif

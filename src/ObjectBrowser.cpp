@@ -23,6 +23,11 @@
 #include "FrameWindowHelper.h"
 #include "MySQLVersionHelper.h"
 #include "ExportMultiFormat.h"
+
+#ifndef COMMUNITY
+#include "pcre.h"
+#endif
+
 //#include "IndexManager.h"
 #include "ExportMultiFormat.h"
 #include "OtherDialogs.h"
@@ -95,6 +100,10 @@ CQueryObject::CQueryObject(HWND hwndparent, wyChar *filterdb)
 
 	m_isnoderefresh = wyFalse;
 
+	#ifndef COMMUNITY
+	m_isRegexChecked = wyFalse;
+	#endif
+
     m_hfont         = NULL;
     m_hwndFilter    = NULL;
 
@@ -150,16 +159,21 @@ CQueryObject::CreateObjectBrowser(HWND hwndparent)
  	//wyUInt32    exstyles =	WS_EX_STATICEDGE;
 	wyUInt32    styles   =  WS_VISIBLE | WS_CHILD | TVS_HASBUTTONS | TVS_SHOWSELALWAYS | TVS_EDITLABELS |TVS_FULLROWSELECT/*| TVS_TRACKSELECT*/;
 	HWND	    hwndobject, hwndFilter, hwndStaticParent = NULL, hwndSt = NULL;
+	#ifndef COMMUNITY
+	HWND hwndRegex;
+	HWND hwndRegexText;
+	#endif
+
 	COLORREF	backcolor, forecolor;
     /*HICON       hicon;
     TOOLINFO    tf;
     */
 	SendMessage(hwndparent, WM_SETREDRAW, 0, FALSE);
 
-    VERIFY(hwndStaticParent = CreateWindowEx(0, WC_STATIC, L"", WS_VISIBLE | WS_CHILD | WS_CLIPCHILDREN, 
+	VERIFY(hwndStaticParent = CreateWindowEx(0, WC_STATIC, L"", WS_VISIBLE | WS_CHILD | WS_CLIPCHILDREN , 
                                         2, 2, 16, 16, hwndparent, (HMENU)-1, pGlobals->m_pcmainwin->GetHinstance(), this));
-    
-    VERIFY(hwndobject	= CreateWindowEx(0 , WC_TREEVIEW, NULL, styles, 5, 30, 150, 150,
+	
+	VERIFY(hwndobject	= CreateWindowEx(0 , WC_TREEVIEW, NULL, styles, 5, 30, 150, 150,
 									  hwndparent,(HMENU)IDC_OBJECTTREE, pGlobals->m_pcmainwin->GetHinstance(), this));
 
     m_hwnd	= hwndobject;
@@ -183,12 +197,27 @@ CQueryObject::CreateObjectBrowser(HWND hwndparent)
     VERIFY(hwndSt = CreateWindowEx(0, WC_STATIC, _(L"Filter Databases"), WS_VISIBLE | WS_CHILD | SS_ENDELLIPSIS,
                                         2, 2, 16,16, hwndStaticParent, (HMENU)-1, pGlobals->m_pcmainwin->GetHinstance(), this));
     m_hwndStMsg    = hwndSt;
-
-    VERIFY(hwndFilter	= CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, NULL, WS_VISIBLE | WS_CHILD | ES_LEFT | WS_TABSTOP | ES_AUTOHSCROLL, 16, 2, 150, 30,
+  VERIFY(hwndFilter	= CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, NULL, WS_VISIBLE | WS_CHILD | ES_LEFT | WS_TABSTOP | ES_AUTOHSCROLL, 16, 2, 150, 30,
 									  hwndStaticParent,(HMENU)IDC_OBJECTFILTER, pGlobals->m_pcmainwin->GetHinstance(), this));
+
+#ifndef COMMUNITY
+	VERIFY(hwndRegex	= CreateWindowEx(0, WC_BUTTON, NULL, WS_VISIBLE | WS_CHILD | BS_CHECKBOX | WS_TABSTOP, 16, 30, 20, 28,
+									  hwndStaticParent,(HMENU)IDC_REGEXFILTER, pGlobals->m_pcmainwin->GetHinstance(), this));
+	VERIFY(hwndRegexText= CreateWindowEx(0, WC_STATIC, _(L"Search As Regex"), WS_VISIBLE | WS_CHILD | SS_ENDELLIPSIS | SS_NOTIFY, 16, 30, 120, 28,
+									  hwndStaticParent, (HMENU)(IDC_REGEXFILTERTEXT), pGlobals->m_pcmainwin->GetHinstance(), this));
+	//CheckDlgButton(hwndRegex, 1, BST_CHECKED);
+#endif
+
 
    SetWindowPos(hwndobject, hwndFilter, 0, 0, 0, 0, SWP_NOMOVE|SWP_NOSIZE);
    SetWindowPos(hwndFilter, hwndStaticParent, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+
+   #ifndef COMMUNITY
+   SetWindowPos(hwndobject, hwndRegex, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+   SetWindowPos(hwndobject, hwndRegexText, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+   m_hwndRegex = hwndRegex;
+   m_hwndRegexText= hwndRegexText;
+   #endif
    
    //ShowWindow(hwndFilter, SW_HIDE);
     
@@ -196,13 +225,15 @@ CQueryObject::CreateObjectBrowser(HWND hwndparent)
     m_hwndFilter =  hwndFilter;
     m_hwndStParent = hwndStaticParent;
 
+	
+
     SendMessage(m_hwndFilter, EM_LIMITTEXT, 64, NULL);
 
     SetWindowLongPtr(m_hwndStParent, GWLP_USERDATA, (LONG_PTR)this);
     m_stWndProc = (WNDPROC)SetWindowLongPtr(m_hwndStParent, GWLP_WNDPROC, (LONG_PTR) CQueryObject::StCtrlProc);
 
     SetWindowLongPtr(m_hwndFilter, GWLP_USERDATA, (LONG_PTR)this);
-    m_FilterProc = (WNDPROC)SetWindowLongPtr(m_hwndFilter, GWLP_WNDPROC, (LONG_PTR) CQueryObject::FilterProc);
+    m_FilterProc = (WNDPROC)SetWindowLongPtr(m_hwndFilter, GWLP_WNDPROC, (LONG_PTR) CQueryObject::FilterProc);	
 
 	//..Setting font
     SetFont();
@@ -277,6 +308,10 @@ CQueryObject::FilterProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     HWND                curHwnd = NULL;
     HDC                 hdc = NULL;
 
+	#ifndef COMMUNITY
+	wyWChar     str1[70];
+	wyWChar strTemp[70];
+	#endif
 
     VERIFY(wnd = GetActiveWin());
     
@@ -321,7 +356,7 @@ CQueryObject::FilterProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             
                 if(PtInRect(&rectWnd, pt))
                 {
-                    if(pcqueryobject->HandleOnEscapeOBFilter())
+				   if(pcqueryobject->HandleOnEscapeOBFilter())
                     {
                         SetFocus(pcqueryobject->m_hwndFilter);
                     }
@@ -417,6 +452,20 @@ CQueryObject::FilterProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         switch(wParam)
         {
         case VK_RETURN:
+			#ifndef COMMUNITY
+			if(pcqueryobject->m_isRegexChecked==wyTrue)
+			{
+
+				//GetWindowText(pcqueryobject->m_hwndFilter, strTemp, 65);
+				//pcqueryobject->HandleOnEscapeOBFilter();
+				pcqueryobject->HandleOBFilter(L"", wyFalse);
+				//SetWindowText(pcqueryobject->m_hwndFilter,strTemp);
+				//CEdit* e = (CEdit*)GetDlgItem();
+				//SetFocus(pcqueryobject->m_hwndFilter);
+				pcqueryobject->HandleOBFilter();
+				break;
+			}
+			#endif
             if(pcqueryobject->m_isSelValid)
             {
                 pcqueryobject->HandleOBFilter();
@@ -494,10 +543,12 @@ CQueryObject::FilterProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             {
                 SetFocus(pcqueryobject->m_hwndFilter);
             }
+			pcqueryobject->PaintFilterWindow(pcqueryobject->m_hwndFilter);
             break;
-        case VK_DELETE:
+	    case VK_DELETE:
         case VK_BACK:
             GetWindowText(pcqueryobject->m_hwndFilter, str, 64);
+
             SendMessage(pcqueryobject->m_hwndFilter, EM_GETSEL, (WPARAM)&start,(LPARAM)&end);
             if(wcslen(str) && wcslen(str) == (end-start))
             {
@@ -557,9 +608,22 @@ void CALLBACK
 CQueryObject::OBFilterTimerProc(HWND hwnd, UINT message, UINT_PTR id, DWORD time)
 {    
     CQueryObject    *pcqueryobject	= (CQueryObject*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-
     KillTimer(hwnd, id);
-    
+#ifndef COMMUNITY
+	wyWChar strTemp[10];
+	if(pcqueryobject->m_isRegexChecked==wyTrue)
+	{
+		GetWindowText(pcqueryobject->m_hwndFilter, strTemp, 10);
+		if(!strTemp[0] )
+		{	
+			pcqueryobject->HandleOnEscapeOBFilter();
+			 pcqueryobject->HandleOBFilter();
+			return;
+		}
+		else
+			return;
+	}
+#endif
     if(!(pcqueryobject->m_isSelValid))
         pcqueryobject->HandleOBFilter();
 }
@@ -573,6 +637,9 @@ CQueryObject::StCtrlProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     /*HBRUSH          hbr = NULL;*/
     MDIWindow       *wnd = NULL;
     wyWChar         str[70];
+#ifndef COMMUNITY
+	wyWChar			 strTemp[70];
+#endif
     /*HTREEITEM       hti = NULL, htiSel = NULL;*/
     
     memset(str, 0, sizeof(str));
@@ -588,17 +655,52 @@ CQueryObject::StCtrlProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
                 switch(HIWORD(wParam))
                 {
                     case EN_UPDATE:
-                       if(wnd->m_executing == wyFalse && !(pcqueryobject->m_isSelValid))
+						if(wnd->m_executing == wyFalse && !(pcqueryobject->m_isSelValid))
                             {
                                 SetTimer(hwnd, OBFILTERTIMER, 200, CQueryObject::OBFilterTimerProc);
-                            }
+							}
+#ifndef COMMUNITY	
+						pcqueryobject->PaintFilterWindow(pcqueryobject->m_hwndFilter);
+						SetCursor(LoadCursor(NULL, IDC_ARROW));
+#endif
                     break;
                 }
             break;
-        }
-        break;
+#ifndef COMMUNITY
+			case IDC_REGEXFILTER:
+				switch(HIWORD(wParam))
+				{
+				case BN_CLICKED:
+				BOOL checked = IsDlgButtonChecked(pcqueryobject->m_hwndStParent, IDC_REGEXFILTER) ;
+				/*BOOL checked = SendMessage((HWND)lParam, BM_GETCHECK, 0, 0);*/
+				SetFocus(pcqueryobject->m_hwndFilter);
+				if (checked)
+					{
+						pcqueryobject->m_isRegexChecked=wyFalse;
+						CheckDlgButton(pcqueryobject->m_hwndStParent, IDC_REGEXFILTER, BST_UNCHECKED);
+						pcqueryobject->HandleOnEscapeOBFilter();
+						
+					}
+					else 
+					{	
+						
+						pcqueryobject->m_isRegexChecked=wyTrue;
+						CheckDlgButton(pcqueryobject->m_hwndStParent, IDC_REGEXFILTER, BST_CHECKED);
+						//GetWindowText(pcqueryobject->m_hwndFilter, strTemp, 65);
+						//pcqueryobject->HandleOnEscapeOBFilter();
+						pcqueryobject->HandleOBFilter(L"", wyFalse);
+						//SetWindowText(pcqueryobject->m_hwndFilter,strTemp);
+						pcqueryobject->HandleOBFilter();
+					}
+				break;
+				}
+				break;
+#endif
+		}
+		break;
+
     case WM_CTLCOLORSTATIC:
-        if((HWND)lParam == pcqueryobject->m_hwndStMsg/* || (HWND)lParam == pcqueryobject->m_hwndStClear*/)
+        if((HWND)lParam == pcqueryobject->m_hwndStMsg /*|| (HWND)lParam == pcqueryobject->m_hwndStClear*/)
         {
             hdc = (HDC)wParam;
             SetBkMode(hdc, TRANSPARENT);
@@ -606,11 +708,25 @@ CQueryObject::StCtrlProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             SetDCBrushColor(hdc, TreeView_GetBkColor(pcqueryobject->m_hwnd));
             return (wyInt32)GetStockBrush(DC_BRUSH);
         }
+#ifndef COMMUNITY
+		if((HWND)lParam == pcqueryobject->m_hwndRegexText)
+       {
+			hdc = (HDC)wParam;
+            SetBkMode(hdc, TRANSPARENT);
+            SetTextColor(hdc, TreeView_GetTextColor(pcqueryobject->m_hwnd));
+            SetDCBrushColor(hdc, TreeView_GetBkColor(pcqueryobject->m_hwnd));
+            return (wyInt32)GetStockBrush(DC_BRUSH);
+        }
+#endif
+
         break;
+
     }
 
     return CallWindowProc(pcqueryobject->m_stWndProc, pcqueryobject->m_hwndStParent, message, wParam, lParam);
 }
+
+
 
 
 wyBool
@@ -671,6 +787,11 @@ CQueryObject::SetFont()
     SendMessage(m_hwnd, WM_SETFONT,(WPARAM)m_hfont, TRUE);
     SendMessage(m_hwndStMsg, WM_SETFONT, (WPARAM)m_hfont, TRUE);
     SendMessage(m_hwndFilter, WM_SETFONT, (WPARAM)m_hfont, TRUE);
+#ifndef COMMUNITY
+	SendMessage(m_hwndRegex,WM_SETFONT,(WPARAM)m_hfont,TRUE);
+	SendMessage(m_hwndRegexText,WM_SETFONT,(WPARAM)m_hfont, TRUE);
+#endif
+
     //SetWindowFont(m_hwnd, m_hfont, TRUE);
 	UpdateWindow(m_hwnd);
     UpdateWindow(m_hwndFilter);
@@ -892,6 +1013,9 @@ CQueryObject::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
                     {
                         SetFocus(pcqueryobject->m_hwnd);
                     }
+#ifndef COMMUNITY
+					pcqueryobject->PaintFilterWindow(pcqueryobject->m_hwndFilter);
+#endif
                     break;
 				case VK_INSERT:
 					pcqueryobject->ProcessInsert();
@@ -902,7 +1026,9 @@ CQueryObject::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 						wyInt32 ret;
 						ret = GetKeyState(VK_SHIFT);
 						if(ret & 0x8000)
+						{
 							pcqueryobject->ProcessDelete(wyTrue);
+						}
 						else
 							pcqueryobject->ProcessDelete(wyFalse);
 					}
@@ -988,6 +1114,7 @@ CQueryObject::Resize(wyBool isannouncements, wyBool isstart)
 	RECT                rcmain, rcvsplitter;
 	wyInt32             ret;
 	wyInt32             hpos, vpos, width, height, widthEditFilter, htmlh;
+//	wyInt32				widthRegexFilter;
 	
 	if(isannouncements && wnd->m_isanncreate == wyFalse)
 		pcqueryvsplitter->Resize(wyTrue);
@@ -1000,25 +1127,54 @@ CQueryObject::Resize(wyBool isannouncements, wyBool isstart)
 	vpos			=	(m_height + 10) > 22 ? m_height + 10: 22;
 	width			=	rcvsplitter.left-2;
     widthEditFilter =   (width - 26) > 0 ? (width - 26) : 0;
+	
+	//widthRegexFilter=	width < 200 ? width : (width-250);
+	//if(widthRegexFilter<=220)
+		//widthRegexFilter=150;
+
+#ifndef COMMUNITY
+	height			=	rcmain.bottom - (2 * vpos)-vpos-9;
+#else
 	height			=	rcmain.bottom - (2 * vpos) - 10;
-    htmlh			=   (wyInt32)(0.3 * height);
+#endif
+    htmlh			=   (wyInt32)((0.3 * height));
 	htmlh+=2;
 
-    
+#ifndef COMMUNITY
+    MoveWindow(m_hwndStParent, 2, 2, width, vpos * 3 + 7, TRUE);
+    MoveWindow(m_hwndStMsg, 6, 4, width, vpos - 5, TRUE); 
+	//MoveWindow(m_hwndStMsg, 6, 4, width - 28, vpos - 5, TRUE);
+    MoveWindow(m_hwndFilter, 2, vpos, widthEditFilter+22, vpos - 2, TRUE); 
+	//MoveWindow(m_hwndRegex, 2, (vpos*2)+5, widthEditFilter-1, vpos-2, TRUE );
+	MoveWindow(m_hwndRegex, 2, (vpos*2)+1, 20, vpos+1, TRUE );
+	MoveWindow(m_hwndRegexText,24,(vpos*2)+1+5, widthEditFilter-22, vpos-2, TRUE);
+#else
     MoveWindow(m_hwndStParent, 2, 2, width, vpos * 2 + 6, TRUE);
     MoveWindow(m_hwndStMsg, 6, 4, width - 28, vpos - 5, TRUE);
-    
-    MoveWindow(m_hwndFilter, 2, vpos, widthEditFilter + 22, vpos - 2, TRUE); 
+    MoveWindow(m_hwndFilter, 2, vpos, widthEditFilter + 22, vpos - 2, TRUE);
+#endif
     
 	if(!isannouncements)
+#ifndef COMMUNITY
+		VERIFY(ret = MoveWindow(m_hwnd, hpos, (vpos * 3) + 7, width, height, TRUE));
+#else
 		VERIFY(ret = MoveWindow(m_hwnd, hpos, (vpos * 2) + 8, width, height, TRUE));
+#endif
 	else
+#ifndef COMMUNITY
+		VERIFY(ret = MoveWindow(m_hwnd, hpos, (vpos * 3) + 10, width, height - htmlh, TRUE));
+#else
 		VERIFY(ret = MoveWindow(m_hwnd, hpos, (vpos * 2) + 8, width, height - htmlh, TRUE));
-
+#endif
+		
+#ifndef COMMUNITY
+	InvalidateRect(m_hwndRegex, NULL, TRUE);
+	InvalidateRect(m_hwndRegexText, NULL, TRUE);
+#endif		
     InvalidateRect(m_hwndStMsg, NULL, TRUE);
+	InvalidateRect(m_hwndFilter, NULL, TRUE);
     InvalidateRect(m_hwnd, NULL, TRUE);
-    InvalidateRect(m_hwndFilter, NULL, TRUE);
-    
+   
 	_ASSERT(ret != 0);
 }
 
@@ -3186,7 +3342,7 @@ CQueryObject::OnSelChanged(HTREEITEM hitem, LPNMTREEVIEW pnmtv)
 {
     HTREEITEM   hitemtemp, hroot, hparent;
 	wyInt32     image, size, nodecount;
-	wyInt32     nid[] = {  ID_OPEN_COPYDATABASE, ID_OBJECT_CREATESCHEMA,  ID_EXPORT_AS, ID_OBJECT_COPYTABLE, ID_OBJECT_INSERTUPDATE, ID_OBJECT_TABLEEDITOR, ID_OBJECT_MAINMANINDEX, ACCEL_MANREL };
+	wyInt32     nid[] = {  ID_OPEN_COPYDATABASE, /*ID_DATABASE_REBUILDTAGS, vgladcode*/ ID_OBJECT_CREATESCHEMA,  ID_EXPORT_AS, ID_OBJECT_COPYTABLE, ID_OBJECT_INSERTUPDATE, ID_OBJECT_TABLEEDITOR, ID_OBJECT_MAINMANINDEX, ACCEL_MANREL };
 	wyInt32     nidd[] = { ID_EXPORT_AS, ID_OBJECT_COPYTABLE, ID_OBJECT_INSERTUPDATE, ID_OBJECT_TABLEEDITOR, ID_OBJECT_MAINMANINDEX, ACCEL_MANREL, ID_OBJECT_COPYTABLE};
     wyInt32     viewdata[] = {ID_OBJECT_VIEWDATA, ID_TABLE_OPENINNEWTAB};
 	MDIWindow   *wnd = GetActiveWin();
@@ -7673,6 +7829,8 @@ CQueryObject::OnWmCommand(WPARAM wparam)
 
                 InvalidateRect(m_hwndStParent, NULL, TRUE);
                 InvalidateRect(m_hwndStMsg, NULL, TRUE);
+				InvalidateRect(m_hwndRegexText, NULL, TRUE);
+				InvalidateRect(m_hwndRegex, NULL, TRUE);
                /* InvalidateRect(m_hwndStClear, NULL, TRUE);*/
 			}
 			break;
@@ -7938,6 +8096,7 @@ CQueryObject::SelectTableEngineMenuItem(MDIWindow *wnd, HMENU hmenuhandle, wyInt
             CheckMenuItem(hsubmenu, index, MF_BYPOSITION | MF_UNCHECKED);
 	}	
 }
+
 wyBool
 CQueryObject::OpenTable()
 {
@@ -8010,9 +8169,13 @@ CQueryObject::HandleOBFilter(wyWChar  *text, wyBool isAutoCmplt)
     HTREEITEM   hti = NULL;
     wyWChar     str[70], str1[70];
     wyWChar     *temp = NULL;
-    
+    //isAutoCmplt=wyFalse;
     ::memset(str, 0, sizeof(str));
     ::memset(str1, 0, sizeof(str1));
+#ifndef COMMUNITY
+	if(m_isRegexChecked==wyTrue)
+		isAutoCmplt=wyFalse;
+#endif
 
     if(text)
     {
@@ -8067,9 +8230,16 @@ CQueryObject::HandleOBFilter(wyWChar  *text, wyBool isAutoCmplt)
         TreeView_SetItem(m_hwnd, &tvi);
 
         wcscpy(str1, m_prevString.GetAsWideChar());
-        _wcslwr_s(str1, 65);
-        _wcslwr_s(str, 65);
-
+#ifndef COMMUNITY
+		if( m_isRegexChecked != wyTrue )
+		{
+			_wcslwr_s(str1, 65);
+			_wcslwr_s(str, 65);
+		}
+#else
+			_wcslwr_s(str1, 65);
+			_wcslwr_s(str, 65);
+#endif
         temp = wcsstr(str1, str);
         if(temp == str1)
         {
@@ -8124,6 +8294,11 @@ CQueryObject::FilterTreeView(wyWChar str[])
     HTREEITEM   nexthti = NULL;
     HTREEITEM   hti;
     TVITEM      tvi;
+#ifndef COMMUNITY
+	pcre*		pregex;
+	const wyChar *str11;
+	wyInt32 offset,ovector[12];
+#endif
     wyWChar     objName[200], *temp = NULL, stri[200];
     OBDltElementParam   *lparamValue = NULL;
     wyElem              *tempDlt = NULL;
@@ -8141,7 +8316,13 @@ CQueryObject::FilterTreeView(wyWChar str[])
     lparamValue = (OBDltElementParam *)tvi.lParam;
     wcscpy(lparamValue->m_filterText, m_strOrig);
     hti = TreeView_GetChild(m_hwnd, hti);
-    
+#ifndef COMMUNITY
+	wyString ttt;
+	ttt.SetAs(str);
+	//ttt.SetAs("(?c)T+"); /*PCRE_CASELESS*//*PCRE_NO_AUTO_CAPTURE*/PCRE_MULTILINE
+if(m_isRegexChecked)	
+pregex = pcre_compile(ttt.GetString(),PCRE_NO_AUTO_CAPTURE,&str11,&offset,NULL); 
+#endif
     while(hti)
     {      
         tvi.hItem = hti;
@@ -8153,26 +8334,50 @@ CQueryObject::FilterTreeView(wyWChar str[])
                 
         wcscpy(stri, tvi.pszText);
         _wcslwr_s(stri, 200);
-        temp = wcsstr(stri, str);
-        
-        if(!temp)
-        {
-            nexthti = TreeView_GetNextSibling(m_hwnd, hti);
-            tempDlt = new DltElement(tvi);
-            lparamValue->m_deleteList.Insert(tempDlt);
-            OnFilterDeleteItem(hti, tempDlt);
-            TreeView_DeleteItem(m_hwnd, hti);
-            hti = nexthti;
-        }
-        else
-        {   
-            if(temp == stri && (wcscmp(tvi.pszText, m_matchString.GetAsWideChar()) < 0 || !m_matchString.GetLength()))
-            {
-                m_matchString.SetAs(tvi.pszText);
-            }
-            
-            hti = TreeView_GetNextSibling(m_hwnd, hti);
-        }
+		temp = wcsstr(stri, str);
+#ifndef COMMUNITY		
+		wyString tt;
+		tt.SetAs(stri);			
+		if(m_isRegexChecked)
+		{
+			int check=pcre_exec(pregex, NULL, tt.GetString(), tt.GetLength(), offset, PCRE_NO_UTF8_CHECK, ovector, sizeof(ovector) / sizeof(wyInt32));  
+			if(check!=1)
+			{
+				nexthti = TreeView_GetNextSibling(m_hwnd, hti);
+				tempDlt = new DltElement(tvi);
+				lparamValue->m_deleteList.Insert(tempDlt);
+				OnFilterDeleteItem(hti, tempDlt);
+				TreeView_DeleteItem(m_hwnd, hti);
+				hti = nexthti;
+			}
+			else
+			{   
+				m_matchString.SetAs(tvi.pszText);
+				hti = TreeView_GetNextSibling(m_hwnd, hti);
+			}
+		}
+		else
+#endif
+			{
+				if(!temp)
+				{
+					nexthti = TreeView_GetNextSibling(m_hwnd, hti);
+					tempDlt = new DltElement(tvi);
+					lparamValue->m_deleteList.Insert(tempDlt);
+					OnFilterDeleteItem(hti, tempDlt);
+					TreeView_DeleteItem(m_hwnd, hti);
+					hti = nexthti;
+				}
+				else
+				{   
+					if(temp == stri && (wcscmp(tvi.pszText, m_matchString.GetAsWideChar()) < 0 || !m_matchString.GetLength()))
+					{
+						m_matchString.SetAs(tvi.pszText);
+					}
+					hti = TreeView_GetNextSibling(m_hwnd, hti);
+				}
+
+			}
     }
 }
 

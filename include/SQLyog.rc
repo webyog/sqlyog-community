@@ -577,6 +577,7 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "Create Schema For Database In &HTML...\tCtrl+Shift+Alt+S", ID_OBJECT_CREATESCHEMA
+       /* MENUITEM "Rebuild Tag",                 ID_DATABASE_REBUILDTAGS*/
     END
     POPUP "T&able"
     BEGIN
@@ -728,7 +729,7 @@ BEGIN
         BEGIN
             MENUITEM "Repeatable Read",             ID_TRX_REPEATABLEREAD, CHECKED
             MENUITEM "Read Committed",              ID_TRX_READCOMMITED
-            MENUITEM "Read Uncommitted",             ID_TRX_READUNCOMMITED
+            MENUITEM "Read Uncommitted",            ID_TRX_READUNCOMMITED
             MENUITEM "Serializable",                ID_TRX_SERIALIZABLE
         END
         MENUITEM SEPARATOR
@@ -895,14 +896,14 @@ BEGIN
     LTEXT           "(Use ';' to separate multiple databases. Leave blank to display all)",IDC_COLONST,119,160,242,18,WS_DISABLED
     CONTROL         "Use Co&mpressed Protocol",IDC_COMPRESS,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,119,175,95,10
     PUSHBUTTON      "?",IDC_COMPRESSHELP,340,175,16,11
-	CONTROL         "Read-Only Connection",IDC_READONLY,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,228,175,86,10
+    CONTROL         "Read-Only Connection",IDC_READONLY,"Button",BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,228,175,86,10
     GROUPBOX        "Session Idle Timeout",IDC_TIMEOUT,119,188,139,28
     CONTROL         "De&fault",IDC_TIMEOUTDEF,"Button",BS_AUTORADIOBUTTON | WS_DISABLED | WS_GROUP,124,200,38,10
     CONTROL         "",IDC_TIMEOUTOPT,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,164,200,12,10
     EDITTEXT        IDC_TIMEOUTEDIT,176,198,40,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
     LTEXT           "(seconds)",IDC_TIMESEC,221,200,33,12
     GROUPBOX        "&Keep-Alive Interval",IDC_KEEPALIVE,264,188,92,28,WS_DISABLED
-	LTEXT			"Need Help?", IDC_LINK,310,218,44,8, NOT WS_VISIBLE | SS_NOTIFY | SS_CENTERIMAGE
+    LTEXT           "Need Help?",IDC_LINK,310,218,44,8,SS_NOTIFY | SS_CENTERIMAGE | NOT WS_VISIBLE
     EDITTEXT        IDC_PINGINTERVAL,270,198,45,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
     LTEXT           "(seconds)",IDC_KEEPALIVESEC,320,200,32,8,WS_DISABLED
     GROUPBOX        "",IDC_TUNNELGRP,117,72,242,154,NOT WS_VISIBLE
@@ -1609,6 +1610,26 @@ BEGIN
     ICON            "",IDC_STATICIMG,7,8,21,20
 END
 
+IDD_REGISTERSPLASH DIALOGEX 0, 0, 299, 103
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_NOPARENTNOTIFY | WS_EX_CONTROLPARENT
+CAPTION " SQLyog Community"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "This is the Community edition of SQLyog",IDC_TRIALSTATIC,4,11,291,8,SS_NOTIFY
+    LTEXT           "Enter email address to start evaluation",IDC_TITLE,4,25,192,8
+    EDITTEXT        IDC_TRIALEMAIL,183,26,104,12,ES_AUTOHSCROLL
+    LTEXT           "Enter passcode received in mail",IDC_TITLE2,4,26,192,8
+    EDITTEXT        IDC_PASSCODE,183,26,104,12,ES_AUTOHSCROLL
+    LTEXT           "To know more  ",IDC_STATIC,4,67,100,10
+    LTEXT           "click here",IDC_LINK,63,65,66,12,SS_NOTIFY | SS_CENTERIMAGE,WS_EX_TRANSPARENT
+    PUSHBUTTON      "Next",IDM_NEXT,244,86,51,14
+    LTEXT           "You will receive a passcode on the email provided above. Click Next to receive passcode",IDC_TRIALNOTESTATIC,5,45,282,19
+    PUSHBUTTON      "Back",IDM_BACK,134,86,51,14
+    PUSHBUTTON      "Resend",IDM_RESEND,189,86,51,14
+    DEFPUSHBUTTON      "Verify",IDM_VERIFY,244,86,51,14
+END
+
 IDD_SHOWIMPORTERR DIALOGEX 0, 0, 249, 83
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "SQLyog - SQL Dump Import Error"
@@ -1844,7 +1865,7 @@ BEGIN
     GROUPBOX        "Transaction Options",IDC_TRANSACTION,4,185,247,36
     CONTROL         "Prompt when query causing implicit commit is executed",IDC_PROMPTTRANSACTION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,196,197,10
-	CONTROL         "Prompt when closing session or program if transaction is active.",IDC_PROMPTCLOSETRANSACTION,
+    CONTROL         "Prompt when closing session or program if transaction is active.",IDC_PROMPTCLOSETRANSACTION,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,208,212,10
 END
 
@@ -2328,9 +2349,9 @@ IDI_TRUNCDB             ICON                    "..\\include\\bitmaps\\truncated
 IDI_VIEWDATA            ICON                    "..\\include\\bitmaps\\viewdata.ico"
 IDI_SORTASC             ICON                    "..\\include\\bitmaps\\sortasc.ico"
 IDI_DBSYNC              ICON                    "..\\include\\bitmaps\\dbsync.ico"
-IDI_COMMIT				ICON					"..\\include\\bitmaps\\commit.ico"
-IDI_ROLLBACK			ICON					"..\\include\\bitmaps\\rollback.ico"					
-IDI_START_TRANSACTION	ICON					"..\\include\\bitmaps\\start_transaction.ico"
+IDI_COMMIT              ICON                    "..\\include\\bitmaps\\commit.ico"
+IDI_ROLLBACK            ICON                    "..\\include\\bitmaps\\rollback.ico"
+IDI_START_TRANSACTION   ICON                    "..\\include\\bitmaps\\start_transaction.ico"
 IDI_PREF                ICON                    "..\\include\\bitmaps\\preferences.ico"
 IDI_REORDERCOL          ICON                    "..\\include\\bitmaps\\reordercol.ico"
 IDI_EMPTYTABLE          ICON                    "..\\include\\bitmaps\\emptytable.ico"
@@ -2413,9 +2434,9 @@ IDI_FUNCTION            ICON                    "bitmaps\\function.ico"
 IDI_CONNECT_16          ICON                    "bitmaps\\connect_16.ico"
 IDI_COPYDATABASE_16     ICON                    "bitmaps\\copy_data_16.ico"
 IDI_DBSYNC_16           ICON                    "bitmaps\\dbsync_16.ico"
-IDI_COMMIT_16			ICON					"bitmaps\\commit_16.ico"
-IDI_ROLLBACK_16			ICON					"bitmaps\\rollback_16.ico"
-IDI_START_TRANSACTION_16	ICON				"bitmaps\\start_transaction_16.ico"
+IDI_COMMIT_16           ICON                    "bitmaps\\commit_16.ico"
+IDI_ROLLBACK_16         ICON                    "bitmaps\\rollback_16.ico"
+IDI_START_TRANSACTION_16 ICON                    "bitmaps\\start_transaction_16.ico"
 IDI_EXECUTEALL_16       ICON                    "bitmaps\\execall_16.ico"
 IDI_EXECUTE_16          ICON                    "bitmaps\\execute_16.ico"
 IDI_EXECUTEFORUPD_16    ICON                    "bitmaps\\execforupd_16.ico"
@@ -2618,6 +2639,12 @@ BEGIN
         RIGHTMARGIN, 242
         TOPMARGIN, 7
         BOTTOMMARGIN, 51
+    END
+
+    IDD_REGISTERSPLASH, DIALOG
+    BEGIN
+        RIGHTMARGIN, 295
+        BOTTOMMARGIN, 100
     END
 
     IDD_SHOWIMPORTERR, DIALOG
@@ -3493,9 +3520,13 @@ END
 
 STRINGTABLE
 BEGIN
-	ID_STARTTRANSACTION_WITHNOMODIFIER  "Start a new Transaction"
-	ID_COMMIT_WITHNOMODIFIER			"Commit the ongoing transacton"	
-	ID_ROLLBACK_TRANSACTION				"Rollback the transaction"
+    ID_STARTTRANSACTION_WITHNOMODIFIER "Start a new Transaction"
+END
+
+STRINGTABLE
+BEGIN
+    ID_COMMIT_WITHNOMODIFIER "Commit the ongoing transacton"
+    ID_ROLLBACK_TRANSACTION "Rollback the transaction"
 END
 
 STRINGTABLE

@@ -68,6 +68,8 @@
 #define IDC_CHK_DROPFUNCTIONS           1101
 #define IDC_CHK_DROPTRIGGERS            1102
 #define IDC_OBJECTFILTER                1103
+#define IDC_REGEXFILTER					1104
+#define IDC_REGEXFILTERTEXT				1105
 #define IDC_ABORT                       1211
 
 #define IDC_AVGROWLEN                   2003

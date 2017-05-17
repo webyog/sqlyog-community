@@ -967,6 +967,9 @@ DataView::IsColumnVirtual(wyInt32 col)
     wyString query,db, table,column;
 	MYSQL_RES  *fieldres = NULL;
 
+	if(! IsMySQL576Maria52(m_wnd->m_tunnel, &m_wnd->m_mysql))
+		return 0;
+
 	if(m_data->m_colvirtual)
 	{
 		if(m_data->m_colvirtual[col]!=-1)

@@ -159,6 +159,9 @@ wyBool IsMySQL577(Tunnel * tunnel, PMYSQL mysql);
 
 wyBool IsMySQL578(Tunnel * tunnel, PMYSQL mysql);
 
+// For virtual column support check
+wyBool IsMySQL576Maria52(Tunnel * tunnel, PMYSQL mysql);
+
 
 //wyBool IsClusterDb(Tunnel * tunnel, PMYSQL mysql);
 

@@ -123,7 +123,7 @@ typedef struct __schdextra_options
 	wyBool	  m_flushlogs;
 	wyBool	  m_flushmaster;
 	wyBool	  m_locktableread;
-	wyBool	  m_flushslave;
+	/*wyBool	  m_flushslave;*/
 	wyBool	  m_autocommit;
 	wyBool	  m_locktablewrite;
 	wyBool	  m_hextoblob;

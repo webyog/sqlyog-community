@@ -404,6 +404,8 @@ public:
 
     wyBool      IsSelectionOnTable();
 
+	void		setIsTruncate(wyBool);
+
     /// Double click manager.
     /**
     @param wparam   : Unsigned message parameter
@@ -904,14 +906,22 @@ public:
 
     void PaintFilterWindow(HWND hwnd);
 
-
-    /*void    AddToDeleteList(HWND hwnd, TVITEMEX &tvi);*/
+	wyBool m_isTruncate;
+   
+	/*void    AddToDeleteList(HWND hwnd, TVITEMEX &tvi);*/
 
     wyBool      m_isClearVisible;
 
     wyBool      m_AllowRename;
 
     wyString    m_prevString;
+
+#ifndef COMMUNTIY
+	wyBool		m_isRegexChecked;
+	HWND		m_hwndRegex;
+	HWND		m_hwndRegexText;
+	WNDPROC		m_RegexProc;
+#endif
 
     wyString    m_matchString;
 

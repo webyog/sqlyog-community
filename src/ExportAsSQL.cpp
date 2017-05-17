@@ -390,12 +390,12 @@ MySQLDump::SetHexBlob(wyBool val)
 	return;
 }
 
-void
-MySQLDump::SetFlushSlave(wyBool val)
-{
-	m_firstslave = val;
-	return;
-}
+//void
+//MySQLDump::SetFlushSlave(wyBool val)
+//{
+//	m_firstslave = val;
+//	return;
+//}
 
 void
 MySQLDump::SetLockTable(wyBool val)
@@ -1530,8 +1530,8 @@ MySQLDump::DumpTrigger(wyString * buffer, const wyChar * db, const wyChar * trig
 	sja_mysql_free_result(m_tunnel, res);
 	sja_mysql_free_result(m_tunnel, res1);
 
-	if(m_flushmaster == wyTrue) 
-        OnFlushMaster();	
+/*	if(m_flushmaster == wyTrue) 
+        OnFlushMaster();*/	
 
 	if( m_individualtablefiles == wyTrue)
 	{
@@ -1998,9 +1998,18 @@ MySQLDump::StartDump()
 			return wyFalse;
 	}
 
+
 	//Write to file , if data is there in buffer
 					if(WriteBufferToFile(&buffer, wyTrue) == wyFalse)
 		return wyFalse;
+
+	if(m_flushmaster == wyTrue)
+	{
+		if(OnFlushMaster() == wyFalse)
+		{
+				return wyFalse;
+		}
+	}
 
 	return wyTrue;
 }
@@ -2354,8 +2363,9 @@ MySQLDump::DumpTableAndViewTableStructure(wyString * buffer, const wyChar *db)
 	m_tunnel->SetDB(db);
 #endif
 
-	if(m_firstslave == wyTrue || m_flushmaster == wyTrue)
-	    DumpDatabaseOnMasterSlave();	
+//	if(m_firstslave == wyTrue || m_flushmaster == wyTrue)
+/*	if(m_flushmaster == wyTrue)
+		DumpDatabaseOnMasterSlave();*/	
 
 	ChangeContextDatabase(db);
 
@@ -2501,9 +2511,7 @@ MySQLDump::DumpDatabase(wyString * buffer, const wyChar *db, wyInt32 *fileerr)
 	m_tunnel->SetDB(db);
 #endif
 
-	if(m_firstslave == wyTrue || m_flushmaster == wyTrue)
-	    DumpDatabaseOnMasterSlave();
-
+//	if(m_firstslave == wyTrue || m_flushmaster == wyTrue)
    
     CHECKSTOP()
 
@@ -3136,9 +3144,9 @@ MySQLDump::DumpTable(wyString * buffer, const wyChar *db, const wyChar *table, w
 	if(m_autocommit == wyTrue && (m_iscommit == wyTrue)) 
         buffer->AddSprintf("%sCOMMIT;%s", m_strnewline.GetString(), m_strnewline.GetString());
 		 	
-	if(m_flushmaster == wyTrue) 
-	    if(OnFlushMaster() == wyFalse)
-            return wyFalse;
+	//if(m_flushmaster == wyTrue) 
+	//    if(OnFlushMaster() == wyFalse)
+ //           return wyFalse;
 		
 	if( m_individualtablefiles == wyTrue )
 	{
@@ -3176,15 +3184,31 @@ MySQLDump::OnFlushMaster()
 {
     wyString    query;
     MYSQL_RES   *res;
-	if(IsMySQL5600(m_tunnel, &m_mysql) == wyTrue)
-		query.SetAs("RESET MASTER");
-	else
-		query.SetAs("FLUSH MASTER");
-
+	MYSQL_ROW	row;
+	wyString str;
+	wyInt32 index_filename;
+	query.SetAs("SHOW MASTER STATUS");
 	res = SjaExecuteAndGetResult(m_tunnel, &m_mysql, query);
+	
+	if(!res && sja_mysql_affected_rows(m_tunnel, m_mysql) == -1)
+		return OnError();
+	if(res->row_count <=0 )
+		return wyTrue;
+	
+	row= mysql_fetch_row(res);
+	index_filename = GetFieldIndex( m_tunnel, res, "File");
+	str.SetAs(row[index_filename]);
+	mysql_free_result(res);
+	query.Clear();
+	query.AddSprintf("PURGE BINARY LOGS TO '%s",str.GetString());
+	query.Add("'");
+
+	res= SjaExecuteAndGetResult(m_tunnel, &m_mysql, query);
 
 	if(!res && sja_mysql_affected_rows(m_tunnel, m_mysql) == -1)
 		return OnError();
+
+	mysql_free_result(res);
 
     return wyTrue;
 }
@@ -3392,8 +3416,8 @@ MySQLDump::DumpProcedure(wyString * buffer, const wyChar *db, const wyChar *proc
 	
 	buffer->AddSprintf("%sDELIMITER ;%s", m_strnewline.GetString(), m_strnewline.GetString());
 	
-	if(m_flushmaster == wyTrue) 
-        OnFlushMaster();	
+/*	if(m_flushmaster == wyTrue) 
+        OnFlushMaster();*/	
 
 	if( m_individualtablefiles == wyTrue )
 	{
@@ -3482,8 +3506,8 @@ MySQLDump::DumpEvent(wyString * buffer, const wyChar * db, const wyChar * event,
 	
 	sja_mysql_free_result(m_tunnel, res);
 						
-	if(m_flushmaster == wyTrue) 
-        OnFlushMaster();	
+/*	if(m_flushmaster == wyTrue) 
+        OnFlushMaster();*/	
 
 	if( m_individualtablefiles == wyTrue )
 	{
@@ -3548,8 +3572,8 @@ MySQLDump::DumpFunction(wyString * buffer, const wyChar *db, const wyChar *funct
 	
 	buffer->AddSprintf("%sDELIMITER ;%s", m_strnewline.GetString(), m_strnewline.GetString());
 	
-	if(m_flushmaster == wyTrue) 
-	    OnFlushMaster();
+	//if(m_flushmaster == wyTrue) 
+	//    OnFlushMaster();
 
     if( m_individualtablefiles == wyTrue )
 	{
@@ -4554,7 +4578,6 @@ MySQLDump::WriteBufferToFile(wyString * buffer, wyBool  isforce)
 		//Flushing buffer for next write
 		buffer->Clear();
 	}
-
 	return wyTrue;
 }
 

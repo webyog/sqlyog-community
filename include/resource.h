@@ -197,14 +197,15 @@
 #define IDI_SCHEMADESIGNER              802
 #define IDD_CREATEDB                    802
 #define IDD_MYSQL_ERROR                 803
+#define IDD_REGISTERSPLASH              804
 #define IDI_PKEY                        810
 #define IDI_CLOSETABLE                  812
 #define IDI_SDTABLEVIEW                 813
 #define IDI_EXPORTASIMG                 815
 #define IDI_SDPRINT                     816
-#define IDI_COMMIT						817
-#define IDI_ROLLBACK					818
-#define IDI_START_TRANSACTION			819
+#define IDI_COMMIT                      817
+#define IDI_ROLLBACK                    818
+#define IDI_START_TRANSACTION           819
 #define IDI_ADDTABLES                   820
 #define IDI_ALTERDB                     821
 #define IDI_PREVIOUS                    824
@@ -217,9 +218,9 @@
 #define IDI_EVENT                       838
 #define IDI_REFRESHCANVAS               839
 #define IDR_TABLESMENU                  840
-#define IDI_COMMIT_16					841
-#define IDI_ROLLBACK_16					842
-#define IDI_START_TRANSACTION_16		843
+#define IDI_COMMIT_16                   841
+#define IDI_ROLLBACK_16                 842
+#define IDI_START_TRANSACTION_16        843
 #define IDI_SDZOOMIN                    845
 #define IDI_SDZOOMOUT                   846
 #define IDI_ALTEREVENT                  847
@@ -485,7 +486,7 @@
 #define IDC_ENABLEUPGRADE               1064
 #define IDD_GETSQLYOGULTIMATE           1064
 #define IDD_OBCOLOR                     1065
-#define IDC_TRANSACTION					1067
+#define IDC_TRANSACTION                 1067
 #define IDC_EXPORTFILENAME              1081
 #define IDC_PROGRESS                    1082
 #define IDC_CHK_USEDBNAME               1083
@@ -773,7 +774,6 @@
 #define IDC_TIMEOUTOPT                  1526
 #define IDC_TIMEOUTEDIT                 1527
 #define IDC_COMPRESSHELP                1533
-#define IDC_READONLY					10289
 #define IDC_TIMEOUTHELP                 1534
 #define IDC_TIMESEC                     1535
 #define IDC_SHOWWARNING                 1536
@@ -955,8 +955,8 @@
 #define IDC_SELCHECK                    1708
 #define IDC_CH                          1708
 #define IDC_PROMPTTRANSACTION           1708
-#define	IDC_PROMPTCLOSETRANSACTION		1710
 #define IDC_OPENSEL                     1709
+#define IDC_PROMPTCLOSETRANSACTION      1710
 #define IDC_PROGRESS2                   1712
 #define IDC_RESTORE_PROGRESS            1712
 #define IDC_CONNECTION_NAME             1713
@@ -970,6 +970,18 @@
 #define IDC_SAVEPOINTEDIT               1755
 #define IDC_SAVEPOINTRELEASE_COMBO      1756
 #define IDC_ROLLBACKTO_COMBO            1757
+#define IDM_VERIFY                      1801
+#define IDM_NEXT                        1802
+#define IDM_RESEND                      1803
+#define IDM_BACK                        1804
+#define IDC_LITE                        1805
+#define IDC_IMAGELINK                   1806
+#define IDC_TRIALEMAIL                  1807
+#define IDC_PASSCODE                    1808
+#define IDC_TITLE                       1809
+#define IDC_TRIALNOTESTATIC             1810
+#define IDC_TITLE2                      1811
+#define IDC_TRIALSTATIC                 1812
 #define IDC_INITCOMMANDHELP             2644
 #define IDC_COMBOCUSTOM                 2645
 #define ID_IMPORT_FROMXML               2655
@@ -992,6 +1004,7 @@
 #define IDS_TITLE5                      10245
 #define IDS_SUBTITLE5                   10246
 #define IDC_DLGCONNECT_STOREPASSWORD    10247
+#define IDC_READONLY                    10289
 #define ID_LF_1                         39100
 #define ID_LF_2                         39101
 #define ID_LF_3                         39102
@@ -1609,6 +1622,7 @@
 #define ID_SAVEPOINT_CREATESAVEPOINT    41821
 #define ID_SAVEPOINT_RELEASESAVEPOINT   41822
 #define ID_Menu                         41823
+#define ID_DATABASE_REBUILDTAGS         41756
 #define IDC_INITCOMMAND                 44114
 #define IDC_EDITINITCOMMAND             44115
 #define IDC_INVISIBLE                   44116
@@ -1643,7 +1657,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        1018
-#define _APS_NEXT_COMMAND_VALUE         41825
+#define _APS_NEXT_COMMAND_VALUE         41826
 #define _APS_NEXT_CONTROL_VALUE         1716
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

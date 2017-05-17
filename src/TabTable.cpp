@@ -116,10 +116,10 @@ TabTable::Refresh()
     wyInt32             diffdb = 0, difftable = 0;
 
     if(!m_data || 
-        (m_pmdi->m_pcqueryobject->IsSelectionOnTable() == wyTrue && 
-         ((diffdb = m_data->m_db.Compare(m_pmdi->m_pcqueryobject->m_seldatabase)) || 
+		(m_pmdi->m_pcqueryobject->IsSelectionOnTable() == wyTrue && 
+		 ((diffdb = m_data->m_db.Compare(m_pmdi->m_pcqueryobject->m_seldatabase)) || 
          (difftable = m_data->m_table.Compare(m_pmdi->m_pcqueryobject->m_seltable)))) ||
-        IsRefreshTableData() == wyTrue)
+		 IsRefreshTableData() == wyTrue)
     {
         if(m_data)
         {

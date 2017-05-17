@@ -2517,7 +2517,7 @@ CCopyTable::GetSelectStmt(wyString &select, wyString &query_for_virtuality,wyWCh
 	query.Sprintf("Show create table `%s`.`%s`",m_db.GetString(), m_table.GetString());
  	myres1 = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
 
-	if(!myres)
+	if(!myres1)
  	{
  		ShowMySQLError(m_hwnd, m_tunnel, m_mysql, query.GetString());
  		return wyFalse;

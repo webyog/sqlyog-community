@@ -931,6 +931,18 @@ FrameWindow::MoveToInitPos(HWND hwnd)
 	wyInt32		virtx, virty;
 	wyInt32		diffht, diffwd;
 	wyInt32		xprim, yprim;
+	static const char* (CDECL *pwine_get_version)(void);
+	HMODULE hntdll;
+
+    hntdll = GetModuleHandle(L"ntdll.dll");
+	if (hntdll)
+	{
+		if(GetProcAddress(hntdll, "wine_get_version"))
+		{
+			m_showwindowstyle = SW_NORMAL;
+			return wyFalse;
+		}
+	}
 
     if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyFalse)
     {
@@ -1048,7 +1060,6 @@ FrameWindow::MoveToInitPos(HWND hwnd)
 	}
 	
 	MoveWindow(hwnd, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, FALSE);  
-
 
 	lstyle = wyIni::IniGetInt(SECTION_NAME, "Maximize", 0, dirstr.GetString());
 
@@ -1736,6 +1747,7 @@ FrameWindow::CreateToolBarWindow()
 	wyUInt32 daysleft = TRIAL_DAYS_LEFT;
 	static const char * (CDECL *pwine_get_version)(void);
 	HMODULE hntdll;
+
 	//Make sure destroy all toolbar resources during the chage of icon size
 	DestroyToolBarResources();
 		
@@ -3410,7 +3422,7 @@ pGlobals->m_pcmainwin->m_closealltrans = 1;
 	case ID_OBJECT_CLEARTABLE:
 		if(hwndactive )
 			pcquerywnd->m_pcqueryobject->EmptyTable(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql);
-		break;
+			break;
 
 	case ACCEL_COPYTABLE:
 	case ID_OBJECT_COPYTABLE:
@@ -3556,6 +3568,11 @@ pGlobals->m_pcmainwin->m_closealltrans = 1;
 		if(hwndactive)
 			pcquerywnd->m_pcqueryobject->CreateSchema();
 		break;
+	//case ID_DATABASE_REBUILDTAGS:		vgladcode 
+	//	if(hwndactive)
+	//	  m_connection->OnWmCommand(hwndactive, pcquerywnd, wParam);
+	//	return wyTrue;			vgladcode
+
 
 	case IDM_WINDOW_TILE:
 		SendMessage(pGlobals->m_hwndclient, WM_MDITILE, 0, 0);
@@ -4975,7 +4992,7 @@ FrameWindow::OnActiveConn()
 								ID_OBJECTS_RENAMEVIEW, ID_OBJECTS_RENAMETRIGGER,
 								ID_TOOLS_FLUSH, IDC_DIFFTOOL, 
 								IDM_CREATEDATABASE,ID_OBJECT_TRUNCATEDATABASE, ID_DB_TABLE_MAKER, ID_TABLE_MAKER, IDM_ALTERDATABASE,ID_OPEN_COPYDATABASE, 
-								ID_OBJECT_DROPDATABASE, ID_OBJECT_EMPTYDATABASE, ID_OBJECT_CREATESCHEMA, 
+								ID_OBJECT_DROPDATABASE, ID_OBJECT_EMPTYDATABASE, ID_OBJECT_CREATESCHEMA,/*ID_DATABASE_REBUILDTAGS, vgladcode*/ 
 								ID_OBJECT_TABLEEDITOR,  
 								ID_OBJECT_COPYTABLE, ID_IMPORT_FROMCSV,ID_IMPORT_FROMXML, ID_OBJECT_RENAMETABLE, ID_OBJECT_CLEARTABLE, 
 								ID_OBJECT_DROPTABLE, ID_OBJECT_REORDER, ID_OBJECT_CHANGETABLETYPE_ISAM, 
@@ -7985,7 +8002,7 @@ FrameWindow::OnCreateDatabase(HWND hwndactive, MDIWindow *wnd)
 	wyWChar     *dbname;
 	wyInt32		ret;
 #ifndef COMMUNITY
-	if(GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
+	if(GetActiveWin()  && GetActiveWin()->m_conninfo.m_isreadonly == wyTrue)
 	{
 		return;
 	}
