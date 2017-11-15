@@ -28,9 +28,6 @@ extern	PGLOBALS pGlobals;
 
 #define FIND_STR_LEN	256
 
-//#define		REGKEY			"Software\\{906D6D9F-AB51-429F-8816-8D33284204FF}"
-//#define		REGKEY			"Software\\{BEE2684F-3781-4372-BA18-75ECC22C3B70}"
-#define		REGKEY			"Use Any UUID Here"
 #define		REGAPPID		"InU"
 /* window identifiers for all windows in both the connection dialog tabs */
 /* since we create everything by hand ( and not using the resource eidtor) 
@@ -58,14 +55,6 @@ extern	PGLOBALS pGlobals;
 #define     ALL_QUERY                                      3
 #define     PASTE_QUERY									   4 
 
-enum EntType
-{
-	ENT_ULTIMATE	= 1,
-	ENT_NORMAL	= 2,
-	ENT_PRO		= 3,
-	ENT_TRIAL   = 4,
-	ENT_INVALID	= 5
-};
 
 class ConnectionBase
 {
@@ -113,6 +102,7 @@ protected:
 
     /// Status bar original window procedure
 	WNDPROC         m_wpstatusbarorigproc;
+
     
 public:
 

@@ -286,7 +286,9 @@ my_queryprofile(MDIWindow *wnd, wyInt64 timetaken, const wyChar *proftext, wyBoo
 	TabHistory	*ptabhistory;
 	wyWChar     systime[SIZE_256];
 	wyString	systimestr, str, tempstr;
-
+	SYSTEMTIME	localtime ={0};
+	wyChar *months[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+	
 	if(!wnd || !proftext)
 		return wyFalse;
 
@@ -298,18 +300,21 @@ my_queryprofile(MDIWindow *wnd, wyInt64 timetaken, const wyChar *proftext, wyBoo
 	GetTimeFormat(LOCALE_USER_DEFAULT, 0, NULL, NULL, systime, ((SIZE_256-1) * 2));
 	systimestr.SetAs(systime);
 	
+	GetLocalTime(&localtime);
+
 	if(iscomment == wyTrue)// set the history log text as comment
-		str.Sprintf("/*[%s][%I64d ms] %s */\r\n", systimestr.GetString(), timetaken / 1000, proftext);
+		str.Sprintf("/*[%d-%s %s][%I64d ms] %s */\r\n", localtime.wDay, months[localtime.wMonth - 1],systimestr.GetString(), timetaken / 1000, proftext);
 
 	else // to add query
     {
         tempstr.SetAs(proftext);
         tempstr.RTrim();
         if(tempstr.GetLength() && tempstr.GetString()[tempstr.GetLength() - 1] != ';')
-		    str.Sprintf("/*[%s][%I64d ms]*/ %s;\r\n", systimestr.GetString(), timetaken / 1000, proftext);
+		    str.Sprintf("/*[%d-%s %s][%I64d ms]*/ %s;\r\n", localtime.wDay, months[localtime.wMonth - 1],systimestr.GetString(), timetaken / 1000, proftext);
         else
-            str.Sprintf("/*[%s][%I64d ms]*/ %s\r\n", systimestr.GetString(), timetaken / 1000, proftext);
+            str.Sprintf("/*[%d-%s %s][%I64d ms]*/ %s\r\n", localtime.wDay, months[localtime.wMonth - 1],systimestr.GetString(), timetaken / 1000, proftext);
     }
+
 	//Add text to history tab
 	if(ptabhistory)
 	{

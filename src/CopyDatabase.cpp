@@ -549,6 +549,10 @@ CopyDatabase::ExecuteCopyThread(LPVOID lpparam)
 		
 		//Shows number of rows copied
 		msg.Sprintf(_("Error occured while copying "));
+
+		if( GetForegroundWindow() != copydb->m_lpParam->m_hwnddlg )
+			FlashWindow(pGlobals->m_pcmainwin->m_hwndmain, TRUE);
+
 		SendMessage(copydb->m_lpParam->m_hwndmsg, WM_SETTEXT, 0, (LPARAM)msg.GetAsWideChar());
 
 		//SetFocus(copydb->m_copydb->m_hwnddlg);		
@@ -556,6 +560,11 @@ CopyDatabase::ExecuteCopyThread(LPVOID lpparam)
 
 	if(copydb->m_copydb->m_summary.GetLength())
 		EnableWindow(GetDlgItem(copydb->m_lpParam->m_hwnddlg, IDC_SUMMARY), wyTrue);
+	
+	
+	if( GetForegroundWindow() != copydb->m_lpParam->m_hwnddlg )
+		FlashWindow(pGlobals->m_pcmainwin->m_hwndmain, TRUE);
+
 
 	//If it is succesful then Close button is changed to Done
 	ShowWindow(GetDlgItem(copydb->m_lpParam->m_hwnddlg, IDCANCEL), !isdone);
@@ -3372,10 +3381,13 @@ CopyDatabase::UpdateGui(void * lpParam, wyChar *tablename, wyUInt32 rowsinserted
 		break;
 		
 	case TABLECOPIED:
-		param->m_summary->AddSprintf("Table '%s'", tablename);
-		if(isdata == wyTrue)
-			param->m_summary->AddSprintf(_(" (%lu rows))"), rowsinserted);
-		param->m_summary->AddSprintf(_(" copied\r\n"));
+		if(param->m_summary)
+		{
+			param->m_summary->AddSprintf("Table '%s'", tablename);
+			if(isdata == wyTrue)
+				param->m_summary->AddSprintf(_(" (%lu rows))"), rowsinserted);
+			param->m_summary->AddSprintf(_(" copied\r\n"));
+		}
 		break;
 
 	case VIEWCOPIED:

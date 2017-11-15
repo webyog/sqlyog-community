@@ -418,6 +418,9 @@ ImportBatch::ImportConclude(IMPORTBATCH * evt, IMPORTPARAM * param)
 	EnableDlgWindows(wyTrue);
 	ChangeOKButtonText(_(L"&Execute"));
 
+	if(GetForegroundWindow() != m_hwnd)
+		FlashWindow(pGlobals->m_pcmainwin->m_hwndmain, TRUE);
+
 	if(SUCCESSWITHERROR == evt->m_retcode)//creating the dialog box to tell the user about the error that were there
 		HandleError();
 	
@@ -652,6 +655,9 @@ ImportBatch::HandleError()
     }
     else
         msg.Sprintf(_("Unable to get SQLyog.err file information!"));
+
+	if(GetForegroundWindow() != m_hwnd)
+		FlashWindow(pGlobals->m_pcmainwin->m_hwndmain, TRUE);
 
 	err.Create(m_hwnd, msg.GetString(), errfile);
 

@@ -5062,6 +5062,8 @@ MDIWindow::HandleQueryExecFinished(HWND hwndactive, MDIWindow *pcquerywnd, WPARA
 		peditorbase->HandleQueryExecFinish(&pcquerywnd->m_stopquery, wparam);
 		pGlobals->m_pcmainwin->OnQueryExecFinish(pcquerywnd);
 		SendMessage(pctabeditor->m_pctabmgmt->m_hwnd, WM_SETREDRAW, TRUE, 0);
+		if(GetForegroundWindow() != pGlobals->m_pcmainwin->m_hwndmain || IsIconic(pGlobals->m_pcmainwin->m_hwndmain) != 0 )
+			FlashWindow(pGlobals->m_pcmainwin->m_hwndmain, TRUE);
 	}
     return;
 }

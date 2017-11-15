@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="100">连接</string>
 	<string name="101">创建新连接</string>
 	<string name="102">以当前连接属性创建新连接</string>
 	<string name="103">断开当前连接</string>

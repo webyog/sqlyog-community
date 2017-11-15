@@ -502,6 +502,8 @@ ExportBatch::OnWmCommand(HWND hwnd, WPARAM wparam)
 	case IDOK:
 		{
 			ExportData();
+			if( GetForegroundWindow() != hwnd)
+				FlashWindow(pGlobals->m_pcmainwin->m_hwndmain, TRUE);
 			EnableDisableOptions(IDC_CHK_DATAONLY);
 			EnableDisableOptions(IDC_CHK_STRUCTURE);
 			EnableDisableOptions(IDC_CHK_DATA);	

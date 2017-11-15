@@ -26,31 +26,4 @@
 	<string name="3652">LOAD LOCAL을 통해 &amp;XML 데이터 가져오기...	Ctrl+Shift+X</string>
 	<string name="3653">XML을 불러오기 위해 테이블과 칼럼을 선택</string>
 	<string name="3654">다음에 의해 식별된 열:</string>
-	<string name="3655">바꾸기</string>
-	<string name="3656">&amp;업무</string>
-	<string name="3657">자동 커밋 설정</string>
-	<string name="3658">격리 수준</string>
-	<string name="3659">시작 트랜잭션</string>
-	<string name="3660">범하다</string>
-	<string name="3661">롤백</string>
-	<string name="3662">세이브 포인트</string>
-	<string name="3663">반복 읽기</string>
-	<string name="3664">커밋 된 읽기</string>
-	<string name="3665">커밋되지 않은 읽기</string>
-	<string name="3666">직렬화</string>
-	<string name="3667">없는 수정과</string>
-	<string name="3668">일관된 스냅 샷으로</string>
-	<string name="3669">읽기 전용</string>
-	<string name="3670">읽기 쓰기</string>
-	<string name="3671">그리고 체인</string>
-	<string name="3672">그리고 어떤 체인 없음</string>
-	<string name="3673">해제</string>
-	<string name="3674">어떤 자료 없음</string>
-	<string name="3675">세이브 포인트하려면</string>
-	<string name="3676">트랜잭션</string>
-	<string name="3677">세이브 포인트를 만들기</string>
-	<string name="3678">릴리스 세이브 포인트</string>
-	<string name="3679">트랜잭션을 커밋</string>
-	<string name="3680">롤백 트랜잭션</string>
-	
-</resources>
+	</resources>

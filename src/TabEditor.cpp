@@ -225,8 +225,8 @@ TabEditor::OnTabSelChange()
 
     /// If the tab type is advance tab then we need to disable the execute button 
     if(pceditorbase->GetAdvancedEditor() == wyTrue)
-	{   
-        SendMessage(hwndtoolbar, TB_SETSTATE, (WPARAM)IDM_EXECUTE, TBSTATE_INDETERMINATE);
+	{ 
+		SendMessage(hwndtoolbar, TB_SETSTATE, (WPARAM)IDM_EXECUTE, TBSTATE_INDETERMINATE);
 		//SendMessage(hwndsecondtool, TB_SETSTATE, (WPARAM)ID_FORMATCURRENTQUERY, TBSTATE_INDETERMINATE);
 		SendMessage(hwndtoolbar, TB_SETSTATE, (WPARAM)ACCEL_QUERYUPDATE, TBSTATE_INDETERMINATE);
         SendMessage(hwndsecondtool, TB_SETSTATE, (WPARAM)ID_FORMATCURRENTQUERY, TBSTATE_ENABLED);

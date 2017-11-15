@@ -41,7 +41,7 @@
 	<string name="1036">이 접속 상세를 정말 삭제하시겠습니까?</string>
 	<string name="1037">접속 성공!
 MySQL 버전: %s</string>
-	<<string name="1038">접속 정보</string>
+	<string name="1038">접속 정보</string>
  	<string name="1039">새로운 창을 초기화하지 못했습니다</string>
  	<string name="1040">이 기능은 HTTP 터널을 이용하여 접속할 경우에만 가능합니다.</string>
 	<string name="1041">복구(&amp;R)</string>

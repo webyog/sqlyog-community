@@ -2,8 +2,6 @@
 
 <resources>
 
-	<string name="100">Connection</string>
-
 	<string name="101">Create A New Connection</string>
 
 	<string name="102">Create A New Connection With Current Connection Properties</string>

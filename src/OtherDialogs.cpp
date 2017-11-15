@@ -3265,7 +3265,7 @@ TableDiag::DiagOptimize()
 		ShowMySQLError(m_hwndparent, m_tunnel, m_mysql, query.GetString());
 		return wyFalse;
 	}
-
+	
 	csi.ShowInfo(m_hwnd, m_tunnel, myres, _(" Table Diagnostics Information"));
 	SetCursor(LoadCursor(NULL, IDC_ARROW));
 	m_tunnel->mysql_free_result(myres);
@@ -3569,6 +3569,9 @@ CShowInfo::ShowInfo(HWND hwndparent, Tunnel * tunnel, MYSQL_RES * myres, wyChar 
 
 	//Post 8.01
     //RepaintTabModule();
+
+	if( GetForegroundWindow() != hwndparent)
+		FlashWindow(pGlobals->m_pcmainwin->m_hwndmain, TRUE);
 
 	ret = DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_SHOWINFO),
 		hwndparent, CShowInfo::DlgProc, (LPARAM)this);
@@ -4085,7 +4088,6 @@ wyInt32
 TableDiag::TableDlgProcCommand(HWND phwnd, TableDiag *pctablediag, WPARAM pwparam, LPARAM plparam)
 {
     HWND hwnd = NULL;
-
 	switch(LOWORD(pwparam))
 	{
 	case IDOK:

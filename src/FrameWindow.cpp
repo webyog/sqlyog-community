@@ -9313,7 +9313,7 @@ FrameWindow::EnableToolButtonsAndCombo(HWND hwndtool, HWND hwndsecondtool, HWND 
 
             if(tb1id[i] == IDM_EXECUTE || tb1id[i] == ACCEL_QUERYUPDATE)
             {
-                if(tabicon != IDI_QUERY_16)
+				if(tabicon != IDI_QUERY_16)
                 {
                     state = TBSTATE_INDETERMINATE;
                 }
@@ -11887,9 +11887,12 @@ sessionsavesproc(void *arg)
 				}
 				if(WaitForSingleObject(pGlobals->m_pcmainwin->m_sqlyogcloseevent, 0) == WAIT_OBJECT_0 )
 				{
-					ret = pGlobals->m_pcmainwin->SaveConnectionDetails();
-					if(!ret && !pGlobals->m_pcmainwin->m_hwndconntab)
-						ispurge = wyTrue;
+					if(pGlobals->m_pcmainwin)
+					{
+						ret = pGlobals->m_pcmainwin->SaveConnectionDetails();
+						if(!ret && !pGlobals->m_pcmainwin->m_hwndconntab)
+							ispurge = wyTrue;
+					}
 				}
 			
 

@@ -26,31 +26,4 @@
 	<string name="3652">Import &amp;XML Data Using LOAD LOCAL...	Ctrl+Shift+X</string>
 	<string name="3653">Select Table and Columns To Import In XML</string>
 	<string name="3654">Rows Identified by</string>
-	<string name="3655">Replace</string>
-	<string name="3656">T&amp;ransactions</string>
-	<string name="3657">Set Autocommit</string>
-	<string name="3658">Isolation Level</string>
-	<string name="3659">Start Transaction</string>
-	<string name="3660">Commit</string>
-	<string name="3661">Rollback</string>
-	<string name="3662">Savepoint</string>
-	<string name="3663">Repeatable Read</string>
-	<string name="3664">Read Committed</string>
-	<string name="3665">Read Uncommitted</string>
-	<string name="3666">Serializable</string>
-	<string name="3667">With no modifier</string>
-	<string name="3668">With Consistent Snapshot</string>
-	<string name="3669">Read only</string>
-	<string name="3670">Read Write</string>
-	<string name="3671">And Chain</string>
-	<string name="3672">And No Chain</string>
-	<string name="3673">Release</string>
-	<string name="3674">No Release</string>
-	<string name="3675">To Savepoint</string>
-	<string name="3676">Transaction</string>
-	<string name="3677">Create Savepoint</string>
-	<string name="3678">Release Savepoint</string>
-	<string name="3679">Commit Transaction</string>
-	<string name="3680">Rollback Transaction</string>
-		
 </resources>

@@ -57,7 +57,10 @@
 #define     NCP_UTF16   3
 #define     NCP_ASCII   4
 
-#define		FMT_SPACE_4 "    "    
+#define		FMT_SPACE_4 "    " 
+
+#define		REGKEY			"Use any UUID here"
+
 
 #define		SSHTUNNELER 	  "plink.exe"
 #define     SQLYOG_MUTEX_NAME "SQLyogSSHMutex"
@@ -108,6 +111,15 @@
 #define  CPI_CP932 932
 #define  MYSQL_TYPE_JSON 245
 #define  FIELD_TYPE_JSON  MYSQL_TYPE_JSON
+
+enum EntType
+{
+	ENT_ULTIMATE	= 1,
+	ENT_NORMAL	= 2,
+	ENT_PRO		= 3,
+	ENT_TRIAL   = 4,
+	ENT_INVALID	= 5
+};
 
 
 typedef struct ForeignKey

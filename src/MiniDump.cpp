@@ -236,7 +236,7 @@ MiniDump::CreateUniqueDumpFile()
     if(m_hfile == INVALID_HANDLE_VALUE)
     {
         count = 0;
-         _snwprintf(filename, 31, L"%s%s%3d", DUMPNAME, basename, count);
+         _snwprintf(filename, 31, L"%s%s%d", TEXT(DUMPNAME), basename, count);
          filenamestr.SetAs(filename);
          fullpathstr.Add(filenamestr.GetString());
          m_hfile = ::CreateFile(fullpathstr.GetAsWideChar(), GENERIC_WRITE, FILE_SHARE_WRITE, NULL, 

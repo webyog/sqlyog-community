@@ -132,6 +132,7 @@ public:
     @returns Length of the buffer.
     */
 	wyUInt32 SetAs(const wyWChar* toset);
+	wyUInt32 SetAs(const wyWChar* toset, wyInt32 length);
 
     /// Sets a specific length of data to the string passed as parameter
     /**
@@ -474,6 +475,8 @@ public:
 	@param isreverse	: if its wyTrue then reverse the main string and search string and do search
 	*/
 	wyInt32				FindIWithReverse(wyChar *searchstr, wyUInt32 pos, wyBool isreverse = wyFalse);
+
+	void JsonEscape();
 	
 private:
 
@@ -555,6 +558,8 @@ private:
 	} */   
 
     wyString(const wyString &str);
+
+
 };
 
 #endif

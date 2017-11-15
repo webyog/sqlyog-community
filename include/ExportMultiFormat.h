@@ -764,6 +764,8 @@ public:
 	*/
 	wyBool		SetStaticText();
 
+	void		FlashIfInactive(HWND hwnd);
+
 	/// Sets the file in the edit box.
 	/**
 	@returns wyTrue on success else wyFalse

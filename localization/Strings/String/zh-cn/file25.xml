@@ -26,30 +26,4 @@
 	<string name="3652">使用LOAD LOCAL导入&amp;XML数据…… 	Ctrl+Shift+X</string>
 	<string name="3653">选择表格和列在XML中导入</string>
 	<string name="3654">行标识方式：</string>
-	<string name="3655">替换</string>
-	<string name="3656">&amp;交易</string>
-	<string name="3657">設置自動提交</string>
-	<string name="3658">隔離級別</string>
-	<string name="3659">開始交易</string>
-	<string name="3660">承諾</string>
-	<string name="3661">回滾</string>
-	<string name="3662">保存點</string>
-	<string name="3663">可重複讀</string>
-	<string name="3664">讀已提交</string>
-	<string name="3665">未提交讀</string>
-	<string name="3666">序列化</string>
-	<string name="3667">由於沒有修改</string>
-	<string name="3668">有了一致的快照</string>
-	<string name="3669">只讀</string>
-	<string name="3670">讀寫</string>
-	<string name="3671">和鏈條</string>
-	<string name="3672">且無鏈</string>
-	<string name="3673">發布</string>
-	<string name="3674">沒有釋放</string>
-	<string name="3675">為了保存點</string>
-	<string name="3676">交易</string>
-	<string name="3677">創建保存點</string>
-	<string name="3678">發布保存點</string>
-	<string name="3679">提交事務</string>
-	<string name="3680">回滾事務</string>
-</resources>
+	</resources>

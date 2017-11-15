@@ -2243,6 +2243,9 @@ CExportResultSet::StartCSVExport(StopExport *resultset)
 
 	ret = resultset->m_exportresultset->SaveDataAsCSV(resultset->m_exportresultset->m_hfile);
 
+	if(m_hwnd)
+		FlashIfInactive(m_hwnd);
+
 	VERIFY(CloseHandle(resultset->m_exportresultset->m_hfile));
 	
 	if(ret)
@@ -2275,6 +2278,10 @@ CExportResultSet::StartExcelExport(StopExport *resultset)
 
     ret = resultset->m_exportresultset->SaveDataAsEXCEL(multisheet, bloblimit, decimalplaces);
 	VERIFY(CloseHandle(resultset->m_exportresultset->m_hfile));
+
+	if(m_hwnd)
+		FlashIfInactive(m_hwnd);
+
 	if(ret)
     {
 	ret1 = yog_message(resultset->m_exportresultset->m_hwnd, _(L"Data exported successfully. Would you like to open file?"), pGlobals->m_appname.GetAsWideChar(), MB_YESNO | MB_ICONQUESTION);
@@ -2379,7 +2386,16 @@ CExportResultSet::SaveDataAsSQL()
 
     retval = exportdata.StartSQLExport(&data);
 
+	if(m_hwnd)
+		FlashIfInactive(m_hwnd);
+
     return retval;
+}
+
+void CExportResultSet::FlashIfInactive(HWND hwnd)
+{
+	if( GetForegroundWindow() != hwnd)
+		FlashWindow(pGlobals->m_pcmainwin->m_hwndmain, TRUE);
 }
 
 /*
@@ -2556,6 +2572,9 @@ CExportResultSet::SaveDataAsXML(HANDLE hfile)
 	buffer.Add("</data>");
 	
 	ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbyteswritten, NULL);
+
+	if(m_hwnd)
+		FlashIfInactive(m_hwnd);
 	
 	if(ret == FALSE)
 	{
@@ -2584,7 +2603,7 @@ wyBool
 	MYSQL_FIELD		*myfield;
 	MYSQL_ROWEX	    *tmp = NULL;
 	MYSQL_ROWS		*rowswalker = NULL;
-
+	wyString		temp;
 	myres			= m_res;
 	myfield			= m_field;
 	SetCursor(LoadCursor(NULL, IDC_WAIT));
@@ -2658,27 +2677,9 @@ wyBool
 			buffer.Add(",\r\n");
 
 			buffer.Add("\"");
-			
-			// we output the fields but before we check if there is a space in between.
-			k=0;
-
-			while(myfield[j].name[k])
-			{
-				switch(myfield[j].name[k])
-				{
-				case C_SPACE:
-					buffer.Add("_");
-					break;
-
-				default:
-					buffer.AddSprintf("%c", *(myfield[j].name+k));
-					break;
-				}
-				
-				k++;
-			}
-
-			
+			temp.SetAs(myfield[j].name);
+			temp.JsonEscape();
+			buffer.Add(temp.GetString());
 			buffer.Add("\":");
 			
 			if(myrow[j] != NULL)
@@ -2694,7 +2695,9 @@ wyBool
 				
 			    {
 						buffer.Add("\"");
-						buffer.Add(myrowstr.GetString());
+						temp.SetAs(myrowstr.GetString());
+						temp.JsonEscape();
+						buffer.Add(temp.GetString());
 						buffer.Add("\"");
 				}
 			}
@@ -2731,6 +2734,11 @@ wyBool
 	
 	ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbyteswritten, NULL);
 	
+	
+	if(m_hwnd)
+		FlashIfInactive(m_hwnd);
+
+
 	if(ret == FALSE)
 	{
 		DisplayErrorText(GetLastError(), _("Error writing in file."));
@@ -3207,6 +3215,10 @@ CExportResultSet::SaveDataAsHTML(HANDLE hfile)
 	ret = WriteFile(hfile, buffer.GetString(), buffer.GetLength(), &dwbyteswritten, NULL);
 	
 	buffer.Clear();
+
+	
+	if(m_hwnd)
+		FlashIfInactive(m_hwnd);
 
 	if(ret == FALSE)
 	{

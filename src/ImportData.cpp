@@ -757,6 +757,8 @@ ExportMultiFormat::ImportData(wyBool iscsv)
 	res = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query, wyTrue, wyFalse, wyTrue, false);
     //mysql_thread_end();
 
+	if( GetForegroundWindow() != m_hwnd)
+		FlashWindow(pGlobals->m_pcmainwin->m_hwndmain, TRUE);
 
 	if(!res && m_tunnel->mysql_affected_rows(*m_mysql)== -1)
 	    goto cleanup;

@@ -191,7 +191,6 @@ Note: To create a job use the respective job wizards</string>
 	<string name="2146">Error handling</string>
 	<string name="2147">1</string>
 	<string name="2148">Completing the Database Import Wizard</string>
-	<string name="2149">Specify Job File:</string>
 	<string name="2150">Specify Schedule Name:</string>
 	<string name="2151">DDL/DML Options</string>
 	<string name="2152">Import Options</string>

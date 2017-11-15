@@ -172,10 +172,6 @@ wyString::SetAs(wyString& str)
 wyUInt32 
 wyString::SetAs(const wyWChar* toset)
 {	
-	wyChar		*utf8 = NULL;
-	wyUInt32	len = 0;
-	wyInt32		lengthofutf8 = 0;		
-
 	if(wcslen(toset) == 0)
 	{
 		SetAs("");
@@ -189,6 +185,22 @@ wyString::SetAs(const wyWChar* toset)
     wyInt32 length = wcstombs(NULL, toset, 0);
 #endif
     
+	return SetAs(toset, length);
+}
+
+wyUInt32 
+wyString::SetAs(const wyWChar* toset, wyInt32 length)
+{	
+	wyChar		*utf8 = NULL;
+	wyUInt32	len = 0;
+	wyInt32		lengthofutf8 = 0;		
+
+	if(length == 0)
+	{
+		SetAs("");
+		return 0;
+	}
+    
 	utf8 = (wyChar *)calloc(sizeof(wyChar), length + 1);
 	
 	if(utf8 == NULL)
@@ -200,6 +212,7 @@ wyString::SetAs(const wyWChar* toset)
 #ifdef _WIN32
 	lengthofutf8 = WideCharToMultiByte(CP_UTF8, 0, toset, -1, utf8, length, NULL, NULL);
 #else
+	setlocale(LC_ALL, "en_US.utf8");
     lengthofutf8 = wcstombs(utf8, toset, length);
 #endif
 	
@@ -209,6 +222,7 @@ wyString::SetAs(const wyWChar* toset)
 	utf8 = NULL;
 	return len;	
 }
+
 
 wyUInt32
 wyString::SetAs(const wyChar* toset, wyUInt32 len)
@@ -1423,4 +1437,53 @@ wyString::StrIStr(wyChar* buffer, wyChar *to_find) {
     }
   }
   return NULL;
+}
+
+void wyString::JsonEscape() {
+    wyInt32 index;
+    wyChar ch;
+    wyString temp;
+
+    for (index = 0; index < GetLength(); index++) {
+        ch = GetCharAt(index);
+
+        switch (ch) {
+            case '\"':
+                Replace(index, 1, "\\\"");
+                index++;
+                break;
+            case '\\':
+                Replace(index, 1, "\\\\");
+                index++;
+                break;
+            case '\b':
+                Replace(index, 1, "\\b");
+                index++;
+                break;
+            case '\f':
+                Replace(index, 1, "\\f");
+                index++;
+                break;
+            case '\n':
+                Replace(index, 1, "\\n");
+                index++;
+                break;
+            case '\r':
+                Replace(index, 1, "\\r");
+                index++;
+                break;
+            case '\t':
+                Replace(index, 1, "\\t");
+                index++;
+                break;
+            default:
+            {
+                if (ch > 0 && ch <= 0x1F) {
+                    temp.Sprintf("\\u%04x;", ch);
+                    Replace(index, 1, temp.GetString(), temp.GetLength());
+                    index += (temp.GetLength() - 1);
+                }
+            }
+        }
+    }
 }

@@ -29,12 +29,12 @@
 #define _DATATYPE_H_
 
 
-
 #ifdef _WIN32
     
     #include <winsock.h>
 	#include <mysql.h>
 #else
+       #include <limits.h>
 	#include <mysql/mysql.h>
 #endif
 
