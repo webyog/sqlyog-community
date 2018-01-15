@@ -3842,29 +3842,36 @@ MySQLDump::PrintFieldValue(wyString * buffer, MYSQL_RES *res, MYSQL_ROW row, wyI
 		
 		if(m_sethexblob && isBlob)
 		{
-				hex_datalen=lengths[count]+1;
-				hex_data.SetAs(row[count]);
-				if(hex_datalen==1)
+				hex_datalen=lengths[count];
+				
+				if(hex_datalen==0)
 				{
 					buffer->AddSprintf("''");
 					firstcol++;
 					continue;
 				}
-				len=hex_data.GetLength();
-				blob_temp.SetAs(hex_data.GetString());
+
 				buffer->AddSprintf("0x");
 				hex_tmp.SetAs("");
-				for (i = 0; i < len; i++) 
+
+				const char *ptr= row[count];
+				
+				for (i = 0; i < hex_datalen; i++) 
 				{
-					if((i+3) < len && blob_temp.GetCharAt(i) == '\\' && blob_temp.GetCharAt(i+1)=='r' && blob_temp.GetCharAt(i+2)=='\\' && blob_temp.GetCharAt(i+3) == 'n')
-					{
-						hex_tmp.Add("0D0A");
-						i += 3;
+					//MM: Test case?
+					if((i+3) < hex_datalen) {
+						if (*((unsigned char *)(ptr + i)) == '\\' && 
+							*((unsigned char *)(ptr + i + 1)) =='r' &&
+							*((unsigned char *)(ptr + i + 2)) =='\\' && 
+							*((unsigned char *)(ptr + i + 3)) == 'n')
+						{
+							hex_tmp.Add("0D0A");
+							i += 3;
+							continue;
+						}
 					}
-					else
-					{
-						hex_tmp.AddSprintf("%02x",blob_temp.GetCharAt(i));
-					}
+
+					hex_tmp.AddSprintf("%02x", *((unsigned char *)(ptr+i)));
 				}
 				buffer->AddSprintf(hex_tmp.GetString());
 				firstcol ++;
