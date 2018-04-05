@@ -270,7 +270,7 @@ ObjectInfo::HtmlWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	switch(message)
 	{		
 	    case WM_HELP:
-		    ShowHelp("http://sqlyogkb.webyog.com/article/203-query-profiler");
+		    ShowHelp("http://sqlyogkb.webyog.com/article/84-query-profiler");
             break;	
 
         case UM_FOCUS:

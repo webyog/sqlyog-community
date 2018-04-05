@@ -1623,6 +1623,9 @@
 #define ID_SAVEPOINT_RELEASESAVEPOINT   41822
 #define ID_Menu                         41823
 #define ID_DATABASE_REBUILDTAGS         41756
+#define ID_Menu41826                    41826
+#define ID_Menu41827                    41827
+#define IDM_COLLAPSEOBJECT              41828
 #define IDC_INITCOMMAND                 44114
 #define IDC_EDITINITCOMMAND             44115
 #define IDC_INVISIBLE                   44116
@@ -1657,7 +1660,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        1018
-#define _APS_NEXT_COMMAND_VALUE         41826
+#define _APS_NEXT_COMMAND_VALUE         41829
 #define _APS_NEXT_CONTROL_VALUE         1716
 #define _APS_NEXT_SYMED_VALUE           101
 #endif

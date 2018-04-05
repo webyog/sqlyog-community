@@ -167,7 +167,7 @@ TabMessage::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 		break;
 
      case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/205-message-tab");
+		ShowHelp("http://sqlyogkb.webyog.com/article/78-message-tab");
 		return 1;
 
      case SCI_COPY:

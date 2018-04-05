@@ -116,7 +116,7 @@ CAdvProp::~CAdvProp()
 wyBool
 CAdvProp::Create(HWND hwndparent, Tunnel *tunnel, PMYSQL mysql, wyChar *database, wyChar *tbl)
 {
-	wyInt32	ret;
+	wyInt64	ret;
 
 	m_hwndparent = m_hwndparent;
 	m_mysql = mysql;
@@ -168,7 +168,7 @@ CAdvProp::AdvPropDialogProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPARAM l
 		return wyTrue;
 		
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/224-advanced-properties");
+		ShowHelp("http://sqlyogkb.webyog.com/article/96-advanced-tab");
 		return wyTrue;
 
 	case WM_INITDLGVALUES:
@@ -354,7 +354,7 @@ CShowValue::~CShowValue()
 wyBool
 CShowValue::Create(HWND hwndparent, Tunnel * tunnel, PMYSQL mysql, wyInt32 valtype)
 {
-	wyInt32	ret;
+	wyInt64	ret;
 
 	m_hwndparent    	= hwndparent;
 	m_mysql		        = mysql;
@@ -431,7 +431,7 @@ CShowValue::ShowValueDialogProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPAR
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/331-environment-variables");
+		ShowHelp("http://sqlyogkb.webyog.com/article/132-environment-variables");
 		return 1;		
 	
 	case WM_CONTEXTMENU:
@@ -833,7 +833,7 @@ CSchema::~CSchema()
 wyBool
 CSchema::Build(CQueryObject *pcqueryobject, Tunnel * tunnel, PMYSQL mysql, HTREEITEM hitem)
 {
-	wyInt32		ret;
+	wyInt64		ret;
 	TVITEM		tvi;
     wyWChar      dbname[SIZE_512] = {0};
 	
@@ -883,7 +883,7 @@ CSchema::SchemaDialogProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPARAM lpa
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/238-database-schema");
+		ShowHelp("http://sqlyogkb.webyog.com/article/119-database-schema");
 		return wyTrue;
 
 	case UM_CREATESCHEMA:
@@ -1579,7 +1579,7 @@ wyBool
 CCopyTable::Create(HWND hwndparent, Tunnel *tunnel, PMYSQL umysql, wyChar *db, 
 				   wyChar *table, HTREEITEM hitemtable, HTREEITEM hitemdb)
 {
-	wyInt32         ret;
+	wyInt64         ret;
 	TVITEM			tvi;
 	TVINSERTSTRUCT	tvins;
 	HTREEITEM		hitemnew;
@@ -1691,7 +1691,7 @@ CCopyTable::CopyTableDialogProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPAR
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/221-copy-table-to-different-host");
+		ShowHelp("http://sqlyogkb.webyog.com/article/105-copy-table-to-different-host");
 		return wyTrue;
 
 	case WM_COMMAND:
@@ -2852,7 +2852,7 @@ CCopyTable::OnPaint(HWND hwnd)
 
 TableDiag::TableDiag(HWND hwndparent, Tunnel * tunnel, PMYSQL mysql)
 {
-	wyInt32				ret;
+	wyInt64				ret;
 
 	m_mysql         =   mysql;
 	m_tunnel        =   tunnel;
@@ -2900,7 +2900,7 @@ TableDiag::TableDlgProc(HWND phwnd, wyUInt32 pmessage, WPARAM pwparam, LPARAM pl
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/335-table-diagnostics");
+		ShowHelp("http://sqlyogkb.webyog.com/article/109-table-diagnostics");
 		return wyTrue;		
 
 	case WM_COMMAND:
@@ -3547,7 +3547,7 @@ CShowInfo::~CShowInfo()
 wyBool 
 CShowInfo::ShowInfo(HWND hwndparent, Tunnel * tunnel, MYSQL_RES * myres, wyChar *title, wyChar *summary)
 {
-	wyInt32     ret;
+	wyInt64     ret;
 
 	m_hwndparent    = hwndparent;
 	
@@ -3601,7 +3601,7 @@ CShowInfo::DlgProc(HWND hwnd, wyUInt32 message, WPARAM wParam, LPARAM lparam)
 	
 	case WM_HELP:
 		if(csi->m_res)
-			ShowHelp("http://sqlyogkb.webyog.com/article/331-environment-variables");
+			ShowHelp("http://sqlyogkb.webyog.com/article/132-environment-variables");
 		return wyTrue;
 
 	case WM_COMMAND:
@@ -3857,7 +3857,7 @@ CShowWarning::WndProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPARAM lparam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/217-import-csv-data-using-load-local");
+		ShowHelp("http://sqlyogkb.webyog.com/article/100-import-csv-data-using-load-local");
 		return wyTrue;
 
 	case WM_COMMAND:
@@ -4424,7 +4424,7 @@ EmptyDB::EmptyDBDialogProc(HWND hwnd, wyUInt32 message, WPARAM wparam, LPARAM lp
 		return wyTrue;
 		
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/237-empty-database");
+		ShowHelp("http://sqlyogkb.webyog.com/article/118-empty-database");
 		return wyTrue;
 
 	case WM_INITDLGVALUES:
@@ -5589,7 +5589,7 @@ ConnColorDlg::ConnColorDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lp
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/158-advanced-connection-settings");
+		ShowHelp("http://sqlyogkb.webyog.com/article/33-advanced-connection-settings");
 		return 1;
 
 		

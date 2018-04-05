@@ -10,7 +10,8 @@ Ctrl+9			Select Last Connection
 Object Browser
 F5			Refresh Object Browser (Default)
 Ctrl+B			Set Focus On Object Browser
-Ctrl+Shift+B		Set Focus On Object Browser Filter 
+Ctrl+Shift+B		Set Focus On Object Browser Filter
+Shift+{-}			Collapse All in Object Browser 
 
 SQL Window
 Ctrl+T			New Query Editor

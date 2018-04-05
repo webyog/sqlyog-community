@@ -28,36 +28,36 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+
 #ifdef _WIN32
 
-#include <winsock.h>
-#include <mysql.h>
+	#ifndef _CONSOLE
+	#include "SQLMaker.h"
+	#include "GUIHelper.h"
+	#endif
+
+	#ifdef _CONSOLE
+	#include "Mail.h"
+	#include "Main.h"
+	#include "ScheduleExport.h"
+	#endif
 
 #else
-
-#include <mysql/mysql.h>
-#include <string.h>         /* for memset as string.h defines memset */
-#include <stdlib.h>         /* for atoi which is included in stdlib.h in Linux */
+	
+	#include <sys/stat.h>
+	#include <mysql/mysql.h>
+	#include <string.h>         /* for memset as string.h defines memset */
+	#include <stdlib.h>         /* for atoi which is included in stdlib.h in Linux */
+	#include "Mail.h"
+	#include "Main.h"
+	#include "ScheduleExport.h"
 
 #endif
 
+
 #ifdef _WIN32
-    #include "ExportAsSQL.h"
-
-    #ifndef _CONSOLE
-    #include "SQLMaker.h"
-    #include "GUIHelper.h"
-    #endif
-
-    #ifdef _CONSOLE
-    #include "Main.h"
-	#include "ScheduleExport.h"
-    #endif
-
-#else
-    #include <sys/stat.h>
-    #include "Main.h"
-	#include "ScheduleExport.h"
+	#include <winsock.h>
+	#include <mysql.h>
 #endif
 
 #include "ExportAsSQL.h"
@@ -3795,7 +3795,7 @@ MySQLDump::PrintFieldValue(wyString * buffer, MYSQL_RES *res, MYSQL_ROW row, wyI
 	wyInt32     *lengths;
 	wyInt32     to, count, firstcol =0;
 	MYSQL_FIELD	*field;
-	int isBlob, i, len;
+	int isBlob, i;
 	wyString	blob_temp;
 	wyString	hex_tmp;
 	wyString	hex_data;
@@ -4037,7 +4037,7 @@ MySQLDump::DumpTableDataRows(wyString * buffer, MYSQL_ROW *row, const wyChar *db
 	virt_res = SjaExecuteAndGetResult(m_tunnel, 
         &m_mysql, virt_query);
 
-	if(!virt_res  && sja_mysql_num_rows(m_tunnel, virt_res) == -1) 
+	if(!virt_res  || sja_mysql_num_rows(m_tunnel, virt_res) == -1) 
 			return OnError();
 
 		no_rows =  mysql_num_rows(virt_res);

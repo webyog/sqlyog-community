@@ -38,7 +38,7 @@
 
 #define	SQLITE_APPVERSION_MAJOR						"10"
 #define	SQLITE_APPVERSION_MINOR						"5"
-#define	COMPANY_COPYRIGHT							"(c) 2001-2017 Webyog Inc."
+#define	COMPANY_COPYRIGHT							"(c) 2001-2018 Webyog Inc."
 
 #define FILEVER                                     MAJOR_VERSION_INT ## , ## MINOR_VERSION_INT ## , ## UPDATE_VERSION_INT ## , ## RELEASE_VERSION_INT
 #define STRFILEVER                                  MAJOR_VERSION "." MINOR_VERSION "." STRINGIZE(UPDATE_VERSION_INT) "." STRINGIZE(RELEASE_VERSION_INT)

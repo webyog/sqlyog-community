@@ -32,6 +32,7 @@
     #include<wctype.h>
     #include <unistd.h>    
     #include<wchar.h>
+	#include <fcntl.h>
 #endif
 
 #include <ctype.h>
@@ -136,6 +137,7 @@ SQLTokenizer::SQLTokenizer(Tunnel *tunnel, PMYSQL mysql, YOGTOKENSOURCE srctype,
 	m_lastcopy		=	(wyChar*)m_src;
 	m_bufferend	    =   wyFalse;
     m_supportedversion = wyFalse;
+	
 
 	memcpy(m_src, source, len);
 	
@@ -145,15 +147,10 @@ SQLTokenizer::SQLTokenizer(Tunnel *tunnel, PMYSQL mysql, YOGTOKENSOURCE srctype,
 	/* if its of file type then we open up the file and keep the pointer */
 	if(IsFile(m_srctype))
     {
-#ifdef _WIN32
-		m_importfile = _wfopen(filename.GetAsWideChar(), L"r");
-#else
-        m_importfile = fopen(filename.GetString(), "r");
-#endif
-
-    }
+		m_importfile = open(filename.GetString(), O_RDONLY);
+	}
 	else
-		m_importfile = NULL;
+		m_importfile = -1;
 
 	InitStuffs();
 }
@@ -168,8 +165,8 @@ SQLTokenizer::~SQLTokenizer()
 	if(m_query)
 		free(m_query);
 
-	if(m_importfile)
-		fclose(m_importfile);
+	if(m_importfile >= 0)
+		close(m_importfile);
 
 	if(m_bufferedline->m_buf)
 		free(m_bufferedline->m_buf);
@@ -344,17 +341,7 @@ SQLTokenizer::AllocAndInitBufferedLine(wyUInt32 max_size)
 {	
     wyInt32     fileid;
 
-#ifdef _WIN32
-	if(m_importfile)
-		fileid  = m_importfile->_file;
-	else
-		fileid  = -1; 
-#else
-	if(m_importfile)
-		fileid  = m_importfile->_fileno;
-	else
-		fileid	= -1;
-#endif
+	fileid = m_importfile;
 	
 	m_bufferedline =(QUERY_TOKEN*) malloc(sizeof(*m_bufferedline));
 	

@@ -286,7 +286,7 @@ FavoriteBase::AddItem(HWND htree, HTREEITEM parent, wyString name, wyInt32 pos)
 	str.item.iSelectedImage = pos;
 
     HTREEITEM htreeitem;
-    VERIFY(htreeitem = (HTREEITEM)SendMessage(htree, TVM_INSERTITEM, NULL, (wyInt32)&str));
+    VERIFY(htreeitem = (HTREEITEM)SendMessage(htree, TVM_INSERTITEM, NULL, (wyInt64)&str));
 	return(htreeitem);
  }
 

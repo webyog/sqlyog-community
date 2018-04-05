@@ -675,7 +675,7 @@ VERIFY(hctrl = GetDlgItem(hdlg, IDC_READONLY));
 wyInt32
 ConnectionBase::NewConnection(HWND hdlg)
 {
-	wyInt32         ret, index;
+	wyInt64         ret, index;
 	wyUInt32        concount = 1;
     wyWChar         directory[MAX_PATH + 1] = {0}, *lpfileport=0;
 	wyString        conn, dirstr, connnamestr, allsecnames;
@@ -764,7 +764,7 @@ ConnectionBase::NewConnection(HWND hdlg)
 wyInt32
 ConnectionBase::CloneConnection(HWND hdlg)
 {
-	wyInt32         ret, index;
+	wyInt64         ret, index;
 	wyUInt32        concount = 1;
     wyWChar         directory[MAX_PATH + 1] = {0}, *lpfileport=0;
 	wyString        conn, dirstr, connnamestr, allsecnames;
@@ -860,7 +860,7 @@ ConnectionBase::CloneConnection(HWND hdlg)
 wyBool  
 ConnectionBase::ChangeConnName(HWND hdlg)
 {
-	wyInt32         count, cursel, ret;
+	wyInt64         count, cursel, ret;
 	HWND			hwndcombo;
 	wyWChar         directory[MAX_PATH + 1]={0}, *lpfileport = 0;
 	wyString        connname, connnamestr, dirstr;
@@ -2072,7 +2072,7 @@ ConnectionBase::EnableToolButtonsAndCombo(HWND hwndtool, HWND hwndsecondtool, HW
 	wyInt32     state = (enable == wyTrue)?(TBSTATE_ENABLED):(TBSTATE_INDETERMINATE);
     
 	wyInt32		tbid[] =  {IDM_FILE_CONNECT, ID_NEW_EDITOR , IDM_EXECUTE, ACCEL_QUERYUPDATE,
-                           ID_STOPQUERY, ACCEL_EXECUTEALL, IDM_REFRESHOBJECT};	
+                           ID_STOPQUERY, ACCEL_EXECUTEALL, IDM_REFRESHOBJECT, IDM_COLLAPSEOBJECT };
 
 	wyInt32		tb2id[] = {	ID_FORMATCURRENTQUERY,			IDC_DIFFTOOL, 
 							ID_QUERYBUILDER,				ID_SCHEMADESIGNER, 

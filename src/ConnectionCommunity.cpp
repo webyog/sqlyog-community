@@ -523,7 +523,7 @@ ConnectionCommunity::OnConnect(HWND hwnd, ConnectionInfo * dbname)
 		ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
 		if(ret == 0)
         {
-		    yog_enddialog(hwnd, (wyInt32)1);
+		    yog_enddialog(hwnd, (wyInt64)1);
 			return;
 		}
 		
@@ -545,7 +545,7 @@ ConnectionCommunity::OnConnect(HWND hwnd, ConnectionInfo * dbname)
 
 			if(!count)
             {
-				yog_enddialog(hwnd,(wyInt32)1);
+				yog_enddialog(hwnd,(wyInt64)1);
 				return;
 			}
 
@@ -581,7 +581,7 @@ ConnectionCommunity::OnConnect(HWND hwnd, ConnectionInfo * dbname)
 		m_rgbobbkcolor = m_rgbconnection;
 		m_rgbobfgcolor = m_rgbconnectionfg;
 
-		yog_enddialog(hwnd,(wyInt32)1);
+		yog_enddialog(hwnd,(wyInt64)1);
 	}
 	else
 	{
@@ -726,30 +726,30 @@ ConnectionCommunity::OnWmCommandConnDialog(HWND hwnd, WPARAM wparam, LPARAM lpar
 		break;
 
 	case IDC_TUNNELHELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/155-connecting-using-http-tunneling");
+		ShowHelp("http://sqlyogkb.webyog.com/article/31-connecting-using-http-tunneling");
 		break;
 
     case IDC_INITCOMMANDHELP:
-       ShowHelp("http://sqlyogkb.webyog.com/article/158-advanced-connection-settings");
+       ShowHelp("http://sqlyogkb.webyog.com/article/33-advanced-connection-settings");
         break;
 
 	case IDC_SSHHELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/154-connecting-using-ssh-tunneling");
+		ShowHelp("http://sqlyogkb.webyog.com/article/30-connecting-using-ssh-tunneling");
 		break;
 
     case IDC_SSLHELP:
-        ShowHelp("http://sqlyogkb.webyog.com/article/157-connecting-using-ssl-encryption");
+        ShowHelp("http://sqlyogkb.webyog.com/article/32-connecting-using-ssl-encryption");
 		break;
 
 	case IDC_TIMEOUTHELP:
 	case IDC_COMPRESSHELP:
-		 ShowHelp("http://sqlyogkb.webyog.com/article/153-direct-connection-using-mysql-c-api");
+		 ShowHelp("http://sqlyogkb.webyog.com/article/28-direct-connection-using-mysql-c-api");
 		 break;
 	}
 	if((HIWORD(wparam)== STN_CLICKED))
     {
 	    if(LOWORD(wparam)== IDC_LINK)
-			ShowHelp("http://sqlyogkb.webyog.com/article/153-direct-connection-using-mysql-c-api");
+			ShowHelp("http://sqlyogkb.webyog.com/article/28-direct-connection-using-mysql-c-api");
 	}
 }
 
@@ -1072,10 +1072,7 @@ ConnectionCommunity::CreateIconList(HWND hwndmain, wyUInt32 *numicons)
 		ID_ROLLBACK_TOSAVEPOINT,		ID_ROLLBACK_TRANSACTION,
 		ID_ROLLBACK_ANDCHAIN,			ID_ROLLBACK_RELEASE,
 		ID_ROLLBACK_ANDNOCHAIN,			ID_ROLLBACK_NORELEASE,
-		ID_SAVEPOINT_CREATESAVEPOINT,	ID_SAVEPOINT_RELEASESAVEPOINT/*,
-		ID_DATABASE_REBUILDTAGS*/
-
-
+		ID_SAVEPOINT_CREATESAVEPOINT,	ID_SAVEPOINT_RELEASESAVEPOINT
 
 	};
 
@@ -1585,19 +1582,19 @@ ConnectionCommunity::OnWmConnectionHelp(HWND hwnd)
 	switch(tab)
 	{
 	case 0:
-		ShowHelp("http://sqlyogkb.webyog.com/article/151-getting-started");
+		ShowHelp("https://sqlyogkb.webyog.com/article/28-direct-connection-using-mysql-c-api");
 		break;
 	case 1:
-		ShowHelp("http://sqlyogkb.webyog.com/article/155-connecting-using-http-tunneling");
+		ShowHelp("http://sqlyogkb.webyog.com/article/31-connecting-using-http-tunneling");
 		break;
 	case 2:	
-		ShowHelp("http://sqlyogkb.webyog.com/article/154-connecting-using-ssh-tunneling");
+		ShowHelp("http://sqlyogkb.webyog.com/article/30-connecting-using-ssh-tunneling");
 		break;
 	case 3:
-		ShowHelp("http://sqlyogkb.webyog.com/article/157-connecting-using-ssl-encryption");
+		ShowHelp("http://sqlyogkb.webyog.com/article/32-connecting-using-ssl-encryption");
 		break;
 	case 4:
-		ShowHelp("http://sqlyogkb.webyog.com/article/252-advanced-tab");
+		ShowHelp("http://sqlyogkb.webyog.com/article/96-advanced-tab");
 		break;
 	}
     return;

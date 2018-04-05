@@ -143,7 +143,7 @@ struct tab_item_information
     LPSTR	    m_psztext;
     wyInt32	    m_cchtextmax;
     wyInt32		m_iimage;
-    wyInt32		m_lparam;
+    LPARAM		m_lparam;
 	COLORREF	m_color;//Color of tab
 	COLORREF	m_fgcolor;//Text color of tab
 	LPSTR		m_tooltiptext;//tooltip text

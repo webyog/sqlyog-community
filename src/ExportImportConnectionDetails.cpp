@@ -1089,7 +1089,7 @@ ExportImportConnection::ImportDataToIni(HWND hwnd, wyInt32& noOfConnection,ConDe
     LVITEM          li;
     ConDetails      *cd=NULL;
     wyChar          secname[30] = {0};
-    wyInt32         i=0,action = -1,ret=0;
+    wyInt32         i=0,action = -1;
     wyWChar         buffer[MAX_PATH+1]={0};
     wyWChar         fromName[MAX_PATH + 1] = {0};
     wyChar          te[14];
@@ -1098,6 +1098,7 @@ ExportImportConnection::ImportDataToIni(HWND hwnd, wyInt32& noOfConnection,ConDe
     wyInt32         cono=0;
     wyInt32         index=0;
     wyBool          isSkipped=wyFalse;
+	wyInt64			ret;
 
     li.iSubItem=0;
     li.mask=LVIF_TEXT|LVIF_PARAM;
@@ -1261,7 +1262,7 @@ ExportImportConnection::DialogProcCnflct(HWND hwnd,UINT message,WPARAM wParam,LP
 {
     ExportImportConnection *ExportImportInstance=(ExportImportConnection *)GetWindowLongPtr(hwnd,GWLP_USERDATA);
     wyString text;
-    wyInt32 ret=0;
+    wyInt64 ret=0;
 
     switch(message)
     {
@@ -1479,15 +1480,7 @@ ExportImportConnection::OnMouseMove(HWND hwnd, LPARAM lParam)
 void
 ExportImportConnection::HandleHelp(wyBool ishelpclicked)
 {
-    if(m_isimport)
-    {
-        ShowHelp("http://sqlyogkb.webyog.com/article/160-export-import-connection-details");
-    }
-    else
-    {
-        ShowHelp("http://sqlyogkb.webyog.com/article/160-export-import-connection-details");
-    }
-    
+        ShowHelp("http://sqlyogkb.webyog.com/article/35-export-import-connection-details");    
 }
 
 //Function Called for resizing Import Connection Details Dialog

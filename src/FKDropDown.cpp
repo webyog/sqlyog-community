@@ -552,7 +552,7 @@ FKDropDown::DlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
             break;
 
         case WM_HELP:
-            ShowHelp("http://sqlyogkb.webyog.com/article/219-looking-up-constraints-for-a-value");
+            ShowHelp("http://sqlyogkb.webyog.com/article/103-looking-up-constraints-for-a-value");
 		    break;
 
         default:

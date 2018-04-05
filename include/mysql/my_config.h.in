@@ -3,6 +3,7 @@
  * Include file constants (processed in LibmysqlIncludeFiles.txt 1
  */
 #cmakedefine HAVE_ALLOCA_H 1
+#cmakedefine HAVE_BIGENDIAN 1
 #cmakedefine HAVE_ARPA_INET_H 1
 #cmakedefine HAVE_CRYPT_H 1
 #cmakedefine HAVE_DIRENT_H 1

@@ -16,7 +16,7 @@
 #define MYSQL_UNIX_ADDR			"/tmp/mysql.sock"
 #define MYSQL_CONFIG_NAME		"my"
 
-#define MARIADB_PACKAGE_VERSION "2.3.1"
+#define MARIADB_PACKAGE_VERSION "2.3.3"
 #define MARIADB_SYSTEM_TYPE "Windows"
 #define MARIADB_MACHINE_TYPE "AMD64"
 

@@ -60,6 +60,7 @@ wyInt32 WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance,
 	FrameWindow    *mainwin;
 	MSG			    msg;
 
+	wyBool	isVistaAnd32BitSQLyog = wyFalse;
 	pGlobals = new GLOBALS;
     
     _ASSERT(pGlobals != NULL);
@@ -94,6 +95,18 @@ wyInt32 WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance,
 
 	CreateInitFile();
 
+#ifndef  _WIN64
+	OSVERSIONINFOEX osvi;
+
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+
+	//get the OS version and set the display style accordingly
+	if (GetVersionEx((OSVERSIONINFO*)&osvi)) {
+		if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0 && osvi.wProductType == VER_NT_WORKSTATION)
+			isVistaAnd32BitSQLyog = wyTrue;
+	}
+#endif
+
 #ifdef _DEBUG
     HANDLE          hlogfile = NULL;
     
@@ -101,13 +114,17 @@ wyInt32 WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance,
                            NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 
 #else
-    MiniDump    dumpcrash;
-
+	
 	//Initialize the Path for .INI & .dmp files
-    CreateInitFile();
+	CreateInitFile();
 
-    if(IsCrashDumpSupported() == wyTrue)
-		dumpcrash.InitDumpDetails(pGlobals->m_configdirpath.GetString());
+	if (isVistaAnd32BitSQLyog == wyFalse) {
+		MiniDump    dumpcrash;
+
+		if (IsCrashDumpSupported() == wyTrue)
+			dumpcrash.InitDumpDetails(pGlobals->m_configdirpath.GetString());
+	}
+	
 #endif
 
    _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE | _CRTDBG_MODE_WNDW);

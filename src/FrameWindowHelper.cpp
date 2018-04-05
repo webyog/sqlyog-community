@@ -258,7 +258,7 @@ wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *qu
 		if(wnd && !tunnel->IsTunnel() && profile == wyTrue && length < MAX_QUERY_SIZE)
 		{         
 			//History profiling 
-			my_queryprofile(wnd, timetaken, newquery + pos, wyFalse);   
+			my_queryprofile(wnd, timetaken, newquery + pos, wyFalse, tunnel->mysql_errno(*mysql), tunnel->mysql_error(*mysql));
 		}
 
        if(!ret && newquery && wnd && currentwnd == wyTrue && wnd->m_grpprocess == wyFalse && !tunnel->IsTunnel())
@@ -280,7 +280,7 @@ wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *qu
 
 // query profiling to history tab
 wyBool
-my_queryprofile(MDIWindow *wnd, wyInt64 timetaken, const wyChar *proftext, wyBool iscomment)
+my_queryprofile(MDIWindow *wnd, wyInt64 timetaken, const wyChar *proftext, wyBool iscomment, wyInt32 errnum, const wyChar *errormsg)
 {
 	TabTypes    *tab = NULL;
 	TabHistory	*ptabhistory;
@@ -306,14 +306,24 @@ my_queryprofile(MDIWindow *wnd, wyInt64 timetaken, const wyChar *proftext, wyBoo
 		str.Sprintf("/*[%d-%s %s][%I64d ms] %s */\r\n", localtime.wDay, months[localtime.wMonth - 1],systimestr.GetString(), timetaken / 1000, proftext);
 
 	else // to add query
-    {
-        tempstr.SetAs(proftext);
-        tempstr.RTrim();
-        if(tempstr.GetLength() && tempstr.GetString()[tempstr.GetLength() - 1] != ';')
-		    str.Sprintf("/*[%d-%s %s][%I64d ms]*/ %s;\r\n", localtime.wDay, months[localtime.wMonth - 1],systimestr.GetString(), timetaken / 1000, proftext);
-        else
-            str.Sprintf("/*[%d-%s %s][%I64d ms]*/ %s\r\n", localtime.wDay, months[localtime.wMonth - 1],systimestr.GetString(), timetaken / 1000, proftext);
-    }
+	{
+		tempstr.SetAs(proftext);
+		tempstr.RTrim();
+		if (errnum > 0)
+		{
+			if (tempstr.GetLength() && tempstr.GetString()[tempstr.GetLength() - 1] != ';')
+				str.Sprintf("/*[%d-%s %s][%I64d ms]*/ %s; /*[Error Code %d: %s]*/\r\n", localtime.wDay, months[localtime.wMonth - 1], systimestr.GetString(), timetaken / 1000, proftext, errnum, errormsg);
+			else
+				str.Sprintf("/*[%d-%s %s][%I64d ms]*/ %s /*[Error Code %d: %s]*/\r\n", localtime.wDay, months[localtime.wMonth - 1], systimestr.GetString(), timetaken / 1000, proftext, errnum, errormsg);
+		}
+		else
+		{
+			if (tempstr.GetLength() && tempstr.GetString()[tempstr.GetLength() - 1] != ';')
+				str.Sprintf("/*[%d-%s %s][%I64d ms]*/ %s;\r\n", localtime.wDay, months[localtime.wMonth - 1], systimestr.GetString(), timetaken / 1000, proftext);
+			else
+				str.Sprintf("/*[%d-%s %s][%I64d ms]*/ %s\r\n", localtime.wDay, months[localtime.wMonth - 1], systimestr.GetString(), timetaken / 1000, proftext);
+		}
+	}
 
 	//Add text to history tab
 	if(ptabhistory)
@@ -2751,7 +2761,7 @@ GetColumnName(wyWChar *field)
 
 int  IsColumnTypeJson(wyWChar *field)
 {
-	wchar_t* result=wcschr(field,L', ');
+	wchar_t* result=wcschr(field,L',');
 	if(result)
 	{
 		if(wcsncmp(result,L", json",6))

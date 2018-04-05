@@ -25,5 +25,6 @@
 	<string name="3678">릴리스 세이브 포인트</string>
 	<string name="3679">트랜잭션을 커밋</string>
 	<string name="3680">롤백 트랜잭션</string>
+	<string name="3681">개체 브라우저에서 모두 축소</string>
 	
 </resources>

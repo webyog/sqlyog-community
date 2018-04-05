@@ -16,7 +16,7 @@
 
 */
 
-#define _WIN32_WINNT   0x500
+#define _WIN32_WINNT   0x501
 #include "FrameWindowHelper.h"
 #include "ImportBatch.h"
 #include "ImportFromSQL.h"
@@ -43,7 +43,7 @@ ImportBatch::~ImportBatch()
 wyBool
 ImportBatch::Create(HWND hwnd, Tunnel * tunnel, PMYSQL mysql)
 {
-	wyInt32 ret;
+	wyInt64 ret;
 	m_umysql = mysql;
 	m_tunnel = tunnel;
 	m_hwndparent = hwnd;
@@ -51,7 +51,7 @@ ImportBatch::Create(HWND hwnd, Tunnel * tunnel, PMYSQL mysql)
 	//Post 8.01
     //RepaintTabModule();
 	
-	ret = (wyInt32)DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_IMPORTBATCH),
+	ret = (wyInt64)DialogBoxParam(pGlobals->m_hinstance, MAKEINTRESOURCE(IDD_IMPORTBATCH),
 							hwnd, ImportBatch::DlgProc, (LPARAM)this);
 
     if(ret == wyTrue )
@@ -96,7 +96,7 @@ ImportBatch::DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/235-excute-sql-script");
+		ShowHelp("http://sqlyogkb.webyog.com/article/117-excute-sql-script");
 		return wyTrue;
 
 	case WM_COMMAND:
@@ -805,7 +805,7 @@ CImportError::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/235-excute-sql-script");
+		ShowHelp("http://sqlyogkb.webyog.com/article/117-excute-sql-script");
 		return wyTrue;
 
 	case WM_COMMAND:

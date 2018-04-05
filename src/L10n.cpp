@@ -298,7 +298,7 @@ L10n::InitDialog(HWND hwnd)
         versionold = wyIni::IniGetInt("UserInterface", "Version", 0, temp.GetString());
     }
 
-    hicon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(MAKEINTRESOURCE(IDI_MAIN)));
+    hicon = LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_MAIN));
     SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hicon);
     DestroyIcon(hicon);
     temp.SetAs(langlocale);

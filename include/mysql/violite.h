@@ -12,8 +12,8 @@
    
    You should have received a copy of the GNU Library General Public
    License along with this library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-   MA 02111-1307, USA */
+   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+   MA 02111-1301, USA */
 
 /*
  * Vio Lite.
@@ -148,8 +148,8 @@ struct st_vio
   struct sockaddr_in local; /* Local internet address */
   struct sockaddr_in remote; /* Remote internet address */
   struct mysql_async_context *async_context; /* For non-blocking API */
-  int write_timeout;
-  int read_timeout;
+  unsigned int write_timeout;
+  unsigned int read_timeout;
   enum enum_vio_type type; /* Type of connection */
   char desc[30]; /* String description */
 #ifdef HAVE_OPENSSL

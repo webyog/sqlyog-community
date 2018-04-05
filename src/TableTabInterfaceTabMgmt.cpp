@@ -386,31 +386,31 @@ TableTabInterfaceTabMgmt::SubTabsCommonWndProc(HWND hwnd, UINT message, WPARAM w
             case IDI_COLUMN:
                 {
                 if(tabmgmt->m_tabinterfaceptr->m_isaltertable)
-                    ShowHelp("http://sqlyogkb.webyog.com/article/244-alter-table-in-database");
+                    ShowHelp("http://sqlyogkb.webyog.com/article/88-alter-table-in-database");
                 else
-                   ShowHelp("http://sqlyogkb.webyog.com/article/241-create-table");
+                   ShowHelp("http://sqlyogkb.webyog.com/article/85-create-table");
                 }
                 break;
 
             case IDI_MANINDEX_16:
                 {
                     if(tabmgmt->m_tabinterfaceptr->m_isaltertable)
-                        ShowHelp("http://sqlyogkb.webyog.com/article/246-alter-index");
+                        ShowHelp("http://sqlyogkb.webyog.com/article/92-alter-index");
                     else
-                        ShowHelp("http://sqlyogkb.webyog.com/article/245-create-index");
+                        ShowHelp("http://sqlyogkb.webyog.com/article/91-create-index");
                 }
                 break;
 
             case IDI_MANREL_16:
-                ShowHelp("http://sqlyogkb.webyog.com/article/249-fk-in-mysql-and-sqlyog");
+                ShowHelp("http://sqlyogkb.webyog.com/article/90-fk-in-mysql-and-sqlyog");
                 break;
 
             case IDI_TABPREVIEW:
-                ShowHelp("http://sqlyogkb.webyog.com/article/253-preview");
+                ShowHelp("http://sqlyogkb.webyog.com/article/97-preview");
                 break;
 
             case IDI_TABLEOPTIONS:
-                ShowHelp("http://sqlyogkb.webyog.com/article/252-advanced-tab");
+                ShowHelp("http://sqlyogkb.webyog.com/article/96-advanced-tab");
                 break;
             }
             return 1;

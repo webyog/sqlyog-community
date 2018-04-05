@@ -144,9 +144,6 @@
     <ClCompile Include="..\src\ImportFromSQL.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\InputBoxGeneric.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\KeyShortCuts.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -357,6 +354,9 @@
     <ClCompile Include="..\src\sqlite3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RegisterEmail.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\AppInfo.h">
@@ -489,9 +489,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\ImportFromSQL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\InputBoxGeneric.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\LexHelper.h">
@@ -1562,6 +1559,24 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="ClassDiagram1.cd" />
+    <None Include="..\include\bitmaps\commit.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\include\bitmaps\rollback.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\include\bitmaps\start_transaction.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\include\bitmaps\commit_16.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\include\bitmaps\rollback_16.ico">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\include\bitmaps\start_transaction_16.ico">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\include\SQLyog.rc">

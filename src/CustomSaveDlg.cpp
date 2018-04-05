@@ -22,9 +22,16 @@ Author: Vishal P.R
 *********************************************/
 
 #include <iostream>
+#include <Windows.h>
+
+#if _WIN32_WINNT >= 0x600
+#include <VersionHelpers.h>
+#endif
+
 #include "CustomSaveDlg.h"
 #include "Include.h"
 #include "L10n.h"
+
 
 wyBool CustomSaveDlg::m_vistastyle = wyFalse;
 
@@ -527,11 +534,13 @@ CustomSaveDlg::WrapTextHelper(wyString& tempbuff, wyString& finalstring, HDC hdc
 LPWORD
 CustomSaveDlg::AlignMemory(LPWORD  ptr, ULONG align)
 {
-    ULONG n;
-
-    n = (ULONG)ptr;
-    n += align - 1;
-    n &= ~(align - 1);
+    unsigned long long n, align_cpy;
+	// Crash with windows 10 system for 64 bit -- Aadarsh
+	align_cpy = (unsigned long long)align;
+    
+	n = (unsigned long long)ptr;
+    n += align_cpy - 1;
+    n &= ~(align_cpy - 1);
     return (LPWORD)n;
 }
 
@@ -541,16 +550,16 @@ CustomSaveDlg::CreateDlgTemplate(HGLOBAL hglobal, const wyChar* fontname, wyInt3
     LPDLGTEMPLATE   lpdlg;
     LPWORD          lpword;
     LPWSTR          lpstr;
-    wyInt32*        dialogdef;
+    wyInt64*        dialogdef;
 
     //dialog template for XP
-    wyInt32 dialogdefxp[] = {
+    wyInt64 dialogdefxp[] = {
         DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU,
         0, 0, 284, 61
     };
 
     //dialog template for vista
-    wyInt32 dialogdefvista[] = {
+    wyInt64 dialogdefvista[] = {
         DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU,
         0, 0, 307, 74
     };
@@ -673,6 +682,8 @@ CustomSaveDlg::AddControls(LPWORD lpword)
 void
 CustomSaveDlg::SetOSStyle()
 {
+#if _WIN32_WINNT < 0x600
+
     OSVERSIONINFO osvi;
 
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -680,6 +691,10 @@ CustomSaveDlg::SetOSStyle()
     //get the OS version and set the display style accordingly
     if(GetVersionEx(&osvi))
         m_vistastyle = (osvi.dwMajorVersion >= 6) ? wyTrue : wyFalse;
+
+#else
+	m_vistastyle = IsWindowsVistaOrGreater() ? wyTrue : wyFalse;
+#endif
 }
 
 //API to invoke Custom Save Message

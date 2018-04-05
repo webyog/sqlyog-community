@@ -12,8 +12,8 @@
    
    You should have received a copy of the GNU Library General Public
    License along with this library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-   MA 02111-1307, USA */
+   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+   MA 02111-1301, USA */
 
 /* This is the main include file that should included 'first' in every
    C file. */
@@ -924,7 +924,7 @@ do { doubleget_union _tmp; \
 #define int8store(T,A)       do { uint def_temp= (uint) (A), def_temp2= (uint) ((A) >> 32); \
                                   int4store((T),def_temp); \
                                   int4store((T+4),def_temp2); } while(0)
-#ifdef WORDS_BIGENDIAN
+#ifdef HAVE_BIGENDIAN
 #define float4store(T,A) do { *(T)= ((uchar *) &A)[3];\
                               *((T)+1)=(char) ((uchar *) &A)[2];\
                               *((T)+2)=(char) ((uchar *) &A)[1];\
@@ -1001,7 +1001,7 @@ do { doubleget_union _tmp; \
   register) variable, M is a pointer to byte
 */
 
-#ifdef WORDS_BIGENDIAN
+#ifdef HAVE_BIGENDIAN
 
 #define ushortget(V,M)  do { V = (uint16) (((uint16) ((uchar) (M)[1]))+\
                                  ((uint16) ((uint16) (M)[0]) << 8)); } while(0)

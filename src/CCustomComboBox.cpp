@@ -282,7 +282,6 @@ CCustomComboBox::SetMargin(LPARAM lparam)
 void
 CCustomComboBox::HandleEditChange()
 {
-    wyBool     id;
     int         len = -1;
     wyWChar     str[70] = {0};
     wyWChar     lbStr[70] = {0};
@@ -303,7 +302,7 @@ void
 CCustomComboBox::CreateConnectionList(){
 
 
-	wyInt32	ret, connindex,i=0;
+	wyInt32	ret,i=0;
 	wyWChar     directory[MAX_PATH + 1], *lpfileport=0;
     wyChar      *tempnum = NULL, *allsectionnames, *tempconsecname;
 	wyString    conn, dirstr, connnamestr, connselnamestr, tempnumstr;

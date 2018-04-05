@@ -188,7 +188,7 @@ TabHistory::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	        break;
 
         case WM_HELP:
-	        ShowHelp("http://sqlyogkb.webyog.com/article/211-history-tab");
+	        ShowHelp("http://sqlyogkb.webyog.com/article/79-history-tab");
 	        return 1;
 
         case WM_SETFOCUS:

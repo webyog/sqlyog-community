@@ -109,7 +109,7 @@ CopyDatabase::~CopyDatabase()
 wyBool
 CopyDatabase::Create(HWND hwndparent, Tunnel * tunnel, PMYSQL umysql, wyChar *db, wyChar *table, wyBool checktables)
 {
-	wyInt32             ret;
+	wyInt64            ret;
 	m_srcmysql			= umysql;
 	m_srctunnel			= tunnel;
 	m_dontnotify		= wyFalse;
@@ -161,7 +161,7 @@ CopyDatabase::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/232-copy-database-to-different-host-db");
+		ShowHelp("http://sqlyogkb.webyog.com/article/105-copy-table-to-different-host");
 		return TRUE;
 
 	case UM_COPYDATABASE:
@@ -393,6 +393,11 @@ CopyDatabase::OnUmCopydatabase(HWND hwnd)
 		
 	hwndmsg = GetDlgItem(m_hwnddlg, IDC_MESSAGE);
 
+
+	evt.m_copydbevent = CreateEvent(NULL, TRUE, FALSE, NULL);
+    evt.m_copydb    = this;
+    evt.m_lpParam   = &copydbparam;
+
 	if(hwndmsg)
 	{
 		msg.Sprintf(_("Connecting to source server  "));
@@ -404,6 +409,8 @@ CopyDatabase::OnUmCopydatabase(HWND hwnd)
     {
         EnableDlgWindows(wyTrue);
         m_copying   = wyFalse;
+		if(evt.m_copydbevent)
+			VERIFY(CloseHandle(evt.m_copydbevent));
 		return;
     }
 
@@ -419,6 +426,8 @@ CopyDatabase::OnUmCopydatabase(HWND hwnd)
         EnableDlgWindows(wyTrue);
         m_copying   = wyFalse;
         RemoveSourceInstances();
+		if(evt.m_copydbevent)
+			VERIFY(CloseHandle(evt.m_copydbevent));
 		return;
     }
 
@@ -429,6 +438,8 @@ CopyDatabase::OnUmCopydatabase(HWND hwnd)
         EnableDlgWindows(wyTrue);
         m_copying   = wyFalse;
         RemoveInstances();
+		if(evt.m_copydbevent)
+			VERIFY(CloseHandle(evt.m_copydbevent));
 		return;
     }
     
@@ -438,9 +449,10 @@ CopyDatabase::OnUmCopydatabase(HWND hwnd)
 	copydbparam.m_summary = &m_summary;
     m_copydbparam = &copydbparam;
 
-    evt.m_copydbevent = CreateEvent(NULL, TRUE, FALSE, NULL);
-    evt.m_copydb    = this;
-    evt.m_lpParam   = &copydbparam;
+//	evt.m_copydbevent = CreateEvent(NULL, TRUE, FALSE, NULL);
+ //   evt.m_copydb    = this;
+ //   evt.m_lpParam   = &copydbparam;
+
     
     m_stopcopying =  wyFalse;
 	m_isobjecttoexport = wyFalse;

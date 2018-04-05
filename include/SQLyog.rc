@@ -296,6 +296,7 @@ BEGIN
     POPUP "Open"
     BEGIN
         MENUITEM "Refresh Object Browser\tF9",  IDM_REFRESHOBJECT
+		MENUITEM "Collapse All in Object Browser\tShift+{-}", IDM_COLLAPSEOBJECT
         MENUITEM SEPARATOR
         MENUITEM "Create &Database...\tCtrl+D", IDM_CREATEDATABASE
         MENUITEM "New Data Searc&h\tCtrl+Shift+D", ID_DATASEARCH
@@ -483,6 +484,8 @@ BEGIN
     BEGIN
         MENUITEM "Refresh &Object Browser\tF5", IDM_REFRESHOBJECT
         MENUITEM "Change Objec&t Browser Color\t", IDM_OBCOLOR
+		MENUITEM "Collapse All in Object Browser\tShift+{-}", IDM_COLLAPSEOBJECT
+		MENUITEM SEPARATOR
         POPUP "Execute Quer&y"
         BEGIN
             MENUITEM "Exe&cute Query\tF9",          ACCEL_EXECUTE_MENU
@@ -577,7 +580,6 @@ BEGIN
         END
         MENUITEM SEPARATOR
         MENUITEM "Create Schema For Database In &HTML...\tCtrl+Shift+Alt+S", ID_OBJECT_CREATESCHEMA
-       /* MENUITEM "Rebuild Tag",                 ID_DATABASE_REBUILDTAGS*/
     END
     POPUP "T&able"
     BEGIN
@@ -970,7 +972,7 @@ BEGIN
     DEFPUSHBUTTON   "&Connect",IDOK,113,241,77,14,WS_DISABLED
     PUSHBUTTON      "Cance&l",IDCANCEL,200,241,77,14
     PUSHBUTTON      "&Test Connection",IDC_TESTCONN,287,241,77,14,WS_DISABLED
-    CONTROL         662,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,9,100,220
+    CONTROL         IDB_CONNECTION,IDC_STATIC,"Static",SS_BITMAP | SS_CENTERIMAGE,7,9,100,220
 END
 
 IDD_EXPORTDATA DIALOGEX 150, 50, 391, 378
@@ -1013,11 +1015,11 @@ BEGIN
     GROUPBOX        "Advance options",IDC_GROUP4,184,263,199,41
     CONTROL         "Prefix with Timestamp",IDC_TIMESTAMP_PREFIX,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,274,87,12
     CONTROL         "File per object",IDC_FILE_TABLE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,288,104,12
-    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,6,323,379,14,WS_EX_TRANSPARENT
+    CONTROL         "",IDC_PROGRESS,"msctls_progress32",WS_BORDER,6,328,379,14,WS_EX_TRANSPARENT
     LTEXT           "",IDC_MESSAGE2,6,307,249,18
-    DEFPUSHBUTTON   "&Export",IDOK,280,345,50,15
-    PUSHBUTTON      "C&lose",IDCANCEL,335,345,50,15
-    PUSHBUTTON      "Do&ne",IDDONE,335,346,50,15,NOT WS_VISIBLE | WS_DISABLED
+    DEFPUSHBUTTON   "&Export",IDOK,280,348,50,15
+    PUSHBUTTON      "C&lose",IDCANCEL,335,348,50,15
+    PUSHBUTTON      "Do&ne",IDDONE,335,349,50,15,NOT WS_VISIBLE | WS_DISABLED
     LTEXT           "Grip",IDC_EXPDAT_GRIP,215,310,14,8
     CONTROL         "Convert BLOB to HEX",IDC_CHK_HEXBLOB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,202,240,168,11
 END
@@ -1627,7 +1629,7 @@ BEGIN
     LTEXT           "You will receive a passcode on the email provided above. Click Next to receive passcode",IDC_TRIALNOTESTATIC,5,45,282,19
     PUSHBUTTON      "Back",IDM_BACK,134,86,51,14
     PUSHBUTTON      "Resend",IDM_RESEND,189,86,51,14
-    DEFPUSHBUTTON      "Verify",IDM_VERIFY,244,86,51,14
+    DEFPUSHBUTTON   "Verify",IDM_VERIFY,244,86,51,14
 END
 
 IDD_SHOWIMPORTERR DIALOGEX 0, 0, 249, 83
@@ -1765,7 +1767,7 @@ STYLE DS_SETFONT | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_BORDER | WS_SYSMENU
 EXSTYLE WS_EX_NOPARENTNOTIFY | WS_EX_CONTROLPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    CONTROL         918,IDC_COMLINK,"Static",SS_BITMAP | SS_NOTIFY | WS_GROUP | WS_TABSTOP,0,0,391,324
+    CONTROL         IDB_COMSPLASH,IDC_COMLINK,"Static",SS_BITMAP | SS_NOTIFY | WS_GROUP | WS_TABSTOP,0,0,391,324
     PUSHBUTTON      "&Continue...",IDCONTINUE,263,328,61,14
     PUSHBUTTON      "&Buy",IDC_BUY_LINK,328,328,60,14
 END
@@ -2970,6 +2972,7 @@ END
 STRINGTABLE
 BEGIN
     IDM_REFRESHOBJECT       " Refresh the object browser"
+	IDM_COLLAPSEOBJECT		" Collapses all expanded objects in object browser"
     ID_OBJECT_DROPDATABASE  " Drop the currently selected database"
     ID_OBJECT_DROPTABLE     " Drop the currently selected table"
     ID_OBJECT_INSERTSTMT    " Create a valid SQL INSERT statement for the table"

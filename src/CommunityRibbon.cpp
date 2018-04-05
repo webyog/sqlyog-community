@@ -110,7 +110,7 @@ CommunityRibbon::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 	switch(message)
 	{
 		case WM_MOUSEMOVE:
-			SetCursor(LoadCursor(NULL, MAKEINTRESOURCE(IDC_HAND))); 
+			SetCursor(LoadCursor(NULL, IDC_HAND)); 
 			pGlobals->m_pcmainwin->AddTextInStatusBar(L"http://www.webyog.com");
 			return 0;
 	}

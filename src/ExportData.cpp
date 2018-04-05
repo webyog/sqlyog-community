@@ -17,7 +17,7 @@
 */
 
 
-#define _WIN32_WINNT   0x500
+#define _WIN32_WINNT   0x501
 
 #include <shlobj.h>
 
@@ -290,7 +290,7 @@ EscapeChar::~EscapeChar()
 wyBool 
 EscapeChar::GetEscapeChar(HWND hwndparent, PESCAPECHAR pesc, wyBool type, wyBool choice)
 {
-	wyInt32 ret;
+	wyInt64 ret;
 
 	m_hwndparent    = hwndparent;
 	m_pesc          = pesc;
@@ -732,7 +732,7 @@ BackUp::~BackUp()
 wyBool
 BackUp::Create(HWND hwndparent, Tunnel * tunnel, PMYSQL mysql, wyChar *db)
 {
-	wyInt32 ret;
+	wyInt64 ret;
 	
 	m_hwndparent = hwndparent;
 	m_mysql      = mysql;
@@ -775,7 +775,7 @@ BackUp::DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/234-backup-database-as-sql-dump");
+		ShowHelp("http://sqlyogkb.webyog.com/article/116-backup-database-as-sql-dump");
 		return TRUE;
 
 	case UM_BACKUPTABLE:
@@ -1082,7 +1082,7 @@ CExportResultSet::~CExportResultSet()
 wyBool  
 CExportResultSet::Export(HWND hwndparent, MySQLDataEx *ptr, wyBool fromquery, wyBool isenablesqlexport)
 {
-	wyInt32		ret;
+	wyInt64		ret;
 
     if(ptr == NULL)
         return wyFalse;
@@ -1166,7 +1166,7 @@ CExportResultSet::DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/215-export-data");
+		ShowHelp("http://sqlyogkb.webyog.com/article/98-export-data");
 		return 1;
 
 	case WM_COMMAND:
@@ -2591,7 +2591,7 @@ CExportResultSet::SaveDataAsXML(HANDLE hfile)
 wyBool 
 	CExportResultSet::SaveDataAsJson(HANDLE hfile)
 {
-		wyUInt32		j,k,count;
+	wyUInt32		j,count;
 	BOOL			ret;
 	DWORD			dwbyteswritten;
     wyInt32         messagecount = 0;
@@ -2997,7 +2997,7 @@ CExportResultSet::SaveDataAsCSV(HANDLE hfile)
 	{
 		if(iswritten == wyFalse && (charset == CPI_UTF8B ) )
 			{
-				if(charset == CPI_UTF8B)
+				//if(charset == CPI_UTF8B)
 					ret = WriteFile(hfile, Header, 3, &dwbytesread, NULL);
 				/*if(charset == CPI_UTF16LE)
 					ret = WriteFile(hfile, Headerle, 2, &dwbytesread, NULL);

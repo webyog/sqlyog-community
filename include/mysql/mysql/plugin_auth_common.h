@@ -1,4 +1,3 @@
-#ifndef MYSQL_PLUGIN_AUTH_COMMON_INCLUDED
 /* Copyright (C) 2010 Sergei Golubchik and Monty Program Ab
 
    This library is free software; you can redistribute it and/or
@@ -13,9 +12,10 @@
    
    You should have received a copy of the GNU Library General Public
    License along with this library; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-   MA 02111-1307, USA */
+   Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+   MA 02111-1301, USA */
 
+#ifndef MYSQL_PLUGIN_AUTH_COMMON_INCLUDED
 /**
   @file
 

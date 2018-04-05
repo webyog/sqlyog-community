@@ -1328,6 +1328,16 @@ public:
     @returns void   
     */
     void                    HandleOnRefresh(MDIWindow *pcquerywnd);
+
+
+	/// Collapse Handler
+	/**
+	@param pcquerywnd       : IN/OUT Query window HANDLE
+	@returns void
+	*/
+	void                    HandleOnCollapse(MDIWindow *pcquerywnd);
+	
+	
 	///Calling Refresh or Excute query functions based on SwitchShortcut Preference
 	/**
 	 @param hwndactive      : IN Active window HANDLE

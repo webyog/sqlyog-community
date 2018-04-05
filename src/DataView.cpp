@@ -7135,7 +7135,7 @@ DataView::CreateColumns(wyBool isupdate)
             if(isupdate == wyFalse)
             {
     			index = CustomGrid_InsertColumn(m_hwndgrid, &gvcol);
-			    CustomGrid_SetColumnLongValue(m_hwndgrid, index, 1);
+			    CustomGrid_SetColumnLongValue(m_hwndgrid, index, (LPARAM)1);
             }
 		} 
         //if the column is enum/set

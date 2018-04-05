@@ -60,7 +60,7 @@ ExportMultiFormat::~ExportMultiFormat()
 wyBool 
 ExportMultiFormat::Create(HWND hwnd, wyChar *db, wyChar *table, Tunnel * tunnel, PMYSQL mysql)
 {
-	wyInt32 ret;
+	wyInt64 ret;
 
 	m_hwndparent    =	hwnd;
 	m_mysql	        = mysql;
@@ -84,7 +84,7 @@ ExportMultiFormat::Create(HWND hwnd, wyChar *db, wyChar *table, Tunnel * tunnel,
 wyBool 
 ExportMultiFormat::CreateXML(HWND hwnd, wyChar *db, wyChar *table, Tunnel * tunnel, PMYSQL mysql)
 {
-	wyInt32 ret;
+	wyInt64 ret;
 
 	m_hwndparent    =	hwnd;
 	m_mysql	        = mysql;
@@ -120,7 +120,7 @@ ExportMultiFormat::DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/217-import-csv-data-using-load-local");
+		ShowHelp("http://sqlyogkb.webyog.com/article/100-import-csv-data-using-load-local");
 		return TRUE;
 
 	case WM_COMMAND:
@@ -155,7 +155,7 @@ ExportMultiFormat::DlgProcXML(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPa
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/217-import-XML-data-using-load-local");
+		ShowHelp("http://sqlyogkb.webyog.com/article/101-import-XML-data-using-load-local");
 		return TRUE;
 
 	case WM_COMMAND:
@@ -1022,7 +1022,7 @@ CRestore::~CRestore()
 wyBool 
 CRestore::Create(HWND hwndparent, Tunnel * tunnel, PMYSQL mysql, wyChar *db)
 {
-	wyInt32         ret;
+	wyInt64         ret;
 	m_hwndparent  =	hwndparent;
 	m_mysql       = mysql;
 	m_tunnel      = tunnel;
@@ -1064,7 +1064,7 @@ CRestore::DlgProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/235-excute-sql-script");
+		ShowHelp("http://sqlyogkb.webyog.com/article/117-excute-sql-script");
 		return 1;
 
 	case WM_COMMAND:

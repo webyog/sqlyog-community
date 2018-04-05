@@ -1606,9 +1606,9 @@ TableTabInterface::TableTabInterfaceWndProc(HWND hwnd, UINT message, WPARAM wPar
     case WM_HELP:
         {
             if(tabint->m_isaltertable)
-                ShowHelp("http://sqlyogkb.webyog.com/article/244-alter-table-in-database");
+                ShowHelp("http://sqlyogkb.webyog.com/article/88-alter-table-in-database");
             else
-                ShowHelp("http://sqlyogkb.webyog.com/article/241-create-table");
+                ShowHelp("http://sqlyogkb.webyog.com/article/85-create-table");
             return 1;
         }
         break;

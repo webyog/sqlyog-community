@@ -16,7 +16,7 @@
 
 */
 
-#define _WIN32_WINNT   0x500
+#define _WIN32_WINNT   0x501
 
 #include <assert.h>
 #include "FrameWindowHelper.h"
@@ -64,7 +64,7 @@ ExportBatch::~ExportBatch()
 wyBool
 ExportBatch::Create(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, TUNNELAUTH * auth, const wyChar *db, const wyChar *table)
 {
-	wyInt32     ret;
+	wyInt64     ret;
 	m_mysql     = mysql;
 	m_tunnel    = tunnel;
 	m_auth      = auth;
@@ -145,7 +145,7 @@ ExportBatch::ExpDataDlgProc	(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 		break;
 
 	case WM_HELP:
-		ShowHelp("http://sqlyogkb.webyog.com/article/234-backup-database-as-sql-dump");
+		ShowHelp("http://sqlyogkb.webyog.com/article/116-backup-database-as-sql-dump");
 		return TRUE;
 
 	case WM_MOUSEMOVE:
@@ -212,7 +212,6 @@ ExportBatch::ExpDataDlgProc	(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPar
 	case UM_CHECKSTATECHANGE:
 		{
 						HWND		hwndtree;
-						wyInt32		state;
 						wyWChar		temptext[SIZE_512] = {0};
 						TVITEM		tvi = {0};
 

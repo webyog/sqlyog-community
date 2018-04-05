@@ -25,5 +25,6 @@
 	<string name="3678">Release Savepoint</string>
 	<string name="3679">Commit Transaction</string>
 	<string name="3680">Rollback Transaction</string>
+	<string name="3681">Collapse All in Object Browser</string>
 	
 </resources>

@@ -221,7 +221,7 @@ QueryAnalyzerBase::PQAHtmlWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM
     switch(message)
     {		
     case WM_HELP:
-	    ShowHelp("http://sqlyogkb.webyog.com/article/203-query-profiler");
+	    ShowHelp("http://sqlyogkb.webyog.com/article/84-query-profiler");
 	    return 1;//On clicking help, profiler page should open			
     }
 

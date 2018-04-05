@@ -1371,7 +1371,7 @@ UserManager::EnableChildren(HWND hwnd, LPARAM lparam)
 void
 UserManager::HandleHelp(wyBool ishelpclicked)
 {
-    ShowHelp("http://sqlyogkb.webyog.com/category/325-user-management");
+    ShowHelp("http://sqlyogkb.webyog.com/category/129-user-management");
 }
 
 //handler function for CBN_CHANGE. this is an import function as this alone triggers all the other functions to populate the user details
@@ -1463,7 +1463,7 @@ UserManager::OnUserComboChange()
 void
 UserManager::OnHandleEditChange()
 {
-    int			id = -1, i, status = 0, index;
+    int			id = -1, status = 0, index;
     int         len = -1, textlen=-1;
 	wyInt32		temp = 0;
 	wyWChar     str[70] = {0};

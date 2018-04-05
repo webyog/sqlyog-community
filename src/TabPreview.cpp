@@ -153,7 +153,7 @@ TabPreview::WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
     case WM_HELP:
         {
-            ShowHelp("http://sqlyogkb.webyog.com/article/253-preview");
+            ShowHelp("http://sqlyogkb.webyog.com/article/97-preview");
         }
         return 1;
         break;

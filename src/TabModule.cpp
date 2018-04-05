@@ -188,7 +188,7 @@ TabModule::Create(MDIWindow * wnd)
 				{
 					CreateAdvEditorTab(wnd, (wyChar *)temptabeditorele->m_psztext.GetString(), temptabdetail->m_iimage, hitem, &temptabeditorele->m_psztext);
 				}
-					temptabeditorele->m_tabptr = (wyInt32)m_pctabeditor;
+					temptabeditorele->m_tabptr = (wyInt64)m_pctabeditor;
 				temptabeditorele->m_pctabeditor = m_pctabeditor;
 				m_pctabeditor->m_pcetsplitter->SetLeftTopPercent(temptabeditorele->m_leftortoppercent);
 				}
@@ -198,7 +198,7 @@ TabModule::Create(MDIWindow * wnd)
 					//create querybuildertab
 #ifndef COMMUNITY
 					CreateQueryBuilderTab(wnd);
-					temptabeditorele->m_tabptr = (wyInt32)m_pctabqb;
+					temptabeditorele->m_tabptr = (wyInt64)m_pctabqb;
 #endif
 				}
 				else
@@ -206,7 +206,7 @@ TabModule::Create(MDIWindow * wnd)
 					//create querybuildertab
 #ifndef COMMUNITY
 					CreateSchemaDesigner(wnd);
-					temptabeditorele->m_tabptr = (wyInt32)m_pctabsd;
+					temptabeditorele->m_tabptr = (wyInt64)m_pctabsd;
 #endif
 				}
 				if(temptabeditorele->m_tabptr != 0)

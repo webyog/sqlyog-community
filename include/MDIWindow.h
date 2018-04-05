@@ -52,7 +52,7 @@ class tabeditorelem : public wyElem
 public:
 	TabEditor*	m_pctabeditor;
 	//TabQueryBuilder* m_
-	wyInt32		m_tabptr;
+	wyInt64		m_tabptr;
 	wyInt32		m_id;
 	wyInt32		m_tabid;
 	wyInt32		m_iimage;

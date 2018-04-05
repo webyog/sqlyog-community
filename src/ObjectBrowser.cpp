@@ -308,11 +308,12 @@ CQueryObject::FilterProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     HWND                curHwnd = NULL;
     HDC                 hdc = NULL;
 
-	#ifndef COMMUNITY
-	wyWChar     str1[70];
-	wyWChar strTemp[70];
-	#endif
-
+	/*
+		#ifndef COMMUNITY
+		wyWChar strTemp[70];
+		#endif
+	*/
+	
     VERIFY(wnd = GetActiveWin());
     
     memset(str, 0, sizeof(str));
@@ -545,7 +546,7 @@ CQueryObject::FilterProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
 			pcqueryobject->PaintFilterWindow(pcqueryobject->m_hwndFilter);
             break;
-	    case VK_DELETE:
+		case VK_DELETE:
         case VK_BACK:
             GetWindowText(pcqueryobject->m_hwndFilter, str, 64);
 
@@ -637,10 +638,13 @@ CQueryObject::StCtrlProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
     /*HBRUSH          hbr = NULL;*/
     MDIWindow       *wnd = NULL;
     wyWChar         str[70];
+/*
 #ifndef COMMUNITY
 	wyWChar			 strTemp[70];
 #endif
-    /*HTREEITEM       hti = NULL, htiSel = NULL;*/
+*/
+
+/*HTREEITEM       hti = NULL, htiSel = NULL;*/
     
     memset(str, 0, sizeof(str));
 
@@ -989,7 +993,7 @@ CQueryObject::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 			break;
 		
 		case WM_HELP:
-			ShowHelp("http://sqlyogkb.webyog.com/article/164-object-browser");
+			ShowHelp("http://sqlyogkb.webyog.com/article/39-object-browser");
 			return 1;
 
 		case WM_KEYDOWN:
@@ -1062,6 +1066,14 @@ CQueryObject::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
                     SetFocus(pcqueryobject->m_hwndFilter);
                     SendMessage(pcqueryobject->m_hwndFilter, EM_SETSEL, 0, -1);
                     break;
+
+				case VK_SUBTRACT:
+				case VK_OEM_MINUS:
+					wyInt32 ret;
+					ret = GetKeyState(VK_SHIFT);
+					if (ret & 0x8000)
+						pGlobals->m_pcmainwin->HandleOnCollapse(wnd);
+					break;
                 }
 			}
 			break;
@@ -1319,6 +1331,38 @@ CQueryObject::RefreshObjectBrowser(Tunnel * tunnel, PMYSQL mysql,MDIWindow* wnd)
     HandleOBFilter(filterText, wyFalse);
 
 	return;
+}
+
+void
+CQueryObject::CollapseObjectBrowser(HWND hTree)
+{
+	HTREEITEM	 hti = NULL;
+
+	hti = TreeView_GetRoot(m_hwnd);
+
+	if (TreeView_GetChild(m_hwnd, hti) != NULL)
+	{
+		//	TreeView_Expand(m_hwnd, hti, TVE_COLLAPSE);
+		hti = TreeView_GetChild(m_hwnd, hti);
+		do
+		{
+			CollapseNode(m_hwnd, hti);
+		} while ((hti = TreeView_GetNextSibling(m_hwnd, hti)) != NULL);
+	}
+}
+
+void
+CQueryObject::CollapseNode(HWND hTree, HTREEITEM hti)
+{
+	if (TreeView_GetChild(hTree, hti) != NULL)
+	{
+		TreeView_Expand(hTree, hti, TVE_COLLAPSE);
+		hti = TreeView_GetChild(hTree, hti);
+		do
+		{
+			CollapseNode(hTree, hti);
+		} while ((hti = TreeView_GetNextSibling(hTree, hti)) != NULL);
+	}
 }
 
 LRESULT
@@ -7753,6 +7797,10 @@ CQueryObject::OnWmCommand(WPARAM wparam)
     	//Server node context menu - Refresh object browser
 		case IDM_REFRESHOBJECT:
 			pGlobals->m_pcmainwin->HandleOnRefresh(wnd);
+			break;
+
+		case IDM_COLLAPSEOBJECT:
+			pGlobals->m_pcmainwin->HandleOnCollapse(wnd);
 			break;
 
 		case IDM_CREATEDATABASE:

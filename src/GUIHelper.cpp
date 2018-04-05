@@ -595,7 +595,7 @@ ChangeEditMenuItem(HMENU hmenu)
                      ACCEL_QUERYUPDATE, ACCEL_EXECUTESEL, IDM_EDIT_ADVANCED_UPPER, IDM_EDIT_ADVANCED_LOWER,
 					 ACCEL_FORMATALLQUERIES, ACCEL_FORMATCURRENTQUERY, ACCEL_FORMATSELECTEDQUERY, ID_EXPLAIN_EXPLAIN, ID_EXPLAIN_EXTENDED};
 
-    wyInt32 ids2[] = { IDM_REFRESHOBJECT, IDM_EDIT_RESULT_TEXT, IDC_EDIT_SHOWOBJECT,
+    wyInt32 ids2[] = { IDM_REFRESHOBJECT, IDM_COLLAPSEOBJECT, IDM_EDIT_RESULT_TEXT, IDC_EDIT_SHOWOBJECT,
                        IDC_EDIT_SHOWRESULT, IDC_EDIT_SHOWEDIT, 
                        IDM_EDIT_ADVANCED_COMMENT, IDM_EDIT_ADVANCED_REMOVE, 
 					   ID_EDIT_SWITCHTABSTOLEFT, ID_EDIT_SWITCHTABSTORIGHT, ID_EDIT_INSERTFILE};
@@ -7200,12 +7200,12 @@ ColorComboInitValues(HWND hwndcombo)
 wyBool
 ColorComboFgInitValues(HWND hwndcombo,wyBool isBk, COLORREF bkcolor)
 {
-	wyInt32     color;
+	wyInt64     color;
 	
 	SendMessage(hwndcombo, CB_RESETCONTENT, 0, 0);
 	if(!isBk)
 		bkcolor = pGlobals->m_pcmainwin->m_connection->m_rgbconnection;
-	wyInt32		conncolor[] = {RGB(0, 0, 0), bkcolor^0xFFFFFF};
+	wyInt64		conncolor[] = {RGB(0, 0, 0), bkcolor^0xFFFFFF};
 
 
 	
@@ -7989,12 +7989,12 @@ SeekCurrentRowFromMySQLResult(MYSQL_RES *res, MYSQL_ROWS **rowswalker, Tunnel *t
 wyBool
 OnDrawConnNameCombo(HWND hwndcombo, LPDRAWITEMSTRUCT lpds,  wyBool isconndbname)
 {
-	wyInt32		ncount, i, j, ret;
+	wyInt32		ncount, i, j;
 	wyString	connstr, dirstr, conncount;
 	wyInt32		topindex;
 	/*wyWChar     directory[MAX_PATH + 1], *lpfileport=0;
     
-	ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+	wyInt32 ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
 	if(ret == 0)
 		return wyFalse;
 	dirstr.SetAs(directory);

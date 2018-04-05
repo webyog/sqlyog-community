@@ -88,6 +88,10 @@ public:
     @param mysql       : Pointer to mysql pointer.
     */
 	void		RefreshObjectBrowser(Tunnel * tunnel, PMYSQL mysql, MDIWindow* wnd);
+
+	void		CollapseObjectBrowser(HWND hTree);
+
+	void		CollapseNode(HWND hTree, HTREEITEM hti);
    
     /// Gets the old database name.
     /**

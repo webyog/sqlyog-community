@@ -3482,7 +3482,7 @@ OnExitSSHConnection(PIPEHANDLES *sshpipehanles)
 	char *buffer = "exit\n";
 
 	//Executing the exit command to solve issue reporte at tickt #7953(Not stopping BASH.exe when terminating plink)
-	VERIFY(WriteFile(sshpipehanles->m_hwritepipe2, buffer, 5, &lpbytes, NULL));
+	WriteFile(sshpipehanles->m_hwritepipe2, buffer, 5, &lpbytes, NULL);
 	
 	Sleep(200);
 	

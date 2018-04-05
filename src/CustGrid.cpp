@@ -181,7 +181,6 @@ HWND CreateCustomGridEx(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width, wy
                         GVWNDPROC m_lpgvwndproc, DWORD styles, LPARAM lparam, wyBool isvisible, wyBool flip)
 {
 	HWND	hwndgrid;
-	HWND	pct;
 	CCustGrid *pcg;
 	TOOLINFO toolinfo;
 	hwndgrid = CreateWindowEx(WS_EX_WINDOWEDGE,  customname, TEXT("Custom Grid Control"), 
@@ -960,13 +959,11 @@ CCustGrid::~CCustGrid()
 LRESULT CALLBACK
 CCustGrid::CustomGridWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	wyInt32		x;
     LRESULT     ret;
 	//retrieve the custom structure POINTER for THIS window 
   	CCustGrid   *pcg = GetCustCtrlData(hwnd);
     wyBool      ikeypressshandled = wyFalse;
 	wyWChar*   tooltip = NULL;
-	RECT		rect;
 
 	switch(msg)
 	{
@@ -1819,7 +1816,6 @@ CCustGrid::OnWMNotify(WPARAM wparam, LPARAM lparam)
 	LONG			ret;
 	wyString		moldcoltextstr;
 	wyInt32			x;
-	RECT			rect;
 	
 	if(lpnmlv->hdr.code == LVN_KEYDOWN)
     {

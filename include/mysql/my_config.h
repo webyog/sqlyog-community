@@ -3,6 +3,7 @@
  * Include file constants (processed in LibmysqlIncludeFiles.txt 1
  */
 /* #undef HAVE_ALLOCA_H */
+/* #undef HAVE_BIGENDIAN */
 /* #undef HAVE_ARPA_INET_H */
 /* #undef HAVE_CRYPT_H */
 /* #undef HAVE_DIRENT_H */
@@ -164,7 +165,7 @@
 # define HAVE_CHAR 1
 #endif
 
-#define SIZEOF_CHARP 4
+#define SIZEOF_CHARP 8
 #if SIZEOF_CHARP
 # define HAVE_CHARP 1
 #endif
@@ -199,7 +200,7 @@
 # define HAVE_SIGSET_T 1
 #endif
 
-#define SIZEOF_SIZE_T 4
+#define SIZEOF_SIZE_T 8
 #if SIZEOF_SIZE_T
 # define HAVE_SIZE_T 1
 #endif
@@ -274,6 +275,6 @@
  */
 #define HAVE_THREADS 1
 /* #undef SHAREDIR */
-#define DEFAULT_CHARSET_HOME "C:/Program Files (x86)/mariadb-connector-c"
+#define DEFAULT_CHARSET_HOME "C:/Program Files/mariadb-connector-c"
 #define PLUGINDIR "/lib/plugin"
 

@@ -1343,7 +1343,7 @@ ResultView::SelectTableComboItem(wyInt32 i)
 void 
 ResultView::ShowHelpFile()
 {
-    ShowHelp("http://sqlyogkb.webyog.com/article/193-result-tab");
+    ShowHelp("http://sqlyogkb.webyog.com/article/65-result-tab");
 }
 
 //function to get auto incrment column index

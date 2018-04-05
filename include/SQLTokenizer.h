@@ -152,7 +152,7 @@ private:
 	QUERY_TOKEN			*m_bufferedline;					
 
     /// File to read query from 
-	FILE				*m_importfile;						
+	int					m_importfile;						
 
 	/// Number of bytes read from buffer
 	wyUInt32    		 m_bytesread;

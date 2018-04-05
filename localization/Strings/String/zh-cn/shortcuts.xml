@@ -102,4 +102,9 @@
 	<string name="205">还原更改</string>
 	
 	<string name="206">还原所选更改</string>
+	
+	<string name="207">重命名查询编辑器</string>
+	
+	<string name="208">在对象浏览器中全部折叠</string>
+
 </resources>

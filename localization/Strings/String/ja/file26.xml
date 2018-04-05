@@ -25,5 +25,6 @@
 	<string name="3678">リリースセーブポイント</string>
 	<string name="3679">トランザクションのコミット</string>
 	<string name="3680">ロールバックトランザクション</string>
+	<string name="3681">オブジェクトブラウザですべて折りたたむ</string>
 	
 </resources>

@@ -584,7 +584,7 @@ wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *qu
 @param iscomment	: IN def. flag tells whether its query or comment
 @return wyTrue on success else return wyFalse
 */
-wyBool  my_queryprofile(MDIWindow *wnd, wyInt64 timetaken, const wyChar *proftext, wyBool iscomment = wyFalse);
+wyBool  my_queryprofile(MDIWindow *wnd, wyInt64 timetaken, const wyChar *proftext, wyBool iscomment = wyFalse, wyInt32 errnum=0, const wyChar *errormsg=NULL);
 
 /// This function is wrapper to the Win32 messagebox. Before calling MessageBox it gets the HWND
 /// which has focus and after the message box has been shown it returns the focus back to that HWND

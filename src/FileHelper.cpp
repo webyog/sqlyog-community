@@ -16,7 +16,7 @@
 
 */
 
-#define _WIN32_WINNT   0x500
+#define _WIN32_WINNT   0x501
 #include <shlobj.h>
 
 #include "FrameWindowHelper.h"

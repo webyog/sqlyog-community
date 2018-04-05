@@ -81,7 +81,7 @@ UpgradeCheck::HandleUpgradeCheck(wyBool isexplict)
 	UPGRD		*evt;
 	wyString	dirstr;
 	wyUInt32	thdid = 0;
-	wyInt32		ret = 0, upgradechk = 1;
+	wyInt64		ret = 0, upgradechk = 1;
 	wyWChar		directory[MAX_PATH +1]={0}, *lpfileport;
 	DWORD		currntday = 0, lastchkdday = 0;
 	wyString	keyvaluestr;

@@ -568,7 +568,6 @@ CalendarCtrl::OnClickOk()
 void 
 CalendarCtrl::OnClickNow()
 {
-    wyInt32 row, col;
 	wyString    temp;
 	SYSTEMTIME seltime;
 	GetLocalTime(&seltime);

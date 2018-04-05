@@ -503,7 +503,7 @@ TableView::GetFieldResultIndexOfColumn(wyInt32 col)
 void
 TableView::ShowHelpFile()
 {
-    ShowHelp("http://sqlyogkb.webyog.com/article/218-data-manipulation");
+    ShowHelp("http://sqlyogkb.webyog.com/article/102-data-manipulation");
 }
 
 //get the database name
