@@ -56,7 +56,8 @@ wyInt32
 CustomSaveDlg::Create()
 {
     HGLOBAL     hglobal;
-    wyInt32     ret, fontsize;
+	wyInt64     ret;
+	wyInt32 fontsize;
     wyString    fontname;
     HDC         hdc;
 	NONCLIENTMETRICS    ncm = {0};

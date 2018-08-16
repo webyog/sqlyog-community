@@ -11677,7 +11677,8 @@ sessionsavesproc(void *arg)
 	}
 	else
 	{
-		const wyChar *desc, *majorver , *minorver ;
+		const wyChar *desc = NULL, *majorver , *minorver ;
+
 		sqlitequery.Sprintf("SELECT * from schema_version");
 		pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString()); 
 		if(pGlobals->m_sqliteobj->Step(&res, wyFalse) && pGlobals->m_sqliteobj->GetLastCode() == SQLITE_ROW)
