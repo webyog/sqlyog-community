@@ -85,12 +85,14 @@ public:
     wyInt32                         m_lastclickindgrid;
     wyInt32                         m_lastclickdlggrid;
 
-		RECT							m_wndrect;
+	RECT							m_wndrect;
 
 	RECT							m_dlgrect;
-
 	
-			List				m_controllist;
+	List							m_controllist;
+
+	// backtick string from preferences, either empty or quote
+	wyChar*							m_backtick;
 
     /// Constructor
     TabIndexes(HWND hwndparent, TableTabInterfaceTabMgmt* ptabmgmt);
@@ -152,6 +154,10 @@ public:
     void                            Resize();
 
     void                            ResizeColumnsDialog(HWND hwnd, LPARAM lParam);
+
+	// All dervied data should be refreshed based on preferences and also display
+	void							Refresh();
+	void							Refresh(IndexInfo *indexInfo);
 
     /// Shows the Dialog-box if the grid cell on which mouse is clicked is INDEXCOLUMNS
     /**

@@ -109,8 +109,6 @@
 //#define  CPI_UTF32  12000
 
 #define  CPI_CP932 932
-#define  MYSQL_TYPE_JSON 245
-#define  FIELD_TYPE_JSON  MYSQL_TYPE_JSON
 
 enum EntType
 {

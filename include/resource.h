@@ -984,6 +984,8 @@
 #define IDC_TRIALSTATIC                 1812
 #define IDC_INITCOMMANDHELP             2644
 #define IDC_COMBOCUSTOM                 2645
+#define IDC_SHOWSQL						2646
+#define	IDC_HIDESQL						2647
 #define ID_IMPORT_FROMXML               2655
 #define ACCEL_IMPORTXML                 2656
 #define FAVORITE_MENU_ID                2900

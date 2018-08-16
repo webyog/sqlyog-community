@@ -64,7 +64,7 @@ class MySQLTableDataEx : public MySQLDataEx
 };
 
 //Class representing table view
-class TableView : public DataView
+class TableView : public DataView, public IQueryBuilder
 {
 	public:
         ///Constuctor
@@ -95,6 +95,12 @@ class TableView : public DataView
         @returns void
         */
         void                    ResetToolBarButtons();
+
+		/// IQueryBuilder implementation
+		/**
+		@returns void. But caller needs to destroy query.(they own it)
+		*/
+		void				GetQuery(wyString& query);
 	
 	protected:
         ///Function to create toolbars and additional controls

@@ -301,6 +301,10 @@ public:
     */
     void                SetBackQuotesOption();
 
+	// Will regenerate and refresh all names, etc. which can be affected by preferences and sql previews if needed to 
+	// apply any change in preferences etc
+	void				Refresh();
+
 	/// Handles the checking or unchecking the Menu item 'text or grid'
     /**
     @param pcquerywnd       : IN Query window pointer

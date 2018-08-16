@@ -1126,6 +1126,10 @@ TableTabInterface::GenerateQuery(wyString &query, wyBool showmsg)
     wyString    tblname(""), tblnameold(""), dbname(""), tempquery(""), tempstr("");
     wyBool      retval = wyTrue, nocols = wyFalse;
     wyInt32     index = -1;
+	wyChar*		backtick;
+
+	//from  .ini file
+	backtick = AppendBackQuotes() == wyTrue ? "`" : "";
 
     retval = GetNewTableName(tblname);
 
@@ -1135,13 +1139,15 @@ TableTabInterface::GenerateQuery(wyString &query, wyBool showmsg)
     tblnameold.FindAndReplace("`", "``");
 
     GetComboboxValue(m_hcmbdbname, dbname);
-    dbname.FindAndReplace("`", "``");
+    dbname.FindAndReplace("`", "``");	
 
     if(m_isaltertable)
-        tempquery.AddSprintf("Alter table `%s`.`%s` ", dbname.GetString(), tblnameold.GetString());
+        tempquery.AddSprintf("Alter table %s%s%s.%s%s%s ", backtick, dbname.GetString(), backtick,
+			backtick, tblnameold.GetString(), backtick);
     else
     {
-        tempquery.AddSprintf("Create table `%s`.`%s`(", dbname.GetString(), tblname.GetString());
+        tempquery.AddSprintf("Create table %s%s%s.%s%s%s (", backtick, dbname.GetString(), backtick,
+			backtick, tblname.GetString(), backtick);
 
         tempstr.SetAs(TABLE_NAME_MISSING);
         if(!tblname.GetLength())
@@ -2484,6 +2490,10 @@ TableTabInterface::GetRenameQuery(wyString& renamequery, wyBool showmsg)
     wyString    newname(""), escapestrold(""), escapestrnew(""), escapedbname("");
     wyString    tempstr;
     wyBool      retval = wyTrue;
+	wyChar*		backtick;
+
+	//from  .ini file
+	backtick = AppendBackQuotes() == wyTrue ? "`" : "";
 
     renamequery.Clear();
 
@@ -2501,7 +2511,11 @@ TableTabInterface::GetRenameQuery(wyString& renamequery, wyBool showmsg)
     escapestrnew.SetAs(newname);
     escapestrnew.FindAndReplace("`", "``");
     
-    renamequery.AddSprintf("Rename table `%s`.`%s` to `%s`.`%s`;", escapedbname.GetString(), escapestrold.GetString(), escapedbname.GetString(), escapestrnew.GetString());
+    renamequery.AddSprintf("Rename table %s%s%s.%s%s%s to %s%s%s.%s%s%s;", 
+		backtick, escapedbname.GetString(), backtick,
+		backtick, escapestrold.GetString(), backtick,
+		backtick, escapedbname.GetString(), backtick,
+		backtick, escapestrnew.GetString(), backtick);
 
     if(!retval)
     {

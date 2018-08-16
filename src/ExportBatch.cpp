@@ -16,8 +16,6 @@
 
 */
 
-#define _WIN32_WINNT   0x501
-
 #include <assert.h>
 #include "FrameWindowHelper.h"
 #include "MySQLVersionHelper.h"

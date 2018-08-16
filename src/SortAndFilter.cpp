@@ -25,6 +25,10 @@ Author: Vishal P.R, Janani SriGuha
 #include "SortAndFilter.h"
 #include "FrameWindow.h"
 #include "BlobMgmt.h"
+#include "EditorFont.h"
+#ifndef COMMUNITY
+#include "SCIFormatter.h"
+#endif
 
 //constructor
 SortAndFilter::SortAndFilter(wyBool isclient, MySQLDataEx* data)
@@ -34,6 +38,7 @@ SortAndFilter::SortAndFilter(wyBool isclient, MySQLDataEx* data)
     m_isfilter = wyFalse;
     m_isclient = isclient;
     m_data = data;
+	m_querybuilder = NULL;
     Initialize();
 
     //we are hardcoding the number of sort/filter columns available
@@ -107,11 +112,22 @@ SortAndFilter::FilterWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
 	wyString        filtercon;
 	wyString        filtertxt;
     SortAndFilter*  sortandfilter;
+	RECT			rect, rectLastItem;
+	LONG			height;
 
 	sortandfilter = (SortAndFilter*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
 	switch(message)
 	{
+		case WM_CTLCOLORSTATIC:
+		{
+			int ctrlId = GetDlgCtrlID((HWND)lparam);
+
+			if (IDC_SHOWSQL == ctrlId || IDC_HIDESQL == ctrlId)
+				return SetAsLink((HDC)wparam);
+			return 0;
+		}
+
         //initialize the dialog
 	    case WM_INITDIALOG:
             //associate the lparam as the user data
@@ -127,34 +143,101 @@ SortAndFilter::FilterWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
 		    {
 			    EndDialog(hwnd, IDCANCEL);
 		    }
+			PostMessage(hwnd, WM_INITDLGVALUES, 0, 0);
 
             break;
 
+		case WM_INITDLGVALUES:
+			sortandfilter->OnWMInitdlgValues(hwnd);
+			break;
+
         //command handling
 	    case WM_COMMAND:
-		    switch(LOWORD(wparam))
-		    {
-                //close the dialog
-		        case IDCANCEL:
-			        EndDialog(hwnd, IDCANCEL);
-			        return TRUE;
+			int wNotifyCode;
 
-                //handle ok press
-		        case IDOK:
-                    //process the filter
-                    if(sortandfilter->ProcessFilter() == wyTrue)
-                    {
-			            EndDialog(hwnd, IDOK);
-                    }
-                    else
-                    {
-                        EndDialog(hwnd, IDCANCEL);
-                    }
+			wNotifyCode = HIWORD(wparam);
+			if (NULL != sortandfilter->m_querybuilder && (EN_KILLFOCUS == wNotifyCode || CBN_KILLFOCUS == wNotifyCode))
+			{
+				wyString query;
+				HWND hwndPreview = GetDlgItem(hwnd, IDC_PREVIEW);
 
-			        return TRUE;
-		    }
+				// Refresh the sql query as user moves across filter values
+				sortandfilter->ProcessFilter();
+				sortandfilter->SetFilterString(wyTrue);
+				sortandfilter->m_querybuilder->GetQuery(query);
+
+				SendMessage(hwndPreview, SCI_SETREADONLY, (WPARAM)FALSE, (LPARAM)0);
+				SendMessage(hwndPreview, SCI_SETTEXT, (WPARAM)query.GetLength(), (LPARAM)query.GetString());
+				//Format query
+#ifndef COMMUNITY
+				Format(hwndPreview, IsStacked(), GetLineBreak() ? wyFalse : wyTrue, FORMAT_ALL_QUERY, GetIndentation());
+#endif
+				SendMessage(hwndPreview, SCI_SETSELECTIONSTART, (WPARAM)0, 0);
+				SendMessage(hwndPreview, SCI_SETSELECTIONEND, (WPARAM)0, 0);
+				SendMessage(hwndPreview, SCI_SETFIRSTVISIBLELINE, 0, 0);
+				SendMessage(hwndPreview, SCI_SETREADONLY, (WPARAM)TRUE, (LPARAM)0);
+			}
+			else if (STN_CLICKED == wNotifyCode || BN_CLICKED == wNotifyCode)
+			{
+				switch (LOWORD(wparam))
+				{
+					//close the dialog
+				case IDCANCEL:
+					EndDialog(hwnd, IDCANCEL);
+					return TRUE;
+
+					//handle ok press
+				case IDOK:
+					//process the filter
+					if (sortandfilter->ProcessFilter() == wyTrue)
+					{
+						EndDialog(hwnd, IDOK);
+					}
+					else
+					{
+						EndDialog(hwnd, IDCANCEL);
+					}
+
+					return TRUE;
+				case IDC_SHOWSQL:
+					ShowWindow(GetDlgItem(hwnd, IDC_SHOWSQL), SW_HIDE);
+					ShowWindow(GetDlgItem(hwnd, IDC_HIDESQL), SW_SHOW);
+					GetWindowRect(GetDlgItem(hwnd, IDC_PREVIEW), &rect);
+					height = rect.bottom - rect.top;
+					GetWindowRect(GetDlgItem(hwnd, IDOK), &rectLastItem);
+					height += rect.top - rectLastItem.bottom;
+					GetWindowRect(hwnd, &rect);
+					SetWindowPos(hwnd, NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top + height, SWP_NOZORDER | SWP_NOMOVE);
+					// Force a refresh of Preview
+					SetFocus(GetDlgItem(hwnd, 100));
+					SetFocus(GetDlgItem(hwnd, IDC_PREVIEW));
+					return TRUE;
+
+				case IDC_HIDESQL:
+					ShowWindow(GetDlgItem(hwnd, IDC_HIDESQL), SW_HIDE);
+					ShowWindow(GetDlgItem(hwnd, IDC_SHOWSQL), SW_SHOW);
+					GetWindowRect(GetDlgItem(hwnd, IDC_PREVIEW), &rect);
+					height = rect.bottom - rect.top;
+					GetWindowRect(GetDlgItem(hwnd, IDOK), &rectLastItem);
+					height += rect.top - rectLastItem.bottom;
+					// cover it up
+					GetWindowRect(hwnd, &rect);
+					SetWindowPos(hwnd, NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top - height, SWP_NOZORDER | SWP_NOMOVE);
+					return TRUE;
+				}
+			}
 
 		    break;
+
+		case WM_SETCURSOR:
+			if ((HWND)wparam == GetDlgItem(hwnd, IDC_SHOWSQL) ||
+				(HWND)wparam == GetDlgItem(hwnd, IDC_HIDESQL)   )
+			{
+				SetCursor(LoadCursor(NULL, MAKEINTRESOURCE(32649)));
+				SetWindowLongPtr(hwnd, DWLP_MSGRESULT, TRUE);
+				return TRUE;
+			}
+			break;
 
         //show filter help
 	    case WM_HELP:
@@ -170,6 +253,7 @@ wyBool
 SortAndFilter::InitDialog()
 {
 	wyInt32			    i, j, k = 0, paddingtobutton, paddingtowindow, selcol = 0, dropwidth = 0, filterindex = -1, existingfilter = -1;
+	wyInt32				topPreview;
     enum_field_types    coltype = MYSQL_TYPE_VARCHAR;
     RECT                rect, rectwin, recttemp, rectcol, rectcond, rectvalue, recttext = {0};
     wyString            temp;
@@ -239,22 +323,49 @@ SortAndFilter::InitDialog()
         SendMessage(hwndtemp, WM_SETFONT, (WPARAM)hfont, 0);
     }
     
-    //position OK button
     hwndtemp = GetDlgItem(m_hwnd, j);
     GetWindowRect(hwndtemp, &rect);
     MapWindowRect(NULL, m_hwnd, &rect);
-    hwndtemp = GetDlgItem(m_hwnd, IDOK);
+
+	// position Show/Hide static links
+	hwndtemp = GetDlgItem(m_hwnd, IDC_SHOWSQL);
+	GetWindowRect(hwndtemp, &recttemp);
+	MapWindowRect(NULL, m_hwnd, &recttemp);
+	SetWindowPos(hwndtemp, GetDlgItem(m_hwnd, j), recttemp.left, rect.bottom + paddingtobutton, 0, 0, SWP_NOSIZE);
+
+	hwndtemp = GetDlgItem(m_hwnd, IDC_HIDESQL);
+	GetWindowRect(hwndtemp, &recttemp);
+	MapWindowRect(NULL, m_hwnd, &recttemp);
+	SetWindowPos(hwndtemp, GetDlgItem(m_hwnd, IDC_SHOWSQL), recttemp.left, rect.bottom + paddingtobutton, 0, 0, SWP_NOSIZE);
+
+	//position OK button
+	hwndtemp = GetDlgItem(m_hwnd, IDOK);
     GetWindowRect(hwndtemp, &recttemp);
     MapWindowRect(NULL, m_hwnd, &recttemp);
-    SetWindowPos(hwndtemp, GetDlgItem(m_hwnd, j), recttemp.left, rect.bottom + paddingtobutton, 0, 0, SWP_NOSIZE);
+    SetWindowPos(hwndtemp, GetDlgItem(m_hwnd, IDC_HIDESQL), recttemp.left, rect.bottom + paddingtobutton, 0, 0, SWP_NOSIZE);
 
     //position cancel button
     hwndtemp = GetDlgItem(m_hwnd, IDCANCEL);
     GetWindowRect(hwndtemp, &recttemp);
     MapWindowRect(NULL, m_hwnd, &recttemp);
     SetWindowPos(hwndtemp, GetDlgItem(m_hwnd, IDOK), recttemp.left, rect.bottom + paddingtobutton, 0, 0, SWP_NOSIZE);
-    GetWindowRect(hwndtemp, &recttemp);
-    SetWindowPos(m_hwnd, NULL, 0, 0, rectwin.right - rectwin.left, recttemp.bottom + paddingtowindow - rectwin.top, SWP_NOZORDER | SWP_NOMOVE);
+	// calculate the top for Preview which is same as dialog's bottom covering it 
+	topPreview = rect.bottom + paddingtobutton + (recttemp.bottom - recttemp.top) + paddingtowindow;
+	
+	// Resize dialog window to include additional filters we added
+	// This will cover the Preview window completely
+	GetWindowRect(hwndtemp, &recttemp);
+	SetWindowPos(m_hwnd, NULL, 0, 0, rectwin.right - rectwin.left, recttemp.bottom + paddingtowindow - rectwin.top, SWP_NOZORDER | SWP_NOMOVE);
+
+	// position SQL Preview window
+	hwndtemp = GetDlgItem(m_hwnd, IDC_PREVIEW);
+	GetWindowRect(hwndtemp, &recttemp);
+	MapWindowRect(NULL, m_hwnd, &recttemp);
+	SetWindowPos(hwndtemp, GetDlgItem(m_hwnd, IDCANCEL), recttemp.left, topPreview, 0, 0, SWP_NOSIZE);
+
+	// Both Show & Hide SQL Preview are not visible to start with. If server side queries is on, turn on Show
+	if (NULL != m_querybuilder)
+		ShowWindow(GetDlgItem(m_hwnd, IDC_SHOWSQL), SW_SHOW);
 
     hwndtemp = GetDlgItem(m_hwnd, 100);
     hdc = GetDC(hwndtemp);
@@ -409,7 +520,7 @@ SortAndFilter::InitDialog()
         SetFocus(hwndtemp);
     }
 
-    //position window to raltive to the filter button in the toolbar
+    //position window relative to the filter button in the toolbar
     if(m_prelrect)
     {
         PositionWindow();
@@ -418,6 +529,30 @@ SortAndFilter::InitDialog()
 	return wyTrue;
 }
 
+void
+SortAndFilter::OnWMInitdlgValues(HWND hwnd)
+{
+	MDIWindow *wnd = GetActiveWin();
+	HWND hwndpreview = GetDlgItem(hwnd, IDC_PREVIEW);
+
+	// attempt to set scintilla code page to support utf8 data
+
+	//set the lexer language 
+	SendMessage(hwndpreview, SCI_SETLEXERLANGUAGE, 0, (LPARAM)"MySQL");
+
+	SendMessage(hwndpreview, SCI_SETCODEPAGE, SC_CP_UTF8, 0);
+
+	EditorFont::FormatEditor(hwndpreview, wyTrue, wnd->m_keywordstring, wnd->m_functionstring);
+
+	/* make the scintilla preview control word wrap */
+	SendMessage(hwndpreview, SCI_SETWRAPMODE, SC_WRAP_WORD, SC_WRAP_WORD);
+
+	//Line added because on changing color there was margin coming for editor
+	SendMessage(hwndpreview, SCI_SETMARGINWIDTHN, 1, 0);
+	SendMessage(hwndpreview, SCI_SETREADONLY, (WPARAM)TRUE, (LPARAM)0);
+}
+
+
 //function to position the window relative to button
 void
 SortAndFilter::PositionWindow()
@@ -425,11 +560,21 @@ SortAndFilter::PositionWindow()
     HMONITOR    hmonitor;
     MONITORINFO mi = {0};
     RECT        temprect = {0}, rc = *m_prelrect;
+	RECT		temprect2 = { 0 }, temprect3 = { 0 };
     wyInt32     width, height, animate = 0;
     RECT*       prect = &rc;
 
     //get the modified window rect
     GetWindowRect(m_hwnd, &temprect);
+
+	if (NULL != m_querybuilder)
+	{
+		// Since the Preview starts by hidden, we need to include it also in our calculations
+		GetWindowRect(GetDlgItem(m_hwnd, IDC_PREVIEW), &temprect2);
+		temprect.bottom += temprect2.bottom - temprect2.top; // add the size of preview window which is now hidden
+		GetWindowRect(GetDlgItem(m_hwnd, IDOK), &temprect3);
+		temprect.bottom += temprect2.top - temprect3.bottom; // including the additional gap when it shows
+	}
 
     //get the monitor info for the monitor associated with the rect
     hmonitor = MonitorFromRect(prect, MONITOR_DEFAULTTONEAREST);
@@ -585,7 +730,11 @@ SortAndFilter::SetFilterString(wyBool isnewfilter)
     const wyChar*   typetext;
     wyChar*         escapedstr = NULL;
     wyString*       ptemp;
-    
+	wyChar*			backtick;
+
+	//from  .ini file
+	backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
     //depending on we are asking for new filter or the existing filter
     ptemp = isnewfilter == wyTrue ? &m_filterstring : &m_currfilterstring;
     ptemp->Clear();
@@ -593,41 +742,41 @@ SortAndFilter::SetFilterString(wyBool isnewfilter)
     //loop throguth filters
     for(i = 0; i < m_filtercolumns; i++)
     {
-        //if it is valid
-        if(m_filter[i].m_colindex != -1 && m_filter[i].m_filtertype != FT_NONE)
-        {
-            //we always use AND to combine two conditions
-            if(ptemp->GetLength())
-            {
-                ptemp->Add(" AND ");
-            }
+		//if it is isnt valid, then all filters are over.
+		if (m_filter[i].m_colindex == -1 || m_filter[i].m_filtertype == FT_NONE)
+			break;
 
-            //set the column name
-            colname.SetAs(m_data->m_datares->fields[m_filter[i].m_colindex].name, m_wnd->m_ismysql41);
+		//we always use AND to combine two conditions
+		if (ptemp->GetLength())
+		{
+			ptemp->Add(" AND ");
+		}
 
-            //get the string representation of filter
-            typetext = GetFilterTypeStr(m_filter[i].m_filtertype);
+		//set the column name
+		colname.SetAs(m_data->m_datares->fields[m_filter[i].m_colindex].name, m_wnd->m_ismysql41);
 
-            //handle NULL
-            if((m_filter[i].m_filtertype == FT_EQUAL || m_filter[i].m_filtertype == FT_NOTEQUAL) &&
-                (!m_filter[i].m_value.CompareI("NULL") || !m_filter[i].m_value.CompareI("(NULL)")))
-            {
-                ptemp->AddSprintf("`%s` IS %s NULL", colname.GetString(), 
-                    m_filter[i].m_filtertype == FT_EQUAL ? "" : "NOT"); 
-            }
-            else
-            {
-                //escape the string and add it to the filter text
-                escapedstr = (wyChar*)malloc(m_filter[i].m_value.GetLength() * 2 + 1);
-                m_wnd->m_tunnel->mysql_real_escape_string(m_wnd->m_mysql, 
-                    escapedstr, m_filter[i].m_value.GetString(), m_filter[i].m_value.GetLength());
-                ptemp->AddSprintf("`%s` %s '%s%s%s'", colname.GetString(), typetext ? typetext : "", 
-                    m_filter[i].m_filtertype == FT_LIKEBEGIN || m_filter[i].m_filtertype == FT_LIKEBOTH ? "%" : "", 
-                    escapedstr,
-                    m_filter[i].m_filtertype == FT_LIKEEND || m_filter[i].m_filtertype == FT_LIKEBOTH ? "%" : "");
-                free(escapedstr);
-            }
-        }
+		//get the string representation of filter
+		typetext = GetFilterTypeStr(m_filter[i].m_filtertype);
+
+		//handle NULL
+		if ((m_filter[i].m_filtertype == FT_EQUAL || m_filter[i].m_filtertype == FT_NOTEQUAL) &&
+			(!m_filter[i].m_value.CompareI("NULL") || !m_filter[i].m_value.CompareI("(NULL)")))
+		{
+			ptemp->AddSprintf("%s%s%s IS %s NULL", backtick, colname.GetString(), backtick,
+				m_filter[i].m_filtertype == FT_EQUAL ? "" : "NOT");
+		}
+		else
+		{
+			//escape the string and add it to the filter text
+			escapedstr = (wyChar*)malloc(m_filter[i].m_value.GetLength() * 2 + 1);
+			m_wnd->m_tunnel->mysql_real_escape_string(m_wnd->m_mysql,
+				escapedstr, m_filter[i].m_value.GetString(), m_filter[i].m_value.GetLength());
+			ptemp->AddSprintf("%s%s%s %s '%s%s%s'", backtick, colname.GetString(), backtick, typetext ? typetext : "",
+				m_filter[i].m_filtertype == FT_LIKEBEGIN || m_filter[i].m_filtertype == FT_LIKEBOTH ? "%" : "",
+				escapedstr,
+				m_filter[i].m_filtertype == FT_LIKEEND || m_filter[i].m_filtertype == FT_LIKEBOTH ? "%" : "");
+			free(escapedstr);
+		}
     }
 }
 
@@ -1320,16 +1469,31 @@ SortAndFilter::EndFilter(wyBool issuccess)
 
 //function to begin filter
 wyBool 
-SortAndFilter::BeginFilter(wyInt32 command, wyChar* data, wyUInt32 datalen, wyInt32 col, HWND hwndparent, RECT* prect)
+SortAndFilter::BeginFilter(wyInt32 command, wyChar* data, wyUInt32 datalen, wyInt32 col, HWND hwndparent, IQueryBuilder* querybuilder, RECT* prect)
 {
     wyInt32 i;
 
     //open custom filter
     if(command == ID_FILTER_CUSTOMFILTER || command == ID_RESETFILTER)
     {
-        if(OpenFilterDialog(hwndparent, col, data, datalen, prect) == IDCANCEL)
+		m_querybuilder = querybuilder;
+		wyInt32 wId;
+
+		wId = OpenFilterDialog(hwndparent, col, data, datalen, prect);
+		m_querybuilder = NULL;
+        if (wId == IDCANCEL)
         {
-            return wyFalse;
+			// Since we are now munging with filter variables we have to cancel it
+			if (m_isfilter == wyTrue) // already in filter.
+			{
+				m_filterstring.SetAs(m_currfilterstring);
+			}
+			else
+			{
+				ResetFilter();
+				SetFilterString(wyTrue); // this will set to null
+			}
+			return wyFalse;
         }
     }
     else

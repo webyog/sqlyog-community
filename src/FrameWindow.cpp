@@ -7151,9 +7151,8 @@ FrameWindow::OnWmInitPopup(WPARAM wparam, LPARAM lparam)
 		{
 			return wyTrue;
 		}
-		if(!(lstyle & WS_MAXIMIZE))
-			menuindex++;
-		else if(menuindex == 0 && (wnd->m_executing == wyTrue || wnd->m_pingexecuting == wyTrue))
+
+		if (menuindex == 0 && (wnd->m_executing == wyTrue || wnd->m_pingexecuting == wyTrue))
             return wyTrue;
 
         iswindowmenu = m_connection->IsWindowMenu(menuindex);

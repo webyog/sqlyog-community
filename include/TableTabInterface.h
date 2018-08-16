@@ -124,7 +124,7 @@ public:
 	HBRUSH									m_objbkcolor;
     
     wyBool                                  m_isbuffereddraw;
-    
+
     TableTabInterface(HWND hwnd, wyBool open_in_dialog, wyBool isaltertable, wyInt32 setfocustotab);
 
     ~TableTabInterface();

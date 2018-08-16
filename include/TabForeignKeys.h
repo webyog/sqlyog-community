@@ -182,11 +182,13 @@ public:
 
 	RECT							m_dlgrect;
 
-	
-			List				m_controllist;
+	List							m_controllist;
 
 	//member stores the subclassing procedure for the static control showing the gripper
-        WNDPROC                 m_gripproc;
+    WNDPROC							m_gripproc;
+
+	// backtick string from preferences, either empty or quote
+	wyChar*							m_backtick;
 
     void                            InitStructFK(StructFK *value);
 
@@ -572,6 +574,10 @@ public:
     @returns    void
     */
     void                            ReInitializeGrid(List *unsavedfkwrappers = NULL);
+
+	// All dervied data should be refreshed based on preferences and also display
+	void							Refresh();
+	void							Refresh(StructFK* fkInfo);
 
     void                            SetValueToStructure(wyUInt32 row, wyUInt32 col, wyChar* data);
 

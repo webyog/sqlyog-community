@@ -191,7 +191,7 @@ ResultTabTableElem::~ResultTabTableElem()
 }
 
 //view constructor
-ResultView::ResultView(MDIWindow *wnd, HWND hwndparent) : DataView(wnd, hwndparent)
+ResultView::ResultView(MDIWindow *wnd, HWND hwndparent) : DataView(wnd, hwndparent, NULL)
 {
     m_mydata = NULL;
 }

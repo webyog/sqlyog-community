@@ -129,6 +129,7 @@ TabFields::TabFields(HWND hwnd, TableTabInterfaceTabMgmt* ptabmgmt)
 	m_ismysql578        =   IsMySQL578(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
     m_p = new Persist;
 	m_p->Create("TabbedInterface");
+
 }
 
 TabFields::~TabFields()
@@ -1228,6 +1229,10 @@ TabFields::GenerateQuery(wyString& query)
     wyString    str("");
     wyBool      retval = wyTrue;
 
+	// We always read here so that we can get current value not cached one
+	//Read the .ini file
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
     /// Generating query
     if(m_ptabmgmt->m_tabinterfaceptr->m_isaltertable)
     {
@@ -1324,10 +1329,10 @@ TabFields::GenerateCreateQuery(wyString& str)
                 
                 /// If not the first column of the index, add a new index
                 if(indcol->m_pcwrapobj != cwrapobj)
-                    query.AddSprintf("\r\n   Key(`%s`),", m_autoinccol.GetString());
+                    query.AddSprintf("\r\n   Key(%s%s%s),", m_backtick, m_autoinccol.GetString(), m_backtick);
             }
             else
-                query.AddSprintf("\r\n   Key(`%s`),", m_autoinccol.GetString());
+                query.AddSprintf("\r\n   Key(%s%s%s),", m_backtick, m_autoinccol.GetString(),m_backtick);
         }
     }
 
@@ -1403,7 +1408,7 @@ TabFields::GenerateAlterQuery(wyString& query)
                         indby = (IndexedBy *)indby->m_next;
                     }
                     if(!indexedfirst)
-                        completequery.AddSprintf("\r\n  add Key(`%s`),", m_autoinccol.GetString());
+                        completequery.AddSprintf("\r\n\tadd Key(%s%s%s),", m_backtick, m_autoinccol.GetString(), m_backtick);
                 }
             }
         }
@@ -1426,7 +1431,7 @@ TabFields::DropColumnQuery(wyString &dropcolumns)
     {
         if(cwrapobj->m_oldval && !(cwrapobj->m_newval))
         {
-            dropcolumns.AddSprintf("\r\n  drop column `%s`, ", cwrapobj->m_oldval->m_name.GetString());
+            dropcolumns.AddSprintf("\r\n\tdrop column %s%s%s, ", m_backtick, cwrapobj->m_oldval->m_name.GetString(), m_backtick);
         }
         cwrapobj = (FieldStructWrapper*)cwrapobj->m_next;
     }
@@ -1505,7 +1510,7 @@ TabFields::GetNewAndModifiedColumns(wyString &columnsstr)
                 columnsstr.Add(" first");
             }
             else
-                columnsstr.AddSprintf(" after `%s`", prevcwrap->m_newval->m_name.GetString());
+                columnsstr.AddSprintf(" after %s%s%s", m_backtick, prevcwrap->m_newval->m_name.GetString(), m_backtick);
             columnsstr.Add(",");
 
             lasterrmsg.SetAs(cwrapobj->m_errmsg);
@@ -1525,7 +1530,7 @@ TabFields::GetNewAndModifiedColumns(wyString &columnsstr)
             if(!prevoldcwrap && prevcwrap)  //..New Field is added at the top of all existing fields
             {
                 if(prevcwrap->m_oldval && prevcwrap->m_newval)
-                    reorderstr.Sprintf(" after `%s`", prevcwrap->m_newval->m_name.GetString());
+                    reorderstr.Sprintf(" after %s%s%s", m_backtick, prevcwrap->m_newval->m_name.GetString(), m_backtick);
             }
             else if(!prevoldcwrap && cwrapobj->m_prev)  //..if any existing field other than the first field is shifted to the first position in the Grid
             {
@@ -1544,7 +1549,7 @@ TabFields::GetNewAndModifiedColumns(wyString &columnsstr)
             else if(prevcwrap != NULL && cwrapobj->m_ischanged == wyTrue ) 
             {
 				if (cwrapobj->m_oldval != past_ele->m_oldval)
-                    reorderstr.Sprintf(" after `%s`", prevcwrap->m_newval->m_name.GetString());
+                    reorderstr.Sprintf(" after %s%s%s", m_backtick, prevcwrap->m_newval->m_name.GetString(), m_backtick);
 				else
 				{
 					row_temp =row;
@@ -1566,7 +1571,7 @@ TabFields::GetNewAndModifiedColumns(wyString &columnsstr)
 							{
 								if(past_ele_prev->m_newval->m_name.Compare(present_ele_prev->m_newval->m_name) != 0)
 								{
-									reorderstr.Sprintf(" after `%s`", prevcwrap->m_newval->m_name.GetString());
+									reorderstr.Sprintf(" after %s%s%s", m_backtick, prevcwrap->m_newval->m_name.GetString(), m_backtick);
 									cwrapobj->m_ischanged = wyTrue;
 									break;
 								}
@@ -1592,7 +1597,7 @@ TabFields::GetNewAndModifiedColumns(wyString &columnsstr)
 					{
 						if(!( past_ele_prev ==NULL && present_ele_prev == NULL))
 						{
-                    reorderstr.Sprintf(" after `%s`", prevcwrap->m_newval->m_name.GetString());
+                    reorderstr.Sprintf(" after %s%s%s", m_backtick, prevcwrap->m_newval->m_name.GetString(), m_backtick);
 							cwrapobj->m_ischanged = wyTrue;
 						}
 					}
@@ -1663,12 +1668,12 @@ void
 	{ //dropping and recreating 
 		if(dropandrecreate)
 		{
-			newcolumns.AddSprintf("\r\n  DROP COLUMN `%s` ,",fieldattr->m_name.GetString() );
-			newcolumns.Add("\r\n  add column ");
+			newcolumns.AddSprintf("\r\n\tDROP COLUMN %s%s%s ,", m_backtick, fieldattr->m_name.GetString(), m_backtick );
+			newcolumns.Add("\r\n\tadd column ");
 		}
 		else
 		{
-			newcolumns.Add("\r\n  add column ");
+			newcolumns.Add("\r\n\tadd column ");
 		}
 	}
 	else
@@ -1677,13 +1682,13 @@ void
 			return;
 		colnamestr.SetAs(cwrapobj->m_oldval->m_name);
 		colnamestr.FindAndReplace("`", "``");
-		newcolumns.AddSprintf("\r\n  change `%s` ", colnamestr.GetString());
+		newcolumns.AddSprintf("\r\n\tchange %s%s%s ", m_backtick, colnamestr.GetString(), m_backtick);
 	}
 
 	colnamestr.SetAs(fieldattr->m_name);
 	colnamestr.FindAndReplace("`", "``");
 
-	newcolumns.AddSprintf("`%s` %s", colnamestr.GetString(), fieldattr->m_datatype.GetString());
+	newcolumns.AddSprintf("%s%s%s %s", m_backtick, colnamestr.GetString(), m_backtick, fieldattr->m_datatype.GetString());
 
 	if(fieldattr->m_len.GetLength())
 		newcolumns.AddSprintf("(%s) ", fieldattr->m_len.GetString());
@@ -2044,7 +2049,7 @@ TabFields::GetColumnAndDataType(wyString &query, FIELDATTRIBS*   pfieldattribs)
     tmpstr.SetAs(pfieldattribs->m_name);
     tmpstr.FindAndReplace("`", "``");
 
-    query.AddSprintf("`%s` %s", tmpstr.GetString(), pfieldattribs->m_datatype.GetString());
+    query.AddSprintf("%s%s%s %s", m_backtick, tmpstr.GetString(), m_backtick, pfieldattribs->m_datatype.GetString());
     if(pfieldattribs->m_len.GetString() && strlen(pfieldattribs->m_len.GetString()))
     {
         query.AddSprintf("(%s)", pfieldattribs->m_len.GetString());

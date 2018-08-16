@@ -35,6 +35,7 @@ enum ThreadAction;
 class MySQLRowExArray;
 enum ThreadExecStatus;
 enum ArrayAction;
+class IQueryBuilder;
 
 //Filter type enumeration
 enum FilterType 
@@ -144,6 +145,13 @@ class SortAndFilter
         */
         wyBool                      InitDialog();
 
+		/// Initializes the main dlg procedure
+		/**
+		@param hwndparent:     IN       Window handle
+		@returns void
+		*/
+		void						OnWMInitdlgValues(HWND hwnd);
+
         ///Function to reset sort
         /**
         @returns void
@@ -185,10 +193,11 @@ class SortAndFilter
         @param datalen              : IN cell data length
         @param col                  : IN selected column, can be -1
         @param hwndparent           : IN handle to the parent window if you are invoking custom filter, can be NULL otherwise
+		@param querybuilder			: IN queryBuilder interface
         @param prect                : IN rectangle with respect to which the dialog box to be positioned, can be NULL if the command is not custom filter
         @returns wyTrue on success else wyFalse
         */
-        wyBool                      BeginFilter(wyInt32 command, wyChar* data, wyUInt32 datalen, wyInt32 col, HWND hwndparent = NULL, RECT* prect = NULL);
+        wyBool                      BeginFilter(wyInt32 command, wyChar* data, wyUInt32 datalen, wyInt32 col, HWND hwndparent = NULL, IQueryBuilder* querybuilder = NULL, RECT* prect = NULL);
 
         ///Function finishes the filter operation. This includes copying any new filter applied to the current filter, or canceling it
         /**
@@ -443,6 +452,9 @@ class SortAndFilter
         wyString                    m_currfilterstring;
 
         wyBool                      m_isfilteronnull;
+
+		// IQueryBuilder interface
+		IQueryBuilder*				m_querybuilder;
 };
 
 #endif

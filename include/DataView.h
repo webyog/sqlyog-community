@@ -392,6 +392,15 @@ class EnumListElem : public wyElem
         wyString m_str;
 };
 
+// abstract interface to be used as a callback interface for DataView. Any clients can construct this with
+// non null interface to DataView, and are responsible for implementing that interface which gives the complete
+// live query used at that time. null implies they dont need that.
+class IQueryBuilder
+{
+	public:
+		virtual void GetQuery(wyString& query) = 0;
+};
+
 //Class represents the view. This is an abstact class. You need to derive your own class from this and implement the methods
 class DataView
 {
@@ -405,8 +414,9 @@ class DataView
         /**
         @param wnd              : IN MDI window pointer
         @param hwndparent       : IN handle to parent window
+		@param queryBuilder		: IN IQueryBuilder interface supplied from derived class
         */
-		                        DataView(MDIWindow* wnd, HWND hwndparent);
+		                        DataView(MDIWindow* wnd, HWND hwndparent, IQueryBuilder* queryBuilder);
 
         ///Destrouctor. Has to be virtual to avoid memory leak
 		virtual                 ~DataView();
@@ -1859,6 +1869,12 @@ class DataView
 
         //Padding window
         HWND                    m_hwndpadding;
+
+		// IQueryBuilder interface
+		IQueryBuilder*			m_querybuilder;
+
+		// backtick string can be used across multiple methods. But reinit them from .ini
+		wyChar*					m_backtick;
 };
 
 #endif

@@ -107,7 +107,7 @@ TabAdvancedProperties::InitDelayKeyWriteValues(wyBool includedefault)
 void
 TabAdvancedProperties::InitRowFormatValues(wyBool includedefault)
 {
-	wyWChar  rowformat[][20] = {L"dynamic", L"fixed", L"compressed", NULL };
+	wyWChar  rowformat[][20] = {L"dynamic", L"fixed", L"compressed", L"compact", L"redundant", NULL };
     wyInt32 i=0, index = 0;
     
     if(includedefault)

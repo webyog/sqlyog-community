@@ -147,7 +147,13 @@ SQLTokenizer::SQLTokenizer(Tunnel *tunnel, PMYSQL mysql, YOGTOKENSOURCE srctype,
 	/* if its of file type then we open up the file and keep the pointer */
 	if(IsFile(m_srctype))
     {
+#ifdef _WIN32
+		m_importfile = _wopen(filename.GetAsWideChar(), O_RDONLY);
+#else
 		m_importfile = open(filename.GetString(), O_RDONLY);
+#endif // _WIN32
+
+		
 	}
 	else
 		m_importfile = -1;

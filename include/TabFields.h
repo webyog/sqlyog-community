@@ -190,6 +190,9 @@ public:
 
     /// Persistence class object pointer
 	Persist	                    *m_p;
+
+	// backtick string from preferences, either empty or quote
+	wyChar*						m_backtick;
     
     /// intializes m_mysql, m_tunnel and calls CreateGrid()
     /**

@@ -29,6 +29,7 @@ extern PGLOBALS		pGlobals;
 
 //General Preference Default Values
 #define		WORDWRAP_DEFAULT			0
+#define		JSONFORMAT_DEFAULT			0
 #define		BACKQUOTES_DEFAULT			1
 #define		FOCUSAFTERQUERY_DEFAULT		1
 #define		CONFIRMONTABCLOSE_DEFAULT	1
@@ -1177,7 +1178,10 @@ PreferenceBase::InitGeneralPrefValues()
 	SendMessage(GetDlgItem(m_hwnd, IDC_GETTEXTONDBCLICK), BM_SETCHECK, truncdata, 0);
 
 	truncdata	= wyIni::IniGetInt(GENERALPREFA, "WordWrap", WORDWRAP_DEFAULT/* from 5.1 RC1 default value is false */, dirstr.GetString());
-	SendMessage(GetDlgItem(m_hwnd, IDC_WORDWRAP), BM_SETCHECK, truncdata, 0);	
+	SendMessage(GetDlgItem(m_hwnd, IDC_WORDWRAP), BM_SETCHECK, truncdata, 0);
+
+	truncdata = wyIni::IniGetInt(GENERALPREFA, "JsonFormat", JSONFORMAT_DEFAULT, dirstr.GetString());
+	SendMessage(GetDlgItem(m_hwnd, IDC_JSON), BM_SETCHECK, truncdata, 0);
 
 	truncdata   = wyIni::IniGetInt(GENERALPREFA, "StartTransaction", TRANSACTIONENABLE_DEFAULT, dirstr.GetString());
 	SendMessage(GetDlgItem(m_hwnd, IDC_TRANSACTIONENABLE), BM_SETCHECK, truncdata, 0);
@@ -1649,6 +1653,7 @@ PreferenceBase::SaveGeneralPreferences(HWND hwndbase, wyInt32 page)
 	SetBoolProfileString(hwnd, GENERALPREF, L"PromptOnTabClose", IDC_CONFIRMONTABCLOSE);
 	SetBoolProfileString(hwnd, GENERALPREF, L"GetTextOnDBClick", IDC_GETTEXTONDBCLICK);
 	SetBoolProfileString(hwnd, GENERALPREF, L"WordWrap", IDC_WORDWRAP);
+	SetBoolProfileString(hwnd, GENERALPREF, L"JsonFormat", IDC_JSON);
 
 	// for supporting transaction
 	SetBoolProfileString(hwnd, GENERALPREF, L"StartTransaction", IDC_TRANSACTIONENABLE );
@@ -2147,7 +2152,6 @@ PreferenceBase::EnumChildProc(HWND hwnd, LPARAM lParam)
 {
 	MDIWindow*		wnd;
 	wyWChar  		classname[SIZE_128]={0};
-	wyInt32			tabicon = 0;
     PreferenceBase* pref = (PreferenceBase*)lParam;
     wyBool          isupdtabledata = wyTrue, isupdhistory = wyTrue, isupdinfo = wyTrue;
     
@@ -2165,7 +2169,6 @@ PreferenceBase::EnumChildProc(HWND hwnd, LPARAM lParam)
         }
 
         wnd->PositionTabs(isupdtabledata, isupdhistory, isupdinfo);
-		tabicon = wnd->m_pctabmodule->GetActiveTabImage();
  
         /*Change font for all tabs*/
 		wnd->m_pctabmodule->SetTabFont();
@@ -2176,6 +2179,8 @@ PreferenceBase::EnumChildProc(HWND hwnd, LPARAM lParam)
 
         //..Setting Object-browser font
         wnd->m_pcqueryobject->SetFont();
+
+		wnd->m_pctabmodule->Refresh();
 	}
 
 	return TRUE;
@@ -2185,6 +2190,7 @@ void
 PreferenceBase::SetGenPrefDefaultValues(HWND hwnd)
 {	
 	SendMessage(GetDlgItem(hwnd, IDC_WORDWRAP), BM_SETCHECK, WORDWRAP_DEFAULT, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_JSON), BM_SETCHECK, JSONFORMAT_DEFAULT, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_BACKQUOTES), BM_SETCHECK, BACKQUOTES_DEFAULT	, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_FOCUSAFTERQUERY), BM_SETCHECK, FOCUSAFTERQUERY_DEFAULT, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_CONFIRMONTABCLOSE), BM_SETCHECK, CONFIRMONTABCLOSE_DEFAULT, 0);
@@ -2472,6 +2478,7 @@ PreferenceBase::SaveDefaultGeneralPreferences()
 	wyString	dirstr(m_directory);
 
 	wyIni::IniWriteInt(GENERALPREFA, "WordWrap", WORDWRAP_DEFAULT, dirstr.GetString());
+	wyIni::IniWriteInt(GENERALPREFA, "JsonFormat", JSONFORMAT_DEFAULT, dirstr.GetString());
 	wyIni::IniWriteInt(GENERALPREFA, "AppendBackQuotes", BACKQUOTES_DEFAULT, dirstr.GetString());
 	wyIni::IniWriteInt(GENERALPREFA, "FocusOnEdit", FOCUSAFTERQUERY_DEFAULT, dirstr.GetString());
 	wyIni::IniWriteInt(GENERALPREFA, "PromptOnTabClose", CONFIRMONTABCLOSE_DEFAULT, dirstr.GetString());

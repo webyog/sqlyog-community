@@ -31,6 +31,8 @@
 #include "TabPreview.h"
 #include "TabTableData.h"
 #include "TableView.h"
+#include "TabIndexes.h"
+#include "TabForeignKeys.h"
 
 #ifndef COMMUNITY
 #include "HelperEnt.h"
@@ -1699,6 +1701,25 @@ TabModule::SetBackQuotesOption()
 #endif
 
 	return;
+}
+
+void
+TabModule::Refresh()
+{
+	wyInt32			tabicon = 0;
+
+	tabicon = GetActiveTabImage();
+	if (IDI_CREATETABLE == tabicon || IDI_ALTERTABLE == tabicon)
+	{
+		TableTabInterfaceTabMgmt *tabintmgmt;
+		tabintmgmt = ((TableTabInterface*)GetActiveTabType())->m_ptabintmgmt;
+		tabintmgmt->m_tabindexes->Refresh();
+		tabintmgmt->m_tabfk->Refresh();
+
+		if (tabintmgmt->GetActiveTabImage() == IDI_TABPREVIEW)
+			tabintmgmt->m_tabpreview->GenerateAndSetPreviewContent();
+	}
+
 }
 
 // function to handle Edit menu items for each TabEditor ( CTRL+L, CTL+2, CTRL+3).

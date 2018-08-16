@@ -120,7 +120,7 @@ MySQLTableDataEx::HandleViewPersistence(wyBool isset)
 }
 
 //view constructor
-TableView::TableView(MDIWindow *wnd, HWND hwndparent):DataView(wnd, hwndparent)
+TableView::TableView(MDIWindow *wnd, HWND hwndparent):DataView(wnd, hwndparent, (IQueryBuilder *)this)
 {
 	m_mydata = NULL;
 }
@@ -326,6 +326,32 @@ TableView::ResetToolBarButtons()
     }
 }
 
+/// IQueryBuilder implementation
+/**
+@returns wyString. Caller need to destroy this
+*/
+void
+TableView::GetQuery(wyString& query)
+{
+	//from  .ini file
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
+	query.Sprintf("select * from %s%s%s.%s%s%s\r\n", 
+		m_backtick, m_mydata->m_db.GetString(), m_backtick,
+		m_backtick, m_mydata->m_table.GetString(), m_backtick);
+
+	//get filter info
+	GetFilterInfo(query);
+
+	//get sort info
+	GetSortInfo(query);
+
+	//get limits
+	GetLimits(query);
+
+	query.Add(";\r\n");
+}
+
 //function to execute SELECT * query
 wyInt32
 TableView::ExecuteTableData()
@@ -335,16 +361,7 @@ TableView::ExecuteTableData()
     MySQLDataEx*    pdata;
 	MYSQL_ROW        fieldrow;
 
-    query.Sprintf("select * from `%s`.`%s`", m_mydata->m_db.GetString(), m_mydata->m_table.GetString());
-
-    //get filter info
-    GetFilterInfo(query);
-
-    //get sort info
-    GetSortInfo(query);
-
-    //get limits
-    GetLimits(query);
+	GetQuery(query);
 
     //execut query
     m_mydata->m_datares = ExecuteQuery(query);

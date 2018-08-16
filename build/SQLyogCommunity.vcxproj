@@ -97,7 +97,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../include;../include/scintilla;../include/mysql;../include/htmlayout;../include/pcre;../include/tinyxml;../include/vld;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_WIN32_WINNT=0x501;COMMUNITY;UNICODE;_UNICODE;PCRE_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_WIN32_WINNT=0x600;COMMUNITY;UNICODE;_UNICODE;PCRE_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -108,7 +108,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shfolder.lib;version.lib;Ws2_32.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite3.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;ssleay32MD.lib;libeay32MD.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shfolder.lib;version.lib;Ws2_32.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite3.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;ssleay32MD.lib;libeay32MD.lib;wevtapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -159,7 +159,7 @@
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <AdditionalIncludeDirectories>../include;../include/scintilla;../include/mysql;../include/htmlayout;../include/pcre;../include/tinyxml;../include/vld;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_WIN32_WINNT=0x501;SCI_LEXER;STATIC_BUILD;COMMUNITY;_UNICODE;UNICODE;PCRE_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_WIN32_WINNT=0x600;SCI_LEXER;STATIC_BUILD;COMMUNITY;_UNICODE;UNICODE;PCRE_STATIC;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_NON_CONFORMING_SWPRINTFS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -171,7 +171,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shfolder.lib;version.lib;Ws2_32.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite3.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shfolder.lib;version.lib;Ws2_32.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite3.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;wevtapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCD;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -308,6 +308,7 @@
     <ClCompile Include="..\src\ImportBatch.cpp" />
     <ClCompile Include="..\src\ImportData.cpp" />
     <ClCompile Include="..\src\ImportFromSQL.cpp" />
+    <ClCompile Include="..\src\jsoncpp.cpp" />
     <ClCompile Include="..\src\KeyShortCuts.cpp" />
     <ClCompile Include="..\src\L10n.cpp" />
     <ClCompile Include="..\src\L10nText.cpp" />
@@ -451,6 +452,7 @@
     <ClInclude Include="..\include\ImportBatch.h" />
     <ClInclude Include="..\include\ImportFromSQL.h" />
     <ClInclude Include="..\include\Include.h" />
+    <ClInclude Include="..\include\jsoncpp.h" />
     <ClInclude Include="..\include\L10n.h" />
     <ClInclude Include="..\include\L10nText.h" />
     <ClInclude Include="..\include\LexHelper.h" />

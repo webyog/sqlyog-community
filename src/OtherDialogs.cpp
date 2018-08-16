@@ -36,6 +36,10 @@
 #include "scintilla.h"
 #include "scilexer.h"
 
+#ifndef COMMUNITY
+#include "SCIFormatter.h"
+#endif
+
 extern	PGLOBALS	pGlobals;
 
 #define STYLE "<style type=\"text/css\">\r\n<!--\r\n"\
@@ -1730,16 +1734,13 @@ CCopyTable::InitWindows(HWND hwnd)
 	// Set some initial property of the windows in the dialog.
 	SendMessage(m_hwndlist, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_CHECKBOXES, LVS_EX_CHECKBOXES);
 	// add to persist list
-	m_p->Add(hwnd, IDC_ALLFIELDS, "AllFields", "1", CHECKBOX);
-	m_p->Add(hwnd, IDC_ALLINDEX, "Index", "1", CHECKBOX);
 	m_p->Add(hwnd, IDC_STRUC, "Structure", "0", CHECKBOX);
 	m_p->Add(hwnd, IDC_STRUCDATA, "StrucData", "1", CHECKBOX);
 
-	// by deafult if IDC_ALLFIELDS is unchecked then we have to enable the column list window
-	if(BST_UNCHECKED == Button_GetCheck(GetDlgItem(hwnd, IDC_ALLFIELDS)))
-		EnableWindow(m_hwndlist, TRUE);
-	else
-		EnableWindow(m_hwndlist, FALSE);
+	SendMessage(GetDlgItem(hwnd, IDC_ALLINDEX), BM_SETCHECK, BST_CHECKED, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_ALLFIELDS), BM_SETCHECK, BST_CHECKED, 0);
+
+	EnableWindow(m_hwndlist, FALSE);
 	
 	SendMessage(hwndedit, EM_LIMITTEXT, 64, 0);
 
@@ -4889,14 +4890,24 @@ QueryPreview::InitDlg()
 	//Set scintilla properties
 	if(wnd)
     {
-	SetScintillaModes(hwndedit, wnd->m_keywordstring, wnd->m_functionstring, wyTrue);
+		SetScintillaModes(hwndedit, wnd->m_keywordstring, wnd->m_functionstring, wyTrue);
     }
     else if(m_pkeywords && m_pfunctions)
     {
         SetScintillaModes(hwndedit, *m_pkeywords, *m_pfunctions, wyTrue);
     }
 	
-	SendMessage(hwndedit, SCI_SETTEXT, m_query.GetLength(),(LPARAM)m_query.GetString());
+	//Format query
+#ifdef COMMUNITY
+	pGlobals->m_pcmainwin->m_connection->FormateAllQueries(wnd,
+		hwndedit, (wyChar *) m_query.GetString(), ALL_QUERY);
+#else
+	SendMessage(hwndedit, SCI_SETTEXT, m_query.GetLength(), (LPARAM)m_query.GetString());
+
+	Format(hwndedit, IsStacked(), GetLineBreak() ? wyFalse : wyTrue, FORMAT_ALL_QUERY, GetIndentation());
+	SendMessage(hwndedit, SCI_SETSELECTIONSTART, (WPARAM)0, 0);
+	SendMessage(hwndedit, SCI_SETSELECTIONEND, (WPARAM)0, 0);
+#endif
 
 	SendMessage(hwndedit, SCI_SETREADONLY, true, 0);
 

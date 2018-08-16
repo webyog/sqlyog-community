@@ -2217,7 +2217,7 @@ GetColWidth(HWND grid, MYSQL_FIELD * myfield, wyInt32 index)
 	// now calculate which has to implemented,
 	extra  = 5;
 	// but first we check is it blob
-	if(((myfield->type >= FIELD_TYPE_TINY_BLOB)&&(myfield->type <= FIELD_TYPE_BLOB)) || (myfield->type == FIELD_TYPE_JSON) ) 
+	if(((myfield->type >= FIELD_TYPE_TINY_BLOB)&&(myfield->type <= FIELD_TYPE_BLOB)) || (myfield->type == MYSQL_TYPE_JSON) )
     {
 		//cx = maxlen.cx + extra;
 		//Same code repeated in else condition also, I will change this

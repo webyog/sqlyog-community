@@ -3150,7 +3150,7 @@ void
 GetColLength(MYSQL_ROW row, wyInt32 numcols, wyInt32 col, wyUInt32 *len)
 {
 	MYSQL_ROW   column = row;
-	wyUInt32    lengtharray[3400];
+	wyUInt32    lengtharray[4096];// changed the max allowed number of column per table from 3400 to 4096
 	wyUInt32    *arr = NULL, *plen = 0;
 
 #ifdef _WIN32

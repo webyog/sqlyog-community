@@ -17,8 +17,6 @@
 */
 // Modified and Functions aded By Manohar.s 
 
-#define _WIN32_WINNT   0x501
-
 #include "Global.h"
 #include "BlobMgmt.h"
 #include "MDIWindow.h"

@@ -368,6 +368,9 @@ TabForeignKeys::OnGVNEndLabelEdit(WPARAM wParam, LPARAM lParam)
     if(!(row >= 0 && row <= CustomGrid_GetRowCount(m_hgridfk)))
         return;
 
+	//from  .ini file. Refresh always
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
     if(data)
         currentdata.SetAs(data);
 
@@ -749,7 +752,10 @@ TabForeignKeys::OnSrcColsDlgIDOK(HWND hwnd)
     FieldStructWrapper      *fieldwrap = NULL;
     //wyBool                  markasdirty = wyFalse;
     wyString                refcols(""), tmpcolname;
-    
+
+	//from  .ini file
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
     CustomGrid_ApplyChanges(m_hdlggrid);
 
     row = CustomGrid_GetCurSelRow(m_hgridfk);
@@ -826,7 +832,7 @@ TabForeignKeys::OnSrcColsDlgIDOK(HWND hwnd)
         tmpcolname.SetAs(fieldwrap->m_newval->m_name);
         //..Escaping Backtick
         tmpcolname.FindAndReplace("`", "``");
-        refcols.AddSprintf("`%s`, ", tmpcolname.GetString());
+        refcols.AddSprintf("%s%s%s, ", m_backtick, tmpcolname.GetString(), m_backtick);
         listfksrccols->Insert(srccol);
 
         refby = new ReferencedBy(cwrapobj);
@@ -1211,7 +1217,7 @@ TabForeignKeys::FetchTgtTblCols(wyInt32 row, wyString& tblnamestr)
         {
             colnamestr.SetAs(tgtcol->m_name);
             colnamestr.FindAndReplace("`", "``");
-            tgtcolsstr.AddSprintf("`%s`, ", colnamestr.GetString());
+            tgtcolsstr.AddSprintf("%s%s%s, ", m_backtick, colnamestr.GetString(), m_backtick);
         }
         tgtcol = (FKTargetColumn*)tgtcol->m_next;
     }
@@ -1611,6 +1617,9 @@ TabForeignKeys::FetchInitValuesHelper(wyUInt32 row, wyString &fkey)
     RelTableFldInfo	*srcfldinfo = NULL, *tempinfo = NULL, *tgtfldinfo = NULL;
     FKStructWrapper *cwrapobj = NULL;
     StructFK        *value = NULL;
+	
+	//from  .ini file
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
 
     dbname.SetAs(m_ptabmgmt->m_tabinterfaceptr->m_dbname);
 
@@ -1669,7 +1678,7 @@ TabForeignKeys::FetchInitValuesHelper(wyUInt32 row, wyString &fkey)
             tmpstr.SetAs(srcfldinfo->m_tablefld);
             tmpstr.FindAndReplace("`", "``");
 
-            keyval.AddSprintf("`%s`, ", tmpstr.GetString());
+            keyval.AddSprintf("%s%s%s, ", m_backtick, tmpstr.GetString(), m_backtick);
         }
         tempinfo = srcfldinfo;
         srcfldinfo = (RelTableFldInfo*)fkeyparam->m_fkeyfldlist->Remove(srcfldinfo);
@@ -1732,7 +1741,7 @@ TabForeignKeys::FetchInitValuesHelper(wyUInt32 row, wyString &fkey)
 
                 colnamestr.SetAs(tgtfldinfo->m_tablefld);
                 colnamestr.FindAndReplace("`", "``");
-                keyval.AddSprintf("`%s`, ", colnamestr.GetString());
+                keyval.AddSprintf("%s%s%s, ", m_backtick, colnamestr.GetString(), m_backtick);
 
                 listtgtcols->Insert(tgtcol);
             }
@@ -1758,7 +1767,7 @@ TabForeignKeys::FetchInitValuesHelper(wyUInt32 row, wyString &fkey)
         {
             colnamestr.SetAs(tgtfldinfo->m_tablefld);
             colnamestr.FindAndReplace("`", "``");
-            tmpkeycols.AddSprintf("`%s`, ", colnamestr.GetString());
+            tmpkeycols.AddSprintf("%s%s%s, ", m_backtick, colnamestr.GetString(), m_backtick);
             tgtfldinfo = (RelTableFldInfo*)tgtfldinfo->m_next;
         }
         keyval.SetAs(tmpkeycols);
@@ -2778,7 +2787,7 @@ TabForeignKeys::OnTargetColDlgWMCommand(HWND hwnd, WPARAM wparam, LPARAM lparam)
     {
     case IDOK:
         if(m_hdlggrid)
-        OnTgtColsDlgIDOK(hwnd);
+	        OnTgtColsDlgIDOK(hwnd);
         SendMessage(hwnd, WM_CLOSE, wparam, lparam);
         break;
 
@@ -2788,12 +2797,12 @@ TabForeignKeys::OnTargetColDlgWMCommand(HWND hwnd, WPARAM wparam, LPARAM lparam)
 
     case IDC_MOVEUP:
         if(m_hdlggrid)
-        OnButtonUpDown(wyTrue);
+			OnButtonUpDown(wyTrue);
         break;
 
     case IDC_MOVEDOWN:
         if(m_hdlggrid)
-        OnButtonUpDown(wyFalse);
+			OnButtonUpDown(wyFalse);
         break;
     }
 }
@@ -2807,6 +2816,10 @@ TabForeignKeys::OnTgtColsDlgIDOK(HWND hwnd)
     FKTargetColumn  *tgtcol = NULL, *tmptgtcol = NULL;
     FKStructWrapper *cwrapobj = NULL;
     StructFK    *fk = NULL;
+
+	//from  .ini file
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
     //wyBool      markasdirty = wyFalse;
     nrows = CustomGrid_GetRowCount(m_hdlggrid);
     row = CustomGrid_GetCurSelRow(m_hgridfk);
@@ -2891,7 +2904,7 @@ TabForeignKeys::OnTgtColsDlgIDOK(HWND hwnd)
             checkedlist.Insert(tgtcol);
             colnamestr.SetAs(tgtcol->m_name);
             colnamestr.FindAndReplace("`", "``");
-            keydef.AddSprintf("`%s`, ", colnamestr.GetString());
+            keydef.AddSprintf("%s%s%s, ", m_backtick, colnamestr.GetString(), m_backtick);
         }
         else
         {
@@ -4373,6 +4386,104 @@ TabForeignKeys::ReInitializeGrid(List *unsavedfkwrappers)
     InsertRow();
 }
 
+void
+TabForeignKeys::Refresh()
+{
+	FKStructWrapper *cwrapobj = NULL;
+	wyUInt32    nrows = 0;
+
+	//from  .ini file
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
+	cwrapobj = (FKStructWrapper *)m_listfkwrappers.GetFirst();
+	while (cwrapobj)
+	{
+		if (cwrapobj->m_oldval)
+			Refresh(cwrapobj->m_oldval);
+		if (cwrapobj->m_newval && cwrapobj->m_newval != cwrapobj->m_oldval)
+			Refresh(cwrapobj->m_newval);
+
+		cwrapobj = (FKStructWrapper *)cwrapobj->m_next;
+	}
+
+	nrows = CustomGrid_GetRowCount(m_hgridfk);
+	cwrapobj = NULL;
+
+	for (int row = 0; row<nrows; row++)
+	{
+		cwrapobj = (FKStructWrapper *)CustomGrid_GetRowLongData(m_hgridfk, row);
+
+		if (!cwrapobj)
+			continue;
+
+		if (!cwrapobj->m_newval)
+			continue;
+
+		CustomGrid_SetText(m_hgridfk, row, CHILDCOLUMNS, cwrapobj->m_newval->m_srccols.GetString());
+		CustomGrid_SetText(m_hgridfk, row, PARENTCOLUMNS, cwrapobj->m_newval->m_tgtcols.GetString());
+	}
+}
+
+void
+TabForeignKeys::Refresh(StructFK* fkInfo)
+{
+	FKSourceColumn *srccols = NULL;
+	FKTargetColumn *tgtcols = NULL;
+	wyString        srccolsstr(""), tgtcolsstr("");
+
+	if (fkInfo->m_listsrccols)
+	{
+		srccols = (FKSourceColumn*)fkInfo->m_listsrccols->GetFirst();
+
+		while (srccols)
+		{
+			wyString tmpstr;
+			tmpstr.SetAs(srccols->m_pcwrapobj->m_newval->m_name);
+			tmpstr.FindAndReplace("`", "``");
+
+			srccolsstr.AddSprintf("%s%s%s, ", m_backtick, tmpstr.GetString(), m_backtick);
+
+			srccols = (FKSourceColumn*)srccols->m_next;
+		}
+
+		srccolsstr.RTrim();
+		if (srccolsstr.GetLength())
+		{
+			while (srccolsstr.GetCharAt(srccolsstr.GetLength() - 1) == ',')
+				srccolsstr.Strip(1);
+		}
+
+		fkInfo->m_srccols.SetAs(srccolsstr);
+	}
+
+	if (fkInfo->m_listtgtcols)
+	{
+		tgtcols = (FKTargetColumn *)fkInfo->m_listtgtcols->GetFirst();
+
+		while (tgtcols)
+		{
+			if (tgtcols->m_selected)
+			{
+				wyString tmpstr;
+				tmpstr.SetAs(tgtcols->m_name);
+				tmpstr.FindAndReplace("`", "``");
+
+				tgtcolsstr.AddSprintf("%s%s%s, ", m_backtick, tmpstr.GetString(), m_backtick);
+			}
+
+			tgtcols = (FKTargetColumn *)tgtcols->m_next;
+		}
+
+		tgtcolsstr.RTrim();
+		if (tgtcolsstr.GetLength())
+		{
+			while (tgtcolsstr.GetCharAt(tgtcolsstr.GetLength() - 1) == ',')
+				tgtcolsstr.Strip(1);
+		}
+		fkInfo->m_tgtcols.SetAs(tgtcolsstr);
+	}
+}
+
 wyBool
 TabForeignKeys::GenerateFKDropRecreateQuery(wyString **query, wyUInt32 gridrow)
 {
@@ -4391,6 +4502,9 @@ TabForeignKeys::GenerateFKDropRecreateQuery(wyString **query, wyUInt32 gridrow)
     if(cwrapobj->m_oldval == cwrapobj->m_newval)    //..Unchanged existing fks..
         return wyFalse;
 
+	//from  .ini file
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
     tgtdb.SetAs(cwrapobj->m_newval->m_tgtdb);
     tgtdb.FindAndReplace("`", "``");
 
@@ -4402,18 +4516,23 @@ TabForeignKeys::GenerateFKDropRecreateQuery(wyString **query, wyUInt32 gridrow)
         fkname.SetAs(cwrapobj->m_oldval->m_name);
         fkname.FindAndReplace("`", "``");
 
-        query[0]->Sprintf("drop foreign key `%s`", fkname.GetString());
+        query[0]->Sprintf("drop foreign key %s%s%s", m_backtick, fkname.GetString(), m_backtick);
 
         if(!cwrapobj->m_newval->m_name.GetLength())
         {
-            query[1]->Sprintf("add constraint foreign key (%s) references `%s`.`%s`(%s)", cwrapobj->m_newval->m_srccols.GetString(),
-                                                    tgtdb.GetString(), tgttbl.GetString(), cwrapobj->m_newval->m_tgtcols.GetString());
+            query[1]->Sprintf("add constraint foreign key (%s) references %s%s%s.%s%s%s(%s)", cwrapobj->m_newval->m_srccols.GetString(),
+											m_backtick, tgtdb.GetString(), m_backtick,
+											m_backtick, tgttbl.GetString(), m_backtick,
+											cwrapobj->m_newval->m_tgtcols.GetString());
         }
         else
         {
-            query[1]->Sprintf("add constraint `%s` foreign key (%s) references `%s`.`%s`(%s)", fkname.GetString(),
-                                                    cwrapobj->m_newval->m_srccols.GetString(), 
-                                                    tgtdb.GetString(), tgttbl.GetString(), cwrapobj->m_newval->m_tgtcols.GetString());
+            query[1]->Sprintf("add constraint %s%s%s foreign key (%s) references %s%s%s.%s%s%s(%s)", 
+											m_backtick, fkname.GetString(), m_backtick,
+                                            cwrapobj->m_newval->m_srccols.GetString(), 
+											m_backtick, tgtdb.GetString(), m_backtick,
+											m_backtick, tgttbl.GetString(), m_backtick, 
+											cwrapobj->m_newval->m_tgtcols.GetString());
         }
         if(cwrapobj->m_newval->m_onupdate.GetLength())
             query[1]->AddSprintf(" on update %s", cwrapobj->m_newval->m_onupdate.GetString());
@@ -4432,14 +4551,19 @@ TabForeignKeys::GenerateFKDropRecreateQuery(wyString **query, wyUInt32 gridrow)
 
         if(cwrapobj->m_newval->m_name.GetLength())
         {
-            query[0]->Sprintf("\r\n  add constraint `%s` foreign key (%s) references `%s`.`%s`(%s)", fkname.GetString(),
-                                                        cwrapobj->m_newval->m_srccols.GetString(), tgtdb.GetString(), tgttbl.GetString(),
-                                                        cwrapobj->m_newval->m_tgtcols.GetString());
+            query[0]->Sprintf("\r\n  add constraint %s%s%s foreign key (%s) references %s%s%s.%s%s%s(%s)", 
+									m_backtick, fkname.GetString(), m_backtick,
+                                    cwrapobj->m_newval->m_srccols.GetString(), 
+									m_backtick, tgtdb.GetString(), m_backtick,
+									m_backtick, tgttbl.GetString(), m_backtick,
+                                    cwrapobj->m_newval->m_tgtcols.GetString());
         }
         else
         {
-            query[0]->Sprintf("\r\n  add constraint foreign key (%s) references `%s`.`%s`(%s)", cwrapobj->m_newval->m_srccols.GetString(),
-                                                        tgtdb.GetString(), tgttbl.GetString(), cwrapobj->m_newval->m_tgtcols.GetString());
+            query[0]->Sprintf("\r\n  add constraint foreign key (%s) references %s%s%s.%s%s%s(%s)", cwrapobj->m_newval->m_srccols.GetString(),
+									m_backtick, tgtdb.GetString(), m_backtick,
+									m_backtick, tgttbl.GetString(), m_backtick,
+									cwrapobj->m_newval->m_tgtcols.GetString());
         }
         
         if(cwrapobj->m_newval->m_onupdate.GetLength())
@@ -4456,7 +4580,7 @@ TabForeignKeys::GenerateFKDropRecreateQuery(wyString **query, wyUInt32 gridrow)
         fkname.SetAs(cwrapobj->m_oldval->m_name);
         fkname.FindAndReplace("`", "``");
 
-        query[0]->AddSprintf("\r\n  drop foreign key `%s`", fkname.GetString());
+        query[0]->AddSprintf("\r\n  drop foreign key %s%s%s", m_backtick, fkname.GetString(), m_backtick );
     }
 
     return wyTrue;
@@ -4515,6 +4639,9 @@ TabForeignKeys::GenerateNewAndDroppedFKQuery(wyString   &query)
     wyString    dropquery(""), addquery("");
     wyString    tmpstr(""), tgtdb, tgttbl;
 
+	//from  .ini file
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
     for( ; cwrapobj; cwrapobj = (FKStructWrapper *)cwrapobj->m_next)
     {
         //..If existing fk is dropped from the grid
@@ -4522,7 +4649,7 @@ TabForeignKeys::GenerateNewAndDroppedFKQuery(wyString   &query)
         {
             tmpstr.SetAs(cwrapobj->m_oldval->m_name);
             tmpstr.FindAndReplace("`", "``");
-            dropquery.AddSprintf("\r\n  drop foreign key `%s`,", tmpstr.GetString());
+            dropquery.AddSprintf("\r\n  drop foreign key %s%s%s,", m_backtick, tmpstr.GetString(), m_backtick);
         }
         //..If added a new fk
         else if(!cwrapobj->m_oldval && cwrapobj->m_newval)
@@ -4542,17 +4669,18 @@ TabForeignKeys::GenerateNewAndDroppedFKQuery(wyString   &query)
             tgttbl.FindAndReplace("`", "``");
 
             if(cwrapobj->m_newval->m_name.GetLength())
-                addquery.AddSprintf("constraint `%s` foreign key (%s) references `%s`.`%s`(%s)", tmpstr.GetString(),
-                                                                cwrapobj->m_newval->m_srccols.GetString(),
-                                                                tgtdb.GetString(),
-                                                                tgttbl.GetString(),
-                                                                cwrapobj->m_newval->m_tgtcols.GetString());
+                addquery.AddSprintf("constraint %s%s%s foreign key (%s) references %s%s%s.%s%s%s(%s)", 
+									m_backtick, tmpstr.GetString(), m_backtick,
+                                    cwrapobj->m_newval->m_srccols.GetString(),
+									m_backtick, tgtdb.GetString(), m_backtick,
+									m_backtick, tgttbl.GetString(), m_backtick,
+                                    cwrapobj->m_newval->m_tgtcols.GetString());
 
             else
-                addquery.AddSprintf("foreign key (%s) references `%s`.`%s`(%s)", cwrapobj->m_newval->m_srccols.GetString(),
-                                                                tgtdb.GetString(),
-                                                                tgttbl.GetString(),
-                                                                cwrapobj->m_newval->m_tgtcols.GetString());
+                addquery.AddSprintf("foreign key (%s) references %s%s%s.%s%s%s(%s)", cwrapobj->m_newval->m_srccols.GetString(),
+									m_backtick, tgtdb.GetString(), m_backtick,
+									m_backtick, tgttbl.GetString(), m_backtick,
+                                    cwrapobj->m_newval->m_tgtcols.GetString());
 
             if(cwrapobj->m_newval->m_onupdate.GetLength())
                 addquery.AddSprintf(" on update %s", cwrapobj->m_newval->m_onupdate.GetString());

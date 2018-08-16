@@ -16,7 +16,6 @@
 
 */
 
-#define _WIN32_WINNT   0x501
 #include "FrameWindowHelper.h"
 #include "ImportBatch.h"
 #include "ImportFromSQL.h"

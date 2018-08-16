@@ -29,6 +29,10 @@
 #include "TabIndexes.h"
 #include "EditorFont.h"
 
+#ifndef COMMUNITY
+#include "SCIFormatter.h"
+#endif
+
 extern PGLOBALS		pGlobals;
 
 TabPreview::TabPreview(HWND hwndparent, TableTabInterfaceTabMgmt *ptabmgmt)
@@ -366,8 +370,9 @@ TabPreview::UpdateTableName(wyString &newname)
     wyString    dbname(""), oldname("");
     wyInt32     endpos, startpos;
     wyString    tmpstr(""), strnoquery;
+	wyChar*		backtick;
 
-    strnoquery.Sprintf("/* %s */", NO_PENDING_QUERIES);
+	strnoquery.Sprintf("/* %s */", NO_PENDING_QUERIES);
 
     m_ptabmgmt->m_tabinterfaceptr->GetComboboxValue(m_ptabmgmt->m_tabinterfaceptr->m_hcmbdbname, dbname);
     oldname.SetAs(m_ptabmgmt->m_tabinterfaceptr->m_origtblname);
@@ -378,6 +383,9 @@ TabPreview::UpdateTableName(wyString &newname)
     dbname.FindAndReplace("`", "``");
     oldname.FindAndReplace("`", "``");
     newname.FindAndReplace("`", "``");
+
+	//from  .ini file
+	backtick = AppendBackQuotes() == wyTrue ? "`" : "";
 
     if(!m_ptabmgmt->m_tabinterfaceptr->m_isaltertable)      /// for create table only
     {
@@ -403,7 +411,8 @@ TabPreview::UpdateTableName(wyString &newname)
         endpos = SendMessage(m_hwndpreview, SCI_GETLINEENDPOSITION, (WPARAM)0, 0);
 
         /// Forming a query
-        tmpstr.Sprintf("`%s`.`%s`(", dbname.GetString(), newname.GetString());
+        tmpstr.Sprintf("%s%s%s.%s%s%s (", backtick, dbname.GetString(), backtick, 
+			backtick, newname.GetString(), backtick);
 
         //..If table name is missing, then add error message in the query
         if(!newname.GetLength())
@@ -421,7 +430,11 @@ TabPreview::UpdateTableName(wyString &newname)
     else        //..for alter table only
     {
         //..Generating rename query
-        rename.Sprintf("Rename table `%s`.`%s` to `%s`.`%s`", dbname.GetString(), oldname.GetString(), dbname.GetString(), newname.GetString());
+        rename.Sprintf("Rename table %s%s%s.%s%s%s to %s%s%s.%s%s%s", 
+			backtick, dbname.GetString(), backtick,
+			backtick, oldname.GetString(), backtick,
+			backtick, dbname.GetString(), backtick,
+			backtick, newname.GetString(), backtick);
 
         //..If table name is missing, then add error message in the query
         if(!newname.GetLength())
@@ -535,7 +548,11 @@ TabPreview::GenerateQuery(wyString &query)
         wyString    **dropcreate = new wyString*[2];
         wyInt32     cntfkgridrows   = 0;
         wyBool      fkretval        = wyFalse;
-        
+		wyChar*		backtick;
+
+		//from  .ini file
+		backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
         dropcreate[0] = new wyString();
         dropcreate[1] = new wyString();
 
@@ -553,10 +570,16 @@ TabPreview::GenerateQuery(wyString &query)
             escapestr.SetAs(m_ptabmgmt->m_tabinterfaceptr->m_origtblname);
             escapestr.FindAndReplace("`", "``");
             
-            tempstr.AddSprintf("Alter table `%s`.`%s` %s;", m_ptabmgmt->m_tabinterfaceptr->m_dbname.GetString(), escapestr.GetString(), dropcreate[0]->GetString());
+            tempstr.AddSprintf("Alter table %s%s%s.%s%s%s %s;", 
+				backtick, m_ptabmgmt->m_tabinterfaceptr->m_dbname.GetString(), backtick,
+				backtick, escapestr.GetString(), backtick,
+				dropcreate[0]->GetString());
             
             if(dropcreate[1]->GetLength())
-                tempstr.AddSprintf("\r\n\r\nAlter table `%s`.`%s` %s;", m_ptabmgmt->m_tabinterfaceptr->m_dbname.GetString(), escapestr.GetString(), dropcreate[1]->GetString());
+                tempstr.AddSprintf("\r\n\r\nAlter table %s%s%s.%s%s%s %s;", 
+					backtick, m_ptabmgmt->m_tabinterfaceptr->m_dbname.GetString(), backtick,
+					backtick, escapestr.GetString(), backtick,
+					dropcreate[1]->GetString());
         }
 
         delete dropcreate[0];
@@ -650,16 +673,26 @@ TabPreview::SetPreviewContent(wyChar* content)
 
     SendMessage(m_hwndpreview, SCI_SETREADONLY, false, 0);
     SendMessage(m_hwndpreview, SCI_CLEARALL, false, 0);
-    if(content)
-        SendMessage(m_hwndpreview, SCI_SETTEXT, strlen(content),(LPARAM)content);
-    else
-        SendMessage(m_hwndpreview, SCI_SETTEXT, 0,(LPARAM)"");
-    SendMessage(m_hwndpreview, SCI_SETSEL, -1, -1);
+
+	//Format query
+#ifdef COMMUNITY
+	pGlobals->m_pcmainwin->m_connection->FormateAllQueries(GetActiveWin(),
+		m_hwndpreview, content, ALL_QUERY);
+#else
+	if (content)
+		SendMessage(m_hwndpreview, SCI_SETTEXT, strlen(content), (LPARAM)content);
+	else
+		SendMessage(m_hwndpreview, SCI_SETTEXT, 0, (LPARAM)"");
+	SendMessage(m_hwndpreview, SCI_SETSEL, -1, -1);
+	SendMessage(m_hwndpreview, SCI_GOTOPOS, (WPARAM)0, 0);
+
+	Format(m_hwndpreview, IsStacked(), GetLineBreak() ? wyFalse : wyTrue, FORMAT_ALL_QUERY, GetIndentation());
+
+	SendMessage(m_hwndpreview, SCI_SETSELECTIONSTART, (WPARAM)0, 0);
+	SendMessage(m_hwndpreview, SCI_SETSELECTIONEND, (WPARAM)0, 0);
+#endif
+
 	SendMessage(m_hwndpreview, SCI_SETREADONLY, true, 0);
-    SendMessage(m_hwndpreview, SCI_GOTOPOS, (WPARAM)0, 0);
-    
-    SendMessage(m_hwndpreview, SCI_SETSELECTIONSTART, (WPARAM)0, 0);
-    SendMessage(m_hwndpreview, SCI_SETSELECTIONEND, (WPARAM)0, 0);
 
     m_settingpreviewcontent = wyFalse;
 }
