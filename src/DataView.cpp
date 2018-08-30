@@ -1045,6 +1045,9 @@ DataView::AddDataToQuery(MYSQL_ROW data, wyString &query, const wyChar* delimite
     wyInt32     i, max;
     wyString    colname;
 
+	//from  .ini file
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
     //if valid col is specified then we will add data for that column only
     if(col >= 0)
     {
@@ -1107,6 +1110,8 @@ DataView::AddDataToQueryJSON(MYSQL_ROW data, wyString &query, const wyChar* deli
     wyInt32     i, max;
     wyString    colname;
 
+	//from  .ini file
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
 
     //if valid col is specified then we will add data for that column only
     if(col >= 0)
