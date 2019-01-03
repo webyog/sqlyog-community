@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3682">ワードラップを有効にする</string>
+	<string name="3683">JSONビューアでJSONデータをフォーマットする</string>
+	<string name="3684">エラー時にクエリの実行を停止する</string>
+	<string name="3685">日付ピッカーはサーバー時間を挿入する</string>
+	<string name="3686">暗黙のコミットを引き起こすクエリが実行されたときにプロンプ​​トを表示する</string>
+	<string name="3687">トランザクションがアクティブな場合にセッションまたはプログラムを閉じるときにプロンプ​​ト</string>
+	<string name="3689">トランザクションオプション</string>
+	
+</resources>

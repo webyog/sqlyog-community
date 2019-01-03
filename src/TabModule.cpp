@@ -16,6 +16,7 @@
 
 */
 
+#include "FrameWindow.h"
 #include "TabModule.h"
 #include "MDIWindow.h"
 #include "Global.h"
@@ -34,6 +35,7 @@
 #include "TabIndexes.h"
 #include "TabForeignKeys.h"
 
+
 #ifndef COMMUNITY
 #include "HelperEnt.h"
 #include "TabQueryBuilder.h"
@@ -50,6 +52,7 @@
 extern	PGLOBALS		pGlobals;
 #define	SIZE_24	        24
 #define	SIZE_12	        12
+
 
 //constructor sets the window handle
 TabModule::TabModule(HWND hwnd)
@@ -75,6 +78,15 @@ TabModule::TabModule(HWND hwnd)
 	m_istabcreate = wyFalse;
 	
 	m_tableview = NULL;
+
+	//serailnumber = 1;
+
+	List		*m_mdilistfordropdown = new List();
+
+			m_serialnoqb=1;
+			m_serialnosd=1;
+			m_serialnoet=1;
+
 
 #ifdef COMMUNITY	
 	m_cribbon = NULL;
@@ -183,7 +195,7 @@ TabModule::Create(MDIWindow * wnd)
 					CreateQueryEditorTab(wnd);
 					if(!temptabeditorele->m_isfile)
 					{
-						SetTabRename(temptabdetail->m_psztext.GetAsWideChar());
+						SetTabRename(temptabdetail->m_psztext.GetAsWideChar(),wyFalse,wnd);
 					}
 				}
 				else
@@ -405,21 +417,99 @@ TabModule::TabWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam, wyB
 
 // Function creating the normal QueryEditor
 wyBool	
-TabModule::CreateQueryEditorTab(MDIWindow* wnd, wyInt32 pos, wyBool setfocus)
+TabModule::CreateQueryEditorTab(MDIWindow* wnd, wyInt32 pos, wyBool setfocus,wyBool fromprefencetoggle)
 {
 	wyInt32				ret, count;
     wyBool              rstatus;
 	CTCITEM				item = {0};
+	wyString qtabname(""),q("Query");
+	wyInt64 serial;
+	wyBool found = wyFalse;
+	wyInt32 maxsequence = 0;
+
+	//get the max sequence for the query tab
+	maxsequence = GetMaxSequence(wnd);
+	
+	
+	serial = maxsequence + 1;//m_serialnoet; //;
+
+	qtabname.Sprintf("%s %d", q.GetString(), serial);
+
+	LPSTR cString = strdup(qtabname.GetString());
+	//m_serialnoet++;
+
 
 	m_istabcreate = wyTrue;
 	
-	item.m_psztext    = _("Query");
-	item.m_cchtextmax = strlen(_("Query"));
+	item.m_psztext = cString;//_("Query"); 
+	item.m_cchtextmax = qtabname.GetLength(); //strlen(_("Query")); 
 	item.m_mask       = CTBIF_IMAGE | CTBIF_TEXT | CTBIF_LPARAM | CTBIF_CMENU | CTBIF_TOOLTIP;
 	item.m_iimage     = IDI_QUERY_16;
-	item.m_tooltiptext = _("Query");
-	
-	
+	item.m_tooltiptext = cString; // _("Query");
+
+	//inserting the window and list of open query tab
+
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	MDIListForDropDrown *pfound = p;
+
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+	if (found) {
+		ListOfOpenQueryTabs *node2 = new ListOfOpenQueryTabs();
+		if (fromprefencetoggle)
+		{
+			//insert at specified location
+			ListOfOpenQueryTabs  *opentab = (ListOfOpenQueryTabs *)p->opentab->GetFirst();
+			ListOfOpenQueryTabs  *opentabcurr = (ListOfOpenQueryTabs *)p->opentab->GetFirst();
+			wyInt32 tabcount = p->opentab->GetCount();
+			wyInt32 i;
+			wyString stemp = "";
+			for (i = 0; i <= pos; i++)
+			{
+				opentabcurr = opentab;
+				opentab = (ListOfOpenQueryTabs *)opentab->m_next;
+
+			}
+			node2->tabname.SetAs(qtabname);
+			node2->seqofquerytab = maxsequence + 1;
+			node2->tabtype = querytab;
+			pfound->opentab->InsertAfter(opentabcurr, node2);
+
+		}
+		else
+		{
+			node2->tabname.SetAs(qtabname);
+			node2->seqofquerytab = maxsequence + 1;
+			node2->tabtype = querytab;
+			pfound->opentab->Insert(node2);
+		}
+
+		
+	}
+	else//its a new window, create a new mdi winodw node and insert into mdiwindow list
+	{
+		MDIListForDropDrown *node = new MDIListForDropDrown();
+		ListOfOpenQueryTabs *node1 = new ListOfOpenQueryTabs();
+		node->mdi = wnd;
+		node1->tabname.SetAs(qtabname);
+		node1->seqofquerytab = maxsequence+1;
+		node1->tabtype = querytab;
+
+		node->opentab->Insert(node1);
+		pGlobals->m_mdilistfordropdown->Insert(node);
+
+	}
+
+	//end of code
+
 	m_pctabeditor = CreateTabEditor(wnd);
 	m_pctabeditor->Create(wnd, NULL, wyTrue);
 	
@@ -455,6 +545,162 @@ TabModule::CreateQueryEditorTab(MDIWindow* wnd, wyInt32 pos, wyBool setfocus)
 	return wyTrue;
 }
 
+wyInt32
+TabModule::GetMaxSequence(MDIWindow* wnd)
+{
+	wyInt64  tabcount,i,currseq=0,nextseq=0,maxseq=0;
+	wyBool found = wyFalse;
+	ListOfOpenQueryTabs *opentab,*curr;
+	ListofOpenTabs *listofopentabs;
+
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	MDIListForDropDrown *pfound = p;
+
+	if (!p)
+	{
+		return 0;
+	}
+	if (!wnd)
+	{
+		return 0;
+	}
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+	if (found) {
+
+		listofopentabs = (ListofOpenTabs *)pfound->opentab->GetFirst();
+		tabcount = pfound->opentab->GetCount();
+
+		opentab = (ListOfOpenQueryTabs *)pfound->opentab->GetFirst();
+		
+		//tabcount = p->opentab->GetCount();
+
+		for (i = 0; i < tabcount; i++)
+		{
+			curr = (ListOfOpenQueryTabs *)listofopentabs;
+			currseq = curr->seqofquerytab;
+			
+			if (curr->tabtype==querytab && currseq>maxseq)
+			{
+				maxseq = currseq;
+			}
+			listofopentabs = (ListofOpenTabs *)listofopentabs->m_next;
+		}
+	}
+	return maxseq;
+}
+
+
+wyInt32
+TabModule::GetMaxSequenceQB(MDIWindow* wnd)
+{
+	wyInt64  tabcount, i, currseq = 0, nextseq = 0, maxseq = 0;
+	wyBool found = wyFalse;
+	ListOfOpenQueryTabs *opentab, *curr;
+	ListofOpenTabs *listofopentabs;
+
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	MDIListForDropDrown *pfound = p;
+
+	if (!p)
+	{
+		return 0;
+	}
+	if (!wnd)
+	{
+		return 0;
+	}
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+	if (found) {
+
+		listofopentabs = (ListofOpenTabs *)pfound->opentab->GetFirst();
+		tabcount = pfound->opentab->GetCount();
+
+		opentab = (ListOfOpenQueryTabs *)pfound->opentab->GetFirst();
+
+		for (i = 0; i < tabcount; i++)
+		{
+			curr = (ListOfOpenQueryTabs *)listofopentabs;
+			currseq = curr->seqofquerybuilder;
+
+			if (curr->tabtype == querybuilder && currseq>maxseq)
+			{
+				maxseq = currseq;
+			}
+			listofopentabs = (ListofOpenTabs *)listofopentabs->m_next;
+		}
+	}
+	return maxseq;
+}
+
+
+wyInt32
+TabModule::GetMaxSequenceSD(MDIWindow* wnd)
+{
+	wyInt64  tabcount, i, currseq = 0, nextseq = 0, maxseq = 0;
+	wyBool found = wyFalse;
+	ListOfOpenQueryTabs *opentab, *curr;
+	ListofOpenTabs *listofopentabs;
+
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	MDIListForDropDrown *pfound = p;
+
+	if (!p)
+	{
+		return 0;
+	}
+	if (!wnd)
+	{
+		return 0;
+	}
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+	if (found) {
+
+		listofopentabs = (ListofOpenTabs *)pfound->opentab->GetFirst();
+		tabcount = pfound->opentab->GetCount();
+
+		opentab = (ListOfOpenQueryTabs *)pfound->opentab->GetFirst();
+
+		for (i = 0; i < tabcount; i++)
+		{
+			curr = (ListOfOpenQueryTabs *)listofopentabs;
+			currseq = curr->seqofschemadesigner;
+
+			if (curr->tabtype == schemadesigner && currseq>maxseq)
+			{
+				maxseq = currseq;
+			}
+			listofopentabs = (ListofOpenTabs *)listofopentabs->m_next;
+		}
+	}
+	return maxseq;
+}
 
 wyBool
 TabModule::CreateAdvEditorTab(MDIWindow *wnd, wyChar* title, wyInt32 image, HTREEITEM hitem, wyString* strhitemname)
@@ -514,7 +760,10 @@ TabModule::CreateAdvEditorTab(MDIWindow *wnd, wyChar* title, wyInt32 image, HTRE
 
 	Resize();
 	m_istabcreate = wyFalse;
-		
+	
+	if(objectname.GetLength()>0)
+	UpdateDropDownStruct(wnd, objectname.GetString());
+
 	return wyTrue;
 
 }
@@ -539,17 +788,32 @@ TabModule::CreateQueryBuilderTab(MDIWindow * wnd)
 	wyInt32				ret, count = 0;
     wyBool              rstatus;
 	CTCITEM				item = {0};
+	wyInt64			serialqb=0,maxofqb=0;
+	wyBool found = wyFalse;
+	wyString qtabname = "",q="Query Builder";
+	MDIListForDropDrown *pfound; 
+	wyString tname;
+
+	//Get the global list of Query drop down
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	pfound = p;
+	maxofqb = GetMaxSequenceQB(wnd);
+	serialqb = maxofqb + 1;
+
+	tname.Sprintf("%s %d", q.GetString(), serialqb);
 	
 	// get the number of tabs
     count = CustomTab_GetItemCount(m_hwnd);
 
-    item.m_psztext    = _("Query Builder");
-	item.m_cchtextmax = strlen(_("Query Builder"));
+	item.m_psztext = (wyChar *)tname.GetString();// _("Query Builder");
+	item.m_cchtextmax = tname.GetLength(); //strlen(_("Query Builder"));
 	item.m_mask       = CTBIF_IMAGE | CTBIF_TEXT | CTBIF_LPARAM | CTBIF_CMENU  | CTBIF_TOOLTIP;
 	item.m_iimage     = IDI_QUERYBUILDER_16;
 	m_pctabqb		  = CreateTabQB(wnd);
-	item.m_tooltiptext = _("Query Builder");
-	
+	item.m_tooltiptext = (wyChar *)tname.GetString();//_("Query Builder");
+
+	//to transfer the updated name into title
+	m_pctabqb->m_tabnameforqb.SetAs(tname.GetString());
 	
 	if(!m_pctabqb)
 		return wyFalse;
@@ -582,10 +846,52 @@ TabModule::CreateQueryBuilderTab(MDIWindow * wnd)
             CustomTab_EnsureVisible(m_hwnd, 0, wyFalse);
     }
 
+	//to add query builder to the drop doen structure
+	if (p)
+	{
+		if (wnd)
+		{
+			while (p)
+			{
+				if (wnd == p->mdi)
+				{
+					found = wyTrue;
+					pfound = p;
+					break;
+				}
+				p = (MDIListForDropDrown *)p->m_next;
+			}
+
+			if (found) {
+				ListOfOpenQueryTabs *node2 = new ListOfOpenQueryTabs();
+				node2->tabname.SetAs(tname.GetString());
+				node2->seqofquerybuilder = maxofqb + 1;
+				node2->tabtype = querybuilder;
+				pfound->opentab->Insert(node2);
+				//loop to get last node in the list and insert the new tab at that position
+			}
+			else//its a new window, create a new mdi winodw node and insert into mdiwindow list
+			{
+				MDIListForDropDrown *node = new MDIListForDropDrown();
+				ListOfOpenQueryTabs *node1 = new ListOfOpenQueryTabs();
+				node->mdi = wnd;
+				node1->tabname.SetAs(tname.GetString());
+				node1->seqofquerybuilder = maxofqb + 1;
+				node1->tabtype = querybuilder;
+				node->opentab->Insert(node1);
+				pGlobals->m_mdilistfordropdown->Insert(node);
+
+			}
+
+		}
+	}
+	
     //ShowWindow(m_hwnd , TRUE);		
 
 	Resize();
 	m_istabcreate = wyFalse;
+
+
 
 #endif
     return wyTrue;
@@ -659,6 +965,22 @@ TabModule::IsValidFocusInOB(wyInt32 subtabindex)
 
     return ret;
 }
+
+wyString
+TabModule::SetTabSequence(wyString s,MDIWindow *wnd)
+{
+	//MDIWindow *p = GetActiveWin();
+	wyInt32 maxseq = 0;
+	wyString tabname;
+
+	maxseq=GetMaxSequenceQB(wnd);
+
+	//m_serialnoqb;
+	tabname.Sprintf("%s %d", s.GetString(), maxseq+1);
+	//m_serialnoqb++;
+	return tabname.GetString();
+}
+
 
 wyBool
 TabModule::CreateTableTabInterface(MDIWindow *wnd, wyBool isaltertable, wyInt32 setfocustotab)
@@ -807,12 +1129,54 @@ TabModule::CreateTableTabInterface(MDIWindow *wnd, wyBool isaltertable, wyInt32 
         //ShowWindow(m_hwnd, TRUE);			
 		Resize();
 		m_istabcreate = wyFalse;
+		UpdateDropDownStruct(wnd, tabtitle.GetString());
 
 		return wyTrue;
     }
 
     return wyFalse;
 }
+
+void
+TabModule::UpdateDropDownStruct(MDIWindow *wnd,wyString tabname)
+{
+	//to initialise the structure for drop down
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	wyBool found = wyFalse;
+	MDIListForDropDrown *pfound = p;
+	ListOfOpenQueryTabs *newnode;
+
+	if (!p)
+	{
+		return;
+	}
+	if (!wnd)
+	{
+		return;
+	}
+
+	//To search for the particular tab
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+
+	if (found) {
+
+		//search for the particular tab which is modified
+
+		newnode = new ListOfOpenQueryTabs();
+		newnode->tabname.SetAs(tabname);
+		pfound->opentab->Insert(newnode);
+	}
+}
+
 
 wyBool
 TabModule::IsAlterTableTabOpen(wyString& tblname, wyInt32& tabindex)
@@ -855,15 +1219,27 @@ TabModule::CreateSchemaDesigner(MDIWindow * wnd)
 	wyBool				rstatus = wyFalse, retval;
 	CTCITEM				item = {0};
 	TabSchemaDesigner	*ptabschemadesigner = NULL;
+	wyInt64			serialsd,maxofsd=0;
+
+	maxofsd = GetMaxSequenceSD(wnd);
+	serialsd = maxofsd + 1;
+	
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	wyBool found = wyFalse;
+	wyString qtabname = "",q= _("Schema Designer");
+	MDIListForDropDrown *pfound = p;
+	
+	wyString s;
+	s.Sprintf("%s %d", q.GetString(), serialsd);
 	
 	// get the number of tabs
     count = CustomTab_GetItemCount(m_hwnd);
 
-	item.m_psztext    = _("Schema Designer");
-	item.m_cchtextmax = strlen(_("Schema Designer"));
+	item.m_psztext = (wyChar *)s.GetString(); //_("Schema Designer");
+	item.m_cchtextmax = s.GetLength(); //strlen(_("Schema Designer"));
 	item.m_mask       = CTBIF_IMAGE | CTBIF_TEXT | CTBIF_LPARAM | CTBIF_CMENU  | CTBIF_TOOLTIP;
 	item.m_iimage     = IDI_SCHEMADESIGNER_16;
-	item.m_tooltiptext = _("Schema Designer");
+	item.m_tooltiptext = (wyChar *)s.GetString();//cString;//_("Schema Designer");
 	
 	
 
@@ -879,6 +1255,9 @@ TabModule::CreateSchemaDesigner(MDIWindow * wnd)
 		}
 
 		m_istabcreate = wyTrue;
+
+		//to transfer the updated name into title
+		ptabschemadesigner->m_tabnamefordropdown.SetAs(s.GetString());
 
 		ptabschemadesigner->SetParentPtr(this);
 
@@ -901,6 +1280,47 @@ TabModule::CreateSchemaDesigner(MDIWindow * wnd)
 				CustomTab_EnsureVisible(m_hwnd, 0, wyFalse);
 		}
 
+		if (p)
+		{
+			if (wnd)
+			{
+				//to add query builder to the drop doen structure
+				while (p)
+				{
+					if (wnd == p->mdi)
+					{
+						found = wyTrue;
+						pfound = p;
+						break;
+					}
+					p = (MDIListForDropDrown *)p->m_next;
+				}
+
+				if (found) {
+					ListOfOpenQueryTabs *node2 = new ListOfOpenQueryTabs();
+					node2->tabname.SetAs(s.GetString());
+					node2->seqofschemadesigner = maxofsd + 1;
+					node2->tabtype = schemadesigner;
+					pfound->opentab->Insert(node2);
+					//loop to get last node in the list and insert the new tab at that position
+				}
+				else//its a new window, create a new mdi winodw node and insert into mdiwindow list
+				{
+					MDIListForDropDrown *node = new MDIListForDropDrown();
+					ListOfOpenQueryTabs *node1 = new ListOfOpenQueryTabs();
+					node->mdi = wnd;
+					node1->tabname.SetAs(s.GetString());
+					node1->seqofschemadesigner = maxofsd + 1;
+					node1->tabtype = schemadesigner;
+
+					node->opentab->Insert(node1);
+					pGlobals->m_mdilistfordropdown->Insert(node);
+
+				}
+
+			}
+		}
+		
 		//ShowWindow(m_hwnd, TRUE);			
 		Resize();		
 		m_istabcreate = wyFalse;
@@ -935,12 +1355,53 @@ TabModule::CreateDatabaseSearchTab(MDIWindow * wnd, wyBool isdefault)
 	return wyTrue;
 }
 
+VOID 
+TabModule::InsertTabIntoDropDownStruct(MDIWindow * wnd,pretabtype tabtype)
+{
+	wyBool found = wyFalse;
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	if (!p)
+	{
+		return;
+	}
+	if (!wnd)
+	{
+		return;
+	}
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			//pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+	if (found) {
+		ListOfOpenQueryTabs *newnode = new ListOfOpenQueryTabs();
+		if (tabtype = ishistory)
+		{
+			newnode->tabname.SetAs("History");
+		}
+		else if (tabtype = isinfo)
+		{
+			newnode->tabname.SetAs("Info");
+		}
+		else if (tabtype = isdata)
+		{
+			newnode->tabname.SetAs("Table Data");
+		}
+		p->opentab->Insert(newnode);
+	}
+}
 
 //History tab
 wyBool
 TabModule::CreateHistoryTab(MDIWindow * wnd, wyBool showtab, wyBool setfocus)
 {
     TabEditor* pte;
+	wyBool found = wyFalse;
 
     if(!m_pctabhistory)
 	{
@@ -971,8 +1432,36 @@ TabModule::CreateHistoryTab(MDIWindow * wnd, wyBool showtab, wyBool setfocus)
             m_pctabhistory->Resize();
             m_pctabhistory->Show(setfocus);
             GetTabOpenPersistence(IDI_HISTORY, wyTrue, wyTrue);
+			if (setfocus == wyFalse)
+			{
+				MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+				if (p)
+				{
+					if (wnd)
+					{
+						while (p)
+						{
+							if (wnd == p->mdi)
+							{
+								found = wyTrue;
+								//pfound = p;
+								break;
+							}
+							p = (MDIListForDropDrown *)p->m_next;
+						}
+						if (found) {
+							ListOfOpenQueryTabs *newhistorynode = new ListOfOpenQueryTabs();
+							newhistorynode->tabname.SetAs("History");
+							p->opentab->Insert(newhistorynode);
+						}
+					}
+				}
+				
+			}
         }
 	}
+
+	
 
 	return wyTrue;
 }
@@ -1029,7 +1518,33 @@ TabModule::CreateInfoTab(MDIWindow* wnd, wyBool setfocus)
 		CustomTab_SetCurSel(m_hwnd, count);
         CustomTab_EnsureVisible(m_hwnd, count);
 	}
-
+	if (setfocus == wyFalse)
+	{
+		wyBool found = wyFalse;
+		MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+		if (p)
+		{
+			if (wnd)
+			{
+				while (p)
+				{
+					if (wnd == p->mdi)
+					{
+						found = wyTrue;
+						//pfound = p;
+						break;
+					}
+					p = (MDIListForDropDrown *)p->m_next;
+				}
+				if (found) {
+					ListOfOpenQueryTabs *newhistorynode = new ListOfOpenQueryTabs();
+					newhistorynode->tabname.SetAs("Info");
+					p->opentab->Insert(newhistorynode);
+				}
+			}
+		}
+		
+	}
 	return wyTrue;
 }
 
@@ -1155,9 +1670,54 @@ TabModule::CreateTabDataTab(MDIWindow * wnd, wyBool isnewtab, wyBool setfocus)
         {
             GetTabOpenPersistence(IDI_TABLE, wyTrue, wyTrue);
         }
+		
+			//add the table data tab to drop down
+			AddTabletabIntoDropDown(wnd, temptab, setfocus);
     }
-
 	return wyTrue;
+}
+
+VOID 
+TabModule::AddTabletabIntoDropDown(MDIWindow *wnd, TabTableData*       temptab, wyBool setfocus)
+{
+	wyBool found = wyFalse;
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	if (!p)
+	{
+		return;
+	}
+	else if (!wnd)
+	{
+		return;
+	}
+	
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			//pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+	if (found) {
+		ListOfOpenQueryTabs *newnode = new ListOfOpenQueryTabs();
+		//newnode->tabname.SetAs("Table Data");
+		if (!temptab->m_tabledata)
+		{
+			if (setfocus == wyFalse) {
+				newnode->tabname.SetAs("Table Data");
+				p->opentab->Insert(newnode);
+			}
+		}
+		else
+		{
+			newnode->tabname.SetAs(temptab->m_tabledata->m_table.GetString());
+			p->opentab->Insert(newnode);
+		}
+		
+	}
 }
 
 /* Resize for Tab
@@ -1754,7 +2314,8 @@ TabModule::SetTabName(wyWChar *filename, wyBool isshowext, wyBool isedited)
     wyWChar			fname[MAX_PATH] = {0}, ext[MAX_PATH] = {0};
 	wyString		file, extn, tempfilename;
 	wyString        path;
-	
+	wyString newname;
+
 	tabimage = GetActiveTabImage();
 	_wsplitpath(filename, NULL, NULL, fname, ext);
 
@@ -1798,18 +2359,141 @@ TabModule::SetTabName(wyWChar *filename, wyBool isshowext, wyBool isedited)
 	item.m_iimage		= tabimage;
 	item.m_tooltiptext  = (wyChar*)path.GetString();
 	
+	newname = file.GetString();
 	VERIFY(CustomTab_SetItem(m_hwnd, itemindex, &item));
+
+	UpdateNameinStruc(itemindex, newname.GetString());
 	return;	
 }
 
+VOID 
+TabModule::UpdateNameinStruc(wyInt32 itemindex, wyString newname)
+{
+	MDIListForDropDrown *pfound = NULL, *p;
+	wyBool foundmodifiedtab = wyFalse, found = wyFalse;
+	wyInt32 tabcount, tabindexindropdown,tabnumber,tabn;
+	wyString s2,sname;
+
+	MDIWindow *wnd = GetActiveWin();
+
+	p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	if (wnd)
+	{
+		//Update the tabname in query drop down
+		while (p)
+		{
+			if (wnd == p->mdi)
+			{
+				found = wyTrue;
+				pfound = p;
+				break;
+			}
+			p = (MDIListForDropDrown *)p->m_next;
+		}
+		if (found) {
+			if (pfound) {
+
+				//get the tab which is modifed
+				tabcount = p->opentab->GetCount();
+
+				ListOfOpenQueryTabs *node2 = new ListOfOpenQueryTabs();
+				node2 = (ListOfOpenQueryTabs *)p->opentab->GetFirst();
+				for (tabindexindropdown = 0; tabindexindropdown < tabcount; tabindexindropdown++)
+				{
+					if (tabindexindropdown == itemindex)//as indexs for tabs starts from 0 
+					{
+						foundmodifiedtab = wyTrue;
+						break;
+					}
+					node2 = (ListOfOpenQueryTabs *)node2->m_next;
+				}
+				if (foundmodifiedtab)
+				{
+					
+
+					if (node2->tabtype == querytab)
+					{
+						node2->seqofquerytab = 0;
+					}
+
+						if (node2->tabtype == querybuilder)
+						{
+							s2.SetAs(newname.GetString());
+							s2.SetAs(s2.Substr(0, 13));
+							s2.LTrim();
+							s2.RTrim();
+
+							tabn = s2.Compare("Query Builder");
+							if (tabn>0) {
+								node2->seqofquerybuilder = 0;
+							}
+							if (tabn == 0)
+							{
+								
+								sname.SetAs(newname.Substr(13, newname.GetLength()));
+								sname.LTrim();
+								sname.RTrim();
+								tabnumber = sname.GetAsInt32();
+								if (tabnumber != node2->seqofquerybuilder)
+								{
+									node2->seqofquerybuilder = tabnumber;
+								}
+
+							}
+							
+						}
+						else if (node2->tabtype == schemadesigner)
+						{
+							s2.SetAs(newname.GetString());
+							s2.SetAs(s2.Substr(0, 15));
+							s2.LTrim();
+							s2.RTrim();
+
+							tabn = s2.Compare("Schema Designer");
+							if (tabn>0) {
+								node2->seqofschemadesigner = 0;
+							}
+							if (tabn == 0)
+							{
+								
+								sname.SetAs(newname.Substr(15, newname.GetLength()));
+								sname.LTrim();
+								sname.RTrim();
+								tabnumber = sname.GetAsInt32();
+								if (tabnumber != node2->seqofschemadesigner)
+								{
+									node2->seqofschemadesigner = tabnumber;
+								}
+								
+							}
+							
+						}
+						else if (node2->tabtype == datasearch)
+						{
+							node2->seqofdatasearch = 0;
+						}
+						wnd->m_isfromsaveas = wyFalse;
+
+					node2->tabname.SetAs(newname.GetString());
+				}
+			}
+		}
+	}
+}
 
 //Setting tab name
 void
-TabModule::SetTabRename(wyWChar *name, wyBool isedited)
+TabModule::SetTabRename(wyWChar *name, wyBool isedited,MDIWindow *wnd, wyBool isfromrenamedlg)
 {
 	CTCITEM         item;
-	wyInt32         itemindex, tabimage;
+	wyInt32         itemindex, tabimage,tabindexindropdown,tabcount=0, tabn,tabnumber;
 	wyString		newname;
+	wyBool found = wyFalse,foundmodifiedtab=wyFalse;
+	wyString qtabname = "",newname1="",tabname1="", sname="",s2="";
+	MDIListForDropDrown *pfound=NULL ,*p;
+	
+//	MDIWindow *wnd = GetActiveWin();
+	p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
 	
 	tabimage = GetActiveTabImage();
 	newname.SetAs(name);
@@ -1819,7 +2503,6 @@ TabModule::SetTabRename(wyWChar *name, wyBool isedited)
 		
 	}
 	
-
 	itemindex	 =	CustomTab_GetCurSel(m_hwnd);
 	
 	item.m_mask         = CTBIF_TEXT | CTBIF_IMAGE | CTBIF_CMENU | CTBIF_TOOLTIP;
@@ -1830,6 +2513,83 @@ TabModule::SetTabRename(wyWChar *name, wyBool isedited)
 	
 	//m_pctabeditor->m_tabtitle.SetAs(item.m_psztext);
 	VERIFY(CustomTab_SetItem(m_hwnd, itemindex, &item));
+
+	//Update the tabname in query drop down
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+	if (found) {
+		if (pfound) {
+
+			//get the tab which is modifed
+			tabcount = p->opentab->GetCount();
+
+			ListOfOpenQueryTabs *node2;// = new ListOfOpenQueryTabs();
+			node2 = (ListOfOpenQueryTabs *)p->opentab->GetFirst();
+			for (tabindexindropdown = 0; tabindexindropdown < tabcount; tabindexindropdown++)
+			{
+				if (tabindexindropdown == itemindex)//as indexs for tabs starts from 0 
+				{
+					foundmodifiedtab = wyTrue;
+					break;
+				}
+				node2 = (ListOfOpenQueryTabs *)node2->m_next;
+			}
+			if (foundmodifiedtab)
+			{
+				if (isfromrenamedlg || node2->tabname.CompareI(newname.GetString()))
+				{ 
+					if (node2->tabtype == querytab)
+					{
+						//Fix to update sequence number from old and new session
+						s2.SetAs(newname.GetString());
+						s2.SetAs(s2.Substr(0, 5));
+						s2.LTrim();
+						s2.RTrim();
+
+						tabn = s2.Compare("Query");
+						if (tabn > 0) {
+							node2->seqofquerytab = 0;
+						}
+						if (tabn == 0)
+						{
+							if (newname.GetLength()>5)//tabn=0 : tabname is restored name "Query" and if length>5 : sequence from 13.1.2 session with sequence i.e. restore from old session
+							{
+								sname.SetAs(newname.Substr(5, newname.GetLength()));
+								sname.LTrim();
+								sname.RTrim();
+								tabnumber = sname.GetAsInt32();
+								if (tabnumber != node2->seqofquerytab)
+								{
+									node2->seqofquerytab = tabnumber;
+								}
+							}
+							else
+							{
+								node2->seqofquerytab = 0;// length = 5 : no sequence to append i.e.restore from old session
+							}
+
+						}
+					}
+
+				}
+				/*if (isfromrenamedlg || node2->tabname.CompareI(newname.GetString()))
+				{
+					node2->seqofquerytab = 0;
+				}*/
+				node2->tabname.SetAs(newname.GetString());
+			}
+
+		}
+	}
+
 	return;	
 }
 	

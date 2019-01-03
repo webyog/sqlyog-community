@@ -460,7 +460,7 @@ TabMgmt::DeleteAllItem(wyBool isdeletefixedtabs)
         }
         
         ptr = (TabQueryTypes*)ctci.m_lparam;
-        CustomTab_DeleteItem(m_hwnd, 0);
+        CustomTab_DeleteItem(m_hwnd, 0,wyTrue);
         delete ptr;
 	}
 
@@ -472,7 +472,7 @@ TabMgmt::DeleteAllItem(wyBool isdeletefixedtabs)
 }
 
 void 
-TabMgmt::DeleteTab(wyInt32 index)
+TabMgmt::DeleteTab(wyInt32 index, wyBool ispostion)
 {
     CTCITEM         ctci;
     TabQueryTypes*  ptr;
@@ -482,7 +482,7 @@ TabMgmt::DeleteTab(wyInt32 index)
     ctci.m_mask = CTBIF_LPARAM;
     CustomTab_GetItem(m_hwnd, index, &ctci);
     ptr = (TabQueryTypes*)ctci.m_lparam;
-    CustomTab_DeleteItem(m_hwnd, index);
+    CustomTab_DeleteItem(m_hwnd, index, ispostion);
     delete ptr;
 
     if(index <= i && CustomTab_GetItemCount(m_hwnd))

@@ -138,7 +138,10 @@ class CalendarCtrl
 		void	OnClickOk();
 
 	//Handles click of the OK button
-		void	OnClickNow();
+		void	OnClickNow(DataView *m_dv);
+
+	//Get preference to show server date and time when click on NOW button
+		wyBool GetPreferenceForNowButton();
 
 	//Handles click of the Cancel button
 		void	OnClickCancel();

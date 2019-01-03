@@ -358,7 +358,7 @@ TabHistory::Show(wyBool setfocus)
     wyInt32				count = 0, i;
 	CTCITEM				item1 = {0}, item = {0};
 	wyString			buffer;
-
+	wyBool found = wyFalse;
     
     wyWChar		*lpfileport = 0;
 	wyWChar		directory[MAX_PATH+1] = {0};
@@ -399,6 +399,7 @@ TabHistory::Show(wyBool setfocus)
         CustomTab_SetCurSel(m_hwndparent, i);
         CustomTab_EnsureVisible(m_hwndparent, i);
     }
+
 }
 
 

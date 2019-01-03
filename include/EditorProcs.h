@@ -58,6 +58,7 @@ public:
 	@returns (HWND)handle to AdvEdit.
 	*/
 	HWND				CreateAdvEdit(MDIWindow *wnd, HWND hwnd, HTREEITEM hitem, wyString *strhitemname = NULL);
+
 	
 	///Function executes the current query.
 	///i.e the query in which the cursor is at the moment. 

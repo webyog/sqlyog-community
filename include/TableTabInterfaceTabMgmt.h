@@ -25,6 +25,9 @@ class TabAdvancedProperties;
 class TabIndexes;
 class TabForeignKeys;
 class TabPreview;
+class TabCheck;
+
+
 
 class TableTabInterfaceTabMgmt
 {
@@ -59,6 +62,8 @@ public:
     wyBool      CreateIndexesTab();
 
     wyBool      CreateForeignKeysTab();
+
+	wyBool CreateCheckConstraintTab();
 
     wyBool      CreatePreviewTab();
 
@@ -107,6 +112,8 @@ public:
     TabIndexes*                 m_tabindexes;
 
     TabForeignKeys*             m_tabfk;
+
+	TabCheck*                 m_tabcheck;
 
     TabPreview*                 m_tabpreview;
 

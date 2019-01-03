@@ -386,4 +386,6 @@ public:
 	void						OnDlgWMPaint(HWND hwnd);
 
 	void						CreateDlgCancel(HWND hwnd);
+
+	void					UpdateDropdownStruct(wyInt32 index,wyString newname);
 };

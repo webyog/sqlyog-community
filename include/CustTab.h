@@ -52,6 +52,7 @@ typedef LRESULT(CALLBACK* CTBWNDPROC)(HWND, UINT, WPARAM, LPARAM, wyBool* pishan
 #define CTCN_PAINTTIMERSTART    WM_USER+130
 #define CTCN_PAINTTIMEREND      WM_USER+132
 #define CTCN_TABRENAME		    WM_USER+133
+#define CTCN_DROPDOWNBUTTONCLICK    WM_USER+134
 
 #define CTBIF_TEXT              1
 #define CTBIF_IMAGE             2
@@ -235,7 +236,9 @@ public:
     @param isexplicit               : IN whether the tab was closed with an explicti close operation
     @returns wyBool, wyTrue if success, otherwise wyFalse
     */
-	wyBool                          DeleteItem(wyInt32 tabindex, wyBool isexplicit = wyFalse);
+
+	//Added notdeletefromstruct Param: wyTrue denotes the tab doesn't need to remove from the drop down structure, wyFalse: remove tab details from drop down
+	wyBool                          DeleteItem(wyInt32 tabindex, wyBool isexplicit = wyFalse, wyBool notdeletefromstruct = wyFalse);
 
     /// Remove all tabs
     /**
@@ -471,6 +474,9 @@ private:
     @returns wyBool, wyTrue if success, otherwise wyFalse.
     */
 	wyBool                          FreeItem(LPCTCITEMEX pitem, wyInt32 tabindex = -1);
+
+	/// Reset sequence numbers for different tabs
+	void							ResetGlobalSequenceNumbers(wyString tabname);
 
     
     /// Checks the Cursor position is over any of the tabs
@@ -742,6 +748,10 @@ private:
 
     void                            CreateBottomLinePen();
 
+	void							UpdateDropDownStructPosition(wyInt32 selectedtab, wyInt32 dropindex);
+	void							UpdateDropDownNodePosforconnection(wyInt32 selectedtab, wyInt32 dropindex);
+	void							FindAndUpdateTheDropDown(wyInt32 selectedtab,wyInt32 dropindex);
+
     /// Flag for tab width is fixed or not
 	wyBool          m_isfixedlength;
 
@@ -989,7 +999,7 @@ wyInt32		        CustomTab_SetMinTabWidth(HWND hwnd , wyInt32 cx);
 @param index		: IN Index of the tab to be deleted
 @returns wyTrue on success else wyFalse
 */
-wyBool  	        CustomTab_DeleteItem(HWND hwnd , wyInt32 index);
+wyBool  	        CustomTab_DeleteItem(HWND hwnd , wyInt32 index,wyBool isdelrequired=wyFalse);
 
 
 /// Function to delete all item from the tab

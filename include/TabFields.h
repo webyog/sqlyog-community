@@ -43,7 +43,7 @@
 #define     COLLATIONCOL            10
 #define     VIRTUALITY              13
 #define     EXPRESSION              14
-
+#define		CHECKCONSTRAINT			15
 #define     MAXLENWITHBACKTICKS                         4
 #define		DEFAULTNUMROWS								6
 
@@ -75,6 +75,7 @@ struct FIELDATTRIBS
 	wyString                m_expression;               //expression for virtual coloumn.
 	wyString                m_mysqlvirtuality;               //for mysql virtual/stored columns
 	wyString                m_mysqlexpression;               //expression for virtual coloumn.
+	wyString                m_mycheckexpression;               //expression for check constraint.
     struct FIELDATTRIBS*    m_next;                     /// pointer to the next FIELDATTRIBS struct elem
 };
 
@@ -148,6 +149,9 @@ public:
 	//is mariadb version>=5.2
 	wyBool                     m_ismariadb52;
 
+	//is mariadb version>=10.3.9
+	wyBool                     m_ismariadb10309;
+
 	//is mysql version>=5.7
 	wyBool                     m_ismysql57;
 
@@ -194,6 +198,9 @@ public:
 	// backtick string from preferences, either empty or quote
 	wyChar*						m_backtick;
     
+	//to check whether control from save table or alter table
+	wyBool m_isalter;
+
     /// intializes m_mysql, m_tunnel and calls CreateGrid()
     /**
     @returns void
@@ -628,6 +635,15 @@ public:
     */
     void                        GetCommentValue(wyString& query, FIELDATTRIBS*   pfieldattribs);
 
+
+	/// Helper function to get the check condition of the columns
+	/**
+	@param query		: OUT wyString in which the values have to be added
+	@param prowdata		: IN  Array of column values from which data needs to be extracted
+	@returns void
+	*/
+	void                        GetCheckValue(wyString& query, FIELDATTRIBS*   pfieldattribs);
+
     /// Fetches the initial the values
     /**
     @returns wyBool, wyTrue if success, otherwise wyFalse
@@ -791,12 +807,23 @@ public:
 
 	wyBool                    IsDropAndRecreateRequired(FieldStructWrapper* cwrapobj,wyBool isnew);
 
+	//function to findout wehther to generate drop or recreate for check constraint
+
+	wyBool                    IsDropAndRecreateCheckRequired(FieldStructWrapper* cwrapobj, wyBool isnew);
+
     /// rotates through all grid rows, finds the wrapper from the column name
     /*
     @param                      :   IN  column name
     @returns FieldStructWrapper object pointer
     */
-    FieldStructWrapper*         GetWrapperObjectPointer(wyString &columnname);
+    FieldStructWrapper*         GetWrapperObjectPointer(wyString &columnname); 
+
+	/// rotates through all grid rows, finds the wrapper from the column name
+	/*
+	@param                      :   IN  column name
+	@returns FieldStructWrapper object pointer
+	*/
+	FieldStructWrapper*         GetWrapperObjectPointerch();
 
     /// Drops columns from indexes when user deletes the field from the grid
     /*

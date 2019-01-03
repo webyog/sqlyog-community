@@ -342,6 +342,7 @@
 #define IDI_REMOVE_FILTER               994
 #define IDI_REMOVE_DB_FILTER            995
 #define IDI_OVERLAYFILTER               997
+#define IDR_CONNTABPLUSMENU1            998
 #define IDB_PNG1                        1004
 #define IDC_DLGCONNECT_USER             1005
 #define IDI_ICON1                       1005
@@ -622,9 +623,12 @@
 #define IDC_FOCUSAFTERQUERY             1215
 #define IDC_CONFIRMONTABCLOSE           1216
 #define IDC_GETTEXTONDBCLICK            1217
+#define IDC_BACKQUOTES2                 1218
 #define IDC_AUTOCOMPLETE                1219
+#define IDC_SERVERDATE                  1219
 #define IDC_GETINFOKW                   1219
 #define IDC_AUTOCOMPLETEREBUILD         1220
+#define IDC_SERVERDATE2                 1220
 #define IDC_AUTOCOMPLETESHOWTOOLTIP     1221
 #define IDC_QUERY                       1232
 #define IDC_ERROR_NUMBER                1233
@@ -984,8 +988,8 @@
 #define IDC_TRIALSTATIC                 1812
 #define IDC_INITCOMMANDHELP             2644
 #define IDC_COMBOCUSTOM                 2645
-#define IDC_SHOWSQL						2646
-#define	IDC_HIDESQL						2647
+#define IDC_SHOWSQL                     2646
+#define IDC_HIDESQL                     2647
 #define ID_IMPORT_FROMXML               2655
 #define ACCEL_IMPORTXML                 2656
 #define FAVORITE_MENU_ID                2900
@@ -1580,6 +1584,7 @@
 #define ID_OPEN_SELECT                  41754
 #define ID_OPEN_COPYALL                 41755
 #define ID_OPEN_SELECTALL41756          41756
+#define ID_DATABASE_REBUILDTAGS         41756
 #define ID_TABMENU_CREATETABLE          41757
 #define ID_TABMENU_HISTORY              41758
 #define ID_TABMENU_INFO                 41759
@@ -1624,7 +1629,6 @@
 #define ID_SAVEPOINT_CREATESAVEPOINT    41821
 #define ID_SAVEPOINT_RELEASESAVEPOINT   41822
 #define ID_Menu                         41823
-#define ID_DATABASE_REBUILDTAGS         41756
 #define ID_Menu41826                    41826
 #define ID_Menu41827                    41827
 #define IDM_COLLAPSEOBJECT              41828
@@ -1655,6 +1659,9 @@
 #define IDD_CREATESAVEPOINT             44140
 #define IDD_RELEASESAVEPOINT            44141
 #define IDD_ROLLBACKTO                  44142
+#define IDI_CHECKCONSTRAINT             44143
+#define IDM_DROPDOWNLISTITEM            44145
+#define IDR_CONNDROPDOWNMENU            44146
 
 // Next default values for new objects
 // 

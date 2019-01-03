@@ -144,47 +144,55 @@ FrameWindowSplitter::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpar
 
 // function to resize the splitter window.
 wyBool
-FrameWindowSplitter::Resize(wyBool isannouncements)
+FrameWindowSplitter::Resize(wyBool isannouncements, wyBool iswindowresize)
 {
 	RECT	parentrect;
 	LONG	ret;
-	MDIWindow * pcquerywnd  = (MDIWindow*)GetWindowLongPtr(m_hwndparent, GWLP_USERDATA);
+	MDIWindow * pcquerywnd = (MDIWindow*)GetWindowLongPtr(m_hwndparent, GWLP_USERDATA);
 
 	_ASSERT(pcquerywnd);
 
 	VERIFY(GetClientRect(m_hwndparent, &parentrect));
-    parentrect.top += 2;
-    parentrect.bottom -= 2;
-    parentrect.left += 2;
-    parentrect.right -= 2;
-	if(isannouncements)
+	parentrect.top += 2;
+	parentrect.bottom -= 2;
+	parentrect.left += 2;
+
+	parentrect.right -= 2;
+	if (isannouncements)
 	{
 		//force splitter to 22% of the screen for announcements window
 		//m_rect.left = 272;
-		if(m_leftortoppercent < 22)
+		if (m_leftortoppercent < 22)
 			m_leftortoppercent = 22;
 	}
 
-	m_rect.left     = (long)((parentrect.right *((long)m_leftortoppercent /(float)100)));
-	m_rect.top      = parentrect.top; //set the splitter size same as other controls
-    m_rect.right    = m_width;
-	m_rect.bottom   = parentrect.bottom - m_rect.top;
+	//if (m_rect.left <= 2)
+	//	m_rect.left = (long)((parentrect.right *((long)m_leftortoppercent / (float)100)));
 
-    if(m_rect.left < 2)
-    {
-        m_rect.left = 2;
-    }
+	if (!pGlobals->m_pcmainwin->m_isresizing) {
+		m_rect.left = (long)((parentrect.right *((long)m_leftortoppercent / (float)100))); 
+	}
 
-    if(m_rect.left + m_width > parentrect.right)
-    {
-        m_rect.left = parentrect.right - m_width;
-    }
-		
+	m_rect.top = parentrect.top; //set the splitter size same as other controls
+	m_rect.right = m_width;
+	m_rect.bottom = parentrect.bottom - m_rect.top;
+
+		if (m_rect.left < 2)
+		{
+			m_rect.left = 2;
+		}
+		//If Object Browser size is greater than main window size then retain Object Browser size
+		if (m_rect.left + m_width > parentrect.right)
+		{
+			m_rect.left = parentrect.right - m_width;
+		}
+
+
 	if(pcquerywnd->m_isobjbrowvis == wyTrue)
 		pGlobals->m_pcmainwin->SetSplitterPos(&m_rect, m_leftortoppercent);
 
-    VERIFY(ret = MoveWindow(m_hwnd, m_rect.left, m_rect.top, m_rect.right, m_rect.bottom, TRUE));
-
+		VERIFY(ret = MoveWindow(m_hwnd, m_rect.left, m_rect.top, m_rect.right, m_rect.bottom, TRUE));
+		
 	return wyTrue;
 }
 

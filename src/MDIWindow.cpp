@@ -42,6 +42,7 @@
 #include "TableTabInterface.h"
 #include "TableTabInterfaceTabMgmt.h"
 #include "OtherDialogs.h"
+#include "List.h"
 
 #ifndef COMMUNITY
 #include "ConnectionEnt.h"
@@ -161,6 +162,9 @@ MDIWindow::MDIWindow(HWND hwnd, ConnectionInfo * conninfo, wyString &dbname, wyS
 	m_isanncreate = wyFalse;
 	m_listtabeditor = NULL;
 	m_listtabdetails = NULL;
+	m_isfromsave = wyFalse;
+	m_isfromsaveas = wyFalse;
+	m_fromdirtytab = wyFalse;
 	//m_tabposition = 0;
 }
 
@@ -459,7 +463,13 @@ MDIWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 	ConnectionBase* conbase = NULL;
     wyInt32         exstyle;
 	wyString		errmsg;
-    
+	//wyInt32  nWidth;
+
+	//wyString str;
+
+	//str.Sprintf("MDI window message - %d", message);
+	//logtext1(str.GetString());
+
 	switch(message)
 	{
     /*case WM_COMMAND:
@@ -557,7 +567,12 @@ MDIWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
         break;
 
 	case WM_SIZE:
-		pcquerywnd->Resize();
+
+		//str.Sprintf("MDI window size - %d", message);
+		//logtext1(str.GetString());
+
+		//nWidth = LOWORD(lparam);
+		pcquerywnd->Resize(wyTrue);
 		
 		//8.04, for avoiding painting issues at border of con. window when 'Restored'
 		if(wparam == SIZE_RESTORED && pcquerywnd->m_ismanualresizing == wyFalse)
@@ -906,6 +921,14 @@ MDIWindow::OnWmClose(HWND hwnd)
 	CTCITEM		item = {0};
 	item.m_mask = CTBIF_IMAGE;
 	HWND		hwndTabModule = m_pctabmodule->GetHwnd();
+	wyInt64 conncount, nooftab;
+	wyBool found = wyFalse;
+
+	ListofOpenTabs *listofopentabs;// = new ListofOpenTabs;
+	ListofOpenTabs *templistofopentabs;// = new ListofOpenTabs;
+
+	//get the first of the node from the list
+	listofopentabs = (ListofOpenTabs *)pGlobals->m_connectiontabnamelist->GetFirst();
 
 	if(m_keepaliveinterval)
 	{
@@ -1026,9 +1049,61 @@ MDIWindow::OnWmClose(HWND hwnd)
 
 	pGlobals->m_pcmainwin->ResizeToolBar();
 
+	//Start: drop down: Remove tab details from  the global m_connectiontabnamelist 	
+
+	listofopentabs = (ListofOpenTabs *)pGlobals->m_connectiontabnamelist->GetFirst();
+	conncount = pGlobals->m_connectiontabnamelist->GetCount();
+
+	for (nooftab = 0; nooftab < conncount; nooftab++)
+	{
+
+		//get the node details from the list
+		if (listofopentabs->m_hwndTabModuleinlist->m_hwnd == hwndTabModule)
+		{
+			templistofopentabs = listofopentabs;
+			found = wyTrue;
+			break;
+		}
+		listofopentabs = (ListofOpenTabs *)listofopentabs->m_next; //moving pointer to next conenction window
+	}
+	//remove the node from the list;
+	if (found)
+	{
+		//delete the connection tab details from the list
+		pGlobals->m_connectiontabnamelist->Remove(templistofopentabs);
+	}
+
+	//delete the connection list from m_mdilistfordropdown file
+	DelFromQueryStruct(wnd);
+
+	//End dropdown
+
 	SetCursor(LoadCursor(NULL, IDC_ARROW));       
     
     return 1;
+}
+void 
+MDIWindow::DelFromQueryStruct(MDIWindow *wnd)
+{
+	wyBool deletedfromstruct = wyFalse, found = wyFalse;
+	MDIListForDropDrown *pfound = NULL, *p;
+
+	p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+	if (found)
+	{
+		pGlobals->m_mdilistfordropdown->Remove(pfound);
+	}
 }
 
 wyInt32 
@@ -1182,6 +1257,10 @@ MDIWindow::OnWmNotify(HWND hwnd, WPARAM wparam, LPARAM lparam)
     case CTCN_PLUSBUTTONCLICK:
         LoadQueryTabPlusMenu(lparam);
         break;
+
+	case CTCN_DROPDOWNBUTTONCLICK:
+		LoadQueryTabDropDownMenu(hwnd, wparam, lparam);
+		break;
 
     case CTCN_ONCONTEXTMENU:
 		tabcount = CustomTab_GetItemCount(lpnmhdr->hwndFrom);
@@ -1952,7 +2031,7 @@ MDIWindow::SetDirtyTitle()
 			peditorbase =	m_pctabmodule->GetActiveTabType()->m_peditorbase;
 			peditorbase->m_edit = wyTrue;                 
 		}
-
+		m_fromdirtytab = wyTrue;
 		SetQueryWindowTitle();
 	}
 
@@ -1963,9 +2042,10 @@ MDIWindow::SetDirtyTitle()
 // Basically it calls the resize function of all its child window in orderly manner to implement
 // change of size of all its child window.
 void
-MDIWindow::Resize()
+MDIWindow::Resize(wyBool iswindowresize)
 {
-	m_pcqueryvsplitter->Resize();
+	m_ismanualresizing;
+	m_pcqueryvsplitter->Resize(wyFalse, iswindowresize);
 	m_pctabmodule->Resize();
 
 	if(pGlobals->m_isannouncementopen)
@@ -2013,6 +2093,7 @@ MDIWindow::HandleFileSave()
 	TabEditor			*ptabeditor;
 	wyInt32		tabimageid, sel;
     wyBool      retval = wyFalse;
+	m_isfromsave = wyTrue;
 
 	tabimageid = m_pctabmodule->GetActiveTabImage();
 	switch(tabimageid)
@@ -2160,6 +2241,8 @@ MDIWindow::HandleSaveAsFile()
 	TabEditor	*ptabeditor;
 	wyInt32		tabimageid, sel;
     wyBool      retval = wyFalse;
+	
+	m_isfromsaveas = wyTrue;
 
 	tabimageid = m_pctabmodule->GetActiveTabImage();
 	switch(tabimageid)
@@ -4003,7 +4086,9 @@ MDIWindow::TabEditorTitles(wyString *mdititle)
 	wyString	newtitle;
 	EditorBase	*peditorbase = NULL;
 	TabEditor	*ptabeditor = NULL;
+	MDIWindow *wnd;
 	
+	wnd = GetActiveWin();
 	ptabeditor = GetActiveTabEditor();
 	peditorbase = ptabeditor->m_peditorbase;	
 	
@@ -4026,7 +4111,7 @@ MDIWindow::TabEditorTitles(wyString *mdititle)
 		else if(peditorbase->m_save == wyTrue)
 		{
 			//Set tab name
-			m_pctabmodule->SetTabName(peditorbase->m_filename.GetAsWideChar(), wyTrue);
+			m_pctabmodule->SetTabName(peditorbase->m_filename.GetAsWideChar(), wyTrue,wyFalse);
 
 			newtitle.Sprintf("%s", peditorbase->m_filename.GetString());
 		}
@@ -4078,7 +4163,7 @@ MDIWindow::TabSchemaDesignerTitles(wyString *mdititle)
 			newtitle.Sprintf("%s*", ptabsd->m_filename.GetString());
 		}
 
-		else if(ptabsd->m_save == wyTrue)
+		else if(ptabsd->m_save == wyTrue && ptabsd->m_filename.GetLength()>0) // Adding ptabsd->m_filename.GetLength()>0 condition as it was causing a crash
 		{
 			m_pctabmodule->SetTabName(ptabsd->m_filename.GetAsWideChar(), wyFalse);
 			newtitle.Sprintf("%s", ptabsd->m_filename.GetString());
@@ -4095,8 +4180,22 @@ MDIWindow::TabSchemaDesignerTitles(wyString *mdititle)
 	}
 
     //if there is no file name, then set it to default
-    if(!ptabsd->m_filename.GetLength())
-		m_pctabmodule->SetTabName(_(L"Schema Designer"), wyFalse, wyFalse);
+	
+	if (!ptabsd->m_filename.GetLength())
+	{
+		//add the code to display the tab name and the sequence
+
+
+		// to append sequence number
+			wyString qtabname = "", q = "Schema Designer";
+			qtabname.SetAs(ptabsd->m_tabnamefordropdown.GetString());
+
+		m_pctabmodule->SetTabName(qtabname.GetAsWideChar(), wyFalse, wyFalse);
+	}
+
+
+
+	//m_pctabmodule->SetTabName(ptabsd->m_filename.GetAsWideChar(), wyFalse, wyFalse);
 
 	// Set the filename window
 	if(ptabsd->m_filewndtitle.GetLength())
@@ -4147,8 +4246,12 @@ MDIWindow::TabQueryBuilderTitles(wyString *mdititle)
     // if there is no filename, set the default
     else
     {
-        temp.SetAs(_("Query Builder"));
-        m_pctabmodule->SetTabName(temp.GetAsWideChar(), wyFalse, wyFalse);
+		//to append sequence number
+		wyString qtabname = "", q = "Query Builder";
+
+		qtabname.SetAs(ptabqb->m_tabnameforqb.GetString());
+
+        m_pctabmodule->SetTabName(qtabname.GetAsWideChar(), wyFalse, wyFalse);
 
         //set the tool bar caption
         SetWindowText(ptabqb->m_hwndfilename, ptabqb->m_filewndtitle.GetAsWideChar());
@@ -4689,6 +4792,90 @@ MDIWindow::LoadQueryTabPlusMenu(LPARAM lparam)
 }
 
 void
+MDIWindow::LoadQueryTabDropDownMenu(HWND hwnd, WPARAM wparam, LPARAM lparam)
+{
+	LPNMCTC lpnmctc = (LPNMCTC)lparam;
+	wyInt32 extramenucount = 3, itab, tabcount;
+	wyInt64 i,qcount,id=0,j=0,cmdid;
+	MDIWindow *actwin;
+	wyString queryWindowname("");
+	wyWChar *namestring;
+	BOOL flag;
+	wyBool winflag = wyFalse, found = wyFalse;
+	HMENU			hsubmenu;
+	static wyInt32 activetabid;
+	ListOfOpenQueryTabs *tabs;
+
+	//Creating the menu
+	hsubmenu = ::CreatePopupMenu();
+
+	//hmenu = LoadMenu(pGlobals->m_hinstance, MAKEINTRESOURCE(IDR_CONNDROPDOWNMENU));
+	LocalizeMenu(hsubmenu);
+	//htrackmenu = GetSubMenu(hmenu, 0);
+
+	tabcount = pGlobals->m_mdilistfordropdown->GetCount();
+
+//	MDIlist *temp = (MDIlist *)pGlobals->m_mdiwlist->GetFirst();
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+
+	actwin = GetActiveWin();
+
+	if (!actwin)
+	{
+		return;
+	}
+	for (itab = 0; itab<tabcount; itab++)
+	{
+		if (actwin == p->mdi)//(actwin == temp->mdi)
+		{
+			found = wyTrue;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next; //temp = (MDIlist *)temp->m_next;
+	}
+	if (found)
+	{
+		tabs = (ListOfOpenQueryTabs *) p->opentab->GetFirst();
+		qcount = p->opentab->GetCount();
+	}
+	
+	id = 1;
+	for (i = 0; i < qcount; i++)
+	{
+		queryWindowname.SetAs(tabs->tabname.GetString());
+		namestring = queryWindowname.GetAsWideChar();
+
+		flag = InsertMenu(hsubmenu, -1, MF_BYPOSITION, id, namestring);
+		id++;		
+		tabs = (ListOfOpenQueryTabs *)tabs->m_next;
+	}
+
+	activetabid = CustomTab_GetCurSel(actwin->m_pctabmodule->m_hwnd);
+	// Set menu draw property for drawing icon
+	//wyTheme::SetMenuItemOwnerDraw(hsubmenu);
+	SetMenuDefaultItem(hsubmenu, activetabid, TRUE);
+
+	cmdid= TrackPopupMenu(hsubmenu, TPM_RETURNCMD |TPM_LEFTALIGN | TPM_RIGHTBUTTON, lpnmctc->curpos.x-15, lpnmctc->curpos.y+15, 0, actwin->m_pctabmodule->m_hwnd, NULL);
+
+	if (cmdid == 0)
+	{
+			CustomTab_SetCurSel(actwin->m_pctabmodule->m_hwnd, activetabid);
+			CustomTab_EnsureVisible(actwin->m_pctabmodule->m_hwnd, activetabid);
+
+	}
+	else
+	{
+		CustomTab_SetCurSel(actwin->m_pctabmodule->m_hwnd, cmdid-1);
+		CustomTab_EnsureVisible(actwin->m_pctabmodule->m_hwnd, cmdid-1);
+	}
+
+	//FreeMenuOwnerDrawItem(htrackmenu);
+	activetabid = CustomTab_GetCurSel(actwin->m_pctabmodule->m_hwnd);
+
+	VERIFY(DestroyMenu(hsubmenu));
+}
+
+void
 MDIWindow::GetCtrlRects()
 {
     RECT    rect;
@@ -4817,7 +5004,7 @@ MDIWindow::OnWMSizeInfo(LPARAM lparam)
 }
 
 void
-MDIWindow::PositionTabs(wyBool isupdtabledata, wyBool isupdhistory, wyBool isupdinfo)
+MDIWindow::PositionTabs(wyBool isupdtabledata, wyBool isupdhistory, wyBool isupdinfo, wyBool delfromdropdown)
 {
     wyInt32             i, count, j, k;
     CTCITEM             item = {0};
@@ -4842,45 +5029,52 @@ MDIWindow::PositionTabs(wyBool isupdtabledata, wyBool isupdhistory, wyBool isupd
         {
             if(istabeditorcreated == wyFalse)
             {
-                m_pctabmodule->CreateQueryEditorTab(this, i, wyTrue);
+				m_pctabmodule->CreateQueryEditorTab(this, i, wyTrue,wyTrue);
                 istabeditorcreated = wyTrue;
-                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i + 1);
+                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i + 1,wyTrue);//true means deleteItem method will not delete any node from the structure
+				DelFromDropdownStructtabledata(this, i);
             }
             else
             {
-                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i);
+                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i,wyTrue);//true means deleteItem method will not delete any node from the structure
                 --i;
                 --count;
+				DelFromDropdownStructtabledata(this, i);
             }
         }
         else if(item.m_iimage == IDI_TABLEINDEX && pGlobals->m_isinfotabunderquery == wyTrue)
         {
             if(istabeditorcreated == wyFalse)
             {
-                m_pctabmodule->CreateQueryEditorTab(this, i, wyTrue);
+				m_pctabmodule->CreateQueryEditorTab(this, i, wyTrue , wyTrue);
                 istabeditorcreated = wyTrue;
-                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i + 1);
+                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i + 1,wyTrue);//true means deleteItem method will not delete any node from the structure
+				DelFromDropdownStructInfo(this, i);
             }
             else
             {
-                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i);
+                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i,wyTrue);//true means deleteItem method will not delete any node from the structure
                 --i;
                 --count;
+				DelFromDropdownStructInfo(this, i);
             }
         }        
         else if(item.m_iimage == IDI_HISTORY && pGlobals->m_ishistoryunderquery == wyTrue)
         {
             if(istabeditorcreated == wyFalse)
             {
-                m_pctabmodule->CreateQueryEditorTab(this, i, wyTrue);
+                m_pctabmodule->CreateQueryEditorTab(this, i, wyTrue,wyTrue);
                 istabeditorcreated = wyTrue;
-                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i + 1);
+                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i + 1,wyTrue);//true means deleteItem method will not delete any node from the structure
+				DelFromDropdownStruct(this, i);
             }
             else
             {
-                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i);
+                CustomTab_DeleteItem(m_pctabmodule->m_hwnd, i,wyTrue);//true means deleteItem method will not delete any node from the structure
                 --i;
                 --count;
+				//add the code to delete the history node from the srtucture : i is the idex of history code
+				DelFromDropdownStruct(this, i);
             }
         }
         else if((ptabeditor = m_pctabmodule->GetTabEditorAt(i)) && ptabeditor->m_pctabmgmt)
@@ -4895,7 +5089,7 @@ MDIWindow::PositionTabs(wyBool isupdtabledata, wyBool isupdhistory, wyBool isupd
                 }
                 else if(!bottomtabsettings[j * 2] && k != -1)
                 {
-                    ptabeditor->m_pctabmgmt->DeleteTab(k);
+                    ptabeditor->m_pctabmgmt->DeleteTab(k,wyTrue);
                     ptabeditor->m_pctabmgmt->ChangeTitles();
                 }
             }
@@ -4916,6 +5110,200 @@ MDIWindow::PositionTabs(wyBool isupdtabledata, wyBool isupdhistory, wyBool isupd
     {
         m_pctabmodule->CreateHistoryTab(this, wyTrue, wyFalse);
     }
+}
+
+void
+MDIWindow::DelFromDropdownStruct(MDIWindow *wnd, wyInt64 index)
+{
+	wyBool deletedfromstruct = wyFalse, found = wyFalse, delfound = wyFalse;
+	MDIListForDropDrown *pfound = NULL, *p;
+	ListofOpenTabs * temp1, *listofopentabs;
+	wyInt64 i, tabcount;
+	ListOfOpenQueryTabs *temp;
+
+	p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+
+	if (!p)
+	{
+		return;
+	}
+	if (!wnd)
+	{
+		return;
+	}
+	// To search for the particular tab
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+
+	// getting the tab which is being closed
+	//if (found) {
+	/*listofopentabs = (ListofOpenTabs *)p->opentab->GetFirst();
+
+	tabcount = p->opentab->GetCount();
+		for (i = 0; i < tabcount; i++)
+		{
+			if (i == index+1 && !deletedfromstruct && listofopentabs->)
+			{
+				temp = listofopentabs;
+				deletedfromstruct = wyTrue;
+				delfound = wyTrue;
+				break;
+			}
+			listofopentabs = (ListofOpenTabs *)listofopentabs->m_next;
+		}*/
+	wyString stemp;
+		if (found) {
+			ListOfOpenQueryTabs  *opentab = (ListOfOpenQueryTabs *)p->opentab->GetFirst();
+			tabcount = p->opentab->GetCount();
+
+			for (i = 0; i < tabcount; i++)
+			{
+				stemp.SetAs(opentab->tabname.GetString());
+				//wyInt32 k=stemp.CompareI("History");
+				if (stemp.CompareI("History") == 0)
+				{
+					delfound = wyTrue;
+					temp = opentab;
+					break;
+
+				}
+				opentab = (ListOfOpenQueryTabs *)opentab->m_next;
+			}
+		}
+		if (delfound)
+		{
+			p->opentab->Remove(temp);
+			delfound = wyFalse;
+		}
+
+}
+
+
+void
+MDIWindow::DelFromDropdownStructInfo(MDIWindow *wnd, wyInt64 index)
+{
+	wyBool deletedfromstruct = wyFalse, found = wyFalse, delfound = wyFalse;
+	MDIListForDropDrown *pfound = NULL, *p;
+	ListofOpenTabs * temp1, *listofopentabs;
+	wyInt64 i, tabcount;
+	ListOfOpenQueryTabs *temp;
+
+	p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+
+	if (!p)
+	{
+		return;
+	}
+	if (!wnd)
+	{
+		return;
+	}
+	// To search for the particular tab
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+	wyString stemp;
+	if (found) {
+		ListOfOpenQueryTabs  *opentab = (ListOfOpenQueryTabs *)p->opentab->GetFirst();
+		tabcount = p->opentab->GetCount();
+
+		for (i = 0; i < tabcount; i++)
+		{
+			stemp.SetAs(opentab->tabname.GetString());
+			
+			//wyInt32 k = stemp.CompareI("Info");
+			if (stemp.CompareI("Info") == 0)
+			{
+				delfound = wyTrue;
+				temp = opentab;
+				break;
+
+			}
+			opentab = (ListOfOpenQueryTabs *)opentab->m_next;
+			
+		}
+	}
+	if (delfound)
+	{
+		p->opentab->Remove(temp);
+		delfound = wyFalse;
+	}
+
+}
+
+
+void
+MDIWindow::DelFromDropdownStructtabledata(MDIWindow *wnd, wyInt64 index)
+{
+	wyBool deletedfromstruct = wyFalse, found = wyFalse, delfound = wyFalse;
+	MDIListForDropDrown *pfound = NULL, *p;
+	ListofOpenTabs * temp1, *listofopentabs;
+	wyInt64 i, tabcount=0;
+	ListOfOpenQueryTabs *temp;
+	wyString stemp;
+
+	p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	if(!p)
+	{
+		return;
+	}
+	if (!wnd)
+	{
+		return;
+	}
+	// To search for the particular tab
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+
+	if (found) {
+		ListOfOpenQueryTabs  *opentab = (ListOfOpenQueryTabs *)p->opentab->GetFirst();
+		tabcount = p->opentab->GetCount();
+
+		for (i = 0; i < tabcount; i++)
+		{
+			stemp.SetAs(opentab->tabname.GetString());
+
+			//wyInt32 k = stemp.CompareI("Table Data");
+			if (stemp.CompareI("Table Data") == 0)
+			{
+				delfound = wyTrue;
+				temp = opentab;
+				break;
+
+			}
+			opentab = (ListOfOpenQueryTabs *)opentab->m_next;
+
+		}
+	}
+	if (delfound)
+	{
+		p->opentab->Remove(temp);
+		delfound = wyFalse;
+	}
+
 }
 
 void

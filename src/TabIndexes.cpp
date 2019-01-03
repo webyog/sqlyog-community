@@ -3179,6 +3179,9 @@ TabIndexes::ReInitializeGrid()
 
     m_automatedindexrow = -1;
 
+	//from  .ini file. Refresh always
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
     ClearAllMemory();
     CustomGrid_DeleteAllRow(m_hgridindexes, wyTrue);
     

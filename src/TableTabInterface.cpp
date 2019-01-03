@@ -26,6 +26,7 @@
 #include "TabAdvancedProperties.h"
 #include "TabPreview.h"
 #include "DoubleBuffer.h"
+#include "TabCheck.h"
 
 #define	SIZE_24	        24
 #define	SIZE_12	        12
@@ -150,6 +151,7 @@ TableTabInterface::Create()
     HINSTANCE   hinst   = pGlobals->m_entinst?pGlobals->m_entinst:pGlobals->m_hinstance;
 
 	m_ismysql41             =   m_mdiwnd->m_ismysql41;
+	
 
     //..Setting dbname and origtablename from the object browser
     if(!m_open_in_dialog)
@@ -216,7 +218,9 @@ TableTabInterface::Create()
 
     CustomGrid_SetCurSelection(m_ptabintmgmt->m_tabfields->m_hgridfields, 0, 0);
     CustomGrid_SetCurSelection(m_ptabintmgmt->m_tabindexes->m_hgridindexes, 0, 1);
+	CustomGrid_SetCurSelection(m_ptabintmgmt->m_tabcheck->m_hgridtblcheckconst, 0, 1);
     CustomGrid_SetCurSelection(m_ptabintmgmt->m_tabfk->m_hgridfk, 0, 1);
+	
 
     if(m_setfocustotab == -1)
     {
@@ -267,7 +271,7 @@ TableTabInterface::OnWmNotify(HWND hwnd, WPARAM wparam, LPARAM lparam)
         case CTCN_SELCHANGING:
         {
 			lpnmctc = (LPNMCTC)lparam;
-            if(lpnmctc->count == 2 && !m_isfksupported)
+            if(lpnmctc->count == 2 && !m_isfksupported && m_isaltertable)
             {
 				MessageBox(m_hwnd, _(L"The selected table does not support foreign keys.\nTable engine must be InnoDB, PBXT, SolidDB or ndbcluster (if ndbcluster engine version is greater than or equal to 7.3)."), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
 				return 0;
@@ -359,6 +363,7 @@ TableTabInterface::SaveTable(wyBool &queryexecuted)
     //..Apply\Cancel GridChanges
     CustomGrid_ApplyChanges(m_ptabintmgmt->m_tabfields->m_hgridfields, wyTrue);
     m_ptabintmgmt->m_tabindexes->ApplyCancelGridChanges();
+	m_ptabintmgmt->m_tabcheck->ApplyCancelGridChanges();
     CustomGrid_ApplyChanges(m_ptabintmgmt->m_tabfk->m_hgridfk, wyTrue);
 
     //=> Validations
@@ -435,6 +440,7 @@ TableTabInterface::SaveTable(wyBool &queryexecuted)
                     ReInitializeBasicOptions();
                     m_ptabintmgmt->m_tabfields->ReInitializeGrid();
                     m_ptabintmgmt->m_tabindexes->ReInitializeGrid();
+					m_ptabintmgmt->m_tabcheck->ReInitializeGrid();
                     m_ptabintmgmt->m_tabfk->ReInitializeGrid(listunsavedfks);
                     m_ptabintmgmt->m_tabadvprop->ReinitializeValues();
                     if(m_ptabintmgmt->GetActiveTabImage() == IDI_TABPREVIEW)
@@ -589,6 +595,10 @@ TableTabInterface::SetInitFocus()
     {
         PostMessage(m_hwnd, UM_SETFOCUS, (WPARAM)m_ptabintmgmt->m_tabpreview->m_hwndpreview, 0);
     }
+	else if (m_ptabintmgmt->GetActiveTabImage() == IDI_CHECKCONSTRAINT)
+	{
+		PostMessage(m_hwnd, UM_SETFOCUS, (WPARAM)m_ptabintmgmt->m_tabcheck->m_hgridtblcheckconst, 0);
+	}
 }
 
 wyBool
@@ -641,7 +651,67 @@ TableTabInterface::SetTabItem(HWND hwnd, wyInt32 tabindex, wyString& text, wyUIn
     CustomTab_SetItem(m_hwndparent, ncurselindex, &ctci);
     UpdateWindow(m_hwndparent);
 
+	//update here name in dropdown
+	UpdateDropdownStruct(ncurselindex, objectname.GetString());
+
     return wyFalse;
+}
+
+
+void
+TableTabInterface::UpdateDropdownStruct(wyInt32 index,wyString newname)
+{
+	MDIListForDropDrown *p, *pfound;
+	wyInt32 tabindexindropdown, tabcount=0;
+	MDIWindow *wnd;
+	wyBool found = wyFalse, foundmodifiedtab = wyFalse;
+
+	wnd = GetActiveWin();
+
+	p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+
+	if (!p)
+	{
+		return;
+	}
+	if (!wnd)
+	{
+		return;
+	}
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+	if (found) {
+		if (pfound) {
+
+			//get the tab which is modifed
+			tabcount = p->opentab->GetCount();
+
+			ListOfOpenQueryTabs *node2 = new ListOfOpenQueryTabs();
+			node2 = (ListOfOpenQueryTabs *)p->opentab->GetFirst();
+			for (tabindexindropdown = 0; tabindexindropdown < tabcount; tabindexindropdown++)
+			{
+				if (tabindexindropdown == index)//as indexs for tabs starts from 0 
+				{
+					foundmodifiedtab = wyTrue;
+					break;
+				}
+				node2 = (ListOfOpenQueryTabs *)node2->m_next;
+			}
+			if (foundmodifiedtab)
+			{
+				node2->tabname.SetAs(newname.GetString());
+
+			}
+		}
+	}
 }
 
 wyBool
@@ -1003,6 +1073,7 @@ TableTabInterface::OnClickSave(wyBool onclosetab, wyBool showsuccessmsg)
     return wyTrue;
 }
 
+
 void
 TableTabInterface::CancelChanges()
 {
@@ -1017,7 +1088,10 @@ TableTabInterface::CancelChanges()
 
     /// setting m_isfksupported variable
 	wyBool error = wyTrue;
-	m_isfksupported = IsTableInnoDB(error);
+	if (m_isaltertable)
+		m_isfksupported = IsTableInnoDB(error);
+	else
+		m_isfksupported = wyTrue; // bug: click on revert ignores the details entered in Foreign key tab for create table 
 
     if(m_ismysql41)
     {
@@ -1171,6 +1245,9 @@ TableTabInterface::GenerateQuery(wyString &query, wyBool showmsg)
         tempstr.RTrim();
     }
 
+	//Add method for table level check constraint
+	retval = (wyBool)(m_ptabintmgmt->m_tabcheck->GenerateQuery(tempstr) && retval);
+
     //..In Create table, remove last comma, Add bracket..
     if(!m_isaltertable)
     {
@@ -1232,9 +1309,8 @@ TableTabInterface::GenerateQuery(wyString &query, wyBool showmsg)
 
         if(tempstr.GetLength()  && tempstr.Compare(strnoquery) != 0)
         {
-            tempstr.Add("\r\n");
-            tempstr.Add(")");
-            
+				tempstr.Add("\r\n");
+				tempstr.Add(")");
             if(otherprop.GetLength())
                 tempstr.AddSprintf("%s", otherprop.GetString());
             tempstr.RTrim();
@@ -1322,6 +1398,7 @@ TableTabInterface::OnClickCancelChanges()
     m_ptabintmgmt->m_tabfk->CancelChanges();
     m_ptabintmgmt->m_tabadvprop->CancelChanges(m_isaltertable);
     m_ptabintmgmt->m_tabpreview->CancelChanges();
+	m_ptabintmgmt->m_tabcheck->CancelChanges(m_isaltertable);
 
     //if(m_isaltertable)
     {
@@ -1331,6 +1408,7 @@ TableTabInterface::OnClickCancelChanges()
         CustomGrid_SetSelAllState(m_ptabintmgmt->m_tabfields->m_hgridfields, BST_UNCHECKED);
         CustomGrid_SetSelAllState(m_ptabintmgmt->m_tabindexes->m_hgridindexes, BST_UNCHECKED);
         CustomGrid_SetSelAllState(m_ptabintmgmt->m_tabfk->m_hgridfk, BST_UNCHECKED);
+		CustomGrid_SetSelAllState(m_ptabintmgmt->m_tabcheck->m_hgridtblcheckconst, BST_UNCHECKED);
 
 
     }
@@ -2079,6 +2157,11 @@ TableTabInterface::OnTabSelChange()
         case IDI_TABPREVIEW:
             hwndfocus = m_ptabintmgmt->m_tabpreview->m_hwndpreview;
             break;
+
+		case IDI_CHECKCONSTRAINT:
+			hwndfocus = m_ptabintmgmt->m_tabcheck->m_hgridtblcheckconst;
+			break;
+
         }
         SetFocus(hwndfocus);
     }
@@ -2405,8 +2488,10 @@ TableTabInterface::ReInitializeAllValues()
 
     m_ptabintmgmt->m_tabfields->ReInitializeGrid();
     m_ptabintmgmt->m_tabindexes->ReInitializeGrid();
+	m_ptabintmgmt->m_tabcheck->ReInitializeGrid();
     m_ptabintmgmt->m_tabfk->ReInitializeGrid();
     m_ptabintmgmt->m_tabadvprop->ReinitializeValues();
+	
 
     return wyTrue;
 }
@@ -2689,7 +2774,6 @@ TableTabInterface:: GetMyResTableStatus()
 		ShowMySQLError(m_hwnd, m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql, query.GetString());
 		return wyFalse;
 	}
-
     return wyTrue;
 }
 void

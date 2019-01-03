@@ -15,15 +15,16 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA
 
 */
-
+#include "TabCheck.h"
 #include "TableTabInterface.h"
-#include "TableTabInterfaceTabMgmt.h"
 #include "TabFields.h"
 #include "TabAdvancedProperties.h"
 #include "TabIndexes.h"
 #include "TabForeignKeys.h"
 #include "TabPreview.h"
 #include "DoubleBuffer.h"
+
+#include "TableTabInterfaceTabMgmt.h"
 
 # define MAX_HEIGHT		335
 
@@ -38,6 +39,7 @@ TableTabInterfaceTabMgmt::TableTabInterfaceTabMgmt(HWND hwndparent, TableTabInte
     m_hwndtool      = NULL;
     m_tabindexes    = NULL;
     m_tabfk         = NULL;
+	m_tabcheck		= NULL;
     m_tabpreview    = NULL;
     m_tabadvprop    = NULL;
     m_tabfields     = NULL;
@@ -72,6 +74,12 @@ TableTabInterfaceTabMgmt::~TableTabInterfaceTabMgmt()
         delete m_tabpreview;
         m_tabpreview = NULL;
     }
+	if (m_tabcheck)
+	{
+		delete m_tabcheck;
+		m_tabcheck = NULL;
+	}
+	
     
 }
 
@@ -105,6 +113,10 @@ TableTabInterfaceTabMgmt::OnTabSelChanging()
 
 	    case IDI_TABPREVIEW:             //..Preview Tab
 		    break;
+
+		case IDI_CHECKCONSTRAINT:       //..Check constraint Tab
+			m_tabcheck->OnTabSelChanging();
+			break;
     }	
 
     return 1;
@@ -148,6 +160,10 @@ TableTabInterfaceTabMgmt::OnTabSelChange(wyBool visible)
 	    case IDI_MANREL_16:         //ForeignKeys Tab
 		    m_tabfk->OnTabSelChange();
 			break;
+
+		case IDI_CHECKCONSTRAINT:         //Check constraint Tab
+			m_tabcheck->OnTabSelChange();
+			break;
     }
 
 	//SendMessage(m_hwnd, WM_SETREDRAW, TRUE, NULL);
@@ -174,6 +190,9 @@ TableTabInterfaceTabMgmt::Create()
 
     if(!CreateForeignKeysTab())
         return wyFalse;
+
+	if (!CreateCheckConstraintTab())
+		return wyFalse;
 
     if(!CreateAdvancedPropertiesTab())
         return wyFalse;
@@ -475,7 +494,10 @@ TableTabInterfaceTabMgmt::OnToolTipInfo(LPNMTTDISPINFO lpnmtt)
             {
                 m_tooltipstr.SetAs(_(L"Insert new FK (Alt+Ins)"));
             }
-
+			else if (image == IDI_CHECKCONSTRAINT)
+			{
+				m_tooltipstr.SetAs(_(L"Insert new check constraint"));
+			}
             break;
 
         case IDI_DELETEROW:
@@ -491,7 +513,10 @@ TableTabInterfaceTabMgmt::OnToolTipInfo(LPNMTTDISPINFO lpnmtt)
             {
                 m_tooltipstr.SetAs(_(L"Delete selected FK(s) (Alt+Del)"));
             }
-
+			else if (image == IDI_CHECKCONSTRAINT)
+			{
+				m_tooltipstr.SetAs(_(L"Delete selected check constraint"));
+			}
             break;
 
         case IDI_MOVEUP:
@@ -639,6 +664,9 @@ TableTabInterfaceTabMgmt::OnClickAddRow()
     case IDI_MANREL_16:
         m_tabfk->ProcessInsert();
         break;
+	case IDI_CHECKCONSTRAINT:
+		m_tabcheck->ProcessInsert();
+		break;
     default:
         return;
     }
@@ -659,6 +687,9 @@ TableTabInterfaceTabMgmt::OnClickDeleteRows()
     case IDI_MANREL_16:
         m_tabfk->ProcessDelete();
         break;
+	case IDI_CHECKCONSTRAINT:
+		m_tabcheck->ProcessDelete();
+		break;
     default:
         return;
     }
@@ -770,7 +801,10 @@ TableTabInterfaceTabMgmt::Resize()
     if(m_tabadvprop)
         m_tabadvprop->Resize();
     if(m_tabpreview)
-        m_tabpreview->Resize();/**/
+        m_tabpreview->Resize();
+	if (m_tabcheck)
+		m_tabcheck->Resize();
+	/**/
 }
 
 wyBool
@@ -872,12 +906,31 @@ TableTabInterfaceTabMgmt::CreateForeignKeysTab()
 }
 
 wyBool
+TableTabInterfaceTabMgmt::CreateCheckConstraintTab()
+{
+	wyBool      retval = wyTrue;
+	wyString    tabtitle;
+
+	tabtitle.SetAs(_("&4 Check Constraint"));
+
+	m_tabcheck = new TabCheck(m_hcommonwnd, this);
+
+	/// Creating check constraint-tab
+	 m_tabcheck->Create();
+
+	/// Inserting check constraint-tab into tab-management
+	InsertTab(m_hwnd, CustomTab_GetItemCount(m_hwnd), IDI_CHECKCONSTRAINT, tabtitle, (LPARAM)m_tabcheck);
+
+	return retval;
+}
+
+wyBool
 TableTabInterfaceTabMgmt::CreatePreviewTab()
 {
     wyBool      retval = wyTrue;
     wyString    tabtitle;
 
-    tabtitle.SetAs(_("&5 SQL Preview"));
+    tabtitle.SetAs(_("&6 SQL Preview"));
 
     m_tabpreview = new TabPreview(m_hcommonwnd, this);
 
@@ -896,7 +949,7 @@ TableTabInterfaceTabMgmt::CreateAdvancedPropertiesTab()
     wyBool      retval = wyTrue;
     wyString    tabtitle;
    
-	tabtitle.SetAs(_("&4 Advanced"));
+	tabtitle.SetAs(_("&5 Advanced"));
     
     m_tabadvprop = new TabAdvancedProperties(m_hcommonwnd, this);
 

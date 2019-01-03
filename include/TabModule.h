@@ -27,6 +27,7 @@
 #include "TabObject.h"
 #include "TabTableData.h"
 #include "FindAndReplace.h"
+#include "FrameWindow.h"
 
 class EditorProcs;
 class TabEditor;
@@ -37,15 +38,28 @@ class TabSchemaDesigner;
 class TableTabInterface;
 class TabObject;
 class TabHistory;
+class FrameWindow;
 
 #ifdef COMMUNITY	
 class CommunityRibbon;
 #endif
 
+enum pretabtype
+{
+	ishistory,
+	isinfo,
+	isdata
+};
+
 class TabModule
 {
 
+
 public:
+	wyInt32		m_serialnoqb;
+	wyInt32		m_serialnosd;
+	wyInt32		m_serialnoet;
+
 	
 	/// Constructor with parent window handle.
     /**
@@ -98,7 +112,10 @@ public:
 	@return wyBool wytrue if it is SUCCESS, otherwise failure.
 	@param wnd			: IN parent connection window pointer.
 	*/
-	wyBool				CreateQueryEditorTab(MDIWindow* wnd, wyInt32 pos = -1, wyBool setfocus = wyTrue);
+	wyBool				CreateQueryEditorTab(MDIWindow* wnd, wyInt32 pos = -1, wyBool setfocus = wyTrue, wyBool frompreferencetoggle=wyFalse);
+
+	wyInt32				GetMaxSequence(MDIWindow* wnd);
+	wyInt32				GetMaxSequenceQB(MDIWindow* wnd);
 
 
 	/// Creates the normal query editor
@@ -140,6 +157,15 @@ public:
 	*/
 	wyBool				CreateQueryBuilderTab(MDIWindow * wnd);
 
+	//set the sequence of each query tab
+	wyString			SetTabSequence(wyString s,MDIWindow *wnd);
+
+	//set the sequence of each sd tab
+	wyString			SetTabSequenceSD(wyString s, MDIWindow *wnd);
+
+	wyInt32				GetMaxSequenceSD(MDIWindow* wnd);
+
+	//wyInt32				GetMaxSequenceDS(MDIWindow* wnd);
 	///Function to instantiate the TabQueryBuilder
 	/*
 	@param wnd			: IN parent connection window pointer.
@@ -160,6 +186,7 @@ public:
 
 
     wyBool              IsAlterTableTabOpen(wyString& tblname, wyInt32& tabindex);
+	void				UpdateDropDownStruct(MDIWindow *wnd,wyString tabname);
 
 	///Wrapper to create Tab for SchemaDesigner
 	/**  
@@ -181,6 +208,8 @@ public:
 
 	wyBool				CreateTabDataTab(MDIWindow * wnd, wyBool isnewtab = wyFalse, wyBool setfocus = wyFalse);
 
+	//insert tab into the drop down struct
+	VOID				InsertTabIntoDropDownStruct(MDIWindow * wnd, pretabtype tabtype);
 	///Function to instantiate the TabSchemaDesigner
 	/**
 	@param wnd			: IN parent connection window pointer.
@@ -322,7 +351,12 @@ public:
 	@return void
 	*/
 	 VOID		SetTabName(wyWChar *filename, wyBool isshowext, wyBool isedited = wyFalse);
-	 VOID		SetTabRename(wyWChar *name, wyBool isedited = wyFalse);
+	 VOID		SetTabRename(wyWChar *name, wyBool isedited = wyFalse,MDIWindow *wnd=NULL, wyBool isfromrenamedlg=wyFalse);
+
+	 VOID		UpdateNameinStruc(wyInt32 itemindex,wyString newname);
+
+	 //Add table data tab in the drop down
+	 VOID		AddTabletabIntoDropDown(MDIWindow *wnd, TabTableData*       temptab ,wyBool setfocus);
 	/// Shows/Hides all the content of the editor
     /**
     @param tabindex: IN currently selected tab index.

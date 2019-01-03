@@ -2549,6 +2549,9 @@ TabForeignKeys::FillTgtColsDlgGrid(HWND hwnd)
 
     list = (List*)CustomGrid_GetItemLongValue(m_hgridfk, row, col);
 
+	//from  .ini file.
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
+
     if(list)
     {
         tgtcol = (FKTargetColumn*) list->GetFirst();
@@ -3008,6 +3011,7 @@ TabForeignKeys::HandleFKsOnFieldRename(FKStructWrapper* fkwrapobj, FieldStructWr
     ScanEntireRow(row, CHILDCOLUMNS, srccolsstr);
 
     CustomGrid_SetText(m_hgridfk, row, CHILDCOLUMNS, (wyChar*) srccolsstr.GetString());
+	SetValueToStructure(row, CHILDCOLUMNS, (wyChar*)srccolsstr.GetString());
 }
 
 void
@@ -3497,7 +3501,7 @@ TabForeignKeys::ScanEntireRow(wyInt32  currentrow, wyInt32 currentcol, wyString&
                 {
                     if(srccol1->m_pcwrapobj != srccol2->m_pcwrapobj)
                         break;
-
+					
                     srccol1 = (FKSourceColumn *) srccol1->m_next;
                     srccol2 = (FKSourceColumn *) srccol2->m_next;
                 }
@@ -4261,6 +4265,9 @@ TabForeignKeys::AddFKOnDrag(FKStructWrapper *cwrap, List *temp_listsrccols)
 
     if(!cwrap)
         return wyFalse;
+
+	//from  .ini file. 
+	m_backtick = AppendBackQuotes() == wyTrue ? "`" : "";
 
     listsrccol = new List();
 

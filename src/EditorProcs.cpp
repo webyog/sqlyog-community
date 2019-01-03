@@ -65,38 +65,39 @@ EditorProcs::Create(MDIWindow *wnd, HTREEITEM hitem, wyString *strhitemname)
 HWND
 EditorProcs::CreateAdvEdit(MDIWindow *wnd, HWND hwnd, HTREEITEM hitem, wyString *strhitemname)
 {
-    if(CreateEditor(wnd, hwnd) == NULL)
-        return NULL;
-    
+	if (CreateEditor(wnd, hwnd) == NULL)
+		return NULL;
+
 	m_hitem = hitem;
-    if(strhitemname)
-        m_hitemname.SetAs(strhitemname->GetString());
-    else
-        m_hitemname.Clear();
+	if (strhitemname) {
+		m_hitemname.SetAs(strhitemname->GetString());
+	}
+	else
+		m_hitemname.Clear();
 
-    m_dbname.SetAs(wnd->m_pcqueryobject->m_seldatabase);
+	m_dbname.SetAs(wnd->m_pcqueryobject->m_seldatabase);
 
-    m_nodeimage = GetItemImage(wnd->m_pcqueryobject->m_hwnd, TreeView_GetSelection(wnd->m_pcqueryobject->m_hwnd));
+	m_nodeimage = GetItemImage(wnd->m_pcqueryobject->m_hwnd, TreeView_GetSelection(wnd->m_pcqueryobject->m_hwnd));
 
-    switch(m_nodeimage)
-    {
+	switch (m_nodeimage)
+	{
 	case NTABLE:
-        m_nodeimage = NTABLES;
-        break;
+		m_nodeimage = NTABLES;
+		break;
 	case NVIEWSITEM:
-        m_nodeimage = NVIEWS;
+		m_nodeimage = NVIEWS;
 		break;
 	case NEVENTITEM:
-        m_nodeimage = NEVENTS;
-	    break;
+		m_nodeimage = NEVENTS;
+		break;
 	case NSPITEM:
-        m_nodeimage = NSP;
+		m_nodeimage = NSP;
 		break;
 	case NFUNCITEM:
-        m_nodeimage = NFUNC;
+		m_nodeimage = NFUNC;
 		break;
 	case NTRIGGERITEM:
-        m_nodeimage = NTRIGGER;
+		m_nodeimage = NTRIGGER;
 		break;
 	case NFOLDER:
 		break;
@@ -105,12 +106,12 @@ EditorProcs::CreateAdvEdit(MDIWindow *wnd, HWND hwnd, HTREEITEM hitem, wyString 
 	case NSP:
 	case NFUNC:
 	case NTABLES:
-    case NTRIGGER:
-			break;
+	case NTRIGGER:
+		break;
 	case NDATABASE:
-			break;
+		break;
 	}
-    
+
 	return m_hwnd;
 }
 

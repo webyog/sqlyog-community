@@ -41,10 +41,11 @@ the perfomance and a few redundant members are removed.
 #define FIXED_WIDTH		                    150
 #define SCROLLBUTTONPADDING                 1
 #define SCROLLBUTTONWIDTH                   (16 + SCROLLBUTTONPADDING)
-#define RIGHTPADDING(ISPLUSSIGN)            (ISPLUSSIGN ? SCROLLBUTTONWIDTH + 28 : SCROLLBUTTONWIDTH)
+#define RIGHTPADDING(ISPLUSSIGN)            (ISPLUSSIGN ? SCROLLBUTTONWIDTH + 50 : SCROLLBUTTONWIDTH)
 #define SCROLLTHRESHOLD                     10
 #define IDC_LEFTSCROLL                      1
 #define IDC_RIGHTSCROLL                     2 
+#define IDC_DROPDOWN	                    14
 #define IDC_PLUSSIGN                        3
 #define DRAGSCROLLTIMER                     100
 #define SCROLLTIMER                         200
@@ -1475,13 +1476,18 @@ CCustTab::OnLButtonUp(WPARAM wPram, LPARAM lParam)
                 nmctc.curpos = pnt;
                 SendTabMessage(CTCN_PLUSBUTTONCLICK, &nmctc);
             }
+			else if (i == IDC_DROPDOWN)
+			{
+				ClientToScreen(m_hwnd, &pnt);
+				nmctc.curpos = pnt;
+				SendTabMessage(CTCN_DROPDOWNBUTTONCLICK, &nmctc);
+			}
             else
             {
                 KillTimer(m_hwnd, SCROLLTIMER);
             }
         }
     }
-
     SetCursor(LoadCursor(NULL, IDC_ARROW));
     m_closebuttondowntab = -1;
     m_tabcontroldown = -1;
@@ -1558,6 +1564,9 @@ CCustTab::OnDragEnd()
             }
         }
 
+		//m_selectedtab and dropindex , find the node store in a tem and insert before and after wyInt32         m_selectedtab
+		FindAndUpdateTheDropDown(m_selectedtab, dropindex);
+
         m_tabdet[dropindex] = tabitem;
         m_selectedtab = dropindex;
     }
@@ -1583,8 +1592,193 @@ CCustTab::OnDragEnd()
     }
 
     EnsureVisible(m_selectedtab);
+
 }
 
+void
+CCustTab::FindAndUpdateTheDropDown(wyInt32 selectedtab,wyInt32 dropindex)
+{
+	wyInt32 nooftab, conncount;
+	wyBool isconndrag = wyFalse;
+
+	wyString* title1 = new wyString();
+	GetItemTitle(selectedtab, title1);
+	//find the name and type of the tab and change the location of that perticular tab only
+	ListofOpenTabs * listofopentabs = (ListofOpenTabs *)pGlobals->m_connectiontabnamelist->GetFirst();
+
+	//getting the count of open connections
+	 conncount = pGlobals->m_connectiontabnamelist->GetCount();
+	for (nooftab = 0; nooftab < conncount; nooftab++)
+	{
+		title1->LTrim();
+		title1->RTrim();
+		//int y = title1->CompareI(listofopentabs->name.GetString());//getting name of the connection
+		if (title1->CompareI(listofopentabs->name.GetString())==0)
+		{
+			isconndrag = wyTrue;
+			break;
+		}
+		listofopentabs = (ListofOpenTabs *)listofopentabs->m_next; //moving pointer to next conenction window
+	}
+	if (isconndrag)
+	{
+		UpdateDropDownNodePosforconnection(m_selectedtab, dropindex);
+	}
+	else
+	{
+		UpdateDropDownStructPosition(m_selectedtab, dropindex);
+	}
+
+}
+
+void	
+CCustTab::UpdateDropDownStructPosition(wyInt32 selectedtab, wyInt32 dropindex) 
+{
+	//to initialise the structure for drop down
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	wyBool found = wyFalse;
+	ListOfOpenQueryTabs *listofopentabs,*currnodefroseltab, *currnodefroindextab,*prevsel;
+	wyBool dragnodefound = wyFalse, selnodefound = wyFalse;
+	wyInt32 tabcount;
+
+	MDIWindow *wnd = GetActiveWin();
+	if(!wnd)
+	{
+		return;
+	}
+
+	//To search for the particular tab
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+
+	if (found) {
+		listofopentabs = (ListOfOpenQueryTabs *)p->opentab->GetFirst();
+		if(!listofopentabs)
+		{
+			return;
+		}
+		tabcount = p->opentab->GetCount();
+
+		for (int i = 0; i < tabcount; i++)
+		{
+			if (i == dropindex && dragnodefound==wyFalse) //not to change the index if dragindex is found once
+			{
+				prevsel = (ListOfOpenQueryTabs *)listofopentabs->m_prev;
+				currnodefroindextab = listofopentabs;
+				dragnodefound = wyTrue;
+			}
+			if (i == selectedtab && selnodefound==wyFalse) //not to change the index if selindex is found once
+			{
+				currnodefroseltab = listofopentabs;
+				selnodefound = wyTrue;
+			}
+			if (selnodefound && dragnodefound) //if both node are found
+			{
+				break;
+			}
+
+			listofopentabs = (ListOfOpenQueryTabs *)listofopentabs->m_next;
+
+		}
+		if (selnodefound && dragnodefound) //if both node are found
+		{
+			if (dropindex<selectedtab)
+			{
+				if (dropindex == 0)
+				{
+					p->opentab->Remove(currnodefroseltab);
+					p->opentab->InsertBefore(currnodefroindextab, currnodefroseltab);
+					
+				}
+				else
+				{
+					p->opentab->Remove(currnodefroseltab);
+					p->opentab->InsertAfter(prevsel, currnodefroseltab);
+				}
+
+			}
+			else
+			{
+				p->opentab->Remove(currnodefroseltab);
+				p->opentab->InsertAfter(currnodefroindextab, currnodefroseltab);
+			}
+
+		}
+
+	}
+
+}
+
+void
+CCustTab::UpdateDropDownNodePosforconnection(wyInt32 selectedtab, wyInt32 dropindex)
+{
+	ListofOpenTabs   *listofopentabs, *currnodefroseltab, *currnodefroindextab,*prevsel;
+	wyBool dragnodefound = wyFalse, selnodefound = wyFalse;
+	wyInt32 conncount;
+	
+	listofopentabs = (ListofOpenTabs *)pGlobals->m_connectiontabnamelist->GetFirst();
+	List *p = pGlobals->m_connectiontabnamelist;
+
+	if (!listofopentabs)
+	{
+		return;
+	}
+		
+	conncount = pGlobals->m_connectiontabnamelist->GetCount();
+
+		for (int i = 0; i < conncount; i++)
+		{
+			if (i == dropindex && dragnodefound == wyFalse) //not to change the index if dragindex is found once
+			{
+				prevsel = (ListofOpenTabs *)listofopentabs->m_prev;
+				currnodefroindextab = listofopentabs;
+				dragnodefound = wyTrue;
+			}
+			if (i == selectedtab && selnodefound == wyFalse) //not to change the index if selindex is found once
+			{
+				currnodefroseltab = listofopentabs;
+				selnodefound = wyTrue;
+			}
+			if (selnodefound && dragnodefound) //if both node are found
+			{
+				break;
+			}
+
+			listofopentabs = (ListofOpenTabs *)listofopentabs->m_next;
+
+		}
+		if (selnodefound && dragnodefound) //if both node are found
+		{
+			if(dropindex<selectedtab)
+			{
+				if (dropindex == 0)
+				{
+					p->Remove(currnodefroseltab);
+					p->InsertBefore(currnodefroindextab, currnodefroseltab);
+				}
+				else
+				{
+					p->Remove(currnodefroseltab);
+					p->InsertAfter(prevsel, currnodefroseltab);
+				}
+
+			}
+			else
+			{
+				p->Remove(currnodefroseltab);
+				p->InsertAfter(currnodefroindextab, currnodefroseltab);
+			}
+			
+		}
+
+}
 
 wyInt32  
 CCustTab::OverTabs(PPOINT pnt, wyBool* pisoverclosebutton)
@@ -1649,7 +1843,7 @@ wyInt32
 CCustTab::OverTabControls(POINT* pt)
 {
     RECT rect = {0, 0, SCROLLBUTTONWIDTH, m_size.cy + EXTRAHEIGHT - 1}, temprect;
-    wyInt32 i, left = 0, width = 8;
+    wyInt32 i, left = 0, width = 20;
 
     if(m_isscroll)
     {
@@ -1673,17 +1867,28 @@ CCustTab::OverTabControls(POINT* pt)
 
                 if(PtInRect(&rect, *pt))
                 {
-                    temprect.left = rect.left + ((rect.right - rect.left) / 2) - (width / 2) - 2;
+					temprect.left = rect.left + ((rect.right - rect.left) / 2);// -(width / 2) + 1;
                     temprect.right = temprect.left + width;
-                    temprect.top = rect.top + ((rect.bottom - rect.top) / 2) - (width / 2);
+					temprect.top = rect.top + ((rect.bottom - rect.top) / 2) -(width / 2);
                     temprect.top += (m_isfixedlength == wyTrue) ? 2 : 1;
                     temprect.bottom = temprect.top + width;
 
-                    temprect.left -= 4;
+					if (PtInRect(&temprect, *pt))
+					{
+						return IDC_DROPDOWN;
+					}
+
+					temprect.left = rect.left;// +((rect.right - rect.left) / 2);// -(width / 2) + 1;
+					temprect.right = temprect.left + width;
+					temprect.top = rect.top + ((rect.bottom - rect.top) / 2) -(width / 2);
+					temprect.top += (m_isfixedlength == wyTrue) ? 2 : 1;
+					temprect.bottom = temprect.top + width;
+
+                  /*  temprect.left -= 5;
                     temprect.top -= 4;
                     temprect.bottom += 4;
-                    temprect.right += 4;
-
+                    temprect.right -= 1;
+*/
                     if(!PtInRect(&temprect, *pt))
                     {
                         return -1;
@@ -1712,16 +1917,16 @@ CCustTab::OverTabControls(POINT* pt)
 
             if(PtInRect(&rect, *pt))
             {
-                temprect.left = rect.left + ((rect.right - rect.left) / 2) - (width / 2) - 2;
+				temprect.left = rect.left + ((rect.right - rect.left) / 2) -(width / 2) - 2;
                 temprect.right = temprect.left + width;
                 temprect.top = rect.top + ((rect.bottom - rect.top) / 2) - (width / 2);
                 temprect.top += (m_isfixedlength == wyTrue) ? 2 : 1;
                 temprect.bottom = temprect.top + width;
 
-                temprect.left -= 4;
-                temprect.top -= 4;
-                temprect.bottom += 4;
-                temprect.right += 4;
+				temprect.left -= 10;
+				temprect.top += 4;
+				temprect.bottom += 4;
+				temprect.right -= 10;
 
                 if(!PtInRect(&temprect, *pt))
                 {
@@ -2005,11 +2210,18 @@ CCustTab::SetGradient(HDC hdcmem, TRIVERTEX *vertex)
 
 /*Function is used to remove a particular tab*/
 wyBool  
-CCustTab::DeleteItem(wyInt32 tabindex, wyBool isexplicit)
+CCustTab::DeleteItem(wyInt32 tabindex, wyBool isexplicit, wyBool ispositionrequired)
 {
 	LPCTCITEMEX newa = NULL;
     wyInt32     ret, selindex;
     NMCTC       nmctc = {0};
+	ListofOpenTabs * listofopentabs;
+	wyInt64 tabcount,i;
+	wyBool deletedfromstruct = wyFalse, found = wyFalse, delfound = wyFalse,nodefound =wyFalse;
+	MDIListForDropDrown *pfound = NULL, *p;
+	ListofOpenTabs * temp;
+	MDIWindow *wnd;
+	wnd = GetActiveWin();
 
     if(tabindex >= m_tabs || tabindex < 0)
     {
@@ -2078,6 +2290,55 @@ CCustTab::DeleteItem(wyInt32 tabindex, wyBool isexplicit)
         SendTabMessage(CTCN_SELCHANGE);
         m_istabchanging = wyFalse;
     }
+
+	//Added code to Remove the tab from drop down structure 
+	if (!ispositionrequired) { //
+		//getting the head of the list containing all connection details
+		p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+		if (!p)
+		{
+			return wyTrue;
+		}
+		if (!wnd)
+		{
+			return wyTrue;
+		}
+		// To search for the particular tab
+		while (p)
+		{
+			if (wnd == p->mdi)
+			{
+				found = wyTrue;
+				pfound = p;
+				nodefound = wyTrue;
+				break;
+			}
+			p = (MDIListForDropDrown *)p->m_next;
+		}
+
+		// getting the tab which is being closed
+		if (found) {
+			listofopentabs = (ListofOpenTabs *)p->opentab->GetFirst();
+			tabcount = p->opentab->GetCount();
+
+			for (i = 0; i < tabcount; i++)
+			{
+				if (i == tabindex && !deletedfromstruct) 
+				{
+					temp = listofopentabs;
+					deletedfromstruct = wyTrue;
+					delfound = wyTrue;
+					break;
+				}
+				listofopentabs = (ListofOpenTabs *)listofopentabs->m_next;
+			}
+			if (delfound)
+			{
+				p->opentab->Remove(temp);
+				delfound = wyFalse;
+			}
+		}
+	}
 
 	return wyTrue;
 }
@@ -2818,12 +3079,13 @@ CCustTab::DrawTabs(HDC hdc)
     {
         DrawScrollButton(hdc, IDC_LEFTSCROLL, 0, &pt);
         DrawScrollButton(hdc, IDC_RIGHTSCROLL, rect.right - RIGHTPADDING(m_isplussign) + 1 + SCROLLBUTTONPADDING, &pt);
+		DrawScrollButton(hdc, IDC_DROPDOWN, rect.right - RIGHTPADDING(m_isplussign) + 1 + SCROLLBUTTONPADDING + 40, &pt);
         i = rect.right;
         hpen = (HPEN)SelectObject(hdc, m_hpenactivesep);
         //rect.bottom = m_size.cy + RECTHEIGHT + TABTOPSPACE;
         rect.top = 0;
         rect.left = rect.right - RIGHTPADDING(m_isplussign) + 1;
-        MoveToEx(hdc, rect.left, drawrect.bottom - 1, NULL);
+		MoveToEx(hdc, rect.left, drawrect.bottom - 1, NULL);
         LineTo(hdc, rect.right + 1, drawrect.bottom - 1);
 
         rect.right = SCROLLBUTTONWIDTH;
@@ -2845,6 +3107,7 @@ CCustTab::DrawTabs(HDC hdc)
     {
         DrawPlusButton(hdc, &rect, &pt);
     }
+
 }
 
 void 
@@ -2921,6 +3184,17 @@ CCustTab::DrawScrollButton(HDC hdc, wyInt32 id, wyInt32 x,PPOINT pnt)
     arrowpoints[1].y = height;
     arrowpoints[2].x = (id == IDC_RIGHTSCROLL) ? drawrect.left : drawrect.right;
     arrowpoints[2].y = height + SCALEANTIALIASING(6) - scale;
+
+	if (id == IDC_DROPDOWN)
+	{
+		height = ((drawrect.bottom - drawrect.top) / 2) + drawrect.top;
+		arrowpoints[0].x = drawrect.left - SCALEANTIALIASING(2);
+		arrowpoints[0].y = height - SCALEANTIALIASING(6) + scale;
+		arrowpoints[1].x = drawrect.right + SCALEANTIALIASING(2);
+		arrowpoints[1].y = height - SCALEANTIALIASING(6) + scale;
+		arrowpoints[2].x = (drawrect.left + drawrect.right) / 2;
+		arrowpoints[2].y = height + SCALEANTIALIASING(2) - scale;
+	}
     
     hrgnarrow = CreatePolygonRgn(arrowpoints, 3, WINDING);
     FillRgn(m_hdcantialias, hrgnarrow, hbr);
@@ -2951,7 +3225,7 @@ CCustTab::DrawPlusButton(HDC hdc, PRECT prect, PPOINT pnt)
     TRIVERTEX vertex[2];
 
     width = 8;
-    rect.left = prect->left + ((prect->right - prect->left) / 2) - (width / 2) - 2;
+    rect.left = prect->left + ((prect->right - prect->left) / 2) - (width / 2) - 10;
     rect.right = rect.left + width;
     
     rect.top = prect->top + ((prect->bottom - prect->top) / 2) - (width / 2);
@@ -3747,12 +4021,12 @@ LPARAM CustomTab_GetLongData(HWND hwnd)
 	return pct->GetLongData();
 }
 
-wyBool CustomTab_DeleteItem(HWND hwnd, wyInt32 tabcount)
+wyBool CustomTab_DeleteItem(HWND hwnd, wyInt32 tabcount,wyBool ispositionrequired)
 {
 	wyBool ret;
 
 	CCustTab	*pct = GetCustTabCtrlData(hwnd);
-	ret = pct->DeleteItem(tabcount);
+	ret = pct->DeleteItem(tabcount, wyFalse ,ispositionrequired);
     pct->OnWMSize();
     pct->PaintTab();
 

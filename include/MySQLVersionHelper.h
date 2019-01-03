@@ -151,6 +151,12 @@ wyBool IsMySQL565(Tunnel * tunnel, PMYSQL mysql);
 //mariadb 5.2 for Virtual/Persistent
 wyBool IsMariaDB52(Tunnel * tunnel, PMYSQL mysql);
 
+/// Checks the server version is greater than or equal to 10.3.9
+/**
+for virtual columns Persistent->Stored
+*/
+wyBool IsMariaDB10309(Tunnel * tunnel, PMYSQL mysql);
+
 //MySQL 5.7.0 for Virtual/Stored columns
 wyBool IsMySQL57(Tunnel * tunnel, PMYSQL mysql);
 
@@ -197,5 +203,13 @@ wyChar *quote_for_like(const wyChar *name, wyChar *buff);
 @returns void
 */
 void SetCharacterSet(Tunnel *tunnel, MYSQL * mysql, wyChar * charset);
+
+/// Checks the server version is greater than or equal to 5.0.10
+/**
+@param tunnel: IN tunnel pointer
+@param mysql: IN PMYSQL value
+@returns wyBool, wyTrue if it is SUCCESS, else wyFalse
+*/
+wyBool IsMySQL80011(Tunnel * tunnel, PMYSQL mysql);
 
 #endif

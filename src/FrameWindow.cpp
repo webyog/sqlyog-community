@@ -59,6 +59,7 @@
 #include "CCustomComboBox.h"
 #include "Http.h"
 #include "htmlayout.h"
+#include "TabCheck.h"
 
 #ifndef COMMUNITY
 #include "RegistrationApi.h"
@@ -233,6 +234,8 @@ FrameWindow::FrameWindow(HINSTANCE hinstance)
 #ifdef COMMUNITY
 	m_commribbon    =  NULL;
 #endif
+
+	m_isresizing = wyFalse;
 }
 
 
@@ -1506,6 +1509,10 @@ FrameWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 
 		break;
 
+	case WM_SIZING:
+		pcmainwin->m_isresizing = wyTrue;
+		return 1;
+
 	case WM_SIZE:
         return pcmainwin->OnWmSize(wparam);	
         
@@ -2237,6 +2244,7 @@ FrameWindow::Resize(WPARAM wparam)
 	m_connection->ResizeStatusWindow(GetHwnd(), GetStatusHwnd());
 	
 	ResizeMDIWindow();
+	m_isresizing = wyFalse;
 
 	//To paint properely while maximizing frame window
 	if(GetHwnd() && wparam == SIZE_MAXIMIZED)
@@ -2796,6 +2804,7 @@ FrameWindow::OnWmCommand(WPARAM wParam)
         if(hwndactive)
             CreateNewQueryEditor(pcquerywnd);
 		break;
+
 	
 	case ID_EDIT_SWITCHTABSTORIGHT:
 	case ACCEL_NAVIGATETABDOWN:
@@ -5015,7 +5024,7 @@ FrameWindow::OnActiveConn()
 								ID_COMMIT_ANDCHAIN, ID_COMMIT_ANDNOCHAIN, ID_COMMIT_RELEASE,
 								ID_COMMIT_NORELEASE, ID_ROLLBACK_TOSAVEPOINT, ID_ROLLBACK_ANDCHAIN,
 								ID_ROLLBACK_ANDNOCHAIN, ID_ROLLBACK_RELEASE, ID_ROLLBACK_NORELEASE, ID_SAVEPOINT_CREATESAVEPOINT,
-								ID_SAVEPOINT_RELEASESAVEPOINT};
+								ID_SAVEPOINT_RELEASESAVEPOINT };
 
 	if(pGlobals->m_conncount == 0)
 	{
@@ -5943,6 +5952,9 @@ FrameWindow::HandleCreateTrigger(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *trig
 
 	query.Sprintf("show triggers from `%s` where `Trigger` = '%s'", db.GetString(), triggernamestr.GetString());
 
+	//update the structure to add trigger name to the drop down
+	//UpdateDropDownStruct(triggernamestr.GetString());
+
 	res = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
 	if(!res && pcquerywnd->m_tunnel->mysql_affected_rows(pcquerywnd->m_mysql)== -1)
 	{
@@ -5962,11 +5974,48 @@ FrameWindow::HandleCreateTrigger(HWND hwnd, MDIWindow	*pcquerywnd, wyWChar *trig
 	return wyTrue;
 }
 
+void   
+FrameWindow::UpdateDropDownStruct(wyString tabname)
+{
+
+
+	//to initialise the structure for drop down
+	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
+	wyBool found = wyFalse;
+	//wyString tabbname = "";
+	MDIListForDropDrown *pfound = p;
+	ListOfOpenQueryTabs *newnode;
+
+	MDIWindow *wnd = GetActiveWin();
+
+	//To search for the particular tab
+	while (p)
+	{
+		if (wnd == p->mdi)
+		{
+			found = wyTrue;
+			pfound = p;
+			break;
+		}
+		p = (MDIListForDropDrown *)p->m_next;
+	}
+
+	if (found) {
+
+		//search for the particular tab which is modified
+
+		newnode = new ListOfOpenQueryTabs();
+		newnode->tabname.SetAs(tabname);
+		pfound->opentab->Insert(newnode);
+	}
+
+}
+
 void  
 FrameWindow::PrepareCreateProcedure(MDIWindow *pcquerywnd, const wyChar *procedurename, wyString &strproc)
 {
-	wyString    db;
-
+	wyString    db,spname;
+	spname.SetAs(procedurename);
 	GetSelectedDB(pcquerywnd, db);
 
 	if(db.GetLength() == 0)
@@ -5980,14 +6029,17 @@ FrameWindow::PrepareCreateProcedure(MDIWindow *pcquerywnd, const wyChar *procedu
     | COMMENT 'string'*/\r\n\tBEGIN\r\n\r\n\tEND",
     db.GetString(), procedurename, db.GetString(), procedurename);
 
+	//update the structure to add trigger name to the drop down
+	//UpdateDropDownStruct(spname.GetString());
+
 	return;
 }
 
 void  
 FrameWindow::PrepareCreateFunction(MDIWindow	*pcquerywnd, const wyChar *functionname, wyString &strfunc)
 {
-	wyString    db;
-
+	wyString    db,funname;
+	funname.SetAs(functionname);
 	GetSelectedDB(pcquerywnd, db);
 
 	if(db.GetLength() == 0)
@@ -6036,7 +6088,8 @@ FrameWindow::PrepareCreateTrigger(MDIWindow *pcquerywnd, const wyChar *triggerna
 void  
 FrameWindow::PrepareCreateView(MDIWindow *pcquerywnd, const wyChar *viewname, wyString &strview, wyString *qbquery)
 {
-	wyString		db;
+	wyString		db,vwname;
+	vwname.SetAs(viewname);
 	    
 	GetSelectedDB(pcquerywnd, db);
 
@@ -6058,13 +6111,17 @@ FrameWindow::PrepareCreateView(MDIWindow *pcquerywnd, const wyChar *viewname, wy
 	if(qbquery)
 		strview.Add(qbquery->GetString());		
 #endif
+	//update the structure to add trigger name to the drop down
+	//UpdateDropDownStruct(vwname.GetString());
 
 	return;
 }
 void  
 FrameWindow::PrepareCreateEvent(MDIWindow *pcquerywnd, const wyChar *eventname, wyString &strevent)
 {
-	wyString    db;
+	wyString    db,evname;
+
+	evname.SetAs(eventname);
 
 	GetSelectedDB(pcquerywnd, db);
 
@@ -6084,6 +6141,9 @@ FrameWindow::PrepareCreateEvent(MDIWindow *pcquerywnd, const wyChar *eventname, 
 	   ENDS CURRENT_TIMESTAMP/'YYYY-MM-DD HH:MM.SS' { + INTERVAL 1 [HOUR|MONTH|WEEK|DAY|MINUTE|...] } */\r\n\r\n\
 /*[ON COMPLETION [NOT] PRESERVE]\r\n[ENABLE | DISABLE]\r\n[COMMENT 'comment']*/\r\n\r\nDO\r\n\tBEGIN\r\n\t    (sql_statements)\r\n\tEND",		          
 	db.GetString(), eventname, db.GetString(), eventname);
+
+	//update the structure to add trigger name to the drop down
+	//UpdateDropDownStruct(evname.GetString());
 	
 	return;
 }
@@ -7441,6 +7501,13 @@ FrameWindow::ONWmMainWinNotify(HWND hwnd, LPARAM lparam, WPARAM wparam)
         case CTCN_PAINTTIMEREND:
             CustomTab_SetBufferedDrawing(wyFalse);
             break;
+
+		case CTCN_DROPDOWNBUTTONCLICK:
+			if (lpnmhdr->idFrom == IDC_CONNECTIONTAB)
+			{
+				LoadConnTabDropDownMenu(lparam);
+			}
+			break;
 	}
 
     return 1;
@@ -8099,6 +8166,9 @@ FrameWindow::OnCreateFunction(HWND hwndactive, MDIWindow *wnd)
 	//wnd->SetQueryWindowTitle();
 	
 	pGlobals->m_pcmainwin->HandleGoTo(pGlobals->m_pcmainwin->m_hwndmain, wnd, L"8"); // set focus on 8th line
+
+	//update the structure to add trigger name to the drop down
+	//UpdateDropDownStruct(functionnamestr.GetString());
 
 	free(functionname);
 
@@ -9612,6 +9682,69 @@ FrameWindow::LoadConnTabPlusMenu(LPARAM lparam)
     TrackPopupMenu(htrackmenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, lpnmctc->curpos.x, lpnmctc->curpos.y, 0, pGlobals->m_pcmainwin->m_hwndmain, NULL);
     FreeMenuOwnerDrawItem(htrackmenu);
    	VERIFY(DestroyMenu(hmenu));	
+}
+
+void
+FrameWindow::LoadConnTabDropDownMenu(LPARAM lparam)
+{
+	LPNMCTC lpnmctc;
+	wyString  tabname("");
+	wyWChar *namestring;
+	wyInt64 conncount, nooftab,id=0, cmdid=0;
+	//opentabs *head = pGlobals->m_headtolist, *p;
+	BOOL flag;
+	HMENU			hsubmenu;
+	static wyInt32 activetabid = 0;
+	ListofOpenTabs *listofopentabs;// = new ListofOpenTabs;
+
+	//Creating the menu
+	hsubmenu = ::CreatePopupMenu();
+	
+
+	//getting list of opentabs from global variable
+	listofopentabs = (ListofOpenTabs *)pGlobals->m_connectiontabnamelist->GetFirst();
+
+	lpnmctc = (LPNMCTC)lparam;
+
+	//hmenu = LoadMenu(pGlobals->m_hinstance, MAKEINTRESOURCE(IDR_CONNDROPDOWNMENU));
+	LocalizeMenu(hsubmenu);
+	//htrackmenu = GetSubMenu(hmenu, 0);
+
+	//getting the count of open connections
+	conncount = pGlobals->m_connectiontabnamelist->GetCount();
+	id = 1;
+	for (nooftab = 0; nooftab < conncount; nooftab++)
+	{
+		tabname.SetAs(listofopentabs->name.GetString());//getting name of the connection
+		namestring = tabname.GetAsWideChar();
+		flag=InsertMenu(hsubmenu, -1, MF_BYPOSITION, id, namestring);
+		id++;
+		listofopentabs = (ListofOpenTabs *)listofopentabs->m_next; //moving pointer to next conenction window
+	}
+
+	// Set menu draw property for drawing icon
+	//wyTheme::SetMenuItemOwnerDraw(hmenu);
+	activetabid = CustomTab_GetCurSel(pGlobals->m_pcmainwin->m_hwndconntab);
+	
+	SetMenuDefaultItem(hsubmenu, activetabid, TRUE);
+	
+	cmdid = TrackPopupMenu(hsubmenu, TPM_RETURNCMD | TPM_LEFTALIGN | TPM_RIGHTBUTTON, lpnmctc->curpos.x - 15, lpnmctc->curpos.y + 15, 0, pGlobals->m_pcmainwin->m_hwndconntab, NULL);
+
+	if (cmdid == 0)
+	{
+		CustomTab_SetCurSel(pGlobals->m_pcmainwin->m_hwndconntab, activetabid,1);
+		CustomTab_EnsureVisible(pGlobals->m_pcmainwin->m_hwndconntab, activetabid);
+	}
+	else
+	{
+		CustomTab_SetCurSel(pGlobals->m_pcmainwin->m_hwndconntab, cmdid-1,1);
+		CustomTab_EnsureVisible(pGlobals->m_pcmainwin->m_hwndconntab, cmdid-1);
+	}
+
+	activetabid = CustomTab_GetCurSel(pGlobals->m_pcmainwin->m_hwndconntab);
+
+	//FreeMenuOwnerDrawItem(htrackmenu);
+	VERIFY(DestroyMenu(hsubmenu));
 }
 
 void CALLBACK 

@@ -136,7 +136,7 @@ wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *qu
 		if(wnd)
 			wnd->m_execstarttime = timetaken = GetHighPrecisionTickCount(); //execution starting time
 		
-		ret  = HandleMySQLRealQuery(tunnel,*mysql, query, length, isbadforxml, 
+		ret  = HandleMySQLRealQuery(tunnel,*mysql, query, length, isbadforxml,
 			batch, isend, (bool*)stop, isread ? true : false, fksethttpimport == wyTrue ? true:false);
 				
 		tsrecon = GetHighPrecisionTickCount();

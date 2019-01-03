@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3682">啟用自動換行</string>
+	<string name="3683">在JSON查看器中格式化JSON數據</string>
+	<string name="3684">在錯誤時停止執行查詢</string>
+	<string name="3685">日期選擇器應插入服務器時間</string>
+	<string name="3686">執行導致隱式提交的查詢時提示</string>
+	<string name="3687">如果交易處於活動狀態，則在關閉會話或程序時提示</string>
+	<string name="3689">交易選項</string>
+	
+</resources>

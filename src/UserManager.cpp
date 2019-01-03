@@ -741,11 +741,20 @@ UserManager::SavePassword()
             return wyFalse;
         }
 
-        //prepare and execute the query
-        query.Sprintf("GRANT USAGE ON *.* TO '%s'@'%s' IDENTIFIED BY '%s'",
-            EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
-            EscapeMySQLString(m_host.GetString(), temphost).GetString(),
-            EscapeMySQLString(password.GetString(), temppassword).GetString());
+		if (IsMySQL80011(m_hmdi->m_tunnel, &m_hmdi->m_mysql) == wyTrue)
+		{
+			query.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED BY '%s'",
+				EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
+				EscapeMySQLString(m_host.GetString(), temphost).GetString(),
+				EscapeMySQLString(password.GetString(), temppassword).GetString());
+		}
+		else
+		{
+			query.Sprintf("GRANT USAGE ON *.* TO '%s'@'%s' IDENTIFIED BY '%s'",
+				EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
+				EscapeMySQLString(m_host.GetString(), temphost).GetString(),
+				EscapeMySQLString(password.GetString(), temppassword).GetString());
+		}
 
         if(ExecuteUMQuery(query) == wyFalse)
         {

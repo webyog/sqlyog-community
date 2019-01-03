@@ -1131,6 +1131,119 @@ if(ptr) {
 return found;
 
 }
+wyBool GetCheckConstraintValue(wyChar * currentrow, wyString * expression)
+{
+	if (currentrow == NULL)
+	{
+		return wyFalse;
+	}
+	wyChar * find = "CHECK", *findcomment = "COMMENT";
+	wyBool found = wyFalse;
+	wyChar *ptr = strstr(currentrow, find);
+	wyChar *ptrc = strstr(currentrow, findcomment);
+	wyString s1, s2,s3;
+	s1.SetAs(currentrow);
+	s2.SetAs("");
+	s3.SetAs("COMMENT");
+	wyInt32 index=0;
+	if (ptr) {
+		if (ptrc) {
+			index = ptr - currentrow + 5;
+			s2.SetAs(s1.Substr(index, 7));
+			while (s2.CompareI(s3)!=0)//(currentrow[index + 2] != 'C' && currentrow[index + 3] != 'O' && currentrow[index + 4] != 'M')
+			{
+				expression->AddSprintf("%c", currentrow[index]);
+				index++;
+				s2.SetAs(s1.Substr(index, 7));
+			}
+			found = wyTrue;
+		}
+		else
+		{
+			 index = ptr - currentrow + 5;
+
+			while (wyTrue)
+			{
+				if ((currentrow[index] == ',' && currentrow[index + 2] == ' ')|| (currentrow[index] == '\0' ))
+					break;
+
+				expression->AddSprintf("%c", currentrow[index]);
+				index++;
+			}
+			found = wyTrue;
+		}
+
+	}
+
+	return found;
+
+}
+
+wyBool GettablelevelCheckConstraintValue(wyChar * currentrow, wyString * expression)
+{
+	wyChar * find = "CHECK";
+	wyBool found = wyFalse;/*, withcomment = wyFalse, withoutcomment = wyFalse;*/
+	wyChar *ptr = strstr(currentrow, find);
+	wyInt32 index=0;
+	if (ptr) {
+		found = wyTrue;
+		index =( ptr - currentrow) + 5;
+		while (currentrow[index] != '\0')
+		{
+			/*if (currentrow[index] == '\0' && currentrow[index + 2] == ' ')
+				break;*/
+			expression->AddSprintf("%c", currentrow[index]);
+			index++;
+		}
+		const char last = expression->GetCharAt(expression->GetLength() - 1);
+		if (last == ',')
+		{
+			expression->Strip(1);
+		}
+	}
+
+	return found;
+}
+
+void
+CheckForQuotesAndReplace(wyString *name)
+{
+	wyBool flag = wyFalse;
+	const char first = name->GetCharAt(0);
+	const char last = name->GetCharAt(name->GetLength() - 1);
+
+	if (first == '`' && last == '`')
+	{
+		name->Strip(1);
+		name->Erase(0, 1);
+	}
+	return ;
+}
+
+wyBool GetCheckConstraintName(wyChar * currentrow, wyString * checkconstraintname)
+{
+	wyChar * find = "CONSTRAINT";
+	wyBool found = wyFalse;
+	wyString s1, s2(""), p;
+	wyInt32 index = 0;
+
+	s1.SetAs(currentrow);
+
+	wyChar *ptr = strstr(currentrow, find);
+	if (ptr) {
+			found = wyTrue;
+			index = ptr - currentrow + 12;
+				while (currentrow[index] != '`')
+				{
+					checkconstraintname->AddSprintf("%c", currentrow[index]);
+					index++;
+				}
+
+		}
+
+	return found;
+
+}
 wyInt32
 GetBitFieldColumnWidth(wyString &strcreate, wyInt32 fieldpos)
 {
@@ -4332,6 +4445,82 @@ RemoveDefiner(wyString &text, const wyChar* pattern, wyInt32 extra)
 
 
 }
+
+void
+RemoveBrackets(wyString &text, const wyChar* pattern)
+{
+	
+	wyInt32   ovector[30];
+	pcre           *re;
+	wyInt32         erroffset, rc = -1, sucess = 0;//, i = 0;
+	wyInt32         subject_length, text_length;
+	const char      *error;
+	wyString tempstr, strfirst,strlast;
+	wyChar * tempstr1 = NULL;
+	
+
+
+	subject_length = (wyInt32)strlen(text.GetString());
+
+	re = pcre_compile(
+		pattern,              /* the pattern */
+		PCRE_UTF8 | PCRE_CASELESS | PCRE_NEWLINE_CR,/* default options */ //match is a case insensitive 
+		&error,               /* for error message */
+		&erroffset,           /* for error offset */
+		NULL);                /* use default character tables */
+
+							  /* Compilation failed: print the error message and exit */
+
+	if (re == NULL)
+		return;
+
+	/*************************************************************************
+	* If the compilation succeeded, we call PCRE again, in order to do a     *
+	* pattern match against the subject string. This does just ONE match *
+	*************************************************************************/
+
+	rc = pcre_exec(
+		re,                   /* the compiled pattern */
+		NULL,                 /* no extra data - we didn't study the pattern */
+		text.GetString(),              /* the subject string */
+		subject_length,       /* the length of the subject */
+		0,                    /* start at offset 0 in the subject */
+		PCRE_NO_UTF8_CHECK,             /* default options */
+		ovector,              /* output vector for substring information */
+		30);           /* number of elements in the output vector */
+
+	if (re)
+		pcre_free(re);
+
+	tempstr.SetAs(text.GetString());
+	strlast.SetAs(text.GetString());
+
+	if (rc == 2)
+	{
+		tempstr1=tempstr.Substr(ovector[0], ovector[1]);
+		if (tempstr1 != NULL)
+		{
+			text.SetAs(tempstr1);
+		}
+		strlast.Erase(ovector[0], ovector[1] - ovector[0]);
+	}
+		//Add method to remove the opening and closing brackets
+		text_length = (wyInt32)strlen(strlast.GetString());
+		
+		const char first = strlast.GetCharAt(0);
+		const char last = strlast.GetCharAt(text_length - 1);
+	
+
+		if (strcmp(&first,"(")==0  && strcmp(&last, ")")==0)
+		{
+			strlast.Erase(0, 1);
+			strlast.Strip(1);
+		}
+		strfirst.AddSprintf("%s%s", text.GetString(), strlast.GetString());
+		text.SetAs(strfirst);
+
+}
+
 //void DebugLog(const char *buffer)
 //{
 //        wyWChar                directory[MAX_PATH+1];

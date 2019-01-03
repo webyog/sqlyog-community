@@ -259,7 +259,7 @@ wyInt32 WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hprevinstance,
 	
     ImageList_Destroy(pGlobals->m_hiconlist);
 	VERIFY(FreeLibrary(hrich));
-
+	
 #ifdef BLACKBOX
 	VERIFY(FreeLibrary(hblackbox));
 #endif

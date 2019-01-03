@@ -86,6 +86,8 @@ public:
 	*/
 	HWND		GetActiveWindowHandle(HWND hwndtab);
 
+	//void insert(wyString tabname, opentabs *head);
+
     /// To get tab index for active window
 	/*
 	@param hwndtab  : IN connetiontab HANDLE

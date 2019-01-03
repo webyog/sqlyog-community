@@ -67,6 +67,7 @@ public:
 	wyBool		m_isedited;
 	wyInt32		m_leftortoppercent;
 	wyString	m_content;
+
 };
 
 class TableDiag
@@ -288,6 +289,9 @@ class MDIWindow
 {
 public:
 
+	wyBool		m_isfromsave;
+	wyBool		m_isfromsaveas;
+	wyBool		m_fromdirtytab;
     /// Parametric constructor
     /**
     @param hwnd     : Window HANDLE
@@ -489,7 +493,7 @@ public:
 	/**
 	@returns wyTrue
 	*/
-	void				Resize();
+	void				Resize(wyBool iswindowresize =wyFalse);
 
     /// Ask or confirmation to save file and return the value.
     /**
@@ -759,6 +763,8 @@ public:
     */
     void                OnWmCreate(HWND hwnd);
 
+	void DelFromQueryStruct(MDIWindow *wnd);
+
     /// Handles the WM_CLOSE case
     /**
     @param hwnd         : Window HANDLE
@@ -999,7 +1005,15 @@ public:
 
     void                        LoadQueryTabPlusMenu(LPARAM lparam);
 
-    void                        PositionTabs(wyBool isupdtabledata, wyBool isupdhistory, wyBool isupdinfo);
+	void						LoadQueryTabDropDownMenu(HWND hwnd, WPARAM wparam, LPARAM lparam);
+
+    void                        PositionTabs(wyBool isupdtabledata, wyBool isupdhistory, wyBool isupdinfo,wyBool delfromdropdown=wyFalse);
+
+	//delete info, Table data and History tabs from drop down strct
+	void						DelFromDropdownStruct(MDIWindow *wnd,wyInt64 index);
+
+	void						DelFromDropdownStructInfo(MDIWindow *wnd, wyInt64 index);
+	void						DelFromDropdownStructtabledata(MDIWindow *wnd, wyInt64 index);
 
     //Function to handle Timer for keep-alive ping
 

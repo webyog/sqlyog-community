@@ -192,7 +192,7 @@ CalendarCtrl::CalendarCtrlProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
 			switch(LOWORD(wParam))
 			{
 				case IDCURRDATE:
-					pcc->OnClickNow();
+					pcc->OnClickNow(pcc->m_dv);
 					break;
 
 				case IDOK:
@@ -296,12 +296,38 @@ void
 CalendarCtrl::InitCalendarValues()
 {
 	wyInt32 iszerodateflag=0;
-	wyString temp,temp2;
+	wyString temp,temp2,settozero;
 	m_row = CustomGrid_GetCurSelRow(m_hwndparent);
 	m_col = CustomGrid_GetCurSelCol(m_hwndparent);
 	wyChar tempchar[5]= "";
 	wyString year,month,day;
 	wyChar * tempstr = NULL;
+	wyBool pretoshowserverdate;
+	MYSQL			*mysql;
+	Tunnel			*tunnel;
+	wyString	    query("select NOW()");
+	MYSQL_RES	    *res;
+	MYSQL_ROW	    row;
+	wyString		myrowstr;
+	wyInt32			qret, checkint=1;
+
+	//Get preference setting to show server date or system date
+	pretoshowserverdate = GetPreferenceForNowButton();
+
+	if (pretoshowserverdate && m_dv != NULL) {
+		tunnel = m_dv->m_data->m_pmdi->m_tunnel;
+		mysql = m_dv->m_data->m_pmdi->m_mysql;
+		qret = HandleMySQLRealQuery(tunnel, mysql, query.GetString(), query.GetLength(), wyTrue, wyTrue, wyTrue);
+
+		res = tunnel->mysql_store_result(mysql, wyTrue);
+		/* we specifically ignore empty queries */
+		if (res == NULL && mysql->affected_rows == -1)
+		{
+			return;
+		}
+		row = tunnel->mysql_fetch_row(res);
+		myrowstr.SetAs(row[0]);
+	}
 
 // Year Section
 	tempstr = m_orgdata.Substr(0,4);
@@ -313,8 +339,15 @@ CalendarCtrl::InitCalendarValues()
 			strcpy(tempchar,"1970");
 			iszerodateflag=-1;
 		}
-		else
-			strcpy(tempchar,year.GetString());	
+		else {
+				strcpy(tempchar, year.GetString());
+				settozero.Add(tempchar);
+				checkint = settozero.GetAsUInt32();
+				if (pretoshowserverdate && checkint==0)
+				{
+					strcpy(tempchar, myrowstr.Substr(0, 4));
+				}
+		}
 	}
 	else
 	{
@@ -334,8 +367,16 @@ CalendarCtrl::InitCalendarValues()
 			strcpy(tempchar,"01");
 			iszerodateflag=-1;
 		}
-		else
-			strcpy(tempchar,month.GetString());	
+		else {
+				strcpy(tempchar, month.GetString());
+				settozero.Add(tempchar);
+				checkint = -1;
+				checkint = settozero.GetAsUInt32();
+				if (pretoshowserverdate && checkint == 0)
+				{
+				strcpy(tempchar, myrowstr.Substr(5, 2));
+			}
+		}
 	}
 	else
 	{
@@ -355,46 +396,106 @@ CalendarCtrl::InitCalendarValues()
 			strcpy(tempchar,"01");
 			iszerodateflag=-1;
 		}
-		else
-			strcpy(tempchar,day.GetString());	
+		else {
+				strcpy(tempchar, day.GetString());
+				settozero.Add(tempchar);
+				checkint = -1;
+				checkint = settozero.GetAsUInt32();
+				if (pretoshowserverdate && checkint == 0)
+				{
+					strcpy(tempchar, myrowstr.Substr(8, 2));
+				}
+				
+		}
 	}
 	else
 	{
-		strcpy(tempchar,"0");
+		if (pretoshowserverdate)
+		{
+			strcpy(tempchar, myrowstr.Substr(8, 2));
+		}
+		else {
+			strcpy(tempchar, "0");
+		}
 	}
 	temp.Add(tempchar);
 	m_datetime.wDay=temp.GetAsUInt32();
 	temp.Clear();
 
 	
-	if(m_orgdata.Substr(11,2)==NULL)
+	if(m_orgdata.Substr(11,2)==NULL && !pretoshowserverdate)
 		strcpy(tempchar,"0");
-	else
-		strcpy(tempchar,m_orgdata.Substr(11,2));
+	else {
+		if (m_orgdata.Substr(11, 2) == NULL)
+		{
+			strcpy(tempchar, myrowstr.Substr(11, 2));
+		}
+		else {
+			strcpy(tempchar, m_orgdata.Substr(11, 2));
+			settozero.Add(tempchar);
+			checkint = -1;
+			checkint = settozero.GetAsUInt32();
+			if (pretoshowserverdate && checkint == 0)
+			{
+				strcpy(tempchar, myrowstr.Substr(11, 2));
+			}
+		}
+			
+	}
+
 	temp.Add(tempchar);
 	m_datetime.wHour=temp.GetAsUInt32();
 	temp.Clear();
 	
 	
-	if(m_orgdata.Substr(14,2)==NULL)
+	if(m_orgdata.Substr(14,2)==NULL && !pretoshowserverdate)
 		strcpy(tempchar,"0");
-	else
-		strcpy(tempchar,m_orgdata.Substr(14,2));
-	temp.Add(tempchar);
-
-			m_datetime.wMinute=temp.GetAsUInt32();
-			temp.Clear();
+	else {
+		if (m_orgdata.Substr(14, 2) == NULL)
+		{
+			strcpy(tempchar, myrowstr.Substr(14, 2));
+		}
+		else {
+			strcpy(tempchar, m_orgdata.Substr(14, 2));
+			settozero.Add(tempchar);
+			checkint = -1;
+			checkint = settozero.GetAsUInt32();
+			if (pretoshowserverdate && checkint == 0)
+			{
+				strcpy(tempchar, myrowstr.Substr(14, 2));
+			}
+		}
 
 			
-	if(m_orgdata.Substr(17,2)==NULL)
+	}
+	temp.Add(tempchar);
+	m_datetime.wMinute=temp.GetAsUInt32();
+	temp.Clear();
+
+			
+	if(m_orgdata.Substr(17,2)==NULL && !pretoshowserverdate)
 		strcpy(tempchar,"0");
-	else
-		strcpy(tempchar,m_orgdata.Substr(17,2));
+	else {
+		if (m_orgdata.Substr(17, 2) == NULL)
+		{
+			strcpy(tempchar, myrowstr.Substr(17, 2));
+		}
+		else {
+			strcpy(tempchar, m_orgdata.Substr(17, 2));
+			settozero.Add(tempchar);
+			checkint = -1;
+			checkint = settozero.GetAsUInt32();
+			if (pretoshowserverdate && checkint == 0)
+			{
+				strcpy(tempchar, myrowstr.Substr(17, 2));
+			}
+		}
+			
+	}
 	temp.Add(tempchar);
 	m_datetime.wSecond=temp.GetAsUInt32();
 	m_datetime.wMilliseconds=0;
-	
-	
+
 
 	/* to check if the user has entered a date containg year as zero or month as zero or day as zero*/
 
@@ -566,11 +667,55 @@ CalendarCtrl::OnClickOk()
 
 // handle NOW Click
 void 
-CalendarCtrl::OnClickNow()
+CalendarCtrl::OnClickNow(DataView *m_dv)
 {
-	wyString    temp;
 	SYSTEMTIME seltime;
-	GetLocalTime(&seltime);
+	wyBool pretoshowserverdate;
+
+	//Get preference setting to show server date or system date
+	pretoshowserverdate = GetPreferenceForNowButton();
+
+	if (pretoshowserverdate && m_dv != NULL) {
+		
+		MYSQL			*mysql;
+		Tunnel			*tunnel;
+		wyString	    query("select NOW()");
+		MYSQL_RES	    *res;
+		MYSQL_ROW	    row;
+		wyString		myrowstr;
+		wyInt32			qret;
+
+		tunnel = m_dv->m_data->m_pmdi->m_tunnel;
+		mysql = m_dv->m_data->m_pmdi->m_mysql;
+		qret = HandleMySQLRealQuery(tunnel, mysql, query.GetString(), query.GetLength(), wyTrue, wyTrue, wyTrue);
+
+		res = tunnel->mysql_store_result(mysql, wyTrue);
+		/* we specifically ignore empty queries */
+		if (res == NULL && mysql->affected_rows == -1)
+		{
+			return;
+		}
+		row = tunnel->mysql_fetch_row(res);
+		myrowstr.SetAs(row[0]);
+
+		seltime.wYear = atoi(myrowstr.Substr(0, 4));
+		seltime.wMonth = atoi(myrowstr.Substr(5, 2));
+		seltime.wDay = atoi(myrowstr.Substr(8, 2));
+		seltime.wDayOfWeek = 0;
+		seltime.wHour = atoi(myrowstr.Substr(11, 2));
+		seltime.wMinute = atoi(myrowstr.Substr(14, 2));
+		seltime.wSecond = atoi(myrowstr.Substr(17, 2));
+		seltime.wMilliseconds = 0;
+
+		// free the result space
+		m_dv->m_data->m_pmdi->m_tunnel->mysql_free_result(res);
+
+	}
+	else
+	{
+		GetLocalTime(&seltime);
+	}
+	
 	EnableWindow(GetDlgItem(m_hwnd, IDOK), TRUE);
 	MonthCal_SetCurSel(GetDlgItem(m_hwnd,IDC_MONTHCALENDAR1), &seltime);
 	DateTime_SetFormat(GetDlgItem(m_hwnd,IDC_DATETIMEPICKER1), L"HH:mm:ss");
@@ -591,6 +736,23 @@ CalendarCtrl::OnClickCancel()
     }
 
 	delete this;
+}
+
+// Get preference set by user
+wyBool
+CalendarCtrl::GetPreferenceForNowButton()
+{
+	wyWChar		*lpfileport = 0;
+	wyWChar		directory[MAX_PATH + 1] = { 0 };
+	wyInt32     ret = 0;
+	wyString	dirstr;
+
+	// Get the complete path.
+	SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+	dirstr.SetAs(directory);
+	ret = wyIni::IniGetInt(GENERALPREFA, "ShowServerDate", 1, dirstr.GetString());
+
+	return(ret) ? (wyTrue) : (wyFalse);
 }
 
 // handle LButtonDown on parent (formview)

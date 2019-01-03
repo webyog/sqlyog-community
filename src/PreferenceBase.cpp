@@ -45,6 +45,7 @@ extern PGLOBALS		pGlobals;
 #define     INFOTAB_POS_DEFAULT         1
 #define     TABLEDATA_POS_DEFAULT       1
 #define     HISTORY_POS_DEFAULT         0
+#define     SERVERDATE_DEFAULT			0
 
 //Other Preference Default Values
 #define		COLUMNWIDTH_DEFAULT				0
@@ -1213,6 +1214,9 @@ PreferenceBase::InitGeneralPrefValues()
     truncdata = wyIni::IniGetInt(GENERALPREFA, "HistoryUnderQuery", HISTORY_POS_DEFAULT, dirstr.GetString());
     SendMessage(GetDlgItem(m_hwnd, IDC_HISTORYPOSITION), BM_SETCHECK, truncdata, 0);
 
+	truncdata = wyIni::IniGetInt(GENERALPREFA, "ShowServerDate", SERVERDATE_DEFAULT, dirstr.GetString());
+	SendMessage(GetDlgItem(m_hwnd, IDC_SERVERDATE), BM_SETCHECK, truncdata, 0);
+
 	EnableBulkInsert(m_hwnd, truncdata);
 
     GetGeneralPrefSizeValues(m_hwnd);
@@ -1671,7 +1675,8 @@ PreferenceBase::SaveGeneralPreferences(HWND hwndbase, wyInt32 page)
     SetBoolProfileString(hwnd, GENERALPREF, L"TableDataUnderQuery", IDC_TABLEDATAPOSITION);
     SetBoolProfileString(hwnd, GENERALPREF, L"InfoTabUnderQuery", IDC_INFOPOSITION);
     SetBoolProfileString(hwnd, GENERALPREF, L"HistoryUnderQuery", IDC_HISTORYPOSITION);
-    
+	SetBoolProfileString(hwnd, GENERALPREF, L"ShowServerDate", IDC_SERVERDATE);
+
     return wyTrue;
 }
 
@@ -2206,6 +2211,7 @@ PreferenceBase::SetGenPrefDefaultValues(HWND hwnd)
     SendMessage(GetDlgItem(hwnd, IDC_TABLEDATAPOSITION), BM_SETCHECK, TABLEDATA_POS_DEFAULT, 0);
     SendMessage(GetDlgItem(hwnd, IDC_INFOPOSITION), BM_SETCHECK, INFOTAB_POS_DEFAULT, 0);
     SendMessage(GetDlgItem(hwnd, IDC_HISTORYPOSITION), BM_SETCHECK, HISTORY_POS_DEFAULT, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_SERVERDATE), BM_SETCHECK, SERVERDATE_DEFAULT, 0);
 
 	SetGeneralPrefDefaultSizeValues(hwnd);
 
@@ -2492,7 +2498,8 @@ PreferenceBase::SaveDefaultGeneralPreferences()
     wyIni::IniWriteInt(GENERALPREFA, "TableDataUnderQuery", TABLEDATA_POS_DEFAULT, dirstr.GetString());
     wyIni::IniWriteInt(GENERALPREFA, "InfoTabUnderQuery", INFOTAB_POS_DEFAULT, dirstr.GetString());
     wyIni::IniWriteInt(GENERALPREFA, "HistoryUnderQuery", HISTORY_POS_DEFAULT, dirstr.GetString());
-		
+	wyIni::IniWriteInt(GENERALPREFA, "ShowServerDate", SERVERDATE_DEFAULT, dirstr.GetString());
+
     return ;
 }
 

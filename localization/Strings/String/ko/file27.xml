@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3682">단어 감싸기 사용</string>
+	<string name="3683">JSON 뷰어에서 JSON 데이터 형식 지정</string>
+	<string name="3684">오류시 질의 실행 중지</string>
+	<string name="3685">날짜 선택 도구는 서버 시간을 삽입해야합니다.</string>
+	<string name="3686">암시 적 커밋을 발생시키는 쿼리가 실행될 때 알리는 메시지</string>
+	<string name="3687">트랜잭션이 활성화 된 경우 세션 또는 프로그램을 종료 할 때 확인</string>
+	<string name="3689">트랜잭션 옵션</string>
+	
+</resources>

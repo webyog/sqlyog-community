@@ -609,6 +609,7 @@ typedef struct tagsqlite
    
     
 */ 
+
 typedef struct tagGlobals
 {
 	wyInt32		m_colcount;
@@ -717,6 +718,9 @@ typedef struct tagGlobals
 	wyBool		m_sessionrestore;
 	wyString	m_database;
 	wyString	m_sessionbackup;
+	List		*m_connectiontabnamelist;
+	List		*m_mdilistfordropdown;
+
 } GLOBALS, *PGLOBALS;
 
 

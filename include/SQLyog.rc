@@ -167,21 +167,37 @@ END
 //
 
 IDB_GREEN               BITMAP                  "bitmaps\\greenback.bmp"
+
 IDB_WATERMARK           BITMAP                  "bitmaps\\Watermrk.bmp"
+
 IDB_BANNER              BITMAP                  "bitmaps\\Header.bmp"
+
 IDB_DBICON              BITMAP                  "bitmaps\\sqlyog2.bmp"
+
 IDB_ARROW               BITMAP                  "bitmaps\\sqlyog3.bmp"
+
 IDB_DSYNC1              BITMAP                  "bitmaps\\dsync1.bmp"
+
 IDB_DSYNC2              BITMAP                  "bitmaps\\dsync2.bmp"
+
 IDB_BLUE                BITMAP                  "bitmaps\\blueback.bmp"
+
 IDB_JOBBIG              BITMAP                  "bitmaps\\jobbig.bmp"
+
 IDB_JOBSMALL            BITMAP                  "bitmaps\\jobsmall.bmp"
+
 IDB_CONNECTION          BITMAP                  "bitmaps\\connection.bmp"
+
 IDB_SCHDBIG             BITMAP                  "bitmaps\\schexport_big.bmp"
+
 IDB_SCHDSMALL           BITMAP                  "bitmaps\\schdexport_small.bmp"
+
 IDB_SCHDODBC            BITMAP                  "bitmaps\\odbc_schd.bmp"
+
 IDB_COMSPLASH           BITMAP                  "bitmaps\\splash.bmp"
+
 IDB_TWILIGHT_THEME_BITMAP BITMAP                  "bitmaps\\bg.bmp"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -296,7 +312,7 @@ BEGIN
     POPUP "Open"
     BEGIN
         MENUITEM "Refresh Object Browser\tF9",  IDM_REFRESHOBJECT
-		MENUITEM "Collapse All in Object Browser\tShift+{-}", IDM_COLLAPSEOBJECT
+        MENUITEM "Collapse All in Object Browser\tShift+{-}", IDM_COLLAPSEOBJECT
         MENUITEM SEPARATOR
         MENUITEM "Create &Database...\tCtrl+D", IDM_CREATEDATABASE
         MENUITEM "New Data Searc&h\tCtrl+Shift+D", ID_DATASEARCH
@@ -484,8 +500,8 @@ BEGIN
     BEGIN
         MENUITEM "Refresh &Object Browser\tF5", IDM_REFRESHOBJECT
         MENUITEM "Change Objec&t Browser Color\t", IDM_OBCOLOR
-		MENUITEM "Collapse All in Object Browser\tShift+{-}", IDM_COLLAPSEOBJECT
-		MENUITEM SEPARATOR
+        MENUITEM "Collapse All in Object Browser\tShift+{-}", IDM_COLLAPSEOBJECT
+        MENUITEM SEPARATOR
         POPUP "Execute Quer&y"
         BEGIN
             MENUITEM "Exe&cute Query\tF9",          ACCEL_EXECUTE_MENU
@@ -831,6 +847,14 @@ BEGIN
     BEGIN
         MENUITEM "&New Connection Using Current Settings\tCtrl+N", IDM_FILE_NEWSAMECONN
         MENUITEM "New &Connection...\tCtrl+M",  IDM_FILE_NEWCONNECTION
+    END
+END
+
+IDR_CONNDROPDOWNMENU MENU
+BEGIN
+    POPUP "connection drop down list"
+    BEGIN
+        MENUITEM "  a",                         IDM_DROPDOWNLISTITEM
     END
 END
 
@@ -1645,7 +1669,7 @@ BEGIN
     EDITTEXT        IDC_MESSAGE,35,7,204,48,ES_MULTILINE | ES_READONLY | NOT WS_BORDER | WS_HSCROLL
 END
 
-IDD_PREF2 DIALOGEX 0, 0, 255, 280
+IDD_PREF2 DIALOGEX 0, 0, 255, 291
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "Editor"
 FONT 8, "MS Shell Dlg", 0, 0, 0x0
@@ -1681,8 +1705,8 @@ BEGIN
     EDITTEXT        IDC_TAB,45,232,33,13,ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "&Insert spaces",IDC_INSERTSPACES,"Button",BS_AUTORADIOBUTTON | WS_GROUP,91,230,77,8
     CONTROL         "Kee&p tabs",IDC_KEEPTABS,"Button",BS_AUTORADIOBUTTON,91,242,48,8
-    PUSHBUTTON      "Restore &All Defaults",IDC_EDITORRESTOREALL,97,262,75,15
-    PUSHBUTTON      "Restore &Tab Defaults",IDC_EDITORRESTORETAB,176,262,75,15
+    PUSHBUTTON      "Restore &All Defaults",IDC_EDITORRESTOREALL,97,273,75,15
+    PUSHBUTTON      "Restore &Tab Defaults",IDC_EDITORRESTORETAB,176,273,75,15
 END
 
 IDD_ADDFAVORITES DIALOGEX 0, 0, 310, 231
@@ -1829,7 +1853,7 @@ BEGIN
     PUSHBUTTON      "Go to &Download page",IDC_DOWNLOAD,128,43,81,12
 END
 
-IDD_PREFOTHERS DIALOGEX 0, 0, 255, 280
+IDD_PREFOTHERS DIALOGEX 0, 0, 255, 291
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "Others"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -1861,8 +1885,8 @@ BEGIN
     COMBOBOX        IDC_ICONSIZE,6,236,71,44,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     GROUPBOX        "Theme ",IDC_STATIC,85,225,163,29
     COMBOBOX        IDC_THEMECOMBO,90,236,153,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
-    PUSHBUTTON      "Restore &All Defaults",IDC_OTHERSRESTOREALL,97,262,75,15
-    PUSHBUTTON      "Restore &Tab Defaults",IDC_OTHERSRESTORETAB,176,262,75,15
+    PUSHBUTTON      "Restore &All Defaults",IDC_OTHERSRESTOREALL,97,273,75,15
+    PUSHBUTTON      "Restore &Tab Defaults",IDC_OTHERSRESTORETAB,176,273,75,15
     CONTROL         "R&estore session on startup",IDC_CONRESTORE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,74,216,9
     GROUPBOX        "Transaction Options",IDC_TRANSACTION,4,185,247,36
     CONTROL         "Prompt when query causing implicit commit is executed",IDC_PROMPTTRANSACTION,
@@ -1871,48 +1895,51 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,208,212,10
 END
 
-IDD_PREFGENERAL DIALOGEX 0, 0, 255, 280
+IDD_PREFGENERAL DIALOGEX 0, 0, 255, 305
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "General"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Generate &queries using backquote(`)",IDC_BACKQUOTES,
-                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,4,5,202,10
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,4,6,202,10
     CONTROL         "Keep &focus on SQL editor after query execution",IDC_FOCUSAFTERQUERY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,16,205,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,17,205,10
     CONTROL         "P&rompt if a tab with unsaved changes is closed",IDC_CONFIRMONTABCLOSE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,27,202,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,28,202,10
     CONTROL         "Paste object name in &editor on double-click",IDC_GETTEXTONDBCLICK,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,38,202,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,39,202,10
     CONTROL         "Enable &word wrap in SQL editor, BLOB and JSON viewer",IDC_WORDWRAP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,49,202,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,50,202,10
+    CONTROL         "F&ormat JSON data in JSON viewer",IDC_JSON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,61,202,10
     CONTROL         "Enable transaction support for &batch process",IDC_TRANSACTIONENABLE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,60,202,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,72,202,10
     CONTROL         "Force disable F&K check throughout HTTP import batch process",IDC_FKCHKIMPORT,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,71,225,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,83,225,10
     CONTROL         "&Show Warning(s) in Messages tab",IDC_SHOWWARNING,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,82,124,10
-    CONTROL         "Halt Execution of Queries on Error",IDC_HALTEXEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,93,124,10
-    GROUPBOX        "Export Options ",IDC_STATIC,4,106,247,99
-    GROUPBOX        "Max. size (in KB) for BULK INSERT statement(s)",IDC_STATIC,9,116,237,40
-    CONTROL         "&Get server default",IDC_DEF_BULK_SIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,127,112,8
-    LTEXT           "Custom si&ze",IDC_STATIC,14,141,39,10
-    EDITTEXT        IDC_BULKINSERT,58,139,37,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
-    GROUPBOX        "Chunk size (in rows) during batch exports ",IDC_STATIC,9,160,237,41
-    CONTROL         "&Don't break into chunks",IDC_SETMAXROW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,170,115,9
-    LTEXT           "&Chunk size",IDC_STATIC,14,186,36,9
-    EDITTEXT        IDC_ROW_LIMIT,58,184,37,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
-    LTEXT           "rows",IDC_STATIC,100,187,31,9
-    PUSHBUTTON      "Restore &All Defaults",IDC_GENRESTOREALL,97,262,75,15
-    PUSHBUTTON      "Restore &Tab Defaults",IDC_GENRESTORETAB,176,262,75,15
-    GROUPBOX        "Table Data/Info/History Tab positioning",IDC_STATIC,4,208,247,49
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,94,124,10
+    CONTROL         "Halt Execution of Queries on Error",IDC_HALTEXEC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,4,105,124,10
+    GROUPBOX        "Export Options ",IDC_STATIC,4,130,247,99
+    GROUPBOX        "Max. size (in KB) for BULK INSERT statement(s)",IDC_STATIC,9,140,237,40
+    CONTROL         "&Get server default",IDC_DEF_BULK_SIZE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,151,112,8
+    LTEXT           "Custom si&ze",IDC_STATIC,14,165,39,10
+    EDITTEXT        IDC_BULKINSERT,58,163,37,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    GROUPBOX        "Chunk size (in rows) during batch exports ",IDC_STATIC,9,184,237,41
+    CONTROL         "&Don't break into chunks",IDC_SETMAXROW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,195,115,9
+    LTEXT           "&Chunk size",IDC_STATIC,14,210,36,9
+    EDITTEXT        IDC_ROW_LIMIT,58,208,37,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    LTEXT           "rows",IDC_STATIC,100,211,31,9
+    PUSHBUTTON      "Restore &All Defaults",IDC_GENRESTOREALL,97,286,75,15
+    PUSHBUTTON      "Restore &Tab Defaults",IDC_GENRESTORETAB,176,286,75,15
+    GROUPBOX        "Table Data/Info/History Tab positioning",IDC_STATIC,4,232,247,49
     CONTROL         "Tab&le Data under Query tabs",IDC_TABLEDATAPOSITION,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,219,109,10
-    CONTROL         "&Info under Query tabs",IDC_INFOPOSITION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,231,88,10
-    CONTROL         "&History under Query tabs",IDC_HISTORYPOSITION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,243,97,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,243,109,10
+    CONTROL         "&Info under Query tabs",IDC_INFOPOSITION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,255,88,10
+    CONTROL         "&History under Query tabs",IDC_HISTORYPOSITION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,267,97,10
+    CONTROL         "Date picker shall set server time",IDC_SERVERDATE,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,4,116,202,10
 END
 
-IDD_PREF3 DIALOGEX 0, 0, 255, 280
+IDD_PREF3 DIALOGEX 0, 0, 255, 291
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "Power Tools"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -1933,12 +1960,13 @@ BEGIN
     CONTROL         "Sh&ow Profile",IDC_PQAPROF,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,96,136,10
     CONTROL         "Status &Variables",IDC_PQASTATUS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,120,122,10
     CONTROL         "E&XPLAIN Result",IDC_PQAEXPLAIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,136,10
-    CONTROL         "EXPLAIN EXTENDED &info",IDC_PQAEXPLAINEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,132,136,10
-    PUSHBUTTON      "Restore &All Defaults",IDC_POWERTOOLSRESTOREALL,97,262,75,15
-    PUSHBUTTON      "Restore &Tab Defaults",IDC_POWERTOOLSRESTORETAB,176,262,75,15
+    CONTROL         "EXPLAIN EXTENDED &info (if supported)",IDC_PQAEXPLAINEXT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,132,136,10
+    PUSHBUTTON      "Restore &All Defaults",IDC_POWERTOOLSRESTOREALL,97,273,75,15
+    PUSHBUTTON      "Restore &Tab Defaults",IDC_POWERTOOLSRESTORETAB,176,273,75,15
 END
 
-IDD_PREFFORMATTER DIALOGEX 0, 0, 255, 280
+IDD_PREFFORMATTER DIALOGEX 0, 0, 255, 291
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
 CAPTION "SQL Formatter"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -1952,8 +1980,8 @@ BEGIN
     LTEXT           "spaces",IDC_SPACES,79,90,26,10
     GROUPBOX        "Preview ",IDC_PRWGROUP,4,105,247,111
     CONTROL         "Custom2",IDC_FORMATTERPREVIEW,"Scintilla",0x0,8,115,239,96
-    PUSHBUTTON      "Restore &All Defaults",IDC_FORMATTERRESTOREALL,97,262,75,15
-    PUSHBUTTON      "Restore &Tab Defaults",IDC_FORMATTERRESTORETAB,176,262,75,15
+    PUSHBUTTON      "Restore &All Defaults",IDC_FORMATTERRESTOREALL,97,273,75,15
+    PUSHBUTTON      "Restore &Tab Defaults",IDC_FORMATTERRESTORETAB,176,273,75,15
     GROUPBOX        "Table and Column List Style ",IDC_STATIC,4,3,247,39
     GROUPBOX        "Linebreaks ",IDC_STATIC,4,45,247,40
 END
@@ -2096,8 +2124,11 @@ BEGIN
     COMBOBOX        IDC_FILTER_COND,96,15,50,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
     LTEXT           "&Value",IDC_STATIC,153,4,18,8
     EDITTEXT        IDC_FILTER_VALUE,152,15,83,13,ES_AUTOHSCROLL
+    LTEXT           "Show SQL Preview",IDC_SHOWSQL,6,33,72,8,SS_NOTIFY | SS_CENTERIMAGE | NOT WS_VISIBLE
+    LTEXT           "Hide SQL Preview",IDC_HIDESQL,6,33,70,8,SS_NOTIFY | SS_CENTERIMAGE | NOT WS_VISIBLE
     DEFPUSHBUTTON   "&OK",IDOK,131,33,50,14
     PUSHBUTTON      "Cance&l",IDCANCEL,185,33,50,14
+    CONTROL         "Custom",IDC_PREVIEW,"Scintilla",0x0,6,50,229,40
 END
 
 IDD_LANGUAGE DIALOGEX 0, 0, 212, 59
@@ -2281,222 +2312,441 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_MAIN                ICON                    "..\\include\\bitmaps\\mysql.ICO"
+
 IDI_SCHEMA              ICON                    "..\\include\\bitmaps\\schema.ICO"
+
 IDI_SORTDSC             ICON                    "..\\include\\bitmaps\\sortdsc.ico"
+
 IDI_INSERT              ICON                    "..\\include\\bitmaps\\insertupdate.ICO"
+
 IDI_XMLHTML             ICON                    "..\\include\\bitmaps\\exportxmlhtml.ico"
+
 IDI_NEWQUERY            ICON                    "..\\include\\bitmaps\\first.ico"
+
 IDI_SAVE                ICON                    "..\\include\\bitmaps\\save.ico"
+
 IDI_CUT                 ICON                    "..\\include\\bitmaps\\cut.ico"
+
 IDI_COPY                ICON                    "..\\include\\bitmaps\\Copy.ico"
+
 IDI_PASTE               ICON                    "..\\include\\bitmaps\\paste.ico"
+
 IDI_OPEN                ICON                    "..\\include\\bitmaps\\open.ico"
+
 IDI_EXECUTE             ICON                    "..\\include\\bitmaps\\execute.ico"
+
 IDI_REFRESH             ICON                    "..\\include\\bitmaps\\refresh.ico"
+
 IDI_ODBC                ICON                    "..\\include\\bitmaps\\odbc.ico"
+
 IDI_DIFFTOOL            ICON                    "..\\include\\bitmaps\\Sync.ico"
+
 IDI_USERS               ICON                    "..\\include\\bitmaps\\users.ICO"
+
 IDI_FLUSH               ICON                    "..\\include\\bitmaps\\flush.ico"
+
 IDI_TABLEDIAG           ICON                    "..\\include\\bitmaps\\tablediag.ico"
+
 IDI_PROCESS             ICON                    "..\\include\\bitmaps\\process.ico"
+
 IDI_CHECK               ICON                    "..\\include\\bitmaps\\check.ICO"
+
 IDI_EXECUTEFORUPD       ICON                    "..\\include\\bitmaps\\execforupd.ico"
+
 IDI_EXECUTEALL          ICON                    "..\\include\\bitmaps\\execall.ico"
+
 IDI_SMALL               ICON                    "..\\include\\bitmaps\\smallico.ICO"
+
 IDI_COLUMN              ICON                    "..\\include\\bitmaps\\column.ico"
+
 IDI_DROPTABLE           ICON                    "..\\include\\bitmaps\\drop_table.ico"
+
 IDI_DROPCOLUMN          ICON                    "..\\include\\bitmaps\\dropcolumn.ico"
+
 IDI_INDEX               ICON                    "..\\include\\bitmaps\\index.ico"
+
 IDI_MANINDEX            ICON                    "..\\include\\bitmaps\\manage_index.ico"
+
 IDI_QUERYRECORD         ICON                    "..\\include\\bitmaps\\result_set.ico"
+
 IDI_TABLE               ICON                    "..\\include\\bitmaps\\table.ico"
+
 IDI_TILE                ICON                    "..\\include\\bitmaps\\tile.ico"
+
 IDI_ALTERTABLE          ICON                    "..\\include\\bitmaps\\altertable.ico"
+
 IDI_COPYDATABASE        ICON                    "..\\include\\bitmaps\\copy_data.ico"
+
 IDI_EXPORTDATA          ICON                    "..\\include\\bitmaps\\export_data.ico"
+
 IDI_HELP                ICON                    "..\\include\\bitmaps\\help.ICO"
+
 IDI_IMPORTDATA          ICON                    "..\\include\\bitmaps\\import_data.ico"
+
 IDI_HISTORY             ICON                    "..\\include\\bitmaps\\history.ico"
+
 IDI_DATABASE            ICON                    "..\\include\\bitmaps\\database.ico"
+
 IDI_KEYSHORT            ICON                    "..\\include\\bitmaps\\keyboard.ICO"
+
 IDI_NEWDATABASE         ICON                    "..\\include\\bitmaps\\new_data.ico"
+
 IDI_TABLEINDEX          ICON                    "..\\include\\bitmaps\\object.ico"
+
 IDI_REDOSM              ICON                    "..\\include\\bitmaps\\redo.ico"
+
 IDI_UNDOSM              ICON                    "..\\include\\bitmaps\\undo.ico"
+
 IDI_SERVER              ICON                    "..\\include\\bitmaps\\serv.ico"
+
 IDI_REPLACE             ICON                    "..\\include\\bitmaps\\replace.ico"
+
 IDI_FIND                ICON                    "..\\include\\bitmaps\\search.ico"
+
 IDI_EXECBATCH           ICON                    "..\\include\\bitmaps\\execbatch.ico"
+
 IDI_COPYTABLE           ICON                    "..\\include\\bitmaps\\copytable.ICO"
+
 IDI_REORDER             ICON                    "..\\include\\bitmaps\\reordercolumns.ico"
+
 IDI_MANREL              ICON                    "..\\include\\bitmaps\\manrel.ico"
+
 IDI_QUERYMESSAGE        ICON                    "..\\include\\bitmaps\\ico00002.ico"
+
 IDI_RESTORE             ICON                    "..\\include\\bitmaps\\restore_data.ico"
+
 IDI_BACKUP              ICON                    "..\\include\\bitmaps\\backup.ico"
+
 IDI_CREATETABLE         ICON                    "..\\include\\bitmaps\\createtableindata.ico"
+
 IDI_TEMPLATE            ICON                    "..\\include\\bitmaps\\templatesm.ico"
+
 IDI_DISCON              ICON                    "..\\include\\bitmaps\\discon.ICO"
+
 IDI_DISCONALL           ICON                    "..\\include\\bitmaps\\disconall.ICO"
+
 IDI_CONNECT             ICON                    "..\\include\\bitmaps\\connect.ico"
+
 IDI_CASCADE             ICON                    "..\\include\\bitmaps\\cascade.ico"
+
 IDI_JOBMANAGER          ICON                    "..\\include\\bitmaps\\jobmanager.ico"
+
 IDI_NOTIFICATION        ICON                    "..\\include\\bitmaps\\notification.ico"
+
 IDI_EDITUSER            ICON                    "..\\include\\bitmaps\\editusers.ico"
+
 IDI_ADDUSER             ICON                    "..\\include\\bitmaps\\addusers.ico"
+
 IDI_CSV                 ICON                    "..\\include\\bitmaps\\csv.ico"
+
 IDI_EMPTYDB             ICON                    "..\\include\\bitmaps\\emptydata.ico"
+
 IDI_RENAME              ICON                    "..\\include\\bitmaps\\rename.ico"
+
 IDI_TABLEPROP           ICON                    "..\\include\\bitmaps\\tableprop.ico"
+
 IDI_TRUNCDB             ICON                    "..\\include\\bitmaps\\truncatedata.ico"
+
 IDI_VIEWDATA            ICON                    "..\\include\\bitmaps\\viewdata.ico"
+
 IDI_SORTASC             ICON                    "..\\include\\bitmaps\\sortasc.ico"
+
 IDI_DBSYNC              ICON                    "..\\include\\bitmaps\\dbsync.ico"
+
 IDI_COMMIT              ICON                    "..\\include\\bitmaps\\commit.ico"
+
 IDI_ROLLBACK            ICON                    "..\\include\\bitmaps\\rollback.ico"
+
 IDI_START_TRANSACTION   ICON                    "..\\include\\bitmaps\\start_transaction.ico"
+
 IDI_PREF                ICON                    "..\\include\\bitmaps\\preferences.ico"
+
 IDI_REORDERCOL          ICON                    "..\\include\\bitmaps\\reordercol.ico"
+
 IDI_EMPTYTABLE          ICON                    "..\\include\\bitmaps\\emptytable.ico"
+
 IDI_DROPDB              ICON                    "..\\include\\bitmaps\\dropdatabase.ico"
+
 IDI_MYSQL               ICON                    "..\\include\\bitmaps\\MySQL.ico"
+
 IDI_TUNNEL              ICON                    "..\\include\\bitmaps\\tunnel.ico"
+
 IDI_SERVERGROUP         ICON                    "..\\include\\bitmaps\\GroupofServers.ico"
+
 IDI_STOP                ICON                    "bitmaps\\Stop.ico"
+
 IDI_EXPORTRESULTCSV     ICON                    "bitmaps\\export_csv.ico"
+
 IDI_EXPORTSELCSV        ICON                    "bitmaps\\export_sel_csv.ico"
+
 IDI_EXPORTSELCELLCSV    ICON                    "bitmaps\\export_sel_cell_csv.ico"
+
 IDI_RESULTCANCEL        ICON                    "bitmaps\\result_cancel.ico"
+
 IDI_RESULTDELETE        ICON                    "bitmaps\\result_delete.ico"
+
 IDI_RESULTINSERT        ICON                    "bitmaps\\result_insert.ico"
+
 IDI_RESULTSAVE          ICON                    "bitmaps\\result_save.ico"
+
 IDI_SCHDEXPORT          ICON                    "bitmaps\\schdexport.ico"
+
 IDI_EMAILMANAGER        ICON                    "bitmaps\\emailmanager.ico"
+
 IDI_VIEW                ICON                    "..\\include\\bitmaps\\view.ico"
+
 IDI_CREATEVIEW          ICON                    "..\\include\\bitmaps\\viewnew.ico"
+
 IDI_ALTERVIEW           ICON                    "..\\include\\bitmaps\\alterview.ico"
+
 IDI_DROPVIEW            ICON                    "..\\include\\bitmaps\\deleteview.ico"
+
 IDI_PROCEDURE           ICON                    "..\\include\\bitmaps\\sp.ico"
+
 IDI_CREATEPROCEDURE     ICON                    "..\\include\\bitmaps\\addsp.ico"
+
 IDI_ALTERPROCEDURE      ICON                    "..\\include\\bitmaps\\altersp.ico"
+
 IDI_DROPPROCEDURE       ICON                    "..\\include\\bitmaps\\deletesp.ico"
+
 IDI_CREATETRIGGER       ICON                    "..\\include\\bitmaps\\addtrigger.ico"
+
 IDI_ALTERTRIGGER        ICON                    "..\\include\\bitmaps\\altertrigger.ico"
+
 IDI_DROPTRIGGER         ICON                    "..\\include\\bitmaps\\deletetrigger.ico"
+
 IDI_CREATEFUNCTION      ICON                    "..\\include\\bitmaps\\addfunction.ico"
+
 IDI_ALTERFUNCTION       ICON                    "..\\include\\bitmaps\\alterfunction.ico"
+
 IDI_DROPFUNCTION        ICON                    "..\\include\\bitmaps\\deletefunction.ico"
+
 IDI_QUERY               ICON                    "bitmaps\\query.ico"
+
 IDI_FAVORITES           ICON                    "bitmaps\\favorites.ico"
+
 IDI_ORGANIZEFAV         ICON                    "bitmaps\\organize_favorites.ico"
+
 IDI_ADDTOFAV            ICON                    "bitmaps\\addtofavorite.ico"
+
 IDI_SQL                 ICON                    "bitmaps\\sql_file.ico"
+
 IDI_QUERYBUILDER        ICON                    "bitmaps\\querybuilder.ico"
+
 IDI_SCHEMADESIGNER      ICON                    "bitmaps\\schemadesigner.ico"
+
 IDI_PKEY                ICON                    "bitmaps\\pkey.ico"
+
 IDI_NEXT                ICON                    "bitmaps\\nextbutton.ico"
+
 IDI_PREVIOUS            ICON                    "bitmaps\\previousbutton.ico"
+
 IDI_CLOSETABLE          ICON                    "bitmaps\\closetable.ICO"
+
 IDI_SDTABLEVIEW         ICON                    "bitmaps\\tableviews.ico"
+
 IDI_EXPORTASIMG         ICON                    "bitmaps\\Exportasimg.ico"
+
 IDI_SDPRINT             ICON                    "bitmaps\\Print.ico"
+
 IDI_SDZOOMIN            ICON                    "bitmaps\\zoomin.ico"
+
 IDI_SDZOOMOUT           ICON                    "bitmaps\\zoomout.ico"
+
 IDI_ALTEREVENT          ICON                    "bitmaps\\alterevent.ico"
+
 IDI_DROPEVENT           ICON                    "bitmaps\\dropevent.ico"
+
 IDI_RENAMEEVENT         ICON                    "bitmaps\\renameevent.ico"
+
 IDI_EVENT               ICON                    "bitmaps\\event.ico"
+
 IDI_ADDTABLES           ICON                    "bitmaps\\Addtables.ico"
+
 IDI_ALTERDB             ICON                    "bitmaps\\alterdb.ico"
+
 IDI_CHECKICON           ICON                    "bitmaps\\check16.ico"
+
 IDI_UNCHECKICON         ICON                    "bitmaps\\uncheck16.ico"
+
 IDI_LINEICON            ICON                    "bitmaps\\line16.ico"
+
 IDI_ENTMENU             ICON                    "bitmaps\\entmenu.ico"
+
 IDI_RESETFILTER         ICON                    "bitmaps\\resetfilter.ico"
+
 IDI_QADONTALERT         ICON                    "bitmaps\\qa_noalert.ico"
+
 IDI_QAALERT             ICON                    "bitmaps\\qa_alert.ico"
+
 IDI_FORMATQUERY         ICON                    "bitmaps\\formatall.ico"
+
 IDI_ABOUTICO            ICON                    "bitmaps\\about.ico"
+
 IDI_EXITICO             ICON                    "bitmaps\\exit.ico"
+
 IDI_REFRESHCANVAS       ICON                    "bitmaps\\refreshcanvas.ico"
+
 IDI_CLOSETAB            ICON                    "bitmaps\\closetab.ico"
+
 IDI_FAVREFRESH          ICON                    "bitmaps\\refreshfav.ico"
+
 IDI_INDEXDROP           ICON                    "bitmaps\\indexdelete.ico"
+
 IDI_INDEXCREATE         ICON                    "bitmaps\\indexcreate.ico"
+
 IDI_INDEXEDIT           ICON                    "bitmaps\\indexedit.ico"
+
 IDI_RENAMETRIGGER       ICON                    "bitmaps\\renametrigger.ico"
+
 IDI_RENAMEVIEW          ICON                    "bitmaps\\renameview.ico"
+
 IDI_EXPORTVIEW          ICON                    "bitmaps\\expotview.ico"
+
 IDI_COPYQUERYTOCLIP     ICON                    "bitmaps\\copyquerytoclip.ico"
+
 IDI_COPYQUERYTOCURTAB   ICON                    "bitmaps\\copyquerytocurrenttab.ico"
+
 IDI_COPYQUERYTONEWTAB   ICON                    "bitmaps\\copyquerytonewtab.ico"
+
 IDI_FOLDER              ICON                    "bitmaps\\foldericon.ico"
+
 IDI_CREATEEVENT         ICON                    "bitmaps\\eventnew.ico"
+
 IDI_TRIGGER             ICON                    "bitmaps\\trigger.ico"
+
 IDI_FUNCTION            ICON                    "bitmaps\\function.ico"
+
 IDI_CONNECT_16          ICON                    "bitmaps\\connect_16.ico"
+
 IDI_COPYDATABASE_16     ICON                    "bitmaps\\copy_data_16.ico"
+
 IDI_DBSYNC_16           ICON                    "bitmaps\\dbsync_16.ico"
+
 IDI_COMMIT_16           ICON                    "bitmaps\\commit_16.ico"
+
 IDI_ROLLBACK_16         ICON                    "bitmaps\\rollback_16.ico"
+
 IDI_START_TRANSACTION_16 ICON                    "bitmaps\\start_transaction_16.ico"
+
 IDI_EXECUTEALL_16       ICON                    "bitmaps\\execall_16.ico"
+
 IDI_EXECUTE_16          ICON                    "bitmaps\\execute_16.ico"
+
 IDI_EXECUTEFORUPD_16    ICON                    "bitmaps\\execforupd_16.ico"
+
 IDI_EXPORTDATA_16       ICON                    "bitmaps\\export_data_16.ico"
+
 IDI_QUERYBUILDER_16     ICON                    "bitmaps\\querybuilder_16.ico"
+
 IDI_QUERY_16            ICON                    "bitmaps\\query_16.ico"
+
 IDI_RENAMEQUERY_16      ICON                    "bitmaps\\renamequery_16.ico"
+
 IDI_SAVESESSION_16      ICON                    "bitmaps\\session_save_all.ico"
+
 IDI_OPENSESSION_16      ICON                    "bitmaps\\session_open.ico"
+
 IDI_CLOSESESSION_16     ICON                    "bitmaps\\session_close.ico"
+
 IDI_SCHEMADESIGNER_16   ICON                    "bitmaps\\schemadesigner_16.ico"
+
 IDI_SCHDEXPORT_16       ICON                    "bitmaps\\schdexport_16.ico"
+
 IDI_NOTIFICATION_16     ICON                    "bitmaps\\notification_16.ico"
+
 IDI_REFRESH_16          ICON                    "bitmaps\\refresh_16.ico"
+
 IDI_MANREL_16           ICON                    "bitmaps\\manrel_16.ico"
+
 IDI_MANINDEX_16         ICON                    "bitmaps\\manage_index_16.ico"
+
 IDI_EXECBATCH_16        ICON                    "bitmaps\\execbatch_16.ico"
+
 IDI_XMLHTML_16          ICON                    "bitmaps\\exportxmlhtml_16.ico"
+
 IDI_ODBC_16             ICON                    "..\\include\\bitmaps\\icon9.ico"
+
 IDI_DIFFTOOL_16         ICON                    "bitmaps\\Sync_16.ico"
+
 IDI_PRIMARYKEY          ICON                    "bitmaps\\primary_key_16.ico"
+
 IDI_OPENINNEWTAB        ICON                    "bitmaps\\open_in_new_tab.ico"
+
 IDI_USERMANAGER         ICON                    "bitmaps\\usermanager.ICO"
+
 IDI_SAVEAS              ICON                    "bitmaps\\saveas.ico"
+
 IDI_CONNCOLOR           ICON                    "bitmaps\\colorpicker.ico"
+
 IDI_RENAMEUSER          ICON                    "bitmaps\\renameuser.ico"
+
 IDI_USER_16             ICON                    "bitmaps\\user16.ico"
+
 IDI_USER_GLOBALPRIV     ICON                    "bitmaps\\user-globe.ico"
+
 IDI_USER_OBJECTPRIV     ICON                    "bitmaps\\user-objects.ico"
+
 IDI_USER_ADD            ICON                    "bitmaps\\user_add.ico"
+
 IDI_USER_WRITE          ICON                    "bitmaps\\user_write.ico"
+
 IDI_DATAVIEWTYPE        ICON                    "bitmaps\\dataview.ico"
+
 IDI_DATASEARCH          ICON                    "bitmaps\\datasearch.ico"
+
 IDI_MOVEDOWN            ICON                    "bitmaps\\Down.ico"
+
 IDI_MOVEUP              ICON                    "bitmaps\\Up.ico"
+
 IDI_ADDROW              ICON                    "bitmaps\\add.ico"
+
 IDI_DELETEROW           ICON                    "bitmaps\\delete.ico"
+
 IDI_TABLEOPTIONS        ICON                    "bitmaps\\TableOptions.ico"
+
 IDI_TABPREVIEW          ICON                    "bitmaps\\TabPreview.ico"
+
 IDI_CIRCLE8             ICON                    "bitmaps\\circle8.ico"
+
 IDI_CIRCLE1             ICON                    "bitmaps\\circle1.ico"
+
 IDI_CIRCLE2             ICON                    "bitmaps\\circle2.ico"
+
 IDI_CIRCLE3             ICON                    "bitmaps\\circle3.ico"
+
 IDI_CIRCLE4             ICON                    "bitmaps\\circle4.ico"
+
 IDI_CIRCLE5             ICON                    "bitmaps\\circle5.ico"
+
 IDI_CIRCLE6             ICON                    "bitmaps\\circle6.ico"
+
 IDI_CIRCLE7             ICON                    "bitmaps\\circle7.ico"
+
 IDI_TABLEREFRESH        ICON                    "bitmaps\\tablerefresh.ico"
+
 IDI_DATAGRID            ICON                    "bitmaps\\grid_view.ico"
+
 IDI_FORMICON            ICON                    "bitmaps\\form_view.ico"
+
 IDI_TEXTVIEW            ICON                    "bitmaps\\text_view.ico"
+
 IDI_DUPLICATEROW        ICON                    "bitmaps\\duplicaterow.ico"
+
 IDI_FILTER              ICON                    "bitmaps\\filter.ico"
+
 IDI_REMOVE_DB_FILTER    ICON                    "bitmaps\\remove_db_filter.ico"
+
 IDI_TABLEEXPORT         ICON                    "bitmaps\\result_export.ico"
+
 IDI_REMOVE_FILTER       ICON                    "bitmaps\\remove_filter.ico"
+
 IDI_OVERLAYFILTER       ICON                    "bitmaps\\overlay_filter.ico"
+
 IDI_VDD                 ICON                    "bitmaps\\compare-data.ico"
+
+IDI_CHECKCONSTRAINT     ICON                    "bitmaps\\check_constraints.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -2734,6 +2984,7 @@ BEGIN
 
     IDD_PREFGENERAL, DIALOG
     BEGIN
+        BOTTOMMARGIN, 291
     END
 
     IDD_PREF3, DIALOG
@@ -2908,22 +3159,39 @@ END
 //
 
 PK                      PNG                     "bitmaps\\primary_key_16.png"
+
 SERVER                  PNG                     "bitmaps\\serv.png"
+
 TABLE                   PNG                     "bitmaps\\table.png"
+
 DATABASE                PNG                     "bitmaps\\database.png"
+
 INDEX                   PNG                     "bitmaps\\index.png"
+
 SP                      PNG                     "bitmaps\\sp.png"
+
 VIEW                    PNG                     "bitmaps\\view.png"
+
 FUNCTION                PNG                     "bitmaps\\function.png"
+
 TRIGGER                 PNG                     "bitmaps\\trigger.png"
+
 EVENT                   PNG                     "bitmaps\\event.png"
+
 CALENDAR                PNG                     "bitmaps\\calendar.png"
+
 DOWNARROW               PNG                     "bitmaps\\downarrow.png"
+
 REVERTSELECTED          PNG                     "bitmaps\\revert_selected.png"
+
 APPLY                   PNG                     "bitmaps\\apply.png"
+
 APPLYALL                PNG                     "bitmaps\\apply_all.png"
+
 REVERTALL               PNG                     "bitmaps\\revert_all.png"
+
 STOP                    PNG                     "bitmaps\\stop.png"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -2932,13 +3200,16 @@ STOP                    PNG                     "bitmaps\\stop.png"
 
 IDR_README              README                  "readme.txt"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // THEME
 //
 
 IDR_THEME_TWILIGHT      THEME                   "twilight_theme.xml"
+
 IDR_THEME_FLAT          THEME                   "Flat.xml"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -2946,6 +3217,7 @@ IDR_THEME_FLAT          THEME                   "Flat.xml"
 //
 
 PROGRESS                GIF                     "bitmaps\\progress.gif"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -2972,13 +3244,17 @@ END
 STRINGTABLE
 BEGIN
     IDM_REFRESHOBJECT       " Refresh the object browser"
-	IDM_COLLAPSEOBJECT		" Collapses all expanded objects in object browser"
     ID_OBJECT_DROPDATABASE  " Drop the currently selected database"
     ID_OBJECT_DROPTABLE     " Drop the currently selected table"
     ID_OBJECT_INSERTSTMT    " Create a valid SQL INSERT statement for the table"
     IDM_EDIT_MANPF          " Manage personal folder"
     ID_POWERTOOLS_SCHEDULEEXPORT " Scheduled backup"
     ACCEL_EXECUTE           " Execute query"
+END
+
+STRINGTABLE
+BEGIN
+    IDM_COLLAPSEOBJECT      " Collapses all expanded objects in object browser"
 END
 
 STRINGTABLE

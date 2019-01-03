@@ -285,6 +285,16 @@ IsMySQL5010(Tunnel * tunnel, PMYSQL mysql)
 	else
 		return wyFalse;
 }
+wyBool
+IsMySQL80011(Tunnel * tunnel, PMYSQL mysql)
+{
+	wyUInt32 me = mysql_get_server_version(*mysql);/* Only available from MySQLv8.1*/
+
+	if (me >= 80011)
+		return wyTrue;
+	else
+		return wyFalse;
+}
 	
 wyBool
 IsMySQL5017(Tunnel * tunnel, PMYSQL mysql)
@@ -476,6 +486,19 @@ wyBool IsMariaDB52(Tunnel * tunnel, PMYSQL mysql)
 	const char *dbString = mysql_get_server_info(*mysql);
 	
 	if(me >= 50002 && strstr(dbString, "MariaDB"))
+		return wyTrue;
+	else
+		return wyFalse;
+
+
+}
+
+wyBool IsMariaDB10309(Tunnel * tunnel, PMYSQL mysql)
+{
+	long me = mysql_get_server_version(*mysql);
+	const char *dbString = mysql_get_server_info(*mysql);
+
+	if (me >= 10309 && strstr(dbString, "MariaDB"))
 		return wyTrue;
 	else
 		return wyFalse;

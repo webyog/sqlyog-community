@@ -315,7 +315,7 @@ TabAdvancedProperties::CreateOtherWindows(HWND hwndparent)
         if(!m_hlastfocusedwnd)
             m_hlastfocusedwnd = m_hcmbdelaykeywrite;
     }
-    
+ 
     if(m_ptabmgmt->m_tabinterfaceptr->m_open_in_dialog)
     {
         m_wporigautoincr = (WNDPROC)SetWindowLongPtr(m_heditautoincr, GWLP_WNDPROC, (LONG_PTR)TabAdvancedProperties::SysKeyDownWndProc);
@@ -338,6 +338,7 @@ TabAdvancedProperties::CreateOtherWindows(HWND hwndparent)
 
         m_wporigdelaykey = (WNDPROC)SetWindowLongPtr(m_hcmbdelaykeywrite, GWLP_WNDPROC, (LONG_PTR)TabAdvancedProperties::SysKeyDownWndProc);
         SetWindowLongPtr(m_hcmbdelaykeywrite, GWLP_USERDATA, (LONG_PTR)this);
+		
     }
     
     m_hwndscroll =  CreateWindowEx( 
@@ -454,6 +455,7 @@ TabAdvancedProperties::FetchInitValues()
     wyString    tempstr;
     
     myres = m_ptabmgmt->m_tabinterfaceptr->m_myrestablestatus;
+
     if(!myres)
         return wyFalse;
 
@@ -462,7 +464,7 @@ TabAdvancedProperties::FetchInitValues()
     commentindex = GetFieldIndex(myres, "comment", m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
 
 	myrow = m_mdiwnd->m_tunnel->mysql_fetch_row(myres);
-	
+
 	if(!myrow || !myrow[0] || !myrow[1])
 	{	
         yog_message(m_hwnd, _(L"Could not read data for the table!"), pGlobals->m_appname.GetAsWideChar(), 
@@ -628,7 +630,7 @@ TabAdvancedProperties::FillInitValues(wyBool iscancelchanges)
     SendMessage(m_heditmaxrows, WM_SETTEXT, 0, (LPARAM) m_origmaxrows.GetAsWideChar());
     SendMessage(m_heditminrows, WM_SETTEXT, 0, (LPARAM) m_origminrows.GetAsWideChar());
     SendMessage(m_heditavgrowlen, WM_SETTEXT, 0, (LPARAM) m_origavgrow.GetAsWideChar());
-    
+  
     m_disableenchange = wyFalse;
 
     return wyTrue;
@@ -1205,7 +1207,7 @@ TabAdvancedProperties::ScrollWindows(wyBool isdown, wyInt32 pos)
 	HWND   hwndarr[25] = {m_hwnd, m_hwndscroll, m_hstaticcomment, m_heditcomment, m_hstatautoincr, m_heditautoincr,
                           m_hstatavgrowlen, m_heditavgrowlen, m_hstatmaxrows, m_heditmaxrows,
                           m_hstatminrows, m_heditminrows, m_hstatrowformat, m_hcmbrowformat,
-						  m_hstatdelaykeywrite, m_hcmbdelaykeywrite, m_hstatchecksum,  m_hcmbchecksum,  
+						  m_hstatdelaykeywrite, m_hcmbdelaykeywrite, m_hstatchecksum,  m_hcmbchecksum,
                           m_ptabmgmt->m_tabinterfaceptr->m_hbtnsave, m_ptabmgmt->m_tabinterfaceptr->m_hbtncancelchanges,
                           NULL};
 	wyInt32 temppos = 0;

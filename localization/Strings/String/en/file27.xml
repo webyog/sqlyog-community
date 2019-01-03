@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="3682">Enable word wrap</string>
+	<string name="3683">Format JSON data in JSON viewer</string>
+	<string name="3684">Halt Execution of Queries on Error</string>
+	<string name="3685">Date picker shall insert server time</string>
+	<string name="3686">Prompt when query causing implicit commit is executed</string>
+	<string name="3687">Prompt when closing session or program if transaction is active</string>
+	<string name="3689">Transaction options</string>
+	
+</resources>

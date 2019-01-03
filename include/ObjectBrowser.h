@@ -1551,6 +1551,14 @@ public:
     */
 			wyBool			GetSelectStmt(wyString &select, wyString &alterQuery , wyWChar new_table[]);
 
+			/// Function prepares the select stmt and stores it in the buffer passed as parameter.
+			/**
+			@param select : Selected items.
+			*/
+			wyBool			GetCheckConstraints(wyString &select, wyString &alterQuery, wyWChar new_table[]);
+
+			
+
 	/// Function copies the initial field stmt. into the buffer.
 	/**
 	@param query	: Query.

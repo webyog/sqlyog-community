@@ -1931,7 +1931,7 @@ CCopyTable::DoCopy()
 {
 	wyInt32		fieldcount, query_for_virtuality_length, isintransaction = 1;;
 	wyBool		relation, isssel, isindex, success, ret;
-	wyString    query, keys, select, query_for_virtuality;
+	wyString    query, keys, select, query_for_virtuality, constraintstmt;
 	MYSQL_RES	*res;
     wyWChar     newtable[SIZE_512]={0};
     wyChar      *tbuff;
@@ -1996,6 +1996,20 @@ CCopyTable::DoCopy()
 			query.Add(",");
 		query.AddSprintf("%s", keys.GetString());
 	}
+
+	//ret = GetCheckConstraints(select, constraintstmt, newtable);
+
+	//if (!ret)
+	//{
+	//	SetCursor(LoadCursor(NULL, IDC_ARROW));
+	//	return wyFalse;
+	//}
+	//if (constraintstmt.GetLength())
+	//{
+	//	constraintstmt.Strip(1);
+	//	query.Strip(1);
+	//	query.AddSprintf(",%s)", constraintstmt.GetString());
+	//}
 	
 	//Collation, Engine type, Create table options(min_rows, max_rows, checksum, delay_key_write, row_format)
 	if(IsMySQL41(m_tunnel, m_mysql))
@@ -2601,6 +2615,84 @@ CCopyTable::GetSelectStmt(wyString &select, wyString &query_for_virtuality,wyWCh
 		select.Add(" where 1 = 0");
 
 	return wyTrue;
+}
+
+wyBool
+CCopyTable::GetCheckConstraints(wyString &select, wyString &constraintstmt, wyWChar new_table[])
+{
+	wyString query;
+	MYSQL_RES *myres;
+	MYSQL_ROW myfieldrow;
+	wyString        tblname(""), dbname(""), createtable(""), checkexpression, checkname, alltblcheck(""), str(""), *allcheck = NULL;
+	wyChar          *tempstr = NULL, *currentrowstr = NULL, *wholecreatestring = NULL, *wholecreate = NULL;
+	//CheckConstraintStructWrapper   *cwrapobj = NULL;
+	//CheckConstarintInfo                *icheck = NULL;
+	//FieldStructWrapper      *fieldswrap = NULL;
+	wyChar * findc = "CONSTRAINT", *findch = "CHECK";
+	wyBool found = wyFalse;
+
+	query.Clear();
+	query.Sprintf("show create table `%s`.`%s`", m_db.GetString(), m_table.GetString());
+	myres = ExecuteAndGetResult(GetActiveWin(), m_tunnel, m_mysql, query);
+
+	if (!myres)
+	{
+		ShowMySQLError(m_hwnd, m_tunnel, m_mysql, query.GetString());
+		return wyFalse;
+	}
+	myfieldrow = m_tunnel->mysql_fetch_row(myres);
+	createtable = myfieldrow[1];
+	wholecreate = (wyChar*)createtable.GetString();
+
+	const char *ptr = strstr(wholecreate, findc);
+	str = wholecreate;
+	if (ptr)
+	{
+		const char *ptr2 = strstr(wholecreate, findch);
+		int index = ptr - wholecreate;
+		alltblcheck = str.Substr(index, str.GetLength());
+		found = wyTrue;
+	}
+
+	if (found) {
+		wholecreatestring = (wyChar*)strdup(alltblcheck.GetString());
+		if (wholecreatestring)
+			currentrowstr = strtok(wholecreatestring, "\n");
+
+		//loop to get all check constraint
+
+		while (currentrowstr != NULL) {
+			if (checkexpression.GetLength() != 0)
+				checkexpression.Clear();
+			if (!GetCheckConstraintValue(currentrowstr, &checkexpression))
+			{
+				currentrowstr = strtok(NULL, "\n");
+				continue;
+			}
+
+			if (checkname.GetLength() != 0)
+				checkname.Clear();
+			if (!GetCheckConstraintName(currentrowstr, &checkname))
+			{
+				currentrowstr = strtok(NULL, "\n");
+				continue;
+			}
+
+			if (checkname.GetLength() && checkexpression.GetLength())
+			{
+				constraintstmt.AddSprintf("\r\n  constraint %s CHECK %s",checkname.GetString(),checkexpression.GetString());
+			}
+			constraintstmt.AddSprintf(",");
+
+			//moving to next set of check constraint
+			if (currentrowstr)
+				currentrowstr = strtok(NULL, "\n");
+
+		}
+	}
+
+	m_tunnel->mysql_free_result(myres);
+
 }
 
 // Function to make the new DB the default for the connection
@@ -5750,7 +5842,7 @@ RenameTabDlg::RenameTabDlgProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lp
 				yog_message(hwnd, _(L"Please enter a valid name"), pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_HELP | MB_ICONINFORMATION);
 				return 0;
 			}
-			wnd->m_pctabmodule->SetTabRename(temptext);
+			wnd->m_pctabmodule->SetTabRename(temptext,wyFalse,wnd,wyTrue);
 			yog_enddialog(hwnd, 0);
 		}
 		else 

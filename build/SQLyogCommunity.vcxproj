@@ -335,6 +335,7 @@
     <ClCompile Include="..\src\SQLTokenizer.cpp" />
     <ClCompile Include="..\src\StatusbarMgmt.cpp" />
     <ClCompile Include="..\src\TabAdvancedProperties.cpp" />
+    <ClCompile Include="..\src\TabCheck.cpp" />
     <ClCompile Include="..\src\TabEditor.cpp">
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(IntDir)%(Filename)1.obj</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Filename)1.obj</ObjectFileName>
@@ -482,6 +483,7 @@
     <ClInclude Include="..\include\StatusbarMgmt.h" />
     <ClInclude Include="..\include\Symbols.h" />
     <ClInclude Include="..\include\TabAdvancedProperties.h" />
+    <ClInclude Include="..\include\TabCheck.h" />
     <ClInclude Include="..\include\TabEditor.h" />
     <ClInclude Include="..\include\TabEditorSplitter.h" />
     <ClInclude Include="..\include\TabFields.h" />

@@ -38,6 +38,8 @@ extern	PGLOBALS		pGlobals;
 
 ConnectionTab::ConnectionTab()
 {
+	pGlobals->m_connectiontabnamelist = new List;
+	pGlobals->m_mdilistfordropdown = new List;
 }
 
 ConnectionTab::~ConnectionTab()
@@ -103,6 +105,7 @@ ConnectionTab::DeleteConnectionTabItem(HWND hwnd)
 
 }
 
+
 //To insert a connection tab item 
 wyBool
 ConnectionTab::InsertConnectionTab(wyString * title, LPARAM lparam, wyBool iscon_res,ConnectionInfo* conninfo)
@@ -111,7 +114,8 @@ ConnectionTab::InsertConnectionTab(wyString * title, LPARAM lparam, wyBool iscon
 	HWND			 hwndtab;
 	unsigned long	tempcolor = -1;
 	MDIWindow		*wnd = GetActiveWin();
-	wyString		tabname;
+	TabModule * hwndTabModule = wnd->m_pctabmodule;
+	wyString		tabname,t1;
 
 	if(!wnd)
 	{
@@ -119,8 +123,15 @@ ConnectionTab::InsertConnectionTab(wyString * title, LPARAM lparam, wyBool iscon
 	}
 
 	hwndtab = pGlobals->m_pcmainwin->m_hwndconntab;
-
+	pGlobals->m_conncount;
 	tabname.Sprintf(" %s", wnd->m_title.GetString());
+
+	ListofOpenTabs *tabdetails = new ListofOpenTabs;
+
+	//set the node of global m_connectiontabnamelist
+	tabdetails->name.SetAs(wnd->m_title.GetString());
+	tabdetails->m_hwndTabModuleinlist = hwndTabModule;
+	pGlobals->m_connectiontabnamelist->Insert(tabdetails);
 
 	CTCITEM				item = {0};
 	item.m_psztext    = (wyChar*)tabname.GetString();

@@ -173,7 +173,7 @@ public:
 
     wyInt32         SelectFixedTab(wyInt32 image, wyBool isonlyprob = wyFalse);
 
-    void            DeleteTab(wyInt32 index);
+    void            DeleteTab(wyInt32 index,wyBool ispostion=wyFalse);
 
     void            AddFixedTab(wyInt32 image);
 
