@@ -713,7 +713,16 @@ EditorBase::OnWMChar(HWND hwnd, WPARAM wparam, MDIWindow *wnd, EditorBase *ebase
 			//and finally replacing the selected text with empty string.
 			SendMessage(hwnd, SCI_REPLACESEL, 0, (LPARAM)""); 
 			return 0;			
-		}	
+		}
+		if (wparam == 10) // Ctrl + Enter
+		{
+			//Execute query
+			::SendMessage(pGlobals->m_pcmainwin->GetHwnd(),
+				WM_COMMAND,
+				(WPARAM)ACCEL_EXECUTE_MENU,
+				TBSTATE_ENABLED);
+			return 0;
+		}
 	}		
 
     state = GetKeyState(VK_MENU);
