@@ -1,6 +1,6 @@
 # SQLyog Community Edition
 
-SQLyog is an all-round Management Tool (/'GUI'/'Frontend') for MySQL.
+SQLyog is an all-round Management Tool (/'GUI'/'Frontend') for MySQL/MariaDB.
 
 ## [Download SQLyog Community Version](https://github.com/webyog/sqlyog-community/wiki/Downloads)
 
