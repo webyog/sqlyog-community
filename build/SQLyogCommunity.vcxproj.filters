@@ -16,9 +16,6 @@
     <Filter Include="Header Files\tinyxml">
       <UniqueIdentifier>{e0ae8f8b-7667-4836-b7dd-25f4d7f82934}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\tinyxml">
-      <UniqueIdentifier>{124cf439-cdf7-4c76-a8e7-1266d239e8c2}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\AutoCompleteInterface.cpp">
@@ -299,18 +296,6 @@
     </ClCompile>
     <ClCompile Include="..\src\TabPreview.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\tinyxml\tinyxmlparser.cpp">
-      <Filter>Source Files\tinyxml</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\tinyxml\tinystr.cpp">
-      <Filter>Source Files\tinyxml</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\tinyxml\tinyxml.cpp">
-      <Filter>Source Files\tinyxml</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\tinyxml\tinyxmlerror.cpp">
-      <Filter>Source Files\tinyxml</Filter>
     </ClCompile>
     <ClCompile Include="..\src\wyTheme.cpp">
       <Filter>Source Files</Filter>
@@ -671,12 +656,6 @@
     <ClInclude Include="..\include\TableTabInterfaceTabMgmt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\tinyxml\tinyxml.h">
-      <Filter>Header Files\tinyxml</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\tinyxml\tinystr.h">
-      <Filter>Header Files\tinyxml</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\wyTheme.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -715,6 +694,9 @@
     </ClInclude>
     <ClInclude Include="..\include\TabCheck.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\tinyxml\tinyxml2.h">
+      <Filter>Header Files\tinyxml</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

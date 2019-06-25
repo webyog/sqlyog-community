@@ -120,7 +120,7 @@ public:
 	TabType tabtype;
 	ListOfOpenQueryTabs()
 	{
-		tabname = "";
+		tabname.SetAs("");
 		seqofquerytab = 1;
 		seqofquerybuilder = 1;
 		seqofschemadesigner = 1;
@@ -138,7 +138,7 @@ public:
 	//TabModule * m_hwndTabModuleinlist;
 	MDIListForDropDrown()
 	{
-		name = "";
+		name.SetAs("");
 		opentab = new List(); 
 	}
 };
@@ -187,7 +187,7 @@ class ListofOpenTabs : public wyElem
 		TabModule * m_hwndTabModuleinlist;
 		ListofOpenTabs()
 		{
-			name = "";
+			name.SetAs("");
 			
 		}
 };
@@ -1746,6 +1746,7 @@ public:
 	wyBool				SaveConnectionDetails2(wySQLite	*ssnsqliteobj = NULL);
 	wyBool				SaveSessionFile(HWND hwnd, wyBool issaveas);
 	wyBool				OpenSessionFile();
+	void				MigratePasswordofSessionFile(wyString filename);
 	wyString			m_sessionfile;
 	wyString			m_sessionname;
 	wyString			m_previoussessionfile;
@@ -1755,6 +1756,7 @@ public:
 	wyBool				WriteTabDetailsToTempList(tabeditorelem *temptabeditorele, CTCITEM quetabitem, wyInt32 tabid, wyInt32 position, wyInt32 id,TabTypes *tabqueryactive, MDIWindow *wnd);
 	wyBool				SetStatusParts2(HWND hwndstatus);
 	wyInt32				OnStatusBarWmCtlColorStatic(HWND hwnd, WPARAM wparam, LPARAM lparam);
+	void				CreateIniFileBackup();
 	HFONT			    m_trialtextfont;
 	HFONT			    m_trialbuyfont;
 	//HBRUSH				m_trialbuybrush;

@@ -3707,8 +3707,13 @@ MySQLDump::CheckQueryLength(wyString * buffer, const wyChar * db, const wyChar *
     if(m_bulksize && m_bulksize < m_maxallowedsize)
         m_maxallowedsize = m_bulksize;
 
+	#ifdef _WIN32
 	//max bulk insert size is restircting to 16 MB
 	bulklimit = min(m_maxallowedsize *1024, BULK_SIZE);
+	#else
+	bulklimit = wmin(m_maxallowedsize * 1024, BULK_SIZE);
+	#endif
+
 		
     fieldlengths = sja_mysql_fetch_lengths(m_tunnel, res);
 

@@ -471,7 +471,7 @@ TabModule::CreateQueryEditorTab(MDIWindow* wnd, wyInt32 pos, wyBool setfocus,wyB
 			ListOfOpenQueryTabs  *opentabcurr = (ListOfOpenQueryTabs *)p->opentab->GetFirst();
 			wyInt32 tabcount = p->opentab->GetCount();
 			wyInt32 i;
-			wyString stemp = "";
+			wyString stemp("");
 			for (i = 0; i <= pos; i++)
 			{
 				opentabcurr = opentab;
@@ -548,7 +548,7 @@ TabModule::CreateQueryEditorTab(MDIWindow* wnd, wyInt32 pos, wyBool setfocus,wyB
 wyInt32
 TabModule::GetMaxSequence(MDIWindow* wnd)
 {
-	wyInt64  tabcount,i,currseq=0,nextseq=0,maxseq=0;
+	wyInt64  tabcount=0,i,currseq=0,nextseq=0,maxseq=0;
 	wyBool found = wyFalse;
 	ListOfOpenQueryTabs *opentab,*curr;
 	ListofOpenTabs *listofopentabs;
@@ -790,7 +790,7 @@ TabModule::CreateQueryBuilderTab(MDIWindow * wnd)
 	CTCITEM				item = {0};
 	wyInt64			serialqb=0,maxofqb=0;
 	wyBool found = wyFalse;
-	wyString qtabname = "",q="Query Builder";
+	wyString qtabname(""),q("Query Builder");
 	MDIListForDropDrown *pfound; 
 	wyString tname;
 
@@ -1226,7 +1226,7 @@ TabModule::CreateSchemaDesigner(MDIWindow * wnd)
 	
 	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
 	wyBool found = wyFalse;
-	wyString qtabname = "",q= _("Schema Designer");
+	wyString qtabname(""),q("Schema Designer");
 	MDIListForDropDrown *pfound = p;
 	
 	wyString s;
@@ -2359,7 +2359,7 @@ TabModule::SetTabName(wyWChar *filename, wyBool isshowext, wyBool isedited)
 	item.m_iimage		= tabimage;
 	item.m_tooltiptext  = (wyChar*)path.GetString();
 	
-	newname = file.GetString();
+	newname.SetAs(file.GetString());
 	VERIFY(CustomTab_SetItem(m_hwnd, itemindex, &item));
 
 	UpdateNameinStruc(itemindex, newname.GetString());
@@ -2371,24 +2371,31 @@ TabModule::UpdateNameinStruc(wyInt32 itemindex, wyString newname)
 {
 	MDIListForDropDrown *pfound = NULL, *p;
 	wyBool foundmodifiedtab = wyFalse, found = wyFalse;
-	wyInt32 tabcount, tabindexindropdown,tabnumber,tabn;
-	wyString s2,sname;
+	wyInt32 tabcount=0, tabindexindropdown,tabnumber,tabn;
+	wyString s2(""),sname("");
 
 	MDIWindow *wnd = GetActiveWin();
+	if (newname.GetLength()<=0)
+	{
+		return;
+	}
 
 	p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
 	if (wnd)
 	{
-		//Update the tabname in query drop down
-		while (p)
+		if (p)
 		{
-			if (wnd == p->mdi)
+			//Update the tabname in query drop down
+			while (p)
 			{
-				found = wyTrue;
-				pfound = p;
-				break;
+				if (wnd == p->mdi)
+				{
+					found = wyTrue;
+					pfound = p;
+					break;
+				}
+				p = (MDIListForDropDrown *)p->m_next;
 			}
-			p = (MDIListForDropDrown *)p->m_next;
 		}
 		if (found) {
 			if (pfound) {
@@ -2489,10 +2496,9 @@ TabModule::SetTabRename(wyWChar *name, wyBool isedited,MDIWindow *wnd, wyBool is
 	wyInt32         itemindex, tabimage,tabindexindropdown,tabcount=0, tabn,tabnumber;
 	wyString		newname;
 	wyBool found = wyFalse,foundmodifiedtab=wyFalse;
-	wyString qtabname = "",newname1="",tabname1="", sname="",s2="";
+	wyString qtabname(""), sname(""),s2("");
 	MDIListForDropDrown *pfound=NULL ,*p;
 	
-//	MDIWindow *wnd = GetActiveWin();
 	p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
 	
 	tabimage = GetActiveTabImage();
@@ -2515,15 +2521,21 @@ TabModule::SetTabRename(wyWChar *name, wyBool isedited,MDIWindow *wnd, wyBool is
 	VERIFY(CustomTab_SetItem(m_hwnd, itemindex, &item));
 
 	//Update the tabname in query drop down
-	while (p)
+	if (p)
 	{
-		if (wnd == p->mdi)
+		if (wnd)
 		{
-			found = wyTrue;
-			pfound = p;
-			break;
+			while (p)
+			{
+				if (wnd == p->mdi)
+				{
+					found = wyTrue;
+					pfound = p;
+					break;
+				}
+				p = (MDIListForDropDrown *)p->m_next;
+			}
 		}
-		p = (MDIListForDropDrown *)p->m_next;
 	}
 	if (found) {
 		if (pfound) {

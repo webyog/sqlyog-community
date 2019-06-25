@@ -314,7 +314,8 @@ CalendarCtrl::InitCalendarValues()
 	//Get preference setting to show server date or system date
 	pretoshowserverdate = GetPreferenceForNowButton();
 
-	if (pretoshowserverdate && m_dv != NULL) {
+	if (pretoshowserverdate && m_dv != NULL && m_dv->m_data != NULL && m_dv->m_data->m_pmdi != NULL && m_dv->m_data->m_pmdi->m_tunnel != NULL && m_dv->m_data->m_pmdi->m_mysql != NULL)
+	{
 		tunnel = m_dv->m_data->m_pmdi->m_tunnel;
 		mysql = m_dv->m_data->m_pmdi->m_mysql;
 		qret = HandleMySQLRealQuery(tunnel, mysql, query.GetString(), query.GetLength(), wyTrue, wyTrue, wyTrue);

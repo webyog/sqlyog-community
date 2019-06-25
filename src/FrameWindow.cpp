@@ -22,7 +22,7 @@
 #include <scintilla.h>
 #include <shlobj.h>
 #ifndef COMMUNITY
-#include "tinyxml.h"
+#include "tinyxml2.h"
 #endif
 #include "Symbols.h"
 #include "ExportMultiFormat.h"
@@ -106,9 +106,9 @@ extern	PGLOBALS		pGlobals;
 #define			TABBED_INTERFACE_HEIGHT	25
 #define         TABBED_INTERFACE_TOP_PADDING    10
 
-#define			SCHEMA_DESCRIPTION "13.00"
+#define			SCHEMA_DESCRIPTION "13.13"
 #define			SCHEMA_MAJOR_VERSION "13"
-#define			SCHEMA_MINOR_VERSION "00"
+#define			SCHEMA_MINOR_VERSION "13"
 
 #define			CONSAVE_INTERVAL	10000
 /* some of the features are not available when you connect using tunneling feature */
@@ -123,7 +123,7 @@ extern	PGLOBALS		pGlobals;
 #define TABLE_SCHEMADETAILS "CREATE TABLE schema_version (description TEXT, major_version TEXT, minor_version TEXT)"
 #define TABLE_CONNDETAILS "CREATE TABLE conndetails (Id INTEGER PRIMARY KEY  NOT NULL, position  INTEGER, ObjectbrowserBkcolor TEXT, ObjectbrowserFgcolor TEXT, isfocussed INTEGER, \
 							Name TEXT , Host TEXT , User TEXT ,Password TEXT ,Port TEXT, StorePassword TEXT,keep_alive TEXT,Database TEXT ,compressedprotocol TEXT,defaulttimeout TEXT,\
-							waittimeoutvalue TEXT,Tunnel TEXT,Http TEXT ,HTTPTime TEXT,HTTPuds TEXT,HTTPudsPath TEXT , Is401 TEXT,IsProxy TEXT,Proxy TEXT , ProxyUser TEXT, ProxyPwd TEXT , ProxyPort TEXT , User401 TEXT , Pwd401 TEXT  , ContentType TEXT  , HttpEncode TEXT,SSH TEXT,SshUser TEXT,SshPwd TEXT,SshHost TEXT,SshPort TEXT,SshForHost TEXT,SshPasswordRadio TEXT,SSHPrivateKeyPath TEXT,SshSavePassword TEXT,SslChecked TEXT,SshAuth TEXT,Client_Key TEXT,Client_Cert TEXT,CA TEXT,Cipher TEXT,sqlmode_global TEXT,sqlmode_value TEXT,init_command TEXT,readonly TEXT)"
+							waittimeoutvalue TEXT,Tunnel TEXT,Http TEXT ,HTTPTime TEXT,HTTPuds TEXT,HTTPudsPath TEXT , Is401 TEXT,IsProxy TEXT,Proxy TEXT , ProxyUser TEXT, ProxyPwd TEXT , ProxyPort TEXT , User401 TEXT , Pwd401 TEXT  , ContentType TEXT  , HttpEncode TEXT,SSH TEXT,SshUser TEXT,SshPwd TEXT,SshHost TEXT,SshPort TEXT,SshForHost TEXT,SshPasswordRadio TEXT,SSHPrivateKeyPath TEXT,SshSavePassword TEXT,SslChecked TEXT,SshAuth TEXT,Client_Key TEXT,Client_Cert TEXT,CA TEXT,Cipher TEXT,sqlmode_global TEXT,sqlmode_value TEXT,init_command TEXT,readonly TEXT,isencrypted INTEGER)"
 
 #define TABLE_TABDETAILS "CREATE TABLE tabdetails (Id INTEGER ,\
 							Tabid INTEGER, Tabtype INTEGER DEFAULT 0, isedited INTEGER DEFAULT 0,position INTEGER, leftortoppercent  INTEGER, title TEXT,tooltip TEXT,isfile INTEGER, isfocussed INTEGER, content TEXT, \
@@ -4864,12 +4864,13 @@ FrameWindow::InsertFromLatestSchemaDesignFile(wyInt32 id, MDIWindow * pcquerywnd
 	wyString			fname, jobbuff;
 	wyBool				issdactve = wyFalse, ret;
 	TabSchemaDesigner	*ptabsd = NULL, tabsd(NULL);
-	TiXmlDocument		*doc;
+	tinyxml2::XMLDocument		*doc;
 		
+	//tinyxml2 library doesn't have this method .. SQLyog v13.1.3
 	// Gets the white space
-	TiXmlBase::SetCondenseWhiteSpace(false);
+	//TiXmlBase::SetCondenseWhiteSpace(false);
 
-	doc = new TiXmlDocument();
+	doc = new tinyxml2::XMLDocument();
 	fname.SetAs(filename);	
 
     //Handles the .schemadesign file
@@ -4921,12 +4922,13 @@ FrameWindow::InsertFromLatestQBFile(wyInt32 id, MDIWindow * pcquerywnd, wyWChar 
 	wyString			fname, jobbuff;
 	wyBool				isqbactve = wyFalse, ret;
     TabQueryBuilder     *ptabqb = NULL, tabqb(NULL);
-	TiXmlDocument		*doc;
+	tinyxml2::XMLDocument		*doc;
 
+	//tinyxml2 library doesn't have this method .. SQLyog v13.1.3
     // Gets the white space
-	TiXmlBase::SetCondenseWhiteSpace(false);
+	//TiXmlBase::SetCondenseWhiteSpace(false);
 
-	doc = new TiXmlDocument();
+	doc = new tinyxml2::XMLDocument();
 	fname.SetAs(filename);	
 
     //Handles the qb file
@@ -5982,11 +5984,19 @@ FrameWindow::UpdateDropDownStruct(wyString tabname)
 	//to initialise the structure for drop down
 	MDIListForDropDrown *p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
 	wyBool found = wyFalse;
-	//wyString tabbname = "";
+
 	MDIListForDropDrown *pfound = p;
 	ListOfOpenQueryTabs *newnode;
 
 	MDIWindow *wnd = GetActiveWin();
+	if (!p)
+	{
+		return;
+	}
+	if (!wnd)
+	{
+		return;
+	}
 
 	//To search for the particular tab
 	while (p)
@@ -6702,9 +6712,11 @@ FrameWindow::ConvertAndWritePwd(wyString &conncount, wyChar	*whichpwd, wyString	
 	wyIni::IniGetString(conncount.GetString(), whichpwd, "", &passwordstr, path.GetString());						
 	if(passwordstr.GetLength())
 	{
+		wyString::JsonDeEscapeForEncryptPassword(passwordstr);
 		DecodePassword(passwordstr);
 		temppwd.SetAs(passwordstr.GetString(), wyFalse);
 		EncodePassword(temppwd);
+		temppwd.JsonEscapeForEncryptPassword();
 		wyIni::IniWriteString(conncount.GetString(), whichpwd, temppwd.GetString(), path.GetString());
 	}
 
@@ -6730,10 +6742,52 @@ FrameWindow::OnCreate()
     CheckForAutoKeywords();
 	ConvertIniFileToUtf8();
     MigrateFiles();
+	////create backup of ini file: Now we are creating the backup at installation
+	//CreateIniFileBackup();
 	//MigratePersonalFolderToFavorites();
     return;
 }
 
+void 
+FrameWindow::CreateIniFileBackup()
+{
+	wyInt32 ret;
+	wyWChar     directory[MAX_PATH + 1] = { 0 }, *lpfileport = 0;
+	wyString dirstr("");
+	wyInt32 version = 0, versionum = MAJOR_VERSION_INT * 10000 + MINOR_VERSION_INT * 100 + UPDATE_VERSION_INT;
+	wyString value("");
+	wyString inipath(""), backupfilepath("");
+
+	value.AddSprintf("%d", versionum);
+
+	ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
+
+	//retb = SearchFilePath(L"sqlyog_backup", L".ini", MAX_PATH, directory, &lpfileport);
+
+	if (ret == 0)
+		return;
+
+	dirstr.SetAs(directory);
+
+	version = wyIni::IniGetInt(SECTION_NAME, "version", 0, dirstr.GetString());
+	//if (version > 130103 && retb == 1)
+	//{
+	//	//backup already created and no need to write the version
+	//	return;
+	//}
+	if (version == 0)
+	{
+		inipath.SetAs(dirstr.GetString());
+		backupfilepath.SetAs(dirstr.GetString());
+
+		backupfilepath.Strip(strlen("sqlyog.ini") + 1);
+		backupfilepath.AddSprintf("\\sqlyog_backup.ini");
+		CopyAndRename(dirstr, inipath, backupfilepath);
+
+	}
+	//we will create the backup only once, perticulary for v13.1.3 release
+	wyIni::IniWriteString(SECTION_NAME, "version", value.GetString(), dirstr.GetString());
+}
 void
 FrameWindow::HandleFiles(wyWChar *filename, wyWChar *extension)
 {
@@ -6971,12 +7025,13 @@ FrameWindow::CopyAndRename(wyString& directorystr, wyString& fullpathstr, wyStri
 			return wyFalse;
 	}
 	fullpathstr.AddSprintf("\\sqlyog.ini");
-    if(CopyFile(directorystr.GetAsWideChar(), fullpathstr.GetAsWideChar(), TRUE))
+    if(CopyFile(directorystr.GetAsWideChar(), newpath.GetAsWideChar(), TRUE))
     {
-        if(_wrename(directorystr.GetAsWideChar(), newpath.GetAsWideChar()) == 0)
+        /*if(_wrename(directorystr.GetAsWideChar(), newpath.GetAsWideChar()) == 0)
         {
 			return wyTrue;
-        }
+        }*/
+		return wyTrue;
     }
     else
     {
@@ -9690,12 +9745,11 @@ FrameWindow::LoadConnTabDropDownMenu(LPARAM lparam)
 	LPNMCTC lpnmctc;
 	wyString  tabname("");
 	wyWChar *namestring;
-	wyInt64 conncount, nooftab,id=0, cmdid=0;
-	//opentabs *head = pGlobals->m_headtolist, *p;
+	wyInt64 conncount=0, nooftab,id=0, cmdid=0;
 	BOOL flag;
 	HMENU			hsubmenu;
 	static wyInt32 activetabid = 0;
-	ListofOpenTabs *listofopentabs;// = new ListofOpenTabs;
+	ListofOpenTabs *listofopentabs;
 
 	//Creating the menu
 	hsubmenu = ::CreatePopupMenu();
@@ -9705,10 +9759,7 @@ FrameWindow::LoadConnTabDropDownMenu(LPARAM lparam)
 	listofopentabs = (ListofOpenTabs *)pGlobals->m_connectiontabnamelist->GetFirst();
 
 	lpnmctc = (LPNMCTC)lparam;
-
-	//hmenu = LoadMenu(pGlobals->m_hinstance, MAKEINTRESOURCE(IDR_CONNDROPDOWNMENU));
 	LocalizeMenu(hsubmenu);
-	//htrackmenu = GetSubMenu(hmenu, 0);
 
 	//getting the count of open connections
 	conncount = pGlobals->m_connectiontabnamelist->GetCount();
@@ -10344,6 +10395,8 @@ FrameWindow::SaveConnectionDetails(wySQLite	*ssnsqliteobj)
 					{
 						//mark as present
 						tempmdilist->m_ispresent = wyTrue;
+						//get the version from schema table and if its is below 13 then migrate the password
+
 						if(tempmdilist->m_position != i)
 						{
 							tempmdilist->m_position = i;//position change update to sqlite based on tempmdilist->m_id & update list
@@ -10958,6 +11011,7 @@ FrameWindow::OpenSessionFile()
 		return wyFalse;
 	}
 	VERIFY (CloseHandle(hfile));
+
 	//wait for session save to pause
 	if(pGlobals->m_sessionrestore)
 	{
@@ -11015,12 +11069,105 @@ FrameWindow::OpenSessionFile()
 	wnd = GetActiveWin();
 	if(wnd)
 		wnd->SetQueryWindowTitle();
+	//Migrate passwords for session db file, Case is already being handled in sessionsaveproc
+	//MigratePasswordofSessionFile(filename.GetString());
 	if(failedconnections.GetLength())
 	{
 		failedconnections.Insert(0, _("Failed to restore following connections\r\n\r\n"));
 		MessageBox(m_hwndmain, failedconnections.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONINFORMATION | MB_OK);
 	}
 	return wyTrue;
+}
+
+void
+FrameWindow::MigratePasswordofSessionFile(wyString filename)
+{
+	wyString			sqlitequery, sqliteerr;
+	sqlite3_stmt		*res;
+	const wyChar *desc = NULL, *majorver, *minorver;
+	wySQLite			*sqliteobj;
+	wyString directoryname("");
+	if (&filename != NULL)
+	{
+		directoryname.SetAs(filename.GetString());
+	}
+
+	sqliteobj = new wySQLite();
+	sqliteobj->Open(directoryname.GetString(), wyTrue);
+
+	sqlitequery.Sprintf("SELECT * from schema_version");
+	sqliteobj->Prepare(&res, sqlitequery.GetString());
+	if (sqliteobj->Step(&res, wyFalse) && sqliteobj->GetLastCode() == SQLITE_ROW)
+	{
+		desc = sqliteobj->GetText(&res, 0);
+		majorver = sqliteobj->GetText(&res, 1);
+		minorver = sqliteobj->GetText(&res, 2);
+	}
+
+	int maj = atoi(majorver);
+	int min = atoi(minorver);
+
+	sqlitequery.Sprintf("SELECT * from schema_version");
+	pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());
+	if (pGlobals->m_sqliteobj->Step(&res, wyFalse) && sqliteobj->GetLastCode() == SQLITE_ROW)
+	{
+		//desc = sqliteobj->GetText(&res, 0);
+		majorver = pGlobals->m_sqliteobj->GetText(&res, 1);
+		minorver = pGlobals->m_sqliteobj->GetText(&res, 2);
+	}
+
+	if (maj <= 12 || (maj == 13 && min < 3))
+	{
+		sqlitequery.SetAs("");
+		sqlitequery.Sprintf("ALTER TABLE conndetails ADD COLUMN 'isencrypted' INTEGER default 0");
+		pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+
+		//get the count from the table
+		wyInt32 count;
+		sqlitequery.SetAs("SELECT count(id) FROM conndetails");
+		pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());
+		if (pGlobals->m_sqliteobj->Step(&res, wyFalse) && pGlobals->m_sqliteobj->GetLastCode() == SQLITE_ROW)
+		{
+			count = pGlobals->m_sqliteobj->GetInt(&res, 0);
+		}
+		sqlitequery.SetAs("");
+		//Get password and id from the table
+		sqlitequery.SetAs("SELECT password,id,isencrypted FROM conndetails ORDER BY id");
+		pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());
+		wyString *s = new wyString[count];
+		wyInt32 i = 0;
+		//collect ids
+		wyInt32 *id = new wyInt32[count];
+		wyInt32 *isencrypted = new wyInt32[count];
+		while (pGlobals->m_sqliteobj->Step(&res, wyFalse) && pGlobals->m_sqliteobj->GetLastCode() == SQLITE_ROW)
+		{
+
+			s[i] = pGlobals->m_sqliteobj->GetText(&res, 0);
+			id[i] = pGlobals->m_sqliteobj->GetInt(&res, 1);
+			isencrypted[i] = pGlobals->m_sqliteobj->GetInt(&res, 2);
+
+			i = i + 1;
+		}
+		sqlitequery.SetAs("");
+		//Migrate all password and update the encrypted flag
+		wyString pass;
+		for (int j = 0; j < count; j++)
+		{
+			if (isencrypted[j] == 0)
+			{
+				pass.SetAs(s[j]);
+				MigratePassword(pass);
+				sqlitequery.Sprintf("UPDATE conndetails set Password = '%s' where Id = %d", pass.GetString(), id[j]);
+				pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+
+				sqlitequery.Sprintf("UPDATE conndetails set isencrypted = 1 where Id = %d", id[j]);
+				pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+			}
+
+		}
+	}
+	pGlobals->m_sqliteobj->Finalize(&res);
+	
 }
 
 wyBool
@@ -11202,7 +11349,7 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 	TabHistory *tabhistory;
 
 #ifndef COMMUNITY
-	TiXmlDocument		*doc;
+	tinyxml2::XMLDocument		*doc;
 	TabQueryBuilder *tabquerybuilder;
     TabSchemaDesigner	*tabschemadesigner;
 #endif
@@ -11377,7 +11524,7 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 #ifndef COMMUNITY
 							if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 							{
-								doc = new TiXmlDocument();
+								doc = new tinyxml2::XMLDocument();
 								isfileopen = tabquerybuilder->HandleQueryBuilderfileOnrestore(temptabeditorele->m_tooltiptext.GetAsWideChar(), &jobbuff);
 								if(isfileopen && !temptabeditorele->m_isedited)
 								{
@@ -11398,7 +11545,7 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 #ifndef COMMUNITY
 							if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 							{
-								doc = new TiXmlDocument();
+								doc = new tinyxml2::XMLDocument();
 								isfileopen = tabschemadesigner->HandleSchemaDesignfileOnrestore(temptabeditorele->m_tooltiptext.GetAsWideChar(), &jobbuff);
 								
 								if(isfileopen && !temptabeditorele->m_isedited)
@@ -11441,7 +11588,7 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 #ifndef COMMUNITY
 							if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 							{
-								doc = new TiXmlDocument();
+								doc = new tinyxml2::XMLDocument();
 								doc->Parse(temptabdetail->m_content.GetString());
 								CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd,  i);
 								tabquerybuilder = (TabQueryBuilder*)temptabeditorele->m_tabptr;
@@ -11467,7 +11614,7 @@ ConnectFromList(wyString* failedconnections, wyString* sessionfile)
 #ifndef COMMUNITY
 							if(pGlobals->m_pcmainwin->m_connection->m_enttype != ENT_PRO)
 							{
-								doc = new TiXmlDocument();
+								doc = new tinyxml2::XMLDocument();
 								doc->Parse(temptabdetail->m_content.GetString());
 								CustomTab_SetCurSel(pcquerywnd->m_pctabmodule->m_hwnd,  i);
 								tabschemadesigner = (TabSchemaDesigner*)temptabeditorele->m_tabptr;
@@ -11840,6 +11987,93 @@ sessionsavesproc(void *arg)
 				sqlitequery.Sprintf("ALTER TABLE conndetails ADD COLUMN 'rebuild_tags' INTEGER default 1");
 				pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
 			}
+			//For password encryption flag introduced in v13.1.3
+			if (maj <= 12 || (maj == 13 && min < 13))
+			{
+				//get the count from the table
+				wyInt32 count;
+				sqlitequery.SetAs("SELECT count(id) FROM conndetails");
+				pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());
+				if (pGlobals->m_sqliteobj->Step(&res, wyFalse) && pGlobals->m_sqliteobj->GetLastCode() == SQLITE_ROW)
+				{
+					count = pGlobals->m_sqliteobj->GetInt(&res, 0);
+				}
+				if (count > 0)
+				{
+					sqlitequery.SetAs("");
+					sqlitequery.Sprintf("ALTER TABLE conndetails ADD COLUMN 'isencrypted' INTEGER default 0");
+					pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+				}
+				//Get password and id from the table
+				sqlitequery.SetAs("SELECT password,id,isencrypted,ProxyPwd,Pwd401,SshPwd FROM conndetails ORDER BY id");
+				pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());
+				wyString *s = new wyString[count];
+				i = 0;
+				//collect ids
+				wyInt32 *id = new wyInt32[count];
+				wyInt32 *isencrypted = new wyInt32[count];
+				wyString *proxypwd = new wyString[count];
+				wyString *pwd401 = new wyString[count];
+				wyString *sshpwd = new wyString[count];
+				while (pGlobals->m_sqliteobj->Step(&res, wyFalse) && pGlobals->m_sqliteobj->GetLastCode() == SQLITE_ROW)
+				{
+
+					s[i] = pGlobals->m_sqliteobj->GetText(&res, 0);
+					id[i] = pGlobals->m_sqliteobj->GetInt(&res, 1);
+					isencrypted[i]= pGlobals->m_sqliteobj->GetInt(&res, 2);
+					proxypwd[i] = pGlobals->m_sqliteobj->GetText(&res, 3);
+					pwd401[i] = pGlobals->m_sqliteobj->GetText(&res, 4);
+					sshpwd[i] = pGlobals->m_sqliteobj->GetText(&res, 5);
+
+					i = i + 1;
+				}
+
+				//Migrate all password and update the encrypted flag
+				wyString pass;
+				for (int j = 0; j < count; j++)
+				{
+					if (isencrypted[j] == 0)
+					{
+						pass.SetAs(s[j]);
+						MigratePassword(pass);
+						sqlitequery.Sprintf("UPDATE conndetails set Password = '%s' where Id = %d", pass.GetString(), id[j]);
+						pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+
+						if (proxypwd[j].GetLength() > 0)
+						{
+							pass.SetAs("");
+							pass.SetAs(proxypwd[j]);
+							MigratePassword(pass);
+							sqlitequery.Sprintf("UPDATE conndetails set ProxyPwd = '%s' where Id = %d", pass.GetString(), id[j]);
+							pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+						}
+
+						if (pwd401[j].GetLength() > 0)
+						{
+							pass.SetAs("");
+							pass.SetAs(pwd401[j]);
+							MigratePassword(pass);
+							sqlitequery.Sprintf("UPDATE conndetails set Pwd401 = '%s' where Id = %d", pass.GetString(), id[j]);
+							pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+						}
+
+						if (sshpwd[j].GetLength() > 0)
+						{
+							pass.SetAs("");
+							pass.SetAs(sshpwd[j]);
+							MigratePassword(pass);
+							sqlitequery.Sprintf("UPDATE conndetails set SshPwd = '%s' where Id = %d", pass.GetString(), id[j]);
+							pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+						}
+
+						sqlitequery.Sprintf("UPDATE conndetails set isencrypted = 1 where Id = %d", id[j]);
+						pGlobals->m_sqliteobj->Execute(&sqlitequery, &sqliteerr);
+					}
+
+				}
+				pGlobals->m_sqliteobj->Finalize(&res);
+			}
+			
 		}
 		sqlitequery.Sprintf("SELECT type FROM sqlite_master WHERE name='sessiondetails'");
 		pGlobals->m_sqliteobj->Prepare(&res, sqlitequery.GetString());

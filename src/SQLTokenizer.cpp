@@ -27,7 +27,7 @@
 
 /* conditional inclusion for read function */
 #ifdef _WIN32
-    #include <io.h>
+   #include <io.h>
 #else
     #include<wctype.h>
     #include <unistd.h>    

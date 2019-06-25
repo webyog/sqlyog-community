@@ -1487,3 +1487,54 @@ void wyString::JsonEscape() {
         }
     }
 }
+
+
+void wyString::JsonEscapeForEncryptPassword() {
+	wyInt32 index;
+	wyChar ch;
+	wyString temp;
+
+	for (index = 0; index < GetLength(); index++) {
+		ch = GetCharAt(index);
+
+		switch (ch) {
+		case '\"':
+			//  Replace(index, 1, "\\\"");
+			//  index++;
+			break;
+		case '\\':
+			// Replace(index, 1, "\\\\");
+			// index++;
+			break;
+		case '\b':
+			Replace(index, 1, "\\b");
+			index++;
+			break;
+		case '\f':
+			//  Replace(index, 1, "\\f");
+			// index++;
+			break;
+		case '\n':
+			Replace(index, 1, "\\n");
+			index++;
+			break;
+		case '\r':
+			Replace(index, 1, "\\r");
+			index++;
+			break;
+		case '\t':
+			//  Replace(index, 1, "\\t");
+			// index++;
+			break;
+		
+		}
+	}
+}
+
+
+void wyString::JsonDeEscapeForEncryptPassword(wyString &pwdstr) {
+	
+	pwdstr.FindAndReplace("\\n", "\n");
+	pwdstr.FindAndReplace("\\r", "\r");
+	pwdstr.FindAndReplace("\\b", "\b");
+}

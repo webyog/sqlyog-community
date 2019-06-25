@@ -103,6 +103,8 @@ protected:
     /// Status bar original window procedure
 	WNDPROC         m_wpstatusbarorigproc;
 
+	wyBool			m_isencrypted_clone;
+
     
 public:
 
@@ -907,6 +909,8 @@ public:
 
 	//array for connection color
 	wyInt32         *m_arrayofcolor;
+
+	wyBool			CopyAndRename(wyString& directorystr, wyString& fullpathstr, wyString& newpath);
 
 };
 

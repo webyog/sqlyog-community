@@ -20,10 +20,15 @@
 #include <shlobj.h>
 #include <mlang.h>
 #include <Tlhelp32.h>
+#include <iomanip>
+//#include "wyIni.h"
 #else
  #include <unistd.h>
 #endif
-
+#include <iomanip>
+#include "modes.h"
+#include "aes.h"
+#include "filters.h"
 #include <string>
 #include <stddef.h>
 #include <assert.h>
@@ -69,6 +74,9 @@ extern	FILE	*logfilehandle;
 
 static wyChar table64[]=
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+static CryptoPP::byte AESKey[16] = { 0 }; //Provide any IV
+static CryptoPP::byte AESiv[16] = { 0 }; //Provide any key
 
 Tunnel * 
 CreateTunnel(wyBool istunnel)
@@ -1447,6 +1455,32 @@ GetModuleNameLength()
 
     return len;
 }
+
+wyBool
+GetModuleDir(wyString &path)
+{
+	wyWChar fullpath[MAX_PATH + 1] = { 0 };
+	wyWChar extractpath[MAX_PATH + 1] = { 0 }, *filename;
+	wyInt32 len;
+
+	if (GetModuleFileName(NULL, fullpath, MAX_PATH - 1) == NULL)
+	{
+		return wyFalse;
+	}
+
+	// extract the directory
+	if (GetFullPathName(fullpath, MAX_PATH, extractpath, &filename) == NULL)
+	{
+		return wyFalse;
+	}
+
+	*(filename - 1) = 0;		// eat the trailing slash
+
+	path.SetAs(extractpath);
+
+	return wyTrue;
+}
+
 
  #endif
 
@@ -3895,11 +3929,23 @@ SetMySQLOptions(ConnectionInfo *conn, Tunnel *tunnel, PMYSQL pmysql, wyBool isse
 	/*if(conn->m_ispwdcleartext == wyTrue)*/
 #ifdef _WIN32
 	TCHAR curdir[MAX_PATH];
-	wyString wyDir;
-
-	GetCurrentDirectory(MAX_PATH-1, curdir);
-	wyDir.SetAs(curdir);
-	wyDir.Add("\\");
+	wyString wyDir, curdirnew;
+	if (GetModuleDir(curdirnew))
+	{
+		wyDir.SetAs(curdirnew);
+		wyDir.Add("\\");
+		//MessageBox(NULL, curdirnew.GetAsWideChar(), L"directory from new method", NULL);
+	}
+	else
+	{
+		GetCurrentDirectory(MAX_PATH - 1, curdir);
+		wyDir.SetAs(curdir);
+		wyDir.Add("\\");
+		//MessageBox(NULL, wyDir.GetAsWideChar(), L"directory old location", NULL);
+	}
+	//GetCurrentDirectory(MAX_PATH-1, curdir);
+	//wyDir.SetAs(curdir);
+	//wyDir.Add("\\");
 	mysql_options(*pmysql,MYSQL_PLUGIN_DIR ,wyDir.GetString());
 #else
 
@@ -4037,7 +4083,7 @@ GetLocalEmptyPort(ConnectionInfo *con)
 	if(psocket == INVALID_SOCKET)
 		return -1;
 
-	ret = bind(psocket, (sockaddr*)&name, sizeof(name));
+	ret = ::bind(psocket, (sockaddr*)&name, sizeof(name));
 
 	if(ret)
 	{
@@ -4206,6 +4252,7 @@ InitConnectionDetails(ConnectionInfo *conn)
 	conn->m_isdeftimeout		= wyTrue;
 	conn->m_strwaittimeout.SetAs("28800"); 
 	conn->m_isreadonly			= wyFalse;
+	conn->m_isencrypted = 0;
 	//conn->m_ispwdcleartext		= wyFalse;
 
 #ifdef _WIN32	
@@ -4333,7 +4380,7 @@ IsDatatypeNumeric(wyString  &datatype)
 
 
 wyBool
-DecodePassword(wyString &text)
+DecodePassword_Absolute(wyString &text)
 {
 	wyChar      pwd[512]={0}, pwdutf8[512] = {0};
 
@@ -4374,7 +4421,7 @@ RotateBitLeft(wyUChar *str)
 }
 
 wyBool
-EncodePassword(wyString &text)
+EncodePassword_Absolute(wyString &text)
 {
 	wyChar *encode = NULL, pwdutf8[512] = {0};
 
@@ -4543,3 +4590,73 @@ RemoveBrackets(wyString &text, const wyChar* pattern)
 //        fprintf(fp, "%s\r\n", buffer);
 //        fclose(fp);
 //}
+
+wyBool
+EncodePassword(wyString &text)
+{
+	wyString ciphertext, plaintext("");
+	wyString temptext("");
+
+	plaintext.SetAs(text);
+	// create an encrypted object
+	CryptoPP::CTR_Mode<CryptoPP::AES>::Encryption enc;
+	enc.SetKeyWithIV(AESKey, sizeof(AESKey), AESiv);
+
+	std::string encText;
+	CryptoPP::StreamTransformationFilter encFilter(enc, new CryptoPP::StringSink(encText));
+
+	//encryption
+	encFilter.Put(reinterpret_cast<const CryptoPP::byte*>(plaintext.GetString()), plaintext.GetLength());
+	encFilter.MessageEnd();
+	text.SetAs(encText.data(), encText.length());
+	
+	return wyTrue;
+}
+
+wyBool
+DecodePassword(wyString &text)
+{
+	wyString ciphertext(""), decryptedtext("");
+
+	if (text.GetLength() <= 0)
+	{
+		return wyFalse;
+	}
+
+	ciphertext.SetAs(text);
+
+	CryptoPP::CTR_Mode<CryptoPP::AES>::Decryption dec;
+	dec.SetKeyWithIV(AESKey, sizeof(AESKey), AESiv);
+
+	// Conversion filter for decryption
+	std::string decText;
+	CryptoPP::StreamTransformationFilter decFilter(dec, new CryptoPP::StringSink(decText));
+	decFilter.Put(reinterpret_cast<const CryptoPP::byte*>(ciphertext.GetString()), ciphertext.GetLength());
+	decFilter.MessageEnd();
+
+	text.SetAs(decText.c_str());
+
+	return wyTrue;
+}
+
+wyBool
+MigratePassword(wyString conn, wyString dirstr, wyString &pwdstr)
+{
+
+	DecodePassword_Absolute(pwdstr);
+	EncodePassword(pwdstr);
+	pwdstr.JsonEscapeForEncryptPassword();
+	return wyTrue;
+	
+}
+
+wyBool
+MigratePassword(wyString &pwdstr)
+{
+
+	DecodePassword_Absolute(pwdstr);
+	EncodePassword(pwdstr);
+	pwdstr.JsonEscapeForEncryptPassword();
+	return wyTrue;
+
+}

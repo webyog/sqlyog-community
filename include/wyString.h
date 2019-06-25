@@ -477,7 +477,8 @@ public:
 	wyInt32				FindIWithReverse(wyChar *searchstr, wyUInt32 pos, wyBool isreverse = wyFalse);
 
 	void JsonEscape();
-	
+	void JsonEscapeForEncryptPassword();
+	static void JsonDeEscapeForEncryptPassword(wyString &pwstr);
 private:
 
     /// Actual data container.

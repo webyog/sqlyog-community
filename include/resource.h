@@ -1660,8 +1660,6 @@
 #define IDD_RELEASESAVEPOINT            44141
 #define IDD_ROLLBACKTO                  44142
 #define IDI_CHECKCONSTRAINT             44143
-#define IDM_DROPDOWNLISTITEM            44145
-#define IDR_CONNDROPDOWNMENU            44146
 
 // Next default values for new objects
 // 

@@ -1598,11 +1598,11 @@ CCustTab::OnDragEnd()
 void
 CCustTab::FindAndUpdateTheDropDown(wyInt32 selectedtab,wyInt32 dropindex)
 {
-	wyInt32 nooftab, conncount;
+	wyInt32 nooftab, conncount=0;
 	wyBool isconndrag = wyFalse;
 
-	wyString* title1 = new wyString();
-	GetItemTitle(selectedtab, title1);
+	wyString titleclicked("");
+	GetItemTitle(selectedtab, &titleclicked);
 	//find the name and type of the tab and change the location of that perticular tab only
 	ListofOpenTabs * listofopentabs = (ListofOpenTabs *)pGlobals->m_connectiontabnamelist->GetFirst();
 
@@ -1610,10 +1610,10 @@ CCustTab::FindAndUpdateTheDropDown(wyInt32 selectedtab,wyInt32 dropindex)
 	 conncount = pGlobals->m_connectiontabnamelist->GetCount();
 	for (nooftab = 0; nooftab < conncount; nooftab++)
 	{
-		title1->LTrim();
-		title1->RTrim();
+		titleclicked.LTrim();
+		titleclicked.RTrim();
 		//int y = title1->CompareI(listofopentabs->name.GetString());//getting name of the connection
-		if (title1->CompareI(listofopentabs->name.GetString())==0)
+		if (titleclicked.CompareI(listofopentabs->name.GetString())==0)
 		{
 			isconndrag = wyTrue;
 			break;
@@ -1639,10 +1639,14 @@ CCustTab::UpdateDropDownStructPosition(wyInt32 selectedtab, wyInt32 dropindex)
 	wyBool found = wyFalse;
 	ListOfOpenQueryTabs *listofopentabs,*currnodefroseltab, *currnodefroindextab,*prevsel;
 	wyBool dragnodefound = wyFalse, selnodefound = wyFalse;
-	wyInt32 tabcount;
+	wyInt32 tabcount = 0;
 
 	MDIWindow *wnd = GetActiveWin();
 	if(!wnd)
+	{
+		return;
+	}
+	if (!p)
 	{
 		return;
 	}
@@ -1721,7 +1725,7 @@ CCustTab::UpdateDropDownNodePosforconnection(wyInt32 selectedtab, wyInt32 dropin
 {
 	ListofOpenTabs   *listofopentabs, *currnodefroseltab, *currnodefroindextab,*prevsel;
 	wyBool dragnodefound = wyFalse, selnodefound = wyFalse;
-	wyInt32 conncount;
+	wyInt32 conncount=0;
 	
 	listofopentabs = (ListofOpenTabs *)pGlobals->m_connectiontabnamelist->GetFirst();
 	List *p = pGlobals->m_connectiontabnamelist;
@@ -2216,7 +2220,7 @@ CCustTab::DeleteItem(wyInt32 tabindex, wyBool isexplicit, wyBool ispositionrequi
     wyInt32     ret, selindex;
     NMCTC       nmctc = {0};
 	ListofOpenTabs * listofopentabs;
-	wyInt64 tabcount,i;
+	wyInt64 tabcount=0,i;
 	wyBool deletedfromstruct = wyFalse, found = wyFalse, delfound = wyFalse,nodefound =wyFalse;
 	MDIListForDropDrown *pfound = NULL, *p;
 	ListofOpenTabs * temp;

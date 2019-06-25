@@ -26,7 +26,7 @@ Author: Vishal P.R
 #define _WYTHEME_H_
 
 #include "wyString.h"
-#include "tinyxml.h"
+#include "tinyxml2.h"
 #include "CustTab.h"
 
 ///Brush constants
@@ -373,7 +373,7 @@ class wyTheme
         @param pthemeinfo           : OUT the theme info loaded
         @returns the root node of theme xml on success else NULL
         */
-        static TiXmlDocument*       LoadTheme(wyString* pthemedir, LPTHEMEINFO pthemeinfo);
+        static tinyxml2::XMLDocument*       LoadTheme(wyString* pthemedir, LPTHEMEINFO pthemeinfo);
 
         ///Function to create the brush for the element
         /**
@@ -381,7 +381,7 @@ class wyTheme
         @param element              : IN child element name
         @returns the brush handle on success else NULL
         */
-        HBRUSH                      CreateBgBrush(TiXmlElement* pele, const wyChar* element);
+        HBRUSH                      CreateBgBrush(tinyxml2::XMLElement* pele, const wyChar* element);
 
         ///Function converts color encoded in hex to COLORREF 
         /**
@@ -397,7 +397,7 @@ class wyTheme
         @param pcolorinfo           : OUT tab color info
         @returns void
         */
-        void                        CreateTabColors(TiXmlElement* pele, const wyChar* element, LPTABCOLORINFO pcolorinfo);
+        void                        CreateTabColors(tinyxml2::XMLElement* pele, const wyChar* element, LPTABCOLORINFO pcolorinfo);
 
         ///Function to set the dual color
         /**
@@ -409,7 +409,7 @@ class wyTheme
         @param pdulacolor           : OUT dual color info
         @returns void
         */
-        void                        SetDualColors(TiXmlElement* pele, const wyChar* element, const wyChar* subele, const wyChar* attrib1, const wyChar* attrib2, DUALCOLOR* pdulacolor);
+        void                        SetDualColors(tinyxml2::XMLElement* pele, const wyChar* element, const wyChar* subele, const wyChar* attrib1, const wyChar* attrib2, DUALCOLOR* pdulacolor);
 
         ///Function to get the color info
         /**
@@ -419,7 +419,7 @@ class wyTheme
         @param pcolor               : IN  color
         @returns wyTrue on success else wyFalse
         */
-        wyBool                      GetColorInfo(TiXmlElement* pele, const wyChar* element, const wyChar* attribute, COLORREF* pcolor);
+        wyBool                      GetColorInfo(tinyxml2::XMLElement* pele, const wyChar* element, const wyChar* attribute, COLORREF* pcolor);
 
         ///Superclassed procedure for edit controls
         /**

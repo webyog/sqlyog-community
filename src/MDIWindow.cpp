@@ -20,7 +20,7 @@
 #include "scintilla.h"
 
 #ifndef COMMUNITY
-#include "tinyxml.h"
+#include "tinyxml2.h"
 #endif
 
 #include "MDIWindow.h"
@@ -921,7 +921,7 @@ MDIWindow::OnWmClose(HWND hwnd)
 	CTCITEM		item = {0};
 	item.m_mask = CTBIF_IMAGE;
 	HWND		hwndTabModule = m_pctabmodule->GetHwnd();
-	wyInt64 conncount, nooftab;
+	wyInt64 conncount=0, nooftab;
 	wyBool found = wyFalse;
 
 	ListofOpenTabs *listofopentabs;// = new ListofOpenTabs;
@@ -2463,7 +2463,7 @@ MDIWindow::OpenSchemaFile(wyString *filename, wyBool issametab, wyBool isrecentf
 #ifndef COMMUNITY
 
 	wyString		    fname;
-	TiXmlDocument		*doc;
+	tinyxml2::XMLDocument		*doc;
 	wyString			jobbuff;
 	TabSchemaDesigner	*ptabsd;
     MDIWindow*          wnd;
@@ -2478,8 +2478,9 @@ MDIWindow::OpenSchemaFile(wyString *filename, wyBool issametab, wyBool isrecentf
 	if(!filename || !filename->GetLength())
 		return wyFalse;
 
+	//tinyxml2 library doesn't have this method .. SQLyog v13.1.3
 	// Gets the white space
-	TiXmlBase::SetCondenseWhiteSpace(false);
+	//TiXmlBase::SetCondenseWhiteSpace(false);
 	
 	//To open file in new schema designer
 	if(issametab == wyFalse)
@@ -2513,7 +2514,7 @@ MDIWindow::OpenSchemaFile(wyString *filename, wyBool issametab, wyBool isrecentf
 	}
 	
 		
-	doc = new TiXmlDocument();
+	doc = new tinyxml2::XMLDocument();
 		
 	fname.SetAs(*filename);
 
@@ -2672,7 +2673,7 @@ MDIWindow::OpenQBFile(wyString *filename, wyBool issametab, wyBool isrecentfiles
 #ifndef COMMUNITY
 
 	wyString		    fname;
-	TiXmlDocument		*doc;
+	tinyxml2::XMLDocument		*doc;
 	wyBool				ret = wyFalse;
 	wyString			jobbuff;
     TabQueryBuilder 	*ptabqb = NULL;
@@ -2684,8 +2685,9 @@ MDIWindow::OpenQBFile(wyString *filename, wyBool issametab, wyBool isrecentfiles
 	if(!wnd || !filename || !filename->GetLength())
         return wyFalse;
 
+	//tinyxml2 library doesn't have this method .. SQLyog v13.1.3
 	// Gets the white space
-	TiXmlBase::SetCondenseWhiteSpace(false);
+	//TiXmlBase::SetCondenseWhiteSpace(false);
 	
 	if(issametab == wyFalse)
 	{
@@ -2718,7 +2720,7 @@ MDIWindow::OpenQBFile(wyString *filename, wyBool issametab, wyBool isrecentfiles
 	
 	}
 		
-	doc = new TiXmlDocument();
+	doc = new tinyxml2::XMLDocument();
 	fname.SetAs(*filename);
 
     //set the file name to empty and call SetQueryWindowTitle() to reset the tab title
@@ -4187,7 +4189,7 @@ MDIWindow::TabSchemaDesignerTitles(wyString *mdititle)
 
 
 		// to append sequence number
-			wyString qtabname = "", q = "Schema Designer";
+			wyString qtabname(""), q("Schema Designer");
 			qtabname.SetAs(ptabsd->m_tabnamefordropdown.GetString());
 
 		m_pctabmodule->SetTabName(qtabname.GetAsWideChar(), wyFalse, wyFalse);
@@ -4247,7 +4249,7 @@ MDIWindow::TabQueryBuilderTitles(wyString *mdititle)
     else
     {
 		//to append sequence number
-		wyString qtabname = "", q = "Query Builder";
+		wyString qtabname(""), q("Query Builder");
 
 		qtabname.SetAs(ptabqb->m_tabnameforqb.GetString());
 
@@ -4796,7 +4798,7 @@ MDIWindow::LoadQueryTabDropDownMenu(HWND hwnd, WPARAM wparam, LPARAM lparam)
 {
 	LPNMCTC lpnmctc = (LPNMCTC)lparam;
 	wyInt32 extramenucount = 3, itab, tabcount;
-	wyInt64 i,qcount,id=0,j=0,cmdid;
+	wyInt64 i,qcount=0,id=0,j=0,cmdid;
 	MDIWindow *actwin;
 	wyString queryWindowname("");
 	wyWChar *namestring;
@@ -4809,7 +4811,6 @@ MDIWindow::LoadQueryTabDropDownMenu(HWND hwnd, WPARAM wparam, LPARAM lparam)
 	//Creating the menu
 	hsubmenu = ::CreatePopupMenu();
 
-	//hmenu = LoadMenu(pGlobals->m_hinstance, MAKEINTRESOURCE(IDR_CONNDROPDOWNMENU));
 	LocalizeMenu(hsubmenu);
 	//htrackmenu = GetSubMenu(hmenu, 0);
 
@@ -5118,7 +5119,7 @@ MDIWindow::DelFromDropdownStruct(MDIWindow *wnd, wyInt64 index)
 	wyBool deletedfromstruct = wyFalse, found = wyFalse, delfound = wyFalse;
 	MDIListForDropDrown *pfound = NULL, *p;
 	ListofOpenTabs * temp1, *listofopentabs;
-	wyInt64 i, tabcount;
+	wyInt64 i, tabcount=0;
 	ListOfOpenQueryTabs *temp;
 
 	p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();
@@ -5193,7 +5194,7 @@ MDIWindow::DelFromDropdownStructInfo(MDIWindow *wnd, wyInt64 index)
 	wyBool deletedfromstruct = wyFalse, found = wyFalse, delfound = wyFalse;
 	MDIListForDropDrown *pfound = NULL, *p;
 	ListofOpenTabs * temp1, *listofopentabs;
-	wyInt64 i, tabcount;
+	wyInt64 i, tabcount=0;
 	ListOfOpenQueryTabs *temp;
 
 	p = (MDIListForDropDrown *)pGlobals->m_mdilistfordropdown->GetFirst();

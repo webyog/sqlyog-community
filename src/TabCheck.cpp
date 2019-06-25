@@ -244,8 +244,9 @@ TabCheck::InitGrid()
 	hfont = CustomGrid_GetColumnFont(m_hgridtblcheckconst);
 
 	num_cols = sizeof(heading) / sizeof(heading[0]);
-	if (!m_ismysql553)
-		num_cols--;
+	//Bug: SQLyog closes abruptly on creating/altering the table with MySQL v5.0 server versions
+	/*if (!m_ismysql553)
+		num_cols--;*/
 
 	for (counter = 0; counter < num_cols; counter++)
 	{
@@ -526,7 +527,7 @@ TabCheck::GetNewAndModifiedChecks(wyString &query, wyBool  execute)
 		}
 		if (exprstr.GetLength() == 0)
 		{
-			tempstr = "";
+			tempstr.SetAs("");
 			tempstr.SetAs(NO_EXPRESSION_SPECIFIED_FOR_CHECK);
 
 			exprstr.AddSprintf("\t\t/* %s */", _(tempstr.GetString()));
@@ -1532,8 +1533,8 @@ TabCheck::ChangeListOnDelete(CheckConstraintStructWrapper * cwrapobj)
 	{
 		if (cwrapobj->m_oldval != cwrapobj->m_newval)
 		{
-			cwrapobj->m_newval->m_name = "";
-			cwrapobj->m_newval->m_checkexpression = "";
+			cwrapobj->m_newval->m_name.SetAs("");
+			cwrapobj->m_newval->m_checkexpression.SetAs("");
 			delete cwrapobj->m_newval;
 		}
 		cwrapobj->m_newval = NULL;

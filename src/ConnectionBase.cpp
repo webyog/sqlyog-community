@@ -31,6 +31,11 @@
 #include <CommCtrl.h>
 #include "CCustomComboBox.h"
 
+#include <iomanip>
+#include "modes.h"
+#include "aes.h"
+#include "filters.h"
+
 
 #define COMUNITY_HTTP	_(L"HTTP Tunneling (Professional/Enterprise/Ultimate only)")
 #define COMUNITY_SSH	_(L"SSH Tunneling (Professional/Enterprise/Ultimate only)")
@@ -61,6 +66,8 @@ ConnectionBase::ConnectionBase()
 
 	m_isnewconnection = wyFalse;
 	m_newconnid = -1;
+
+	m_isencrypted_clone = wyFalse;
     
 }
 
@@ -387,6 +394,7 @@ ConnectionBase::InitConnDialog(HWND hdlg, HWND combo, wyBool toadd, wyBool selec
    	HWND		hwndcombo;
     wyChar	    seps[] = ";";
     RECT        rct;
+	wyInt32		width;//number of characters in connection name 
     
     rct.left    = 28;
     rct.bottom  = 2;
@@ -470,6 +478,10 @@ ConnectionBase::InitConnDialog(HWND hdlg, HWND combo, wyBool toadd, wyBool selec
     pGlobals->m_pcmainwin->m_connection->PopulateColorArray(hwndcombo, &dirstr);
 
 	SendMessage(hwndcombo, CB_SETCURSEL, index, 0);
+
+	////update the width of dropdown
+	//width = SetComboWidth(hwndcombo);
+	//SendMessage(hwndcombo, CB_SETDROPPEDWIDTH, width + 50, 0); //width + 50 means width of the text + width of the scroll bar
 
 	return;
 }
@@ -790,6 +802,13 @@ ConnectionBase::CloneConnection(HWND hdlg)
 	conn.SetAs(connnamestr.GetAsWideChar());
 	conn.Add("_New");
 
+	wyString isencrypted("");
+	wyIni::IniGetString(m_consectionname.GetString(), "Isencrypted", "0", &isencrypted, dirstr.GetString());
+
+	if (isencrypted.Compare("1") == 0)
+	{
+		m_isencrypted_clone = wyTrue;
+	}
 
 	wcscpy(pconn.m_connname, _(conn.GetAsWideChar()));
 	pconn.m_isnew = wyTrue;
@@ -1517,14 +1536,19 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
 {
 	wyInt32     count, storepwd;
 	HWND		hwndcombo;
-	wyString    timeout, conn, dirstr, pwdstr, tempstr;
+	wyString    timeout, conn, dirstr, pwdstr, tempstr, isencrypted;
 	wyString	codepage, userstr, hoststr, portstr, dbstr;
 	wyWChar     directory[MAX_PATH+1]={0}, *lpfileport=0;
 	wyChar	 	pwd[SIZE_512]={0};
 	wyBool      decodepwd = wyTrue;
 	wyUInt32    ret, usecompress = 1, isdefwaittimeout = 1, readonly = 0/*, usecleartext = 0*/;
 	ConnectionInfo  conninfo;
+	wyInt32 version = 0, versionum = MAJOR_VERSION_INT * 10000 + MINOR_VERSION_INT * 100 + UPDATE_VERSION_INT;
+	wyString value("");
+	wyString inipath(""), backupfilepath("");
 	
+	value.AddSprintf("%d", versionum);
+
 	// Get the complete path.
 	ret = SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
 
@@ -1544,6 +1568,83 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
 	VERIFY(count != CB_ERR);
 	count = SendMessage(hwndcombo, CB_GETITEMDATA, count, 0);
 	conn.Sprintf("Connection %u", count);
+	
+	//version = wyIni::IniGetInt(SECTION_NAME, "version", 0, dirstr.GetString());
+	//if (version == 0)
+	//{
+	//	inipath.SetAs(dirstr.GetString());
+	//	backupfilepath.SetAs(dirstr.GetString());
+
+	//	backupfilepath.Strip(strlen("sqlyog.ini") + 1);
+	//	backupfilepath.AddSprintf("\\sqlyog_backup.ini");
+	//	CopyAndRename(dirstr, inipath, backupfilepath);
+	//	
+	//}
+
+	////we will create the backup only once, perticulary for v13.1.3 release
+	//wyIni::IniWriteString(SECTION_NAME, "version", value.GetString(), dirstr.GetString());
+
+	ret = wyIni::IniGetString(conn.GetString(), "Isencrypted", "0", &isencrypted, dirstr.GetString());
+	if (isencrypted.Compare("0") == 0)
+	{
+		//MigrateAllPassword(conn.GetString(),dirstr.GetString());
+		ret = wyIni::IniGetString(conn.GetString(), "Password", "", &pwdstr, dirstr.GetString());
+		if (!ret)
+		{
+			wyIni::IniWriteString(conn.GetString(), "Password", "", dirstr.GetString());
+		}
+		else
+		{
+			wyString pwdstr1("");
+			pwdstr1.SetAs(pwdstr.GetString());
+			MigratePassword(conn.GetString(), dirstr.GetString(), pwdstr1);
+			wyIni::IniWriteString(conn.GetString(), "Password", pwdstr1.GetString(), dirstr.GetString());
+		}
+		////Encrypt the proxy pwd password
+		ret = wyIni::IniGetString(conn.GetString(), "ProxyPwd", "", &pwdstr, dirstr.GetString());
+		if (!ret)
+		{
+			wyIni::IniWriteString(conn.GetString(), "ProxyPwd", "", dirstr.GetString());
+		}
+		else
+		{
+			wyString pwdstr1("");
+			pwdstr1.SetAs(pwdstr.GetString());
+			MigratePassword(conn.GetString(), dirstr.GetString(), pwdstr1);
+			wyIni::IniWriteString(conn.GetString(), "ProxyPwd", pwdstr1.GetString(), dirstr.GetString());
+		}
+		//Encrypt the ssh pwd password
+		ret = wyIni::IniGetString(conn.GetString(), "SshPwd", "", &pwdstr, dirstr.GetString());
+		if (!ret)
+		{
+			wyIni::IniWriteString(conn.GetString(), "SshPwd", "", dirstr.GetString());
+		}
+		else
+		{
+			wyString pwdstr1("");
+			pwdstr1.SetAs(pwdstr.GetString());
+			MigratePassword(conn.GetString(), dirstr.GetString(), pwdstr1);
+			wyIni::IniWriteString(conn.GetString(), "SshPwd", pwdstr1.GetString(), dirstr.GetString());
+		}
+
+		//Encrypt the 401 pwd password
+		ret = wyIni::IniGetString(conn.GetString(), "401Pwd", "", &pwdstr, dirstr.GetString());
+		if (!ret)
+		{
+			wyIni::IniWriteString(conn.GetString(), "401Pwd", "", dirstr.GetString());
+		}
+		else
+		{
+			wyString pwdstr1("");
+			pwdstr1.SetAs(pwdstr.GetString());
+			MigratePassword(conn.GetString(), dirstr.GetString(), pwdstr1);
+			wyIni::IniWriteString(conn.GetString(), "401Pwd", pwdstr1.GetString(), dirstr.GetString());
+		}
+
+		wyIni::IniWriteString(conn.GetString(), "Isencrypted", "1", dirstr.GetString());
+		conninfo.m_isencrypted = 1; 
+		
+	}
 
 	/* starting from 4.0 beta 6 we keep the passwords in encoded form so we have delete the earlier password */
 	/* first time the password breaks and you get an empty string but after that its OK */
@@ -1554,8 +1655,9 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
     
     strcpy(pwd, pwdstr.GetString());
 
-	DecodePassword(pwdstr);
-	
+	//pwdstr.FindAndReplace("\\n", "\n");
+	wyString::JsonDeEscapeForEncryptPassword(pwdstr);
+
 	ret = wyIni::IniGetString(conn.GetString(), "User", "root", &userstr, dirstr.GetString());
 	ret = wyIni::IniGetString(conn.GetString(), "Host", "localhost", &hoststr, dirstr.GetString());
 	ret = wyIni::IniGetString(conn.GetString(), "Port", "3306", &portstr, dirstr.GetString());
@@ -1565,6 +1667,8 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
     /* starting from 5.0 we allow a user to store password */
 	storepwd = wyIni::IniGetInt(conn.GetString(), "StorePassword", 1, dirstr.GetString());
 	Button_SetCheck(GetDlgItem(hdlg, IDC_DLGCONNECT_STOREPASSWORD), storepwd);
+	
+	DecodePassword(pwdstr);
 
 	//Compressed prtocol
 	usecompress = wyIni::IniGetInt(conn.GetString(), "compressedprotocol", 1, dirstr.GetString());
@@ -1643,6 +1747,7 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
 	{
 		pwdstr.SetAs(pwd);
 		EncodePassword(pwdstr);
+		pwdstr.JsonEscapeForEncryptPassword();
 		strcpy(pwd, pwdstr.GetString());
 		dirstr.SetAs(directory);
 		wyIni::IniWriteString(conn.GetString(), "Password", pwdstr.GetString(), dirstr.GetString());
@@ -2499,7 +2604,7 @@ ConnectionBase::SaveServerDetails(HWND hwnd, const wyChar *conn, const wyChar *d
 {
     wyInt32     ret = 1, value = 1;
     wyWChar     temp[SIZE_1024] = {0};
-	wyString    tempstr;
+	wyString    tempstr, isencrypted;
 
     // Server Host
     SendMessage(GetDlgItem(hwnd, IDC_DLGCONNECT_HOST), WM_GETTEXT, SIZE_512-1,(LPARAM)temp);
@@ -2526,8 +2631,11 @@ ConnectionBase::SaveServerDetails(HWND hwnd, const wyChar *conn, const wyChar *d
     {
         ret	= SendMessage(GetDlgItem(hwnd, IDC_DLGCONNECT_PASSWORD), WM_GETTEXT, sizeof(temp), (LPARAM)temp);
 		tempstr.SetAs(temp);
+		tempstr.JsonEscapeForEncryptPassword();
         EncodePassword(tempstr);
+		tempstr.JsonEscapeForEncryptPassword();
 		ret = wyIni::IniWriteString(conn, "Password", tempstr.GetString(), directory);
+		wyIni::IniWriteString(conn, "Isencrypted", "1", directory);
     }
     else
     {
@@ -2575,6 +2683,17 @@ ConnectionBase::SaveServerDetails(HWND hwnd, const wyChar *conn, const wyChar *d
 	tempstr.SetAs(temp);
 	if(wcslen(temp))
 		wyIni::IniWriteString(conn, "keep_alive", tempstr.GetString(), directory);
+
+	//if the flag is already updated, then skip this section, only for clone connnection, use this block
+	ret = wyIni::IniGetString(conn, "Isencrypted", "0", &isencrypted, directory);
+	if (isencrypted.Compare("0") == 0)
+	{
+		if (m_isencrypted_clone)
+		{
+			wyIni::IniWriteString(conn, "Isencrypted", "1", directory);
+		}
+
+	}
 
 }
 
@@ -2890,3 +3009,27 @@ ConnectionBase::GetKeepAliveInterval(HWND hdlg, ConnectionInfo *coninfo)
     coninfo->m_keepaliveinterval = GetDlgItemInt(hdlg, IDC_PINGINTERVAL, NULL, wyFalse);
 }
 
+wyBool
+ConnectionBase::CopyAndRename(wyString& directorystr, wyString& fullpathstr, wyString& newpath)
+{
+	fullpathstr.Strip(strlen("sqlyog.ini") + 1);
+	if (!CreateDirectory(fullpathstr.GetAsWideChar(), NULL))
+	{
+		/* If the folder is there , then we will continue the process, otherwise we will return wyFalse */
+		if (GetLastError() != ERROR_ALREADY_EXISTS)
+			return wyFalse;
+	}
+	fullpathstr.AddSprintf("\\sqlyog_backup.ini");
+	if (CopyFile(directorystr.GetAsWideChar(), fullpathstr.GetAsWideChar(), TRUE))
+	{
+		if (_wrename(directorystr.GetAsWideChar(), newpath.GetAsWideChar()) == 0)
+		{
+			return wyTrue;
+		}
+	}
+	else
+	{
+		return wyFalse;
+	}
+	return wyTrue;
+}

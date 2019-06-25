@@ -2804,10 +2804,19 @@ DataView::IsCurrRowDuplicatable()
     }
     
     //if it can be ediited
-	if(m_data->m_db.GetLength() && m_data->m_table.GetLength() && GetActiveWin()->m_conninfo.m_isreadonly == wyFalse)
-    {
-        return wyTrue;
-    }
+#ifndef COMMUNITY
+	if (m_data->m_db.GetLength() && m_data->m_table.GetLength() && GetActiveWin()->m_conninfo.m_isreadonly == wyFalse)
+	{
+		return wyTrue;
+	}
+#else
+	if (m_data->m_db.GetLength() && m_data->m_table.GetLength())// && GetActiveWin()->m_conninfo.m_isreadonly == wyFalse)
+	{
+		return wyTrue;
+	}
+#endif // !COMMUNITY
+
+
 
     return wyFalse;
 }

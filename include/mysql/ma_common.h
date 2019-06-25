@@ -21,8 +21,22 @@
 #define _ma_common_h
 
 #include <mysql.h>
-#include <hash.h>
+#include <ma_hash.h>
 
+enum enum_multi_status {
+  COM_MULTI_OFF= 0,
+  COM_MULTI_CANCEL,
+  COM_MULTI_ENABLED,
+  COM_MULTI_DISABLED,
+  COM_MULTI_END
+};
+
+
+typedef enum {
+  ALWAYS_ACCEPT,       /* heuristics is disabled, use CLIENT_LOCAL_FILES */
+  WAIT_FOR_QUERY,      /* heuristics is enabled, not sending files */
+  ACCEPT_FILE_REQUEST  /* heuristics is enabled, ready to send a file */
+} auto_local_infile_state;
 
 typedef struct st_mariadb_db_driver
 {
@@ -48,11 +62,52 @@ struct st_mysql_options_extension {
                           double progress,
                           const char *proc_info,
                           unsigned int proc_info_length);
-  MARIADB_DB_DRIVER       *db_driver;
-  char *ssl_fp; /* finger print of server certificate */
-  char *ssl_fp_list; /* white list of finger prints */
-  int (*verify_local_infile)(void *data, const char *filename);
+  MARIADB_DB_DRIVER *db_driver;
+  char *tls_fp; /* finger print of server certificate */
+  char *tls_fp_list; /* white list of finger prints */
+  char *tls_pw; /* password for encrypted certificates */
+  my_bool multi_command; /* indicates if client wants to send multiple
+                            commands in one packet */
+  char *url; /* for connection handler we need to save URL for reconnect */
+  unsigned int tls_cipher_strength;
+  char *tls_version;
+  my_bool read_only;
+  char *connection_handler;
+  my_bool (*set_option)(MYSQL *mysql, const char *config_option, const char *config_value);
+  HASH userdata;
+  char *server_public_key;
+  char *proxy_header;
+  size_t proxy_header_len;
 };
 
+typedef struct st_connection_handler
+{
+  struct st_ma_connection_plugin *plugin;
+  void *data;
+  my_bool active;
+  my_bool free_data;
+} MA_CONNECTION_HANDLER;
+
+struct st_mariadb_net_extension {
+  enum enum_multi_status multi_status;
+};
+
+struct st_mariadb_session_state
+{
+  LIST *list,
+       *current;
+};
+
+struct st_mariadb_extension {
+  MA_CONNECTION_HANDLER *conn_hdlr;
+  struct st_mariadb_session_state session_state[SESSION_TRACK_TYPES];
+  unsigned long mariadb_client_flag; /* MariaDB specific client flags */
+  unsigned long mariadb_server_capabilities; /* MariaDB specific server capabilities */
+  my_bool auto_local_infile;
+};
+
+#define OPT_EXT_VAL(a,key) \
+  ((a)->options.extension && (a)->options.extension->key) ?\
+    (a)->options.extension->key : 0
 
 #endif

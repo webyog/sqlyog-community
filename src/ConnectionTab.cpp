@@ -123,15 +123,18 @@ ConnectionTab::InsertConnectionTab(wyString * title, LPARAM lparam, wyBool iscon
 	}
 
 	hwndtab = pGlobals->m_pcmainwin->m_hwndconntab;
-	pGlobals->m_conncount;
-	tabname.Sprintf(" %s", wnd->m_title.GetString());
+	if (hwndtab)
+	{
+		tabname.Sprintf(" %s", wnd->m_title.GetString());
 
-	ListofOpenTabs *tabdetails = new ListofOpenTabs;
+		ListofOpenTabs *tabdetails = new ListofOpenTabs;
 
-	//set the node of global m_connectiontabnamelist
-	tabdetails->name.SetAs(wnd->m_title.GetString());
-	tabdetails->m_hwndTabModuleinlist = hwndTabModule;
-	pGlobals->m_connectiontabnamelist->Insert(tabdetails);
+		//set the node of global m_connectiontabnamelist
+		tabdetails->name.SetAs(wnd->m_title.GetString());
+		tabdetails->m_hwndTabModuleinlist = hwndTabModule;
+		pGlobals->m_connectiontabnamelist->Insert(tabdetails);
+	}
+
 
 	CTCITEM				item = {0};
 	item.m_psztext    = (wyChar*)tabname.GetString();

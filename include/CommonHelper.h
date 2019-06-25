@@ -59,7 +59,6 @@
 
 #define		FMT_SPACE_4 "    " 
 
-
 #define		REGKEY			"Use any UUID here"
 
 
@@ -568,6 +567,8 @@ wyInt32 GetBitFieldColumnWidth(wyString &strcreate, wyInt32 fieldpos);
 */
 wyInt32  GetModuleNameLength();
 
+wyBool	GetModuleDir(wyString &path);
+
 //Gets the mysql specific escaped value.
 /**
 @param tunnel	: IN Tunnel pointer
@@ -949,14 +950,14 @@ wyBool          IsDatatypeNumeric(wyString  &datatype);
 @param  text         : IN String to decode
 @returns wyTrue on success
 */
-wyBool	DecodePassword(wyString &text);
+wyBool	DecodePassword_Absolute(wyString &text);
 
 /// Encoding of password
 /**
 @param  text         : IN String to decode
 @returns wyTrue on success
 */
-wyBool	EncodePassword(wyString &text);
+wyBool	EncodePassword_Absolute(wyString &text);
 
 /// Rotate string left , bitwise
 /**
@@ -975,6 +976,27 @@ void    RotateBitLeft (unsigned char *str);
 void    RemoveDefiner(wyString &text, const wyChar* pattern, wyInt32 extra);
 
 void    RemoveBrackets(wyString &text, const wyChar* pattern);
+
+/// Encryption of password
+/**
+@param  text         : IN String to decode
+@returns wyTrue on success
+*/
+wyBool	EncodePassword(wyString &text);
+
+/// Decoding of password
+/**
+@param  text         : IN String to decode
+@returns wyTrue on success
+*/
+wyBool	DecodePassword(wyString &text);
+
+//Encrypt the password
+wyBool	MigrateAllPassword(wyString conn, wyString dirstr);
+
+wyBool	MigratePassword(wyString conn, wyString dirstr, wyString &pwdstr);
+
+wyBool	MigratePassword(wyString &pwdstr);
 
 //void DebugLog(const char *buffer);
 #ifdef _WIN32

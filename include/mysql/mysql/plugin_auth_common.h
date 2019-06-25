@@ -15,6 +15,7 @@
    Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
    MA 02111-1301, USA */
 
+
 #ifndef MYSQL_PLUGIN_AUTH_COMMON_INCLUDED
 /**
   @file
@@ -25,7 +26,7 @@
 #define MYSQL_PLUGIN_AUTH_COMMON_INCLUDED
 
 /** the max allowed length for a user name */
-#define MYSQL_USERNAME_LENGTH  512
+#define MYSQL_USERNAME_LENGTH 512
 
 /**
   return values of the plugin authenticate_user() method.

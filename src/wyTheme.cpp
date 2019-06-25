@@ -147,7 +147,7 @@ wyTheme::GetThemes(LPTHEMEINFO* pthemeinfo)
     BOOL            ret;
     wyInt32         i = -1, size, j;
     THEMEINFO       ti;
-    TiXmlDocument*  ptx;
+    tinyxml2::XMLDocument*  ptx;
 	wyInt32         themes[] = {0, AZURETHEME,METROTHEME};
 
     //first initialize the array pointer
@@ -1127,8 +1127,8 @@ wyBool
 wyTheme::InitTheme()
 {
     wyString        themefile;
-    TiXmlDocument*  ptixd;
-    TiXmlElement*   ele;
+    tinyxml2::XMLDocument*  ptixd;
+    tinyxml2::XMLElement*   ele;
     COLORREF        color;
     const wyChar*   attr;
 
@@ -1222,7 +1222,7 @@ wyTheme::GetSetThemeInfo(wyInt32 mode, LPTHEMEINFO pthemeinfo, wyString* pthemed
     wyWChar*        lpfileport = NULL;
     wyString        dirstr, themefile;
     wyInt32         themetype;
-    TiXmlDocument*  ptx = NULL;
+    tinyxml2::XMLDocument*  ptx = NULL;
 
     //search for ini
     if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyFalse)
@@ -1305,15 +1305,15 @@ wyTheme::GetSetThemeInfo(wyInt32 mode, LPTHEMEINFO pthemeinfo, wyString* pthemed
 }
 
 //function to load the theme file
-TiXmlDocument* 
+tinyxml2::XMLDocument* 
 wyTheme::LoadTheme(wyString* pthemedir, LPTHEMEINFO pthemeinfo)
 {
     FILE*           file;
     wyString        temp;
     wyInt32         size, id;
     wyChar*         data = NULL;
-    TiXmlDocument*  ptixd;
-    TiXmlElement*   ele;
+    tinyxml2::XMLDocument*  ptixd;
+    tinyxml2::XMLElement*   ele;
     const wyChar    *tagname, *attr;
     HRSRC           hrsc;
     HGLOBAL		    htheme;
@@ -1380,7 +1380,7 @@ wyTheme::LoadTheme(wyString* pthemedir, LPTHEMEINFO pthemeinfo)
     }
 
     //create a new xml document and set the data
-    ptixd = new TiXmlDocument();
+    ptixd = new tinyxml2::XMLDocument();
     ptixd->Parse(data);
     delete[] data;
 
@@ -1411,9 +1411,9 @@ wyTheme::LoadTheme(wyString* pthemedir, LPTHEMEINFO pthemeinfo)
 
 //function creates the background brush
 HBRUSH 
-wyTheme::CreateBgBrush(TiXmlElement* prootele, const wyChar* element)
+wyTheme::CreateBgBrush(tinyxml2::XMLElement* prootele, const wyChar* element)
 {
-    TiXmlElement* pele;
+    tinyxml2::XMLElement* pele;
     COLORREF      color;
     HBRUSH        hbrush = NULL;    
 
@@ -1435,9 +1435,9 @@ wyTheme::CreateBgBrush(TiXmlElement* prootele, const wyChar* element)
 
 //function to set dual colors
 void
-wyTheme::SetDualColors(TiXmlElement* prootele, const wyChar* element, const wyChar* subele, const wyChar* attrib1, const wyChar* attrib2, DUALCOLOR* pdualcolor)
+wyTheme::SetDualColors(tinyxml2::XMLElement* prootele, const wyChar* element, const wyChar* subele, const wyChar* attrib1, const wyChar* attrib2, DUALCOLOR* pdualcolor)
 {
-    TiXmlElement* pele;
+    tinyxml2::XMLElement* pele;
     
     memset(pdualcolor, 0, sizeof(DUALCOLOR));
 
@@ -1454,9 +1454,9 @@ wyTheme::SetDualColors(TiXmlElement* prootele, const wyChar* element, const wyCh
 
 //function to create tab color
 void 
-wyTheme::CreateTabColors(TiXmlElement* prootele, const wyChar* element, LPTABCOLORINFO pcolorinfo)
+wyTheme::CreateTabColors(tinyxml2::XMLElement* prootele, const wyChar* element, LPTABCOLORINFO pcolorinfo)
 {
-    TiXmlElement* pele;
+    tinyxml2::XMLElement* pele;
     const wyChar* strtemp;
 
     memset(pcolorinfo, 0, sizeof(TABCOLORINFO));
@@ -1501,9 +1501,9 @@ wyTheme::CreateTabColors(TiXmlElement* prootele, const wyChar* element, LPTABCOL
 
 //function to read the color from the element
 wyBool
-wyTheme::GetColorInfo(TiXmlElement* pele, const wyChar* element, const wyChar* attribute, COLORREF* pcolor)
+wyTheme::GetColorInfo(tinyxml2::XMLElement* pele, const wyChar* element, const wyChar* attribute, COLORREF* pcolor)
 {
-    TiXmlElement*   pchildele = pele;
+    tinyxml2::XMLElement*   pchildele = pele;
     const wyChar*   strcolor;
 
     //if we have specified a child element, then get the pointer to the element, else continue with the main element

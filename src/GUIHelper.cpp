@@ -9165,11 +9165,12 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo,
 	inimgr->IniGetString2(connstr.GetString(), "User", "root", &conninfo->m_user, pathstr.GetString());
 	conninfo->m_isstorepwd = inimgr->IniGetInt2(connstr.GetString(), "StorePassword", 1, pathstr.GetString()) ? wyTrue: wyFalse;
 	inimgr->IniGetString2(connstr.GetString(), "Password", "", &conninfo->m_pwd, pathstr.GetString());
+
+	wyString::JsonDeEscapeForEncryptPassword(conninfo->m_pwd);
 	DecodePassword(conninfo->m_pwd);
+	
 	conninfo->m_port = inimgr->IniGetInt2(connstr.GetString(), "Port", 3306, pathstr.GetString());
 	
-	
-
 	inimgr->IniGetString2(connstr.GetString(), "Database","", &conninfo->m_db, pathstr.GetString());
 	conninfo->m_iscompress = inimgr->IniGetInt2(connstr.GetString(), "compressedprotocol", 0, pathstr.GetString()) ? wyTrue: wyFalse;
 #ifndef COMMUNITY
@@ -9202,13 +9203,16 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo,
 		auth->proxyport = inimgr->IniGetInt2(connstr.GetString(), "ProxyPort", 808, pathstr.GetString());
 		inimgr->IniGetString2(connstr.GetString(), "ProxyUser", "", &proxyusername, pathstr.GetString());
 		inimgr->IniGetString2(connstr.GetString(), "ProxyPwd", "", &proxypwd, pathstr.GetString());
-	
+
 		wcscpy(auth->proxy, proxy.GetAsWideChar());
 		wcscpy(auth->proxyusername, proxyusername.GetAsWideChar());
 		wcscpy(auth->proxypwd, proxypwd.GetAsWideChar());
 
-		if(proxypwd.GetLength())
+		if (proxypwd.GetLength())
+		{
+			wyString::JsonDeEscapeForEncryptPassword(proxypwd);
 			DecodePassword(proxypwd);
+		}
 		wcscpy(auth->proxypwd, proxypwd.GetAsWideChar());
 
 		/* get the 401 error and decode the password too */
@@ -9217,8 +9221,11 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo,
 
 		wcscpy(auth->chalusername, chalusername.GetAsWideChar());
 
-		if(chalpwd.GetLength())
+		if (chalpwd.GetLength())
+		{
+			wyString::JsonDeEscapeForEncryptPassword(chalpwd);
 			DecodePassword(chalpwd);
+		}
 
 		wcscpy(auth->chalpwd, chalpwd.GetAsWideChar());
 
@@ -9233,6 +9240,7 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo,
 	conninfo->m_isssh = inimgr->IniGetInt2(connstr.GetString(), "SSH",	0, pathstr.GetString()) ? wyTrue: wyFalse;
 	inimgr->IniGetString2(connstr.GetString(), "SshUser", "", &conninfo->m_sshuser, pathstr.GetString());
 	inimgr->IniGetString2(connstr.GetString(), "SshPwd", "", &conninfo->m_sshpwd, pathstr.GetString());
+	wyString::JsonDeEscapeForEncryptPassword(conninfo->m_sshpwd);
 	DecodePassword(conninfo->m_sshpwd);
 	inimgr->IniGetString2(connstr.GetString(), "SshHost", "", &conninfo->m_sshhost, pathstr.GetString());
 	conninfo->m_sshport = inimgr->IniGetInt2 (connstr.GetString(), "SshPort", 0, pathstr.GetString());
@@ -9548,7 +9556,7 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 	sqliteobj->Prepare(&res, sqlitequery.GetString());
 	if(sqliteobj->Step(&res, wyFalse) && sqliteobj->GetLastCode() == SQLITE_ROW)
 	{
-		 //= sqliteobj->GetInt(&res, 0);
+		 wyInt32 isencrypted = sqliteobj->GetInt(&res, "isencrypted");
 		 colval = sqliteobj->GetText(&res , "position");
 		 if(colval)
 			 position = sqliteobj->GetInt(&res , "position");
@@ -9578,8 +9586,16 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 		 colval = sqliteobj->GetText(&res , "Password"); 
 		 if(colval)
 			 conninfo->m_pwd.SetAs(colval);
+		 if (isencrypted == 0)
+		 {
+			 wyString pwdstr("");
+			 pwdstr.SetAs(conninfo->m_pwd);
+			 MigratePassword(pwdstr);
+			 conninfo->m_pwd.SetAs(pwdstr);
+			
+		 }
+		 wyString::JsonDeEscapeForEncryptPassword(conninfo->m_pwd);
 		 DecodePassword(conninfo->m_pwd);
-
 		 colval = sqliteobj->GetText(&res , "Port");
 		 if(colval)
 			 conninfo->m_port = sqliteobj->GetInt(&res , "Port");
@@ -9680,8 +9696,16 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 			 wcscpy(auth->proxyusername, proxyusername.GetAsWideChar());
 			 wcscpy(auth->proxypwd, proxypwd.GetAsWideChar());
 
-			 if(proxypwd.GetLength())
+			 if (isencrypted == 0)
+			 {
+				 MigratePassword(proxypwd);
+			 }
+
+			 if (proxypwd.GetLength())
+			 {
+				wyString::JsonDeEscapeForEncryptPassword(proxypwd);
 				DecodePassword(proxypwd);
+			 }
 			 wcscpy(auth->proxypwd, proxypwd.GetAsWideChar());
 
 			 colval = sqliteobj->GetText(&res , "User401");
@@ -9694,8 +9718,15 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 
 			 wcscpy(auth->chalusername, chalusername.GetAsWideChar());
 
-			 if(chalpwd.GetLength())
+			 if (isencrypted == 0)
+			 {
+				 MigratePassword(chalpwd);
+			 }
+			 if (chalpwd.GetLength())
+			 {
+				wyString::JsonDeEscapeForEncryptPassword(chalpwd);
 				DecodePassword(chalpwd);
+			 }
 
 			 wcscpy(auth->chalpwd, chalpwd.GetAsWideChar());
 
@@ -9725,6 +9756,14 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 		 colval = sqliteobj->GetText(&res , "SshPwd");
 		 if(colval)
 			 conninfo->m_sshpwd.SetAs(colval);
+
+
+		 if (isencrypted == 0)
+		 {
+			 MigratePassword(conninfo->m_sshpwd);
+		 }
+
+		 wyString::JsonDeEscapeForEncryptPassword(conninfo->m_sshpwd);
 		 DecodePassword(conninfo->m_sshpwd);
 
 		 colval = sqliteobj->GetText(&res , "SshHost");
@@ -9892,6 +9931,7 @@ WriteFullSectionToFile(FILE *out_stream, wyInt32 conno, ConnectionInfo *coninfo,
 		pass.SetAs(coninfo->m_pwd);
 	}
 	EncodePassword(pass);
+	pass.JsonEscapeForEncryptPassword();
 	temp.Sprintf("Password=%s\r\n", pass.GetString());
 	fputs(temp.GetString(), out_stream);
 
@@ -9958,8 +9998,11 @@ WriteFullSectionToFile(FILE *out_stream, wyInt32 conno, ConnectionInfo *coninfo,
 		fputs(temp.GetString(), out_stream);
 		
 		tempstr.SetAs(auth->proxypwd);
-		if(tempstr.GetLength() != 0)
-				EncodePassword(tempstr);
+		if (tempstr.GetLength() != 0)
+		{
+			EncodePassword(tempstr);
+			tempstr.JsonEscapeForEncryptPassword();
+		}
     
 		temp.Sprintf("ProxyPwd=%s\r\n", tempstr.GetString());
 		fputs(temp.GetString(), out_stream);
@@ -9973,8 +10016,11 @@ WriteFullSectionToFile(FILE *out_stream, wyInt32 conno, ConnectionInfo *coninfo,
 		fputs(temp.GetString(), out_stream);
 		
 		tempstr.SetAs(auth->chalpwd);
-		if(tempstr.GetLength())
+		if (tempstr.GetLength())
+		{
 			EncodePassword(tempstr);
+			tempstr.JsonEscapeForEncryptPassword();
+		}
 
 		temp.Sprintf("401Pwd=%s\r\n", tempstr.GetString());
 		fputs(temp.GetString(), out_stream);
@@ -9997,6 +10043,7 @@ WriteFullSectionToFile(FILE *out_stream, wyInt32 conno, ConnectionInfo *coninfo,
 	if(tempstr.GetLength())
 	{
 		EncodePassword(tempstr);
+		tempstr.JsonEscapeForEncryptPassword();
 	}
 
 	temp.Sprintf("SshPwd=%s\r\n", tempstr.GetString());
@@ -10120,8 +10167,8 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 	wySQLite	*sqliteobj;
 	sqliteobj = ssnsqliteobj ? ssnsqliteobj : pGlobals->m_sqliteobj;
 
-	sqlitequery->Sprintf("INSERT INTO conndetails (Id ,position ,ObjectbrowserBkcolor  ,ObjectbrowserFgcolor  ,isfocussed ,Name   ,Host   ,User   ,Password   ,Port  ,StorePassword  ,keep_alive  ,Database   ,compressedprotocol  ,defaulttimeout  ,waittimeoutvalue  ,Tunnel  ,Http   ,HTTPTime  ,HTTPuds  ,HTTPudsPath   , Is401  ,IsProxy  ,Proxy   , ProxyUser  , ProxyPwd   , ProxyPort   , User401 , Pwd401 , ContentType , HttpEncode  ,SSH  ,SshUser  ,SshPwd  ,SshHost  ,SshPort  ,SshForHost  ,SshPasswordRadio  ,SSHPrivateKeyPath  ,SshSavePassword  ,SslChecked  ,SshAuth  ,Client_Key  ,Client_Cert  ,CA  ,Cipher  ,sqlmode_global  ,sqlmode_value ,init_command ,readonly ) VALUES \
-												  (?   ,?       ,?						,?						  ,?	     ,?       ,?       ,?       ,?       ,?       ,?           ,?          ,?          ,?			       ,?				       ,?			 ,?       ,?       ,?       ,?       ,?					,?       ,?       ,?       ,?		       ,?	       ,?	       ,?	       ,?	       ,?	       ,?       ,?       ,?       ,?       ,?       ,?       ,?				 ,?			       ,?			       ,?			       ,?		    ,?       ,?          ,?           ,?     ,?       ,?			  ,?			,?			,?)");
+	sqlitequery->Sprintf("INSERT INTO conndetails (Id ,position ,ObjectbrowserBkcolor  ,ObjectbrowserFgcolor  ,isfocussed ,Name   ,Host   ,User   ,Password   ,Port  ,StorePassword  ,keep_alive  ,Database   ,compressedprotocol  ,defaulttimeout  ,waittimeoutvalue  ,Tunnel  ,Http   ,HTTPTime  ,HTTPuds  ,HTTPudsPath   , Is401  ,IsProxy  ,Proxy   , ProxyUser  , ProxyPwd   , ProxyPort   , User401 , Pwd401 , ContentType , HttpEncode  ,SSH  ,SshUser  ,SshPwd  ,SshHost  ,SshPort  ,SshForHost  ,SshPasswordRadio  ,SSHPrivateKeyPath  ,SshSavePassword  ,SslChecked  ,SshAuth  ,Client_Key  ,Client_Cert  ,CA  ,Cipher  ,sqlmode_global  ,sqlmode_value ,init_command ,readonly, isencrypted ) VALUES \
+												  (?   ,?       ,?						,?						  ,?	     ,?       ,?       ,?       ,?       ,?       ,?           ,?          ,?          ,?			       ,?				       ,?			 ,?       ,?       ,?       ,?       ,?					,?       ,?       ,?       ,?		       ,?	       ,?	       ,?	       ,?	       ,?	       ,?       ,?       ,?       ,?       ,?       ,?       ,?				 ,?			       ,?			       ,?			       ,?		    ,?       ,?          ,?           ,?     ,?       ,?			  ,?			,?			,?			,?)");
 	
 	sqliteobj->Prepare(&stmt,sqlitequery->GetString());
 	
@@ -10152,6 +10199,7 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 		pass.SetAs(coninfo->m_pwd);
 	}
 	EncodePassword(pass);
+	//pass.JsonEscapeForEncryptPassword();
 
 	sqliteobj->SetText(&stmt, 9, pass.GetLength()?pass.GetString():"");
 
@@ -10185,43 +10233,45 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 
 	auth = &pGlobals->m_pcmainwin->m_tunnelauth;
 
-	if(auth)
+	if (auth)
 	{
-		if(auth->ischallenge)
+		if (auth->ischallenge)
 			//sqlitequery->AddSprintf("1 ,");
 			sqliteobj->SetInt(&stmt, 22, 1);
-			//fputs("Is401=1\r\n", out_stream);
+		//fputs("Is401=1\r\n", out_stream);
 		else
 			//sqlitequery->AddSprintf("0 ,");
 			sqliteobj->SetInt(&stmt, 22, 0);
-			//fputs("Is401=0\r\n", out_stream);
-		
-		if(auth->isproxy)
+		//fputs("Is401=0\r\n", out_stream);
+
+		if (auth->isproxy)
 			//sqlitequery->AddSprintf("1 ,");
 			sqliteobj->SetInt(&stmt, 23, 1);
-			//fputs("IsProxy=1\r\n", out_stream);
+		//fputs("IsProxy=1\r\n", out_stream);
 		else
 			//sqlitequery->AddSprintf("0 ,");
 			sqliteobj->SetInt(&stmt, 23, 0);
 
-		
+
 		tempstr.SetAs(auth->proxy);
 
-		sqliteobj->SetText(&stmt, 24, tempstr.GetLength()? tempstr.GetString():"");
+		sqliteobj->SetText(&stmt, 24, tempstr.GetLength() ? tempstr.GetString() : "");
 
 
 		tempstr.SetAs(auth->proxyusername);
 
-		sqliteobj->SetText(&stmt, 25, tempstr.GetLength()? tempstr.GetString():"");
+		sqliteobj->SetText(&stmt, 25, tempstr.GetLength() ? tempstr.GetString() : "");
 
-		
+
 		tempstr.SetAs(auth->proxypwd);
-		if(tempstr.GetLength() != 0)
-				EncodePassword(tempstr);
+		if (tempstr.GetLength() != 0)
+		{
+			EncodePassword(tempstr);
+		}
 
-		sqliteobj->SetText(&stmt, 26, tempstr.GetLength()? tempstr.GetString():"");
+		sqliteobj->SetText(&stmt, 26, tempstr.GetLength() ? tempstr.GetString() : "");
 
-		
+
 		tempstr.Sprintf("%d", auth->proxyport);
 
 		sqliteobj->SetInt(&stmt, 27, auth->proxyport);
@@ -10229,12 +10279,14 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 
 		tempstr.SetAs(auth->chalusername);
 
-		sqliteobj->SetText(&stmt, 28, tempstr.GetLength()? tempstr.GetString():"");
+		sqliteobj->SetText(&stmt, 28, tempstr.GetLength() ? tempstr.GetString() : "");
 
-		
 		tempstr.SetAs(auth->chalpwd);
-		if(tempstr.GetLength())
+		if (tempstr.GetLength())
+		{
 			EncodePassword(tempstr);
+		}
+	
 		sqliteobj->SetText(&stmt, 29, tempstr.GetLength()? tempstr.GetString():"");
 
 		tempstr.SetAs(auth->content_type);
@@ -10293,6 +10345,8 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 	sqliteobj->SetText(&stmt, 49,  coninfo->m_initcommand.GetLength()?coninfo->m_initcommand.GetString():"");
 
 	sqliteobj->SetInt(&stmt, 50, coninfo->m_isreadonly);
+
+	sqliteobj->SetInt(&stmt, 51, 1);
 
 	sqliteobj->Step(&stmt, wyFalse);
 	sqliteobj->Finalize(&stmt);
