@@ -9166,7 +9166,7 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo,
 	conninfo->m_isstorepwd = inimgr->IniGetInt2(connstr.GetString(), "StorePassword", 1, pathstr.GetString()) ? wyTrue: wyFalse;
 	inimgr->IniGetString2(connstr.GetString(), "Password", "", &conninfo->m_pwd, pathstr.GetString());
 
-	wyString::JsonDeEscapeForEncryptPassword(conninfo->m_pwd);
+	wyString::DecodeBase64Password(conninfo->m_pwd);
 	DecodePassword(conninfo->m_pwd);
 	
 	conninfo->m_port = inimgr->IniGetInt2(connstr.GetString(), "Port", 3306, pathstr.GetString());
@@ -9210,7 +9210,7 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo,
 
 		if (proxypwd.GetLength())
 		{
-			wyString::JsonDeEscapeForEncryptPassword(proxypwd);
+			wyString::DecodeBase64Password(proxypwd);
 			DecodePassword(proxypwd);
 		}
 		wcscpy(auth->proxypwd, proxypwd.GetAsWideChar());
@@ -9223,7 +9223,7 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo,
 
 		if (chalpwd.GetLength())
 		{
-			wyString::JsonDeEscapeForEncryptPassword(chalpwd);
+			wyString::DecodeBase64Password(chalpwd);
 			DecodePassword(chalpwd);
 		}
 
@@ -9240,7 +9240,7 @@ wyBool GetSessionDetails(wyWChar* conn, wyWChar* path, ConnectionInfo *conninfo,
 	conninfo->m_isssh = inimgr->IniGetInt2(connstr.GetString(), "SSH",	0, pathstr.GetString()) ? wyTrue: wyFalse;
 	inimgr->IniGetString2(connstr.GetString(), "SshUser", "", &conninfo->m_sshuser, pathstr.GetString());
 	inimgr->IniGetString2(connstr.GetString(), "SshPwd", "", &conninfo->m_sshpwd, pathstr.GetString());
-	wyString::JsonDeEscapeForEncryptPassword(conninfo->m_sshpwd);
+	wyString::DecodeBase64Password(conninfo->m_sshpwd);
 	DecodePassword(conninfo->m_sshpwd);
 	inimgr->IniGetString2(connstr.GetString(), "SshHost", "", &conninfo->m_sshhost, pathstr.GetString());
 	conninfo->m_sshport = inimgr->IniGetInt2 (connstr.GetString(), "SshPort", 0, pathstr.GetString());
@@ -9594,7 +9594,7 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 			 conninfo->m_pwd.SetAs(pwdstr);
 			
 		 }
-		 wyString::JsonDeEscapeForEncryptPassword(conninfo->m_pwd);
+		 wyString::DecodeBase64Password(conninfo->m_pwd);
 		 DecodePassword(conninfo->m_pwd);
 		 colval = sqliteobj->GetText(&res , "Port");
 		 if(colval)
@@ -9703,7 +9703,7 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 
 			 if (proxypwd.GetLength())
 			 {
-				wyString::JsonDeEscapeForEncryptPassword(proxypwd);
+				wyString::DecodeBase64Password(proxypwd);
 				DecodePassword(proxypwd);
 			 }
 			 wcscpy(auth->proxypwd, proxypwd.GetAsWideChar());
@@ -9724,7 +9724,7 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 			 }
 			 if (chalpwd.GetLength())
 			 {
-				wyString::JsonDeEscapeForEncryptPassword(chalpwd);
+				wyString::DecodeBase64Password(chalpwd);
 				DecodePassword(chalpwd);
 			 }
 
@@ -9762,8 +9762,7 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 		 {
 			 MigratePassword(conninfo->m_sshpwd);
 		 }
-
-		 wyString::JsonDeEscapeForEncryptPassword(conninfo->m_sshpwd);
+		 wyString::DecodeBase64Password(conninfo->m_sshpwd);
 		 DecodePassword(conninfo->m_sshpwd);
 
 		 colval = sqliteobj->GetText(&res , "SshHost");
@@ -9931,9 +9930,13 @@ WriteFullSectionToFile(FILE *out_stream, wyInt32 conno, ConnectionInfo *coninfo,
 		pass.SetAs(coninfo->m_pwd);
 	}
 	EncodePassword(pass);
-	pass.JsonEscapeForEncryptPassword();
+	wyChar *encodestr=pass.EncodeBase64Password();
+	pass.SetAs(encodestr);
 	temp.Sprintf("Password=%s\r\n", pass.GetString());
 	fputs(temp.GetString(), out_stream);
+
+	if (encodestr)
+		free(encodestr);
 
 	temp.Sprintf("Port=%d\r\n", coninfo->m_port);
 	fputs(temp.GetString(), out_stream);
@@ -10001,7 +10004,10 @@ WriteFullSectionToFile(FILE *out_stream, wyInt32 conno, ConnectionInfo *coninfo,
 		if (tempstr.GetLength() != 0)
 		{
 			EncodePassword(tempstr);
-			tempstr.JsonEscapeForEncryptPassword();
+			wyChar *encodestr=tempstr.EncodeBase64Password();
+			tempstr.SetAs(encodestr);
+			if (encodestr)
+				free(encodestr);
 		}
     
 		temp.Sprintf("ProxyPwd=%s\r\n", tempstr.GetString());
@@ -10019,7 +10025,10 @@ WriteFullSectionToFile(FILE *out_stream, wyInt32 conno, ConnectionInfo *coninfo,
 		if (tempstr.GetLength())
 		{
 			EncodePassword(tempstr);
-			tempstr.JsonEscapeForEncryptPassword();
+			wyChar *encodestr=tempstr.EncodeBase64Password();
+			tempstr.SetAs(encodestr);
+			if (encodestr)
+				free(encodestr);
 		}
 
 		temp.Sprintf("401Pwd=%s\r\n", tempstr.GetString());
@@ -10043,7 +10052,10 @@ WriteFullSectionToFile(FILE *out_stream, wyInt32 conno, ConnectionInfo *coninfo,
 	if(tempstr.GetLength())
 	{
 		EncodePassword(tempstr);
-		tempstr.JsonEscapeForEncryptPassword();
+		wyChar *encodestr=tempstr.EncodeBase64Password();
+		tempstr.SetAs(encodestr);
+		if (encodestr)
+			free(encodestr);
 	}
 
 	temp.Sprintf("SshPwd=%s\r\n", tempstr.GetString());
@@ -10199,9 +10211,12 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 		pass.SetAs(coninfo->m_pwd);
 	}
 	EncodePassword(pass);
+	wyChar *encodestr=pass.EncodeBase64Password();
+	wyString password("");
+	password.SetAs(encodestr);
 	//pass.JsonEscapeForEncryptPassword();
 
-	sqliteobj->SetText(&stmt, 9, pass.GetLength()?pass.GetString():"");
+	sqliteobj->SetText(&stmt, 9, password.GetLength()?password.GetString():"");
 
 	sqliteobj->SetInt(&stmt, 10, coninfo->m_port);
 
@@ -10264,10 +10279,15 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 
 
 		tempstr.SetAs(auth->proxypwd);
+		wyChar* encodestr = NULL;
 		if (tempstr.GetLength() != 0)
 		{
 			EncodePassword(tempstr);
+			encodestr = tempstr.EncodeBase64Password();
+			tempstr.SetAs(encodestr);
 		}
+		if (encodestr)
+			free(encodestr);
 
 		sqliteobj->SetText(&stmt, 26, tempstr.GetLength() ? tempstr.GetString() : "");
 
@@ -10285,6 +10305,10 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 		if (tempstr.GetLength())
 		{
 			EncodePassword(tempstr);
+			wyChar* encodestr=tempstr.EncodeBase64Password();
+			tempstr.SetAs(encodestr);
+			if (encodestr)
+				free(encodestr);
 		}
 	
 		sqliteobj->SetText(&stmt, 29, tempstr.GetLength()? tempstr.GetString():"");
@@ -10306,6 +10330,10 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 	if(tempstr.GetLength())
 	{
 		EncodePassword(tempstr);
+		wyChar* encodestr = tempstr.EncodeBase64Password();
+		tempstr.SetAs(encodestr);
+		if (encodestr)
+			free(encodestr);
 	}
 
 	sqliteobj->SetText(&stmt, 34, tempstr.GetLength()? tempstr.GetString():"");

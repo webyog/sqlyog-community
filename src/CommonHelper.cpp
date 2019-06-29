@@ -75,8 +75,8 @@ extern	FILE	*logfilehandle;
 static wyChar table64[]=
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static CryptoPP::byte AESKey[16] = { 0 }; //Provide any IV
-static CryptoPP::byte AESiv[16] = { 0 }; //Provide any key
+static CryptoPP::byte AESKey[16] = { };// Type any key
+static CryptoPP::byte AESiv[16] = { };//Type any IV
 
 Tunnel * 
 CreateTunnel(wyBool istunnel)
@@ -4608,7 +4608,7 @@ EncodePassword(wyString &text)
 	//encryption
 	encFilter.Put(reinterpret_cast<const CryptoPP::byte*>(plaintext.GetString()), plaintext.GetLength());
 	encFilter.MessageEnd();
-	text.SetAs(encText.data(), encText.length());
+	text.SetAsDirect(encText.data(), encText.length());
 	
 	return wyTrue;
 }
@@ -4623,7 +4623,7 @@ DecodePassword(wyString &text)
 		return wyFalse;
 	}
 
-	ciphertext.SetAs(text);
+	ciphertext.SetAsDirect(text.GetString(), text.GetLength());
 
 	CryptoPP::CTR_Mode<CryptoPP::AES>::Decryption dec;
 	dec.SetKeyWithIV(AESKey, sizeof(AESKey), AESiv);
@@ -4645,7 +4645,12 @@ MigratePassword(wyString conn, wyString dirstr, wyString &pwdstr)
 
 	DecodePassword_Absolute(pwdstr);
 	EncodePassword(pwdstr);
-	pwdstr.JsonEscapeForEncryptPassword();
+	wyChar *encodestr=pwdstr.EncodeBase64Password();
+	pwdstr.Clear();
+	pwdstr.SetAs(encodestr);
+
+	if (encodestr)
+		free(encodestr);
 	return wyTrue;
 	
 }
@@ -4656,7 +4661,12 @@ MigratePassword(wyString &pwdstr)
 
 	DecodePassword_Absolute(pwdstr);
 	EncodePassword(pwdstr);
-	pwdstr.JsonEscapeForEncryptPassword();
+	wyChar *encodestr=pwdstr.EncodeBase64Password();
+	pwdstr.Clear();
+	pwdstr.SetAs(encodestr);
+
+	if (encodestr)
+		free(encodestr);
 	return wyTrue;
 
 }

@@ -570,7 +570,11 @@ ConnectionCommunity::OnConnect(HWND hwnd, ConnectionInfo * dbname)
                 GetWindowText(GetDlgItem(hwnd, IDC_DLGCONNECT_PASSWORD), pass, MAX_PATH);
                 temp.SetAs(pass);
                 EncodePassword(temp);
+				wyChar *encodestr = temp.EncodeBase64Password();
+				temp.SetAs(encodestr);
                 wyIni::IniWriteString(conn.GetString(), "Password", temp.GetString(), dirnamestr.GetString());
+				if (encodestr)
+					free(encodestr);
             }
 			
 			/* write the store password value too */

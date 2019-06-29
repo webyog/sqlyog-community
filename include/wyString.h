@@ -479,6 +479,9 @@ public:
 	void JsonEscape();
 	void JsonEscapeForEncryptPassword();
 	static void JsonDeEscapeForEncryptPassword(wyString &pwstr);
+	static void DecodeBase64Password(wyString &pwstr);
+	wyChar* EncodeBase64Password();
+	void EscapeNullFromPassword();
 private:
 
     /// Actual data container.

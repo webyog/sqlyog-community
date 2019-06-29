@@ -1655,9 +1655,16 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
     
     strcpy(pwd, pwdstr.GetString());
 
-	//pwdstr.FindAndReplace("\\n", "\n");
-	wyString::JsonDeEscapeForEncryptPassword(pwdstr);
-
+	/*wyChar *decodedstr = NULL;
+	decodedstr = AllocateBuff(512);
+	wyInt32 len = DecodeBase64(pwdstr.GetString(), decodedstr);
+	pwdstr.SetAsDirect(decodedstr, len);*/
+	wyString::DecodeBase64Password(pwdstr);
+	DecodePassword(pwdstr);
+	
+	/*if (decodedstr)
+		free(decodedstr);*/
+	
 	ret = wyIni::IniGetString(conn.GetString(), "User", "root", &userstr, dirstr.GetString());
 	ret = wyIni::IniGetString(conn.GetString(), "Host", "localhost", &hoststr, dirstr.GetString());
 	ret = wyIni::IniGetString(conn.GetString(), "Port", "3306", &portstr, dirstr.GetString());
@@ -1668,8 +1675,6 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
 	storepwd = wyIni::IniGetInt(conn.GetString(), "StorePassword", 1, dirstr.GetString());
 	Button_SetCheck(GetDlgItem(hdlg, IDC_DLGCONNECT_STOREPASSWORD), storepwd);
 	
-	DecodePassword(pwdstr);
-
 	//Compressed prtocol
 	usecompress = wyIni::IniGetInt(conn.GetString(), "compressedprotocol", 1, dirstr.GetString());
 	Button_SetCheck(GetDlgItem(hdlg, IDC_COMPRESS), usecompress);
@@ -1743,14 +1748,15 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
 	/* now it may happen that without saving anything the user has connected 
 	   so the field will be removed and the next time he wont get anything
 	   to handle such cases we have to by default write the encodedpassword */
+	wyChar* encodestr = NULL;
 	if(!decodepwd)
 	{
 		pwdstr.SetAs(pwd);
 		EncodePassword(pwdstr);
-		pwdstr.JsonEscapeForEncryptPassword();
-		strcpy(pwd, pwdstr.GetString());
+		encodestr=pwdstr.EncodeBase64Password();
+		//strcpy(pwd, pwdstr.GetString());
 		dirstr.SetAs(directory);
-		wyIni::IniWriteString(conn.GetString(), "Password", pwdstr.GetString(), dirstr.GetString());
+		wyIni::IniWriteString(conn.GetString(), "Password", encodestr, dirstr.GetString());
 	}
 
 	/*Gets the 'AutocompleteTagbuilded' info from .ini to decides the statusbar message to be 'Building tags' or 'Rebuilding tags'	
@@ -1759,6 +1765,8 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
 	SetAutocompleteTagBuildFlag(&conn, &dirstr);
 		    
 	//SetFocus(GetDlgItem(hdlg, IDOK));
+	if (encodestr)
+		free(encodestr);
 
 	return wyTrue;
 }
@@ -2631,11 +2639,17 @@ ConnectionBase::SaveServerDetails(HWND hwnd, const wyChar *conn, const wyChar *d
     {
         ret	= SendMessage(GetDlgItem(hwnd, IDC_DLGCONNECT_PASSWORD), WM_GETTEXT, sizeof(temp), (LPARAM)temp);
 		tempstr.SetAs(temp);
-		tempstr.JsonEscapeForEncryptPassword();
         EncodePassword(tempstr);
-		tempstr.JsonEscapeForEncryptPassword();
-		ret = wyIni::IniWriteString(conn, "Password", tempstr.GetString(), directory);
+
+		//wyChar *encodestr = NULL;
+		/*encodestr = AllocateBuff(512);
+		EncodeBase64(tempstr.GetString(), tempstr.GetLength(), &encodestr);*/
+		wyChar *encodestr = tempstr.EncodeBase64Password();
+		ret = wyIni::IniWriteString(conn, "Password", encodestr, directory);
 		wyIni::IniWriteString(conn, "Isencrypted", "1", directory);
+
+		if(encodestr)
+			free(encodestr);
     }
     else
     {

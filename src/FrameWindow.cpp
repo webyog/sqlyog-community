@@ -6712,12 +6712,15 @@ FrameWindow::ConvertAndWritePwd(wyString &conncount, wyChar	*whichpwd, wyString	
 	wyIni::IniGetString(conncount.GetString(), whichpwd, "", &passwordstr, path.GetString());						
 	if(passwordstr.GetLength())
 	{
-		wyString::JsonDeEscapeForEncryptPassword(passwordstr);
+		wyString::DecodeBase64Password(passwordstr);
 		DecodePassword(passwordstr);
 		temppwd.SetAs(passwordstr.GetString(), wyFalse);
 		EncodePassword(temppwd);
-		temppwd.JsonEscapeForEncryptPassword();
-		wyIni::IniWriteString(conncount.GetString(), whichpwd, temppwd.GetString(), path.GetString());
+		wyChar * encodestr=temppwd.EncodeBase64Password();
+		wyIni::IniWriteString(conncount.GetString(), whichpwd, encodestr, path.GetString());
+
+		if (encodestr)
+			free(encodestr);
 	}
 
 }

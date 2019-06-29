@@ -1503,8 +1503,8 @@ void wyString::JsonEscapeForEncryptPassword() {
 			//  index++;
 			break;
 		case '\\':
-			// Replace(index, 1, "\\\\");
-			// index++;
+			 Replace(index, 1, "\\\\");
+			 index++;
 			break;
 		case '\b':
 			Replace(index, 1, "\\b");
@@ -1526,6 +1526,10 @@ void wyString::JsonEscapeForEncryptPassword() {
 			//  Replace(index, 1, "\\t");
 			// index++;
 			break;
+		case '\0':
+			 Replace(index, 1, "\\0");
+			 index++;
+			break;
 		
 		}
 	}
@@ -1537,4 +1541,54 @@ void wyString::JsonDeEscapeForEncryptPassword(wyString &pwdstr) {
 	pwdstr.FindAndReplace("\\n", "\n");
 	pwdstr.FindAndReplace("\\r", "\r");
 	pwdstr.FindAndReplace("\\b", "\b");
+	pwdstr.EscapeNullFromPassword();
+}
+
+void wyString::EscapeNullFromPassword()
+{
+	wyInt32 index;
+	wyChar ch,prev, next,ch1=NULL;
+	wyString temp;
+	bool isnull = FALSE;
+	wyInt32 len = GetLength();
+	
+	for (index = 0; index < len-1; index++) {
+		isnull = FALSE;
+		ch = GetCharAt(index);
+		next = GetCharAt(index + 1);
+
+		switch (ch) {
+		case '\\':
+			if ((index+1)<len && GetCharAt(index+1) == '0') {
+				isnull = TRUE;
+				
+			}
+			index++;
+			break;
+		}
+		prev = ch;
+		if(!isnull)
+			temp.AddSprintf("%c", ch);
+		else
+			temp.AddSprintf("\\0");
+	}
+	int i = 0;
+}
+
+void wyString::DecodeBase64Password(wyString &pwdstr)
+{
+	wyChar *decodedstr = NULL;
+	decodedstr = AllocateBuff(512);
+	wyInt32 len = DecodeBase64(pwdstr.GetString(), decodedstr);
+	pwdstr.SetAsDirect(decodedstr, len);
+
+	if (decodedstr)
+		delete decodedstr;
+}
+
+wyChar* wyString::EncodeBase64Password()
+{
+	wyChar *encodestr = AllocateBuff(512);
+	EncodeBase64(GetString(), GetLength(), &encodestr);
+	return encodestr;
 }
