@@ -45,6 +45,8 @@
 #define			MYSQL_SERVER_GONE		2006
 #define			NO_DB_SELECTED			1046
 #define			MYSQL_CONNECT_ERROR		2003
+#define			CR_CONNECTION_ERROR		2002
+
 
 #define			MAX_QUERY_SIZE			(1024*4)
 #define			ZERO					0
@@ -153,7 +155,8 @@ wyInt32 my_query(MDIWindow *wnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *qu
 			ret &&((tunnel->mysql_errno(*mysql)== MYSQL_CONNECT_ERROR) ||
 			(tunnel->mysql_errno(*mysql)== NO_DB_SELECTED) ||
 			(tunnel->mysql_errno(*mysql)== MYSQL_SERVER_GONE) ||
-             tunnel->mysql_errno(*mysql) == LOST_CONNECTION_ERROR)&& querycount == 0 && (!stop || !(*stop)))
+             tunnel->mysql_errno(*mysql) == LOST_CONNECTION_ERROR ||
+				tunnel->mysql_errno(*mysql) == CR_CONNECTION_ERROR)&& querycount == 0 && (!stop || !(*stop)))
 		{	
 			wnd->m_isreconnected = wyFalse; 
 			if(wnd->ReConnect(tunnel, mysql, wnd->m_conninfo.m_isssh, isimport, profile) == wyTrue) 

@@ -59,7 +59,7 @@
 
 #define		FMT_SPACE_4 "    " 
 
-#define		REGKEY			"xxx" //Provide any UUID here
+#define		REGKEY			"Provide any UUID here"
 
 
 #define		SSHTUNNELER 	  "plink.exe"

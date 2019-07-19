@@ -75,8 +75,8 @@ extern	FILE	*logfilehandle;
 static wyChar table64[]=
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static CryptoPP::byte AESKey[16] = { };// Type any key
-static CryptoPP::byte AESiv[16] = { };//Type any IV
+static CryptoPP::byte AESKey[16] = { };//provide any Key
+static CryptoPP::byte AESiv[16] = {}; //Provide any IV
 
 Tunnel * 
 CreateTunnel(wyBool istunnel)

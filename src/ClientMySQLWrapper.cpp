@@ -45,6 +45,7 @@
 #define	LOST_CONNECTION_ERROR	2013
 #define	NO_DB_SELECTED			1046
 #define	MYSQL_CONNECT_ERROR		2003
+#define	CR_CONNECTION_ERROR		2002
 
 /* function checks whether there a unprintable character in between */
 /* this function is required for tunneling as we need to send the data in base 64 encoding */
@@ -323,7 +324,8 @@ MYSQL_RES* SjaExecuteAndGetResult(Tunnel *tunnel, PMYSQL mysql, wyString &query,
 	if(!tunnel->IsTunnel() && ret &&
 		((tunnel->mysql_errno(*mysql)== MYSQL_CONNECT_ERROR) || 
 		 (tunnel->mysql_errno(*mysql)== MYSQL_SERVER_GONE) ||
-		  tunnel->mysql_errno(*mysql) == LOST_CONNECTION_ERROR))
+		  tunnel->mysql_errno(*mysql) == LOST_CONNECTION_ERROR) ||
+		tunnel->mysql_errno(*mysql) == CR_CONNECTION_ERROR)
 	{	
 		if(HandleReconnect(tunnel, mysql, coninfo, usedbname) == true)
 			ret  = HandleSjaMySQLRealQuery(tunnel, *mysql, query.GetString(), query.GetLength(), isbatch, (bool*)stop);
