@@ -204,7 +204,7 @@ wyChar *quote_for_like(const wyChar *name, wyChar *buff);
 */
 void SetCharacterSet(Tunnel *tunnel, MYSQL * mysql, wyChar * charset);
 
-/// Checks the server version is greater than or equal to 5.0.10
+/// Checks the server version is greater than or equal to 8.0.11
 /**
 @param tunnel: IN tunnel pointer
 @param mysql: IN PMYSQL value
@@ -212,4 +212,65 @@ void SetCharacterSet(Tunnel *tunnel, MYSQL * mysql, wyChar * charset);
 */
 wyBool IsMySQL80011(Tunnel * tunnel, PMYSQL mysql);
 
+/// Checks the server version isis MariaDB 10.2.0 or higher
+/**
+@param tunnel: IN tunnel pointer
+@param mysql: IN PMYSQL value
+@returns wyBool, wyTrue if it is SUCCESS, else wyFalse
+*/
+wyBool IsMariaDB100200(Tunnel * tunnel, PMYSQL mysql);
+
+/// Checks the server version is MariaDB
+/**
+@param tunnel: IN tunnel pointer
+@param mysql: IN PMYSQL value
+@returns wyBool, wyTrue if it is SUCCESS, else wyFalse
+*/
+wyBool IsMariaDB(Tunnel * tunnel, PMYSQL mysql);
+
+/// Checks the server version is MariaDB 10.4 or higher
+/**
+@param tunnel: IN tunnel pointer
+@param mysql: IN PMYSQL value
+@returns wyBool, wyTrue if it is SUCCESS, else wyFalse
+*/
+wyBool IsMariaDB104(Tunnel * tunnel, PMYSQL mysql);
+
+/** 
+@param version: the version string from select version();
+@returns wyBool,  wyTrue if param version contains MariaDB 
+**/
+wyBool IsServerMariaDb(wyString version);
+
+///get the version from querying the server. 
+/// An alternative to relying on mysql_get_server_info which does not behaves 100% for mariadb on azure and aws
+/**
+@param tunnel: IN tunnel pointer
+@param mysql: IN PMYSQL value
+@returns wyString resulting from select version();
+**/
+void GetServerVersion(Tunnel * tunnel, PMYSQL mysql, wyString *pServerVersion);
+
+/// similar then GetVersionNo(Tunnel * tunnel, PMYSQL mysql), but parses the param string instead
+/**
+@param version: the version string from select version();
+@returns wyInt32 with the value of version major, minor and patch
+**/
+wyInt32 GetVersionNo(wyString version);
+
+//Helper function to obtain default authentication plugin
+// Returns the default plugin : 
+// if mariadb > 10.14 and system environemnt Old_password is 0 -> sql_native_password, else sql_old_password
+// if mysqlserver > 5.7 return the result of system variable default_authentication_plugin
+/**
+@returns String with defined default plugin
+*/
+wyBool
+GetDefaultAuthenticationPlugin(Tunnel * tunnel, PMYSQL mysql, wyInt32 serververno, wyBool ismariadb, wyString *plugin);
+
+/**
+@returns String with defined value of server environment
+*/
+wyBool
+GetSystemEnvironment(Tunnel * tunnel, PMYSQL mysql, wyString *var, wyString *value);
 #endif

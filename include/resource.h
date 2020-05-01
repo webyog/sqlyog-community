@@ -1660,6 +1660,9 @@
 #define IDD_RELEASESAVEPOINT            44141
 #define IDD_ROLLBACKTO                  44142
 #define IDI_CHECKCONSTRAINT             44143
+#define IDC_PLUGIN_PROMPT				44144
+#define IDC_AUTHPLUGIN					44145
+
 
 // Next default values for new objects
 // 

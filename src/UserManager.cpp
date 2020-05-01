@@ -108,6 +108,10 @@ UserManager::UserManager()
     m_hwndnote = NULL;
     m_isselectallcheck = wyFalse;
     m_ismysql502 = wyFalse;
+	m_versionfull.SetAs("");
+	m_ismariadb = wyFalse;
+	m_serververno = 0;
+
 
     for(i = 0; i < U_MAXLIMITATIONS; ++i)
     {
@@ -366,7 +370,12 @@ UserManager::InitDialog(HWND hwnd)
     m_hwndnote = GetDlgItem(m_hwnd, IDC_PRIV_NOTE);
     m_hmdi = GetActiveWin();
     m_ismysql502 = IsMySQL502(m_hmdi->m_tunnel, &m_hmdi->m_mysql);
-    GetClientRect(m_hwnd, &m_dlgrect);
+	m_ismysql502 = IsMySQL502(m_hmdi->m_tunnel, &m_hmdi->m_mysql);
+	GetServerVersion(m_hmdi->m_tunnel, &m_hmdi->m_mysql, &m_versionfull);
+	m_serververno = GetVersionNo(m_versionfull.GetString());
+	m_ismariadb = IsServerMariaDb(m_versionfull.GetString());
+	GetDefaultAuthenticationPlugin(m_hmdi->m_tunnel, &m_hmdi->m_mysql, m_serververno, m_ismariadb, &m_defaultAuthPlugin);
+	GetClientRect(m_hwnd, &m_dlgrect);
     GetWindowRect(m_hwnd, &m_wndrect);
 
     //set the icon
@@ -435,7 +444,14 @@ UserManager::InitDialog(HWND hwnd)
     {
         return wyFalse;
     }
-
+	//populate the Authentication Plugins registered with the server
+	if (IsAuthPluginSupported()) {
+		if (PopulateAuthPluginCombo() == -1)
+		{
+			return wyFalse;
+		}
+	}
+	
     //get various privileges available in the server
     if(GetServerPrivileges() == wyFalse)
     {
@@ -593,7 +609,9 @@ UserManager::GetCtrlRects()
         IDC_GRIP, 0, 0,
         IDC_SAVE_CHANGES, 0, 0,
         IDC_CANCEL_CHANGES, 0, 0,
-        IDCANCEL, 0, 0
+        IDCANCEL, 0, 0,
+		IDC_AUTHPLUGIN, 0,0,
+		IDC_PLUGIN_PROMPT, 0,0
     };
 
     count = sizeof(ctrlid)/sizeof(ctrlid[0]);
@@ -663,6 +681,7 @@ UserManager::PositionCtrls()
             case IDC_CANCEL_CHANGES:
             case IDCANCEL:
             case IDC_GRIP:
+			
                 y = rect.bottom - bottompadding - height;
                 break;
 
@@ -717,53 +736,116 @@ UserManager::OnResize()
     }
 }
 
-//function executes the query to save the password if necessery
+//function executes the query to save the password if necessary and Authentication plugin
+// If password changes or plugin changes, and Server is any of:
+// Mysql 5.7 or higher, or Mariadb 10.4 - Saves plugin and/or Password (if it has changed)
+// For all other cases, just updates password if it has changed.
 wyBool
 UserManager::SavePassword()
 {
-    wyString    query, password, password2, tempuser, temphost, temppassword;
+    wyString    query, password, password2, tempuser, temphost, temppassword, pluginname, temppluginname;
     wyWChar     buffer[SIZE_128];
+	wyBool		ispluginchanged = wyFalse;
 
     //get the strings from the password field
     GetDlgItemText(m_hwnd, IDC_PASSWORD, buffer, SIZE_128 - 1);
     password.SetAs(buffer);
     GetDlgItemText(m_hwnd, IDC_PASSWORD_CONFIRM, buffer, SIZE_128 - 1);
     password2.SetAs(buffer);
-    
+ 
+	
+	//get the strings from the plugin combo
+	GetDlgItemText(m_hwnd, IDC_AUTHPLUGIN, buffer, SIZE_128 - 1);
+	pluginname.SetAs(buffer);
+	ispluginchanged = wyBool(pluginname.Compare(m_authpluginname) != wyFalse);
+
     //if the user has modified the password fields
-    if(m_ispasswordchanged == wyTrue)
-    {
-        if(password.Compare(password2))
-        {
-            MessageBox(m_hwnd, _(L"Passwords do not match"), 
-                       pGlobals->m_appname.GetAsWideChar(), 
-                       MB_OK | MB_ICONINFORMATION);
-            return wyFalse;
-        }
-
-		if (IsMySQL80011(m_hmdi->m_tunnel, &m_hmdi->m_mysql) == wyTrue)
+	if (m_ispasswordchanged == wyTrue || ispluginchanged == wyTrue)
+	{
+		if (m_ispasswordchanged == wyTrue  && password.Compare(password2))
 		{
-			query.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED BY '%s'",
-				EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
-				EscapeMySQLString(m_host.GetString(), temphost).GetString(),
-				EscapeMySQLString(password.GetString(), temppassword).GetString());
-		}
-		else
-		{
-			query.Sprintf("GRANT USAGE ON *.* TO '%s'@'%s' IDENTIFIED BY '%s'",
-				EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
-				EscapeMySQLString(m_host.GetString(), temphost).GetString(),
-				EscapeMySQLString(password.GetString(), temppassword).GetString());
+			MessageBox(m_hwnd, _(L"Passwords do not match"),
+				pGlobals->m_appname.GetAsWideChar(),
+				MB_OK | MB_ICONINFORMATION);
+			return wyFalse;
 		}
 
-        if(ExecuteUMQuery(query) == wyFalse)
-        {
-            return wyFalse;
-        }
-    }
+		if (m_serververno > 50700) // before this, might as well ignore plugins all together...
+		{
+			if (m_ismariadb && m_serververno > 100400) { // is maria db 10.4. Can change plugin and password
+				if (m_ispasswordchanged == wyTrue) { // pass has changed, set it along with plugin
+					query.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED VIA %s USING PASSWORD('%s')",
+						EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
+						EscapeMySQLString(m_host.GetString(), temphost).GetString(),
+						EscapeMySQLString(pluginname.GetString(), temppluginname).GetString(),
+						EscapeMySQLString(password.GetString(), temppassword).GetString());
 
+					if (ExecuteUMQuery(query) == wyFalse)
+					{
+						return wyFalse;
+					}
+					m_authpluginname.SetAs(pluginname.GetString());
+				}
+				else  // just plugin updated.
+				{
+					query.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED VIA %s ",
+						EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
+						EscapeMySQLString(m_host.GetString(), temphost).GetString(),
+						EscapeMySQLString(pluginname.GetString(), temppluginname).GetString());
+					if (ExecuteUMQuery(query) == wyFalse)
+					{
+						return wyFalse;
+					}
+					m_authpluginname.SetAs(pluginname.GetString());
+				}
+			}
+			else if (!m_ismariadb) // for sanity sake... it is mysql > 5.7 
+			{
+				if (m_ispasswordchanged == wyTrue) {  // pass has changed, set it along with plugin
+					query.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED WITH %s BY '%s'",
+						EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
+						EscapeMySQLString(m_host.GetString(), temphost).GetString(),
+						EscapeMySQLString(pluginname.GetString(), temppluginname).GetString(),
+						EscapeMySQLString(password.GetString(), temppassword).GetString());
+
+					if (ExecuteUMQuery(query) == wyFalse)
+					{
+						return wyFalse;
+					}
+					m_authpluginname.SetAs(pluginname.GetString());
+				}
+				else { // just plugin updated
+					query.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED WITH %s",
+						EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
+						EscapeMySQLString(m_host.GetString(), temphost).GetString(),
+						EscapeMySQLString(pluginname.GetString(), temppluginname).GetString());
+
+					if (ExecuteUMQuery(query) == wyFalse)
+					{
+						return wyFalse;
+					}
+					m_authpluginname.SetAs(pluginname.GetString());
+				}
+			}
+		} // Mysql < 5.7 or MariaDb <10.4
+		else // no proper support for plugin changing...update password if has changed
+		{
+			if (m_ispasswordchanged == wyTrue) {
+				query.Sprintf("GRANT USAGE ON *.* TO '%s'@'%s' IDENTIFIED BY '%s'",
+					EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
+					EscapeMySQLString(m_host.GetString(), temphost).GetString(),
+					EscapeMySQLString(password.GetString(), temppassword).GetString());
+			}
+
+			if (ExecuteUMQuery(query) == wyFalse)
+			{
+				return wyFalse;
+			}
+		}
+	}
     return wyTrue;
 }
+
 
 //the function creates the privilege tables
 void
@@ -952,7 +1034,12 @@ UserManager::OnWMCommand(WPARAM wparam, LPARAM lparam)
                 SetDirtyFlag();
             }
             break;
-
+		case IDC_AUTHPLUGIN:
+			if (HIWORD(wparam) == CBN_SELCHANGE && m_initcompleted)
+			{
+				SetDirtyFlag(); 
+			}
+			break;
         case IDC_CANCEL_CHANGES:
             OnCancelChanges();
             break;
@@ -1046,104 +1133,166 @@ UserManager::OnSaveChanges()
     }
 }
 
+
 //function adds a new user
 wyBool
 UserManager::AddNewUser()
 {
-    wyString    query, username, host, password, password2, tempuser, temphost, temppassword, temp;
-    wyWChar     buffer[SIZE_128];
-    wyInt32     ret;
-
-    GetDlgItemText(m_hwnd, IDC_USERNAME, buffer, SIZE_128 - 1);
-    username.SetAs(buffer);
-    username.RTrim();
-    GetDlgItemText(m_hwnd, IDC_HOSTNAME, buffer, SIZE_128 - 1);
-    host.SetAs(buffer);
-    host.RTrim();
-
-    //get the passwords
-    GetDlgItemText(m_hwnd, IDC_PASSWORD, buffer, SIZE_128 - 1);
-    password.SetAs(buffer);
-    GetDlgItemText(m_hwnd, IDC_PASSWORD_CONFIRM, buffer, SIZE_128 - 1);
-    password2.SetAs(buffer);
-
-    //compare the passwords
-    if(password.Compare(password2))
-    {
-        MessageBox(m_hwnd, _(L"Passwords do not match"), 
-                   pGlobals->m_appname.GetAsWideChar(), 
-                   MB_OK | MB_ICONINFORMATION);
-        return wyFalse;
-    }
-
-    //validate the user name and form the error string
-    if(!username.GetLength())
-    {
-        ret = MessageBox(m_hwnd, _(L"You have not specifed a username. Do you want to create anonymous user?"), 
-                         pGlobals->m_appname.GetAsWideChar(), 
-                         MB_YESNO | MB_ICONQUESTION);
-
-        if(ret != IDYES)
-        {
-            return wyFalse;
-        }
-    }
-
-    EscapeMySQLString(username.GetString(), tempuser);
-    EscapeMySQLString(host.GetString(), temphost);
-    EscapeMySQLString(password.GetString(), temppassword);
-
-    //if it is mysql version > 5.02 use the CREATE USER stmt
-    if(m_ismysql502 == wyTrue)
-    {
-        query.Sprintf("CREATE USER '%s'@'%s' IDENTIFIED BY '%s'",
-            tempuser.GetString(),
-            temphost.GetString(),
-            temppassword.GetString());
-
-        if(ExecuteUMQuery(query) == wyFalse)
-        {
-            return wyFalse;
-        }
-    }
-    //use the INSERT stmt to insert into user table
-    else
-    {
-        query.Sprintf("INSERT INTO mysql.user(`User`, `Host`, `Password`) VALUES('%s', '%s', PASSWORD('%s'))",
-            tempuser.GetString(),
-            temphost.GetString(),
-            temppassword.GetString());
-
-        if(ExecuteUMQuery(query) == wyFalse)
-        {
-            return wyFalse;
-        }
-    }
+	wyString    query, username, host, password, password2, tempuser, temphost, temppassword, temp, authplugin, tempauthplugin;
+	wyWChar     buffer[SIZE_128];
+	wyInt32     ret;
 	
-    m_username.SetAs(username);
-    m_host.SetAs(host);
+
+	GetDlgItemText(m_hwnd, IDC_USERNAME, buffer, SIZE_128 - 1);
+	username.SetAs(buffer);
+	username.RTrim();
+	GetDlgItemText(m_hwnd, IDC_HOSTNAME, buffer, SIZE_128 - 1);
+	host.SetAs(buffer);
+	host.RTrim();
+	GetDlgItemText(m_hwnd, IDC_AUTHPLUGIN, buffer, SIZE_128 - 1);
+	authplugin.SetAs(buffer);
+	//get the passwords
+	GetDlgItemText(m_hwnd, IDC_PASSWORD, buffer, SIZE_128 - 1);
+	password.SetAs(buffer);
+	GetDlgItemText(m_hwnd, IDC_PASSWORD_CONFIRM, buffer, SIZE_128 - 1);
+	password2.SetAs(buffer);
+
+	//compare the passwords
+	if (password.Compare(password2))
+	{
+		MessageBox(m_hwnd, _(L"Passwords do not match"),
+			pGlobals->m_appname.GetAsWideChar(),
+			MB_OK | MB_ICONINFORMATION);
+		return wyFalse;
+	}
+
+	//validate the user name and form the error string
+	if (!username.GetLength())
+	{
+		ret = MessageBox(m_hwnd, _(L"You have not specifed a username. Do you want to create anonymous user?"),
+			pGlobals->m_appname.GetAsWideChar(),
+			MB_YESNO | MB_ICONQUESTION);
+
+		if (ret != IDYES)
+		{
+			return wyFalse;
+		}
+	}
+
+	EscapeMySQLString(username.GetString(), tempuser);
+	EscapeMySQLString(host.GetString(), temphost);
+	EscapeMySQLString(password.GetString(), temppassword);
+	EscapeMySQLString(authplugin.GetString(), tempauthplugin);
+
+	//if it is mysql version > 5.02 use the CREATE USER stmt
+	if (m_ismysql502 == wyTrue)
+	{
+		// if it is higher then 5.7, but not maria db, add plugin when creating user 
+		if (m_serververno > 50700 && m_ismariadb == false) {
+			query.Sprintf("CREATE USER '%s'@'%s' IDENTIFIED WITH %s BY '%s'",
+				tempuser.GetString(),
+				temphost.GetString(),
+				tempauthplugin.GetString(),
+				temppassword.GetString());
+
+			if (ExecuteUMQuery(query) == wyFalse)
+			{
+				return wyFalse;
+			}
+		}
+		else if (m_ismariadb && m_serververno > 100400)
+		{	// If MariaDB 10.4 can create with Plugin 
+			// may fail because password does not have the right format for the selected plugin
+			// ...but works for normal plugins that support PASSWORD hook.
+			// with tweaks..i.e. unix_socket works if password is left blank...
+			query.Sprintf("CREATE USER '%s'@'%s' IDENTIFIED VIA %s USING PASSWORD('%s')",
+				tempuser.GetString(),
+				temphost.GetString(),
+				tempauthplugin.GetString(),
+				temppassword.GetString());
+
+			if (ExecuteUMQuery(query) == wyFalse)
+			{
+				return wyFalse;
+			}
+		}
+		//else if(m_serververno > 50600 && m_ismariadb == wyFalse) {
+		//	// if it is mysql5.6 then we can still save the plugin
+		//	// create the user with plugin then set password
+		//	query.Sprintf("CREATE USER '%s'@'%s' IDENTIFIED WITH %s AS '%s'",
+		//		tempuser.GetString(),
+		//		temphost.GetString(),
+		//		tempauthplugin.GetString(),
+		//		temppassword.GetString());
+
+		//	if (ExecuteUMQuery(query) == wyFalse)
+		//	{
+		//		return wyFalse;
+		//	}
+		//	query.Sprintf("GRANT USAGE ON *.* TO '%s'@'%s' IDENTIFIED BY '%s'",
+		//		tempuser.GetString(),
+		//		temphost.GetString(),
+		//		temppassword.GetString());
+
+		//	if (ExecuteUMQuery(query) == wyFalse)
+		//	{
+		//		return wyFalse;
+		//	}
+		//}
+		else {
+			// No proper support of plugin, handle it as second step
+			// for all other scenarios just assume the default creation
+			query.Sprintf("CREATE USER '%s'@'%s' IDENTIFIED BY '%s'",
+				tempuser.GetString(),
+				temphost.GetString(),
+				temppassword.GetString());
+
+			if (ExecuteUMQuery(query) == wyFalse)
+			{
+				return wyFalse;
+			}
+		
+		}
+	}//use the INSERT stmt to insert into user table
+	else
+	{
+		query.Sprintf("INSERT INTO mysql.user(`User`, `Host`, `Password`) VALUES('%s', '%s', PASSWORD('%s'))",
+			tempuser.GetString(),
+			temphost.GetString(),
+			temppassword.GetString());
+
+		if (ExecuteUMQuery(query) == wyFalse)
+		{
+			return wyFalse;
+		}
+	}
+
+	m_username.SetAs(username);
+	m_host.SetAs(host);
 
 	temp.SetAs(username.GetString());
-	temp.AddSprintf("@%s",host.GetString()); 
+	temp.AddSprintf("@%s", host.GetString());
 
-	USERLIST *tempnode = new USERLIST; 
+	USERLIST *tempnode = new USERLIST;
 	tempnode->m_uname.SetAs(temp.GetString());
 	//tempnode->m_dropdown = wyFalse;
 	tempnode->m_dropdown = wyTrue;
-	tempnode->m_itemvalue.Sprintf("%d",m_usercount);
+	tempnode->m_itemvalue.Sprintf("%d", m_usercount);
 	tempnode->next = NULL;
 
 	USERLIST *itr = m_userlist;
-	while(itr->next)
+	while (itr->next)
 		itr = itr->next;
 	itr->next = tempnode;
 
 
 
-    ApplyLimitations();
+	ApplyLimitations();
+	
 	m_usercount += 1;
-    return wyTrue;
+	return wyTrue;
 }
+
 
 //handler for select all check box
 void
@@ -1256,6 +1405,99 @@ UserManager::PopulateUserCombo()
     return retflag;
 }
 
+boolean
+UserManager::IsAuthPluginSupported() {
+	boolean authPluginSupported = false;
+	// go for the miminum supported 
+	if (m_serververno > 50600) {
+		if ((m_ismariadb && m_serververno > 100400) || m_ismariadb == wyFalse) {
+			authPluginSupported = wyTrue;
+		}
+	}
+	return authPluginSupported;
+}
+
+//function populates Plugin  combo
+wyInt32
+UserManager::PopulateAuthPluginCombo()
+{
+	wyString    query;
+	MYSQL_RES*  myres;
+	MYSQL_ROW   row;
+	wyString    temp;
+	wyInt32     retflag = 0, index, length;
+	HWND        hwndPlugincombo = GetDlgItem(m_hwnd, IDC_AUTHPLUGIN);
+
+	SetCursor(LoadCursor(NULL, IDC_WAIT));
+
+	//reset the combo box contents
+	SendMessage(hwndPlugincombo, CB_RESETCONTENT, 0, 0);
+	
+	//execute the query and get all the entries
+	query.SetAs("SELECT `PLUGIN_NAME` FROM INFORMATION_SCHEMA.PLUGINS where plugin_type='AUTHENTICATION' and plugin_status='ACTIVE'");
+	myres = ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query);
+
+	if (myres == NULL)
+	{
+		OnUMError(query.GetString(), wyTrue);
+		return -1;
+	}
+	int defaultidx = 0;
+	while ((row = m_hmdi->m_tunnel->mysql_fetch_row(myres)))
+	{
+		temp.SetAs(row[0], m_hmdi->m_ismysql41);
+		if (temp.Compare(m_defaultAuthPlugin.GetString())!=0 ){
+			defaultidx++;
+		}
+
+		length = temp.GetLength();
+		index = SendMessage(hwndPlugincombo, CB_ADDSTRING, 0, (LPARAM)temp.GetAsWideChar());
+		SendMessage(hwndPlugincombo, CB_SETITEMDATA, (WPARAM)index, (LPARAM)length);
+	}
+
+	m_hmdi->m_tunnel->mysql_free_result(myres);
+
+	//set the initial selection index in the combo box
+	m_selindex = defaultidx;
+	SendMessage(hwndPlugincombo, CB_SETCURSEL, (WPARAM)m_selindex, 0);
+	SetCursor(LoadCursor(NULL, IDC_ARROW));
+	return retflag;
+}
+
+//function set the current user Authentication plugin
+wyBool
+UserManager::GetUserCurrentAuthPlugin()
+{
+	wyString            query, boolvalue, tempuser, temphost, tempplugin;
+	MYSQL_RES*          myres;
+	MYSQL_ROW           row;
+	wyString			temp;
+
+
+	SetCursor(LoadCursor(NULL, IDC_WAIT));
+	query.Sprintf("SELECT plugin FROM `mysql`.`user` WHERE User = '%s' and host = '%s'",
+		EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
+		EscapeMySQLString(m_host.GetString(), temphost).GetString());
+	myres = ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query);
+
+	if (myres == NULL)
+	{
+		ShowMySQLError(m_hwnd, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query.GetString());
+		return wyFalse;
+	}
+
+	row = m_hmdi->m_tunnel->mysql_fetch_row(myres);
+	temp.SetAs(row[0], m_hmdi->m_ismysql41);
+	
+	if (temp.Compare("") == 0) {
+		temp.SetAs(m_defaultAuthPlugin.GetString());
+	}
+
+	m_authpluginname.SetAs(temp);
+
+	return wyTrue;
+}
+
 //function populates the user privileges
 wyBool
 UserManager::PopulateUserInfo()
@@ -1271,7 +1513,9 @@ UserManager::PopulateUserInfo()
     tvi.pszText = user.GetAsWideChar();
     tvi.cchTextMax = user.GetLength() + 1;
     TreeView_SetItem(hwndobtree, &tvi);
-
+	if (IsAuthPluginSupported()) {
+		GetUserCurrentAuthPlugin();
+	}
     //get the user privileges
     if(m_isnewuser == wyFalse)
     {
@@ -1337,6 +1581,8 @@ UserManager::OnNewUser()
     SetDlgItemText(m_hwnd, IDC_CANCEL_CHANGES, _(L"&Cancel"));
     SetDlgItemText(m_hwnd, IDC_SAVE_CHANGES, _(L"Creat&e"));
     //SetDlgItemText(m_hwnd, IDC_OBJECTINFO, U_NEW_USER);
+
+	SetDlgItemText(m_hwnd, IDC_AUTHPLUGIN, m_defaultAuthPlugin.GetAsWideChar());
 
     //change the icon
     SetDlgItemText(m_hwnd, IDC_CONTEXTHELP, U_CONTEXTHELP_ADDUSER);
@@ -2040,6 +2286,14 @@ UserManager::SetSelectedObjectInfo(PrivilegedObject* privobj)
                 m_currentdb.SetAs(tvi.pszText);
             }
     }
+	wyBool defaultvis = wyFalse;
+	if (m_serververno > 50700) {
+		if ((m_ismariadb && m_serververno > 100400) || m_ismariadb == wyFalse) {
+			defaultvis = wyTrue;
+		}
+	}
+
+	EnableWindow(GetDlgItem(m_hwnd, IDC_AUTHPLUGIN), defaultvis);
 }
 
 //function sets the range of the spin control
@@ -2060,7 +2314,7 @@ UserManager::ShowHideControls(wyInt32 imageindex)
     wyInt32 showcmd, shownote = SW_HIDE;
 
     wyInt32 ctrlids0[] = {
-        IDC_USERNAME_PROMPT, IDC_USERNAME, 
+		IDC_USERNAME_PROMPT, IDC_USERNAME,
         IDC_HOST_PROMPT, IDC_HOSTNAME, 
         IDC_PASSWORD_PROMPT, IDC_PASSWORD, 
         IDC_PASSWORD2_PROMPT, IDC_PASSWORD_CONFIRM,
@@ -2068,7 +2322,8 @@ UserManager::ShowHideControls(wyInt32 imageindex)
         IDC_MAXUPDATE_PROMPT, IDC_MAXUPDATE, IDC_MAXUPDATE_SPIN,
         IDC_MAXCONN_PROMPT, IDC_MAXCONN, IDC_MAXCONN_SPIN,
         IDC_MAXCONNSIM_PROMPT, IDC_MAXSIMCONN, IDC_MAXSIMCONN_SPIN,
-        IDC_HELPZERO
+        IDC_HELPZERO,
+		IDC_PLUGIN_PROMPT,IDC_AUTHPLUGIN
     };
 
     wyInt32 ctrlids1[] = {
@@ -2111,7 +2366,7 @@ UserManager::ShowHideControls(wyInt32 imageindex)
             case 19:
                 showcmd &= (m_showlimitations[3] == wyTrue) ? shownote = SW_SHOW : SW_HIDE;
                 break;
-
+	
             case 20:
                 showcmd &= shownote;
         }
@@ -2124,8 +2379,18 @@ UserManager::ShowHideControls(wyInt32 imageindex)
         ShowWindow(GetDlgItem(m_hwnd, ctrlids1[i]), 
                    (imageindex == m_umimageindex) ? SW_HIDE : SW_SHOW);
     }
-
+	
     ShowWindow(m_hwndnote, SW_HIDE);
+	// reset plugin selection visibility depending on the DBversion number.
+
+	wyBool defaultvis = wyFalse;
+	if (m_serververno > 50700) {
+		if ((m_ismariadb && m_serververno > 100400) || m_ismariadb == wyFalse) {
+			defaultvis = wyTrue;
+		}
+	}
+
+	EnableWindow(GetDlgItem(m_hwnd, IDC_AUTHPLUGIN), defaultvis );
 }
 
 //function sets the dirty flag
@@ -2267,6 +2532,8 @@ UserManager::ApplyChanges(wyBool issave)
         {
             return wyFalse;
         }
+
+		
 
         //truncate and replace the original table with the working table and vice versa
         //this updates the original tables and eleminates any redundant rows in the working copy
@@ -2737,9 +3004,18 @@ UserManager::FillUserInfo()
 {
     wyInt32 ctrls[] = {IDC_MAXQUERY_SPIN, IDC_MAXUPDATE_SPIN, IDC_MAXCONN_SPIN, IDC_MAXSIMCONN_SPIN};
     wyInt32 i;
+	string temp;
+	wyString defaultpluginname;
 
     SetDlgItemText(m_hwnd, IDC_USERNAME, m_username.GetAsWideChar());
     SetDlgItemText(m_hwnd, IDC_HOSTNAME, m_host.GetAsWideChar());
+	
+	// set the plugin even if the values is not part of the combo list. in Mariadb, it can be empty.
+	temp = m_authpluginname.GetString();
+	defaultpluginname.SetAs(m_authpluginname.GetString());
+
+	SetDlgItemText(m_hwnd, IDC_AUTHPLUGIN, defaultpluginname.GetAsWideChar());
+	
     SetDlgItemText(m_hwnd, IDC_PASSWORD, U_PASSWORD);
     SetDlgItemText(m_hwnd, IDC_PASSWORD_CONFIRM, U_REPASSWORD);
 
@@ -2928,17 +3204,18 @@ UserManager::ExecuteUMQuery(wyString& query)
 void
 UserManager::EnableUserControls(wyBool isnewuser)
 {
+	
      wyInt32 ctrlids0[] = {
         IDC_USERNAME_PROMPT, IDC_HOST_PROMPT, IDC_PASSWORD_PROMPT, IDC_PASSWORD2_PROMPT,
         IDC_MAXQUERY_PROMPT, IDC_MAXUPDATE_PROMPT, IDC_MAXCONN_PROMPT, IDC_MAXCONNSIM_PROMPT,
         IDC_MAXQUERY_SPIN, IDC_MAXUPDATE_SPIN, IDC_MAXCONN_SPIN,
         IDC_MAXSIMCONN_SPIN, IDC_CANCEL_CHANGES, IDCANCEL, 
-        IDC_CONTEXTHELP, IDC_HELPZERO, IDC_UM_HELP, IDC_GRIP
+        IDC_CONTEXTHELP, IDC_HELPZERO, IDC_UM_HELP, IDC_GRIP , IDC_PLUGIN_PROMPT
     };
-
+	 
     wyInt32 ctrlids1[] = {
-        IDC_USERNAME, IDC_HOSTNAME, IDC_PASSWORD, IDC_PASSWORD_CONFIRM, IDC_MAXQUERIES, IDC_MAXUPDATE,
-        IDC_MAXCONN, IDC_MAXSIMCONN
+        IDC_USERNAME, IDC_HOSTNAME, IDC_PASSWORD, IDC_PASSWORD_CONFIRM,  IDC_MAXQUERIES, IDC_MAXUPDATE,
+        IDC_MAXCONN, IDC_MAXSIMCONN, IDC_AUTHPLUGIN
     };
 
     wyInt32 i, size;
@@ -2954,7 +3231,7 @@ UserManager::EnableUserControls(wyBool isnewuser)
         {
             continue;
         }
-
+		
         if(i < 4)
         {
             if(i == 1)
@@ -2970,14 +3247,39 @@ UserManager::EnableUserControls(wyBool isnewuser)
         {
             SetDlgItemText(m_hwnd, ctrlids1[i], L"0");
         }
+		if (i == 8) // Auth method
+		{
+			SetDlgItemText(m_hwnd, ctrlids1[i], L"");
+			SendDlgItemMessage(m_hwnd, ctrlids1[i], CB_SETCURSEL, 0, 0); 
+		}
+			
     }
+	
 
+	
     size = sizeof(ctrlids0)/sizeof(ctrlids0[0]);
 
     for(i = 0; i < size; ++i)
     {
         EnableWindow(GetDlgItem(m_hwnd, ctrlids0[i]), TRUE);
     }
+	// reset plugin selection visibility depending on the DBversion number.
+	wyBool defaultvis = wyFalse;
+	if (isnewuser) { // can create for those
+		if (m_serververno > 50600) {
+			if ((m_ismariadb && m_serververno > 100400) || m_ismariadb == wyFalse) {
+				defaultvis = wyTrue;
+			}
+		}
+		else { // can only update for those
+			if (m_serververno > 50700) {
+				if ((m_ismariadb && m_serververno > 100400) || m_ismariadb == wyFalse) {
+					defaultvis = wyTrue;
+				}
+			}
+		}
+	}
+	EnableWindow(GetDlgItem(m_hwnd, IDC_AUTHPLUGIN), defaultvis==wyFalse? FALSE : TRUE);
 
     //EnableWindow(GetDlgItem(m_hwnd, IDC_SAVE_CHANGES), FALSE);
     m_isedited = wyFalse;

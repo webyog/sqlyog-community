@@ -98,7 +98,7 @@ CCustomComboBox::ComboCtrlProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
     
     switch(message)
     {
-    case WM_ERASEBKGND:
+	case WM_ERASEBKGND:
         return 1;           // On WM_ERASEBKGND do nothing.
 
     case WM_PAINT:
@@ -113,7 +113,10 @@ CCustomComboBox::ComboCtrlProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lP
         InvalidateRect(con->m_cbif.hwndItem, NULL, TRUE);
         UpdateWindow(con->m_cbif.hwndItem);
         ReleaseDC(hwnd, hdc);
-        return 1;
+		return 1;
+
+	case CB_SETDROPPEDWIDTH: // force this to be sent to combo
+		ret = SendMessage(con->m_hwndParent, CB_SETDROPPEDWIDTH, wParam, lParam);
     }
 
     return CallWindowProc(con->m_origComboCtrlProc, con->m_hwndCombo, message, wParam, lParam);
@@ -380,7 +383,7 @@ CCustomComboBox::OnHandleEditChange(){
 	if(len)
 	{
 		if(len==1)
-		SendMessage(m_hwndCombo, CB_SHOWDROPDOWN, FALSE, NULL);
+			SendMessage(m_hwndCombo, CB_SHOWDROPDOWN, FALSE, NULL);
 
 		for(i=0;i<m_conncount;i++)
 		{	 
@@ -389,15 +392,13 @@ CCustomComboBox::OnHandleEditChange(){
 			temp = StrStrI(m_connectionlist[i].m_connectionname.GetAsWideChar(),str);
 			if(temp)
 				status=1;
-							
-
+						
 			if(temp && m_connectionlist[i].m_dropdown == wyFalse)
 			{
 				index=SendMessage(m_hwndCombo, CB_ADDSTRING, 0,(LPARAM)m_connectionlist[i].m_connectionname.GetAsWideChar());
 				//MessageBox(hcb,connlist[i].itemvalue.GetAsWideChar(),connlist[i].conn_name.GetAsWideChar(),MB_OK);
 				VERIFY(SendMessage(m_hwndCombo, CB_SETITEMDATA, index,m_connectionlist[i].m_itemvalue.GetAsInt32()));
 				m_connectionlist[i].m_dropdown=wyTrue;
-					
 			}
 
 			if(!temp && m_connectionlist[i].m_dropdown==wyTrue)
@@ -409,6 +410,7 @@ CCustomComboBox::OnHandleEditChange(){
 		 }
 					 
 	}
+	
 	if(!len || status==0)
 	{
 		SendMessage(m_hwndCombo, CB_SETCURSEL, -1, 0);
@@ -447,6 +449,7 @@ CCustomComboBox::OnHandleEditChange(){
 	return wyTrue;
 }
 
+
 // function handles WM_COMMAND message to the Custom Combo Control
 void
 CCustomComboBox::HandleWmCommand(HWND hwnd, WPARAM wparam, LPARAM lparam)
@@ -457,6 +460,7 @@ CCustomComboBox::HandleWmCommand(HWND hwnd, WPARAM wparam, LPARAM lparam)
     {
         switch(HIWORD(wparam))
         {
+		
         case CBN_EDITCHANGE:
             {
                 HandleEditChange();
@@ -467,6 +471,7 @@ CCustomComboBox::HandleWmCommand(HWND hwnd, WPARAM wparam, LPARAM lparam)
             {
                 m_fillText = wyTrue;
                 InvalidateRect(m_hwndCombo, NULL, TRUE);
+				
             }
             break;
         }
@@ -511,7 +516,7 @@ CCustomComboBox::CreateCtrls(HWND hwnd, LPARAM lParam)
         return wyFalse;
 
     SendMessage(m_hwndCombo, WM_SETFONT, (WPARAM)hfont, (LPARAM)TRUE);
-    
+
     ShowWindow(m_hwndCombo, SW_SHOW);
 
     ret = GetComboBoxInfo(m_hwndCombo, &m_cbif);
@@ -525,7 +530,7 @@ CCustomComboBox::CreateCtrls(HWND hwnd, LPARAM lParam)
     {
         SendMessage(hwnd, WM_ENABLE, FALSE, NULL);
     }
-
+	
     SetWindowLongPtr(m_hwndCombo, GWLP_USERDATA, (LONG_PTR) this);
     m_origComboCtrlProc = (WNDPROC)SetWindowLongPtr(m_hwndCombo, GWLP_WNDPROC, (LONG_PTR) CCustomComboBox::ComboCtrlProc);
     
@@ -534,7 +539,6 @@ CCustomComboBox::CreateCtrls(HWND hwnd, LPARAM lParam)
 
     return wyTrue;
 }
-
 
 // register Custom Combo Control
 wyBool 

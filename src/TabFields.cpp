@@ -709,7 +709,11 @@ TabFields::TraverseEachFieldRow(MYSQL_RES *myfieldres,wyString createtable)
 		
 		myrowstr.SetAs(myfieldrow[1], m_ismysql41);
 
-		if(strstr(myrowstr.GetString(), "unsigned"))
+		if (strstr(myrowstr.GetString(), "enum"))
+		{
+			fieldattr->m_unsigned = wyFalse;
+		}
+		else if(strstr(myrowstr.GetString(), "unsigned"))
             fieldattr->m_unsigned = wyTrue;
 
 		if(m_ismysql41 == wyFalse)

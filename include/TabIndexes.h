@@ -21,6 +21,9 @@ class TableTabInterfaceTabMgmt;
 
 #define     NO_COLUMNS_DEFINED_FOR_INDEX    _(L"No columns selected")
 
+
+
+
 class FieldStructWrapper;
 
 class IndexColumn : public wyElem
@@ -28,6 +31,7 @@ class IndexColumn : public wyElem
 public:
     FieldStructWrapper *m_pcwrapobj;
     wyInt32             m_lenth;
+	wyString			m_order;
     IndexColumn(FieldStructWrapper *value);
 };
 
@@ -38,6 +42,8 @@ struct IndexInfo
     List        *m_listcolumns;
     wyString    m_indextype;
 	wyString	m_indexcomment;
+	wyString	m_visible;
+	
 };
 
 class IndexesStructWrapper : public wyElem
@@ -80,6 +86,9 @@ public:
     wyBool                          m_ismysql41;
 	wyBool                          m_ismariadb52;
 	wyBool							m_ismysql553;
+	wyBool							m_supportsordering;
+	wyBool							m_supportsvisibility;
+
 
     // used for Shift+Click functionality
     wyInt32                         m_lastclickindgrid;
@@ -94,6 +103,7 @@ public:
 	// backtick string from preferences, either empty or quote
 	wyChar*							m_backtick;
 
+	
     /// Constructor
     TabIndexes(HWND hwndparent, TableTabInterfaceTabMgmt* ptabmgmt);
 
@@ -178,6 +188,7 @@ public:
     wyBool                          OnEndEditIndexColumns(WPARAM wParam, LPARAM lParam);
     wyBool                          OnEndEditIndexType(WPARAM wParam, LPARAM lParam);
     wyBool                          OnEndEditIndexComment(WPARAM wParam, LPARAM lParam);
+	wyBool                          OnEndEditIndexVisibility(WPARAM wParam, LPARAM lParam);
 
     /// Shows the Columns Dialog
     /**
@@ -454,4 +465,21 @@ public:
 		void						PositionWindow(RECT* prect, HWND hwnd);
 
         wyInt32                     InsertRow();
+		
+		
+		/**
+		Maps A/D to ASC / DESC
+		@params val              : IN message parameter A or D 
+		@returns ASC or DESC in accordance
+		*/
+		wyString DecodeIndexOrder(wyString val);
+
+		/**
+		Maps yes/no to Visible / Unvisible
+		@params val              : IN message parameter : Yes or False
+		@returns Visible or Unvisible in accordance
+		*/
+		wyString DecodeIndexVisibility(wyString val);
+		
+		
 };

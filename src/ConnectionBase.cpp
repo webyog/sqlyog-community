@@ -392,6 +392,7 @@ ConnectionBase::InitConnDialog(HWND hdlg, HWND combo, wyBool toadd, wyBool selec
 	wyString    conn, dirstr, connnamestr, connselnamestr, tempnumstr;
 	wyString	selconnnamestr, codepage, allsecnames, tempdir;
    	HWND		hwndcombo;
+	
     wyChar	    seps[] = ";";
     RECT        rct;
 	wyInt32		width;//number of characters in connection name 
@@ -408,6 +409,8 @@ ConnectionBase::InitConnDialog(HWND hdlg, HWND combo, wyBool toadd, wyBool selec
 	
 	dirstr.SetAs(directory);
 	tempdir.SetAs(directory);
+
+	
 
 	if(!combo)
 		VERIFY(hwndcombo = GetDlgItem(hdlg, IDC_DESC));
@@ -479,10 +482,12 @@ ConnectionBase::InitConnDialog(HWND hdlg, HWND combo, wyBool toadd, wyBool selec
 
 	SendMessage(hwndcombo, CB_SETCURSEL, index, 0);
 
-	////update the width of dropdown
-	//width = SetComboWidth(hwndcombo);
-	//SendMessage(hwndcombo, CB_SETDROPPEDWIDTH, width + 50, 0); //width + 50 means width of the text + width of the scroll bar
+	/*width = SetComboWidth(hwndcombo);
+	SendMessage(hwndcombo, CB_SETDROPPEDWIDTH, width+50, 0); //width + 50 means width of the text + width of the scroll bar*/
 
+	HWND actualcombo = (HWND)SendMessage(hwndcombo, CCBM_GETCOMBOHWND, 0, 0);
+	width = SetComboWidth(actualcombo);
+	SendMessage(actualcombo, CB_SETDROPPEDWIDTH, width + 50, 0);
 	return;
 }
 
@@ -810,7 +815,11 @@ ConnectionBase::CloneConnection(HWND hdlg)
 		m_isencrypted_clone = wyTrue;
 	}
 
-	wcscpy(pconn.m_connname, _(conn.GetAsWideChar()));
+	// THE FOLLOWING FIXES THE Connection Size when clonning the name.
+	// so that the size will not exceeds the 64 char limit 
+	// if for 13.1.6 version is decided to be kept unchanged switch to the comment line below
+	wcsncpy(pconn.m_connname, _(conn.GetAsWideChar()),64); 
+	// wcscpy(pconn.m_connname, _(conn.GetAsWideChar()));
 	pconn.m_isnew = wyTrue;
 	conn.Clear();
 

@@ -811,6 +811,9 @@ void
 					
 			  }
 
+		wyInt32 width = SetComboWidth(m_hwndcombodb);
+		SendMessage(m_hwndcombodb, CB_SETDROPPEDWIDTH, width + 50, 0);
+
 }
 
 void 
@@ -1054,6 +1057,7 @@ CopyDatabase::AddInitData()
 		EnableWindow(m_hwndcombo, TRUE);
 		EnableWindow(m_hwndcombodb, TRUE);
 	}
+	
 
 	m_p->Add(m_hwnddlg, IDC_SOURCEDB, "Target", "", COMBOBOX_P);
 
@@ -1091,6 +1095,13 @@ CopyDatabase::AddInitData()
 	GetCtrlRects();
 	PositionCtrls();
 
+	// set the width of the combos
+	
+	wyInt32 width = SetComboWidth(GetDlgItem(m_hwnddlg, IDC_SOURCEDB));
+	SendMessage(GetDlgItem(m_hwnddlg, IDC_SOURCEDB), CB_SETDROPPEDWIDTH, width + 50, 0);
+
+	width = SetComboWidth(GetDlgItem(m_hwnddlg, IDC_SOURCEDB2));
+	SendMessage(GetDlgItem(m_hwnddlg, IDC_SOURCEDB2), CB_SETDROPPEDWIDTH, width + 50, 0);
 
 
 	return wyTrue;
@@ -3137,6 +3148,10 @@ CopyDatabase::ExportActualData(wyChar * table,wyBool *isvirtual)
 		//In HTTP, if don't break into chunks is checked or chunk size is zero or chunk size is > 1000 , then we will use the chunk size as 1000
 		//otherwise , means if chunksize is <1000, that size will use.
 		if(chunklimit > MAX_ROW_LIMIT || ischunkinsert == wyFalse || chunklimit == 0)
+			chunklimit = MAX_ROW_LIMIT;
+	}
+	else {
+		if(ischunkinsert ==  wyTrue && chunklimit == 0)
 			chunklimit = MAX_ROW_LIMIT;
 	}
 

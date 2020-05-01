@@ -144,6 +144,23 @@ class UserManager
         */
         wyInt32                 PopulateUserCombo();
 
+		//Function that checks if current server supports  authentication plugin 
+		/**
+		*/
+		boolean IsAuthPluginSupported();
+
+		//Function that populates the contents of plugin combo
+		/**
+		@returns -1 on MySQL error else, >= 0
+		*/
+		wyInt32					PopulateAuthPluginCombo();
+
+		//Function that updates the selection on plugin combo from current user definitions on DB
+		/**
+		@returns -1 on MySQL error else, >= 0
+		*/
+		wyBool					GetUserCurrentAuthPlugin();
+
         ///Enumeration procedure that enables/disables the children
         /**
         @param hwnd             : IN child window handle
@@ -326,7 +343,22 @@ class UserManager
         */
         wyBool                  OnTreeViewItemExpanding(LPARAM lparam);
 
-        ///Function creates the two SQLite tables used to store the privileges in memeory
+
+		//Function that Saves the contents of plugin combo
+		/**
+		@returns treu on sucess false on failure>
+		*/
+		wyBool					SaveAuthPlugin();
+
+		/*
+		wyBool IsServerMariaDb(wyString version);
+
+		wyString GetServerVersion();
+
+		wyInt32 GetVersionNo(wyString version);
+		*/
+
+		///Function creates the two SQLite tables used to store the privileges in memeory
         /**
         @returns void
         */
@@ -560,6 +592,7 @@ class UserManager
         */
         wyBool                  SavePassword();
 
+		
         ///Helper function to execute FLUSH PRVILEGES
         /**
         @returns wyTrue on success else wyFalse
@@ -698,6 +731,12 @@ class UserManager
         //flag tells whether the server is >= 5.02
         wyBool                  m_ismysql502;
 
+		//flag tells whether the server is MariaDb
+		wyBool                   m_ismariadb;
+		//flag tells whether the server is MariaDb higher then 10.4
+		wyBool                   m_ismariadb104;
+		//flag tells whether the server is MariaDb higher then 10.4
+		wyBool                   m_ismariadb55;
         //name of the currently selected db in tree view
         wyString                m_currentdb;
 
@@ -747,6 +786,20 @@ class UserManager
 
         //member stores the database context on starting UM and restore it before closing
         wyString                m_selecteddatabase;
+
+		//plugin name of the selected user
+		wyString                m_authpluginname;
+	
+		wyInt32					m_authplugincount;
+	
+		// stores the current server version number
+		wyInt32					m_serververno;
+
+		// holds current server full version string 
+		wyString				m_versionfull;
+
+		// holds current default plugin for authentication
+		wyString		m_defaultAuthPlugin;
 };
 
 

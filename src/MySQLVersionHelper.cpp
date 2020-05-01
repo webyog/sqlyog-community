@@ -295,7 +295,43 @@ IsMySQL80011(Tunnel * tunnel, PMYSQL mysql)
 	else
 		return wyFalse;
 }
-	
+
+wyBool
+IsMariaDB100200(Tunnel * tunnel, PMYSQL mysql)
+{
+	wyUInt32 me = mysql_get_server_version(*mysql);/* Only available from MySQLv8.1*/
+	const char *dbString = mysql_get_server_info(*mysql);
+
+	if (me < 100200 && strstr(dbString, "MariaDB"))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
+wyBool 
+IsMariaDB(Tunnel * tunnel, PMYSQL mysql)
+{
+	wyUInt32 me = mysql_get_server_version(*mysql);/* Only available from MySQLv8.1*/
+	const char *dbString = mysql_get_server_info(*mysql);
+
+	if (strstr(dbString, "MariaDB"))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
+wyBool
+IsMariaDB104(Tunnel * tunnel, PMYSQL mysql)
+{
+	long me = mysql_get_server_version(*mysql);
+	const char *dbString = mysql_get_server_info(*mysql);
+
+	if (me >= 100400 && strstr(dbString, "MariaDB"))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
 wyBool
 IsMySQL5017(Tunnel * tunnel, PMYSQL mysql)
 {
@@ -738,3 +774,143 @@ SetCharacterSet(Tunnel *tunnel, MYSQL * mysql, wyChar * charset)
 
     return ;
 }
+
+wyBool
+IsServerMariaDb(wyString version) {
+	if (strstr(version.GetString(), "MariaDB"))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
+
+wyInt32
+GetVersionNo(wyString ver)
+{
+	wyString errorlog;
+	wyChar	 *major, *minor, *minorminor;
+	wyChar	 seps[] = ".";
+	wyInt32  majorver = 0, minorver = 0, minorminorver = 0;
+	wyUInt32 verno = 0;
+
+	major = strtok((wyChar*)ver.GetString(), seps);
+	minor = strtok(NULL, seps);
+	minorminor = strtok(NULL, seps);
+
+	if (major)
+	{
+		majorver = atoi(major);
+	}
+	else
+	{
+		errorlog.Sprintf("GetVersionNo() major is NULL version = %s", ver.GetString());
+		YOGLOG(0, errorlog.GetString());
+	}
+
+	if (minor)
+	{
+		minorver = atoi(minor);
+	}
+	else
+	{
+		errorlog.Sprintf("GetVersionNo() minor is NULL version = %s", ver.GetString());
+		YOGLOG(0, errorlog.GetString());
+	}
+
+	if (minorminor)
+	{
+		minorminorver = atoi(minorminor);
+	}
+	else
+	{
+		errorlog.Sprintf("GetVersionNo() minorminorver is NULL version = %s", ver.GetString());
+		YOGLOG(0, errorlog.GetString());
+	}
+
+	verno = majorver * 10000 + minorver * 100 + minorminorver * 1;
+
+	return verno;
+}
+
+
+void
+GetServerVersion(Tunnel * tunnel, PMYSQL mysql, wyString *pServerVersion)
+{
+	wyString            query("SELECT version()"), res("");
+	MYSQL_RES*          qres;
+	MYSQL_ROW           row;
+
+	qres = SjaExecuteAndGetResult(tunnel, mysql, query);
+	if (qres) {
+		row = sja_mysql_fetch_row(tunnel, qres);
+		if(row && row[0])
+			res.SetAs(row[0]);
+
+		sja_mysql_free_result(tunnel, qres);
+		pServerVersion->SetAs(res);
+	}
+
+	return;
+}
+
+//Helper function to obtain default authentication plugin
+// Returns the default plugin : 
+// if mariadb > 10.14 and system environemnt Old_password is 0 -> sql_native_password, else sql_old_password
+// if mysqlserver > 5.7 return the result of system variable default_authentication_plugin
+/**
+@returns String with defined default plugin
+*/
+wyBool
+GetDefaultAuthenticationPlugin(Tunnel * tunnel, PMYSQL mysql, wyInt32 serververno, wyBool ismariadb, wyString *plugin) {
+	wyString var("");
+	wyString res("");
+	if (ismariadb && serververno > 100400) {
+		var.Sprintf("old_passwords");
+		GetSystemEnvironment(tunnel, mysql, &var, &res);
+
+		if (res.CompareI("OFF") == 0) {
+			res.SetAs("mysql_native_password");
+		}
+		else {
+			res.SetAs("mysql_old_password");
+		}
+	}
+
+	if (!ismariadb && serververno > 50700) {
+		var.SetAs("default_authentication_plugin");
+		GetSystemEnvironment(tunnel, mysql, &var, &res);
+		if (res.Compare("") != 0)
+			GetSystemEnvironment(tunnel, mysql, &var, &res);
+		else
+			res.SetAs("mysql_native_password");
+	}
+
+	plugin->SetAs(res);
+
+	return wyTrue;
+}
+
+wyBool
+GetSystemEnvironment(Tunnel * tunnel, PMYSQL mysql, wyString *var, wyString *value)
+{
+	wyString            query("");
+	MYSQL_RES*          qres;
+	MYSQL_ROW           row;
+
+	query.Sprintf("show variables where variable_name = '%s'", var->GetString());
+
+	qres = SjaExecuteAndGetResult(tunnel, mysql, query);
+	
+	if (qres) {
+		row = sja_mysql_fetch_row(tunnel, qres);
+		if (row && row[1]) {
+			value->SetAs(row[1]);
+		}
+		sja_mysql_free_result(tunnel, qres);
+	}
+
+	return wyTrue;
+}
+
+
+

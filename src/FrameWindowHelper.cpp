@@ -3388,6 +3388,7 @@ SetComboWidth(HWND hwndCombo)
 
 	count = SendMessage(hwndCombo, CB_GETCOUNT, 0, 0);
 	hdc = GetWindowDC(hwndCombo);
+	//hdc = GetDC(hwndCombo);
 	font = GetWindowFont(hwndCombo);
 	oldfont = (HFONT)SelectObject(hdc,font);
 
