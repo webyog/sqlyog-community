@@ -20,6 +20,8 @@
 #include "EditorFont.h"
 #include "Htmlrender.h"
 
+
+
 #define TABLEINFO_X             2
 #define TABLEINFO_Y             30
 #define TABLEINFO_HEIGHT_ADJ    33
@@ -2030,8 +2032,9 @@ ObjectInfo::AddObjectInfoHtmlFormat(MDIWindow *wnd, MYSQL_RES *myres, wyString *
 	htmlbuffer->Add(title.GetString());
     htmlbuffer->Add("</div><br>");
 
+	/*Bug  issue 2250 is solved at here*/
 	if(obj == OBJECT_TABLE && m_istostopcaption == wyFalse 
-		&& m_isoptimizationaborted == wyFalse && m_isschemaoptimized == wyFalse && m_istableanalyse == wyFalse)
+		&& m_isoptimizationaborted == wyFalse && m_isschemaoptimized == wyFalse && m_istableanalyse == wyFalse && (IsMySQL800(&wnd->m_mysql) == wyFalse || IsMariaDB(wnd->m_tunnel,&wnd->m_mysql)))
 	{
 		htmlbuffer->AddSprintf("<div class=\"resultcaptionstyle\">");
 
@@ -2067,7 +2070,7 @@ ObjectInfo::AddObjectInfoHtmlFormat(MDIWindow *wnd, MYSQL_RES *myres, wyString *
     }
 
 #ifndef COMMUNITY
-	else if(obj == OBJECT_TABLE && m_istostopcaption == wyTrue)
+	else if(obj == OBJECT_TABLE && m_istostopcaption == wyTrue && (IsMySQL800(&wnd->m_mysql) == wyFalse && IsMariaDB(wnd->m_tunnel, &wnd->m_mysql)))/*Bug #2250 solved at here*/
 	{
 		htmlbuffer->AddSprintf("<div class=\"tabcaptionstyle\">");
 

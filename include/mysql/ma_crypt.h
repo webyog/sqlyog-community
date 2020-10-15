@@ -44,14 +44,7 @@
 #define MA_MAX_HASH_SIZE 64
 /** \typedef MRL hash context */
 
-#if defined(HAVE_OPENSSL)
-typedef void MA_HASH_CTX;
-#elif defined(HAVE_GNUTLS)
-typedef struct {
-  void *ctx;
-  const struct nettle_hash *hash;
-} MA_HASH_CTX;
-#elif defined(HAVE_SCHANNEL)
+#if defined(WIN32)
 #include <windows.h>
 #include <bcrypt.h>
 typedef struct {
@@ -60,6 +53,13 @@ typedef struct {
   BCRYPT_HASH_HANDLE hHash;
   PBYTE hashObject;
   DWORD digest_len;
+} MA_HASH_CTX;
+#elif defined(HAVE_OPENSSL)
+typedef void MA_HASH_CTX;
+#elif defined(HAVE_GNUTLS)
+typedef struct {
+  void *ctx;
+  const struct nettle_hash *hash;
 } MA_HASH_CTX;
 #endif
 

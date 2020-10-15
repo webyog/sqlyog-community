@@ -212,6 +212,15 @@ void SetCharacterSet(Tunnel *tunnel, MYSQL * mysql, wyChar * charset);
 */
 wyBool IsMySQL80011(Tunnel * tunnel, PMYSQL mysql);
 
+/// Checks the server version is greater than or equal to 8.0.0
+/**
+@param tunnel: IN tunnel pointer
+@param mysql: IN PMYSQL value
+@returns wyBool, wyTrue if it is SUCCESS, else wyFalse
+*/
+/*For Bug issue 2250*/
+wyBool IsMySQL800(PMYSQL mysql);
+
 /// Checks the server version isis MariaDB 10.2.0 or higher
 /**
 @param tunnel: IN tunnel pointer

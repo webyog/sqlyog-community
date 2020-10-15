@@ -79,6 +79,9 @@ lparam: Not Used
 //Custom ComboBox class registered for Community and Connection Manager 
 #define CUSTOMCOMBOBOX1     L"CustomComboBox1"
 
+//Add extra space for combobox for better view
+#define COMBOWIDTHMARGIN 50
+
 
 /*! \struct connectionlist
     \brief 
@@ -98,7 +101,10 @@ typedef struct connectionlist
 // Custom Combo Box Class
 class CCustomComboBox
 {
+
+
 private:
+
 
 	//Holds the list of connection
 	CONNLIST	*m_connectionlist;

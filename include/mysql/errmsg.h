@@ -100,7 +100,8 @@ extern const char *mariadb_client_errors[];	/* Error messages */
 #define CR_FILE_READ 5005
 #define CR_BULK_WITHOUT_PARAMETERS 5006
 #define CR_INVALID_STMT 5007
+#define CR_VERSION_MISMATCH 5008
 /* Always last, if you add new error codes please update the
    value for CR_MARIADB_LAST_ERROR */
-#define CR_MARIADB_LAST_ERROR CR_INVALID_STMT
+#define CR_MARIADB_LAST_ERROR CR_VERSION_MISMATCH
 #endif

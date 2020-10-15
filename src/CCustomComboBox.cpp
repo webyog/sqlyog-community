@@ -408,6 +408,9 @@ CCustomComboBox::OnHandleEditChange(){
 				 m_connectionlist[i].m_dropdown=wyFalse;
 			}
 		 }
+
+		wyInt32 width = SetComboWidth(m_hwndCombo);
+		SendMessage(m_hwndCombo, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
 					 
 	}
 	
@@ -421,6 +424,10 @@ CCustomComboBox::OnHandleEditChange(){
 				if(m_connectionlist[i].m_dropdown == wyFalse)
 				{
 					index=SendMessage(m_hwndCombo, CB_ADDSTRING, 0,(LPARAM)m_connectionlist[i].m_connectionname.GetAsWideChar());
+
+					wyInt32 width = SetComboWidth(m_hwndCombo);
+					SendMessage(m_hwndCombo, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
+
 					VERIFY(SendMessage(m_hwndCombo, CB_SETITEMDATA, index, (LPARAM)m_connectionlist[i].m_itemvalue.GetAsInt32()));
 					m_connectionlist[i].m_dropdown=wyTrue;
 				}

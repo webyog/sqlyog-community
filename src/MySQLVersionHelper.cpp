@@ -295,6 +295,17 @@ IsMySQL80011(Tunnel * tunnel, PMYSQL mysql)
 	else
 		return wyFalse;
 }
+/*For bug issue 2250*/
+wyBool 
+IsMySQL800(PMYSQL mysql)
+{
+	wyUInt32 me = mysql_get_server_version(*mysql);/* Only available from MySQLv8.0*/
+
+	if (me >= 80000)
+		return wyTrue;
+	else
+		return wyFalse;
+}
 
 wyBool
 IsMariaDB100200(Tunnel * tunnel, PMYSQL mysql)

@@ -27,6 +27,7 @@
 #include "TabPreview.h"
 #include "DoubleBuffer.h"
 #include "TabCheck.h"
+#include "CCustomComboBox.h"
 
 #define	SIZE_24	        24
 #define	SIZE_12	        12
@@ -1826,7 +1827,10 @@ TableTabInterface::CreateOtherWindows()
                                         style | CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP | WS_GROUP, 
 										0, 0, 0, 0, m_hwnd, 
                                         (HMENU) IDC_DBNAME, (HINSTANCE)pGlobals->m_hinstance, NULL);
-    ShowWindow(m_hcmbdbname , SW_SHOW);
+
+	
+
+	ShowWindow(m_hcmbdbname , SW_SHOW);
     UpdateWindow(m_hcmbdbname);
     
     //...Creating Table-type Windows (Static & Combo)
@@ -2356,9 +2360,12 @@ TableTabInterface::GetAllDatabases()
         if(pdbarr[ind]->GetLength())
         {
             SendMessage(m_hcmbdbname, CB_ADDSTRING, 0, (LPARAM) pdbarr[ind]->GetAsWideChar());
-            delete pdbarr[ind];
+			delete pdbarr[ind];
         }
     }
+	//Changed (Bug fixed)
+	wyInt32 width = SetComboWidth(m_hcmbdbname);
+	SendMessage(m_hcmbdbname, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
 
     free(pdbarr);
 }

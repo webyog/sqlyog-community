@@ -2,6 +2,7 @@
 /*
  * Include file constants (processed in LibmysqlIncludeFiles.txt 1
  */
+#cmakedefine HAVE_OPENSSL_APPLINK_C 1
 #cmakedefine HAVE_ALLOCA_H 1
 #cmakedefine HAVE_BIGENDIAN 1
 #cmakedefine HAVE_SETLOCALE 1
@@ -44,6 +45,7 @@
 #cmakedefine HAVE_THR_YIELD 1
 #cmakedefine HAVE_VASPRINTF 1
 #cmakedefine HAVE_VSNPRINTF 1
+#cmakedefine HAVE_CUSERID 1
 
 /*
  * types and sizes

@@ -461,6 +461,9 @@ ConnectionBase::InitConnDialog(HWND hdlg, HWND combo, wyBool toadd, wyBool selec
         tempconsecname = strtok(NULL, seps);
     }
 
+	width = SetComboWidth(hwndcombo);
+	SendMessage(hwndcombo, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
+
     if(toadd)
     {
         SendMessage(hwndcombo, CB_INSERTSTRING, (WPARAM)0, (LPARAM)(DEFAULT_CONN));
@@ -483,11 +486,11 @@ ConnectionBase::InitConnDialog(HWND hdlg, HWND combo, wyBool toadd, wyBool selec
 	SendMessage(hwndcombo, CB_SETCURSEL, index, 0);
 
 	/*width = SetComboWidth(hwndcombo);
-	SendMessage(hwndcombo, CB_SETDROPPEDWIDTH, width+50, 0); //width + 50 means width of the text + width of the scroll bar*/
+	SendMessage(hwndcombo, CB_SETDROPPEDWIDTH, width+COMBOWIDTHMARGIN, 0); //width + 50 means width of the text + width of the scroll bar*/
 
 	HWND actualcombo = (HWND)SendMessage(hwndcombo, CCBM_GETCOMBOHWND, 0, 0);
 	width = SetComboWidth(actualcombo);
-	SendMessage(actualcombo, CB_SETDROPPEDWIDTH, width + 50, 0);
+	SendMessage(actualcombo, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
 	return;
 }
 
@@ -748,6 +751,9 @@ ConnectionBase::NewConnection(HWND hdlg)
     WriteDefValues(hdlg);
 	
 	index = SendMessage(hwndcombo, CB_ADDSTRING, -1,(LPARAM)pconn.m_connname);
+	wyInt32 width = SetComboWidth(hwndcombo);
+	SendMessage(hwndcombo, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
+
 	SendMessage(hwndcombo, CB_SETITEMDATA, index, concount+1);
 
 	//populate color array for connection combo
@@ -854,6 +860,9 @@ ConnectionBase::CloneConnection(HWND hdlg)
 	conn.Sprintf("Connection %u", concount + 1);
 
  	index = SendMessage(hwndcombo, CB_ADDSTRING, -1,(LPARAM)pconn.m_connname);
+	wyInt32 width = SetComboWidth(hwndcombo);
+	SendMessage(hwndcombo, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
+
 	SendMessage(hwndcombo, CB_SETITEMDATA, index, concount+1);
 
 	//populate color array for connection combo

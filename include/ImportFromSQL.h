@@ -52,8 +52,10 @@ typedef	enum __import_errors
 */
 #define		MAX_QUERY_LEN			1024
 
+#define		ER_SQL_SYNTAX			1064
 
 #define     ER_EMPTY_QUERY          1065
+
 
 /* callback function to display any GUI related stuff.
    this is always called when we are reading a file */

@@ -78,6 +78,7 @@ struct st_mysql_options_extension {
   char *server_public_key;
   char *proxy_header;
   size_t proxy_header_len;
+  int (*io_wait)(my_socket handle, my_bool is_read, int timeout);
 };
 
 typedef struct st_connection_handler
@@ -90,6 +91,7 @@ typedef struct st_connection_handler
 
 struct st_mariadb_net_extension {
   enum enum_multi_status multi_status;
+  int extended_errno;
 };
 
 struct st_mariadb_session_state
@@ -111,3 +113,9 @@ struct st_mariadb_extension {
     (a)->options.extension->key : 0
 
 #endif
+
+
+typedef struct st_mariadb_field_extension
+{
+  MARIADB_CONST_STRING metadata[MARIADB_FIELD_ATTR_LAST+1]; /* 10.5 */
+} MA_FIELD_EXTENSION;

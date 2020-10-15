@@ -1926,15 +1926,40 @@ MDIWindow::StopQuery()
 
 #ifndef COMMUNITY
 
+	//If CA-cert is not provided then m_no_ca = TRUE
+	if (m_conninfo.m_cacert.Compare("") == 0)
+	{
+		m_conninfo.m_no_ca = wyTrue;
+	}
+	else
+	{
+		m_conninfo.m_no_ca = wyFalse;
+	}
+
 	if(m_conninfo.m_issslchecked == wyTrue)
     {
-        if(m_conninfo.m_issslauthchecked == wyTrue)
+		/*If we provide all Cert and Keys*/
+        if(m_conninfo.m_issslauthchecked == wyTrue && m_conninfo.m_no_ca == wyFalse)
         {
             mysql_ssl_set(mysql, m_conninfo.m_clikey.GetString(), m_conninfo.m_clicert.GetString(), 
                             m_conninfo.m_cacert.GetString(), NULL, 
                             m_conninfo.m_cipher.GetLength() ? m_conninfo.m_cipher.GetString() : NULL);
         }
-        else
+		/*If we select Use Authentication and do not provide CA-cert, but we need to give Client-cert, and Client-key*/
+		else if (m_conninfo.m_issslauthchecked == wyTrue && m_conninfo.m_no_ca == wyTrue)
+		{
+			mysql_ssl_set(mysql, m_conninfo.m_clikey.GetString(), m_conninfo.m_clicert.GetString(),
+				NULL, NULL,
+				m_conninfo.m_cipher.GetLength() ? m_conninfo.m_cipher.GetString() : NULL);
+
+		}
+		/*If we don't select Use Authentication and do not provide CA-cert, Client-cert, and Client-key*/
+		else if (m_conninfo.m_issslauthchecked == wyFalse && m_conninfo.m_no_ca == wyTrue)
+		{
+			mysql_ssl_set(mysql, NULL, NULL, NULL,
+				NULL, m_conninfo.m_cipher.GetLength() ? m_conninfo.m_cipher.GetString() : NULL);
+		}
+        else    /*If we don't select Use Authentication and provide CA-cert*/
         {
             mysql_ssl_set(mysql, NULL, NULL, m_conninfo.m_cacert.GetString(), 
                 NULL, m_conninfo.m_cipher.GetLength() ? m_conninfo.m_cipher.GetString() : NULL);

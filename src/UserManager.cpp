@@ -25,6 +25,7 @@ Author: Vishal P.R
 #include "UserManager.h"
 #include "MySQLVersionHelper.h"
 #include "DoubleBuffer.h"
+#include "CCustomComboBox.h"
 
 #define U_ACCESSDENIED          _("SQLyog cannot retrieve what information is required to populate the User Manager dialog. \
 Most likely the user does not have SELECT privilege to privileges tables in the `mysql` database. \
@@ -827,6 +828,27 @@ UserManager::SavePassword()
 					m_authpluginname.SetAs(pluginname.GetString());
 				}
 			}
+			else {
+				wyString queryString;
+
+				if (m_ismariadb && m_serververno < 100200) {
+					queryString.SetAs("SET PASSWORD FOR '%s'@'%s' = PASSWORD('%s');");
+				}
+				else{
+					queryString.SetAs("ALTER USER '%s'@'%s' IDENTIFIED BY '%s';");
+				}
+
+				query.Sprintf(queryString.GetString(),
+					EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
+					EscapeMySQLString(m_host.GetString(), temphost).GetString(),
+					EscapeMySQLString(password.GetString(), temppassword).GetString());
+
+				if (ExecuteUMQuery(query) == wyFalse) {
+					return wyFalse;
+				}
+				m_authpluginname.SetAs(pluginname.GetString());
+			}
+
 		} // Mysql < 5.7 or MariaDb <10.4
 		else // no proper support for plugin changing...update password if has changed
 		{
@@ -1095,6 +1117,9 @@ UserManager::OnSaveChanges()
         //add the created user to the combo box and internaly call the CBN_CHANGE handler. 
         user.Sprintf("%s@%s", m_username.GetString(), m_host.GetString());
         m_selindex = SendMessage(hwndcombo, CB_ADDSTRING, 0, (LPARAM)user.GetAsWideChar());
+
+
+
         SendMessage(hwndcombo, CB_SETITEMDATA, (WPARAM)m_selindex, (LPARAM)m_username.GetLength());
         SendMessage(hwndcombo, CB_SETCURSEL, (WPARAM)m_selindex, 0);
 		
@@ -1378,6 +1403,11 @@ UserManager::PopulateUserCombo()
         length = temp.GetLength();
         temp.AddSprintf("@%s", row[0]);        
         index = SendMessage(hwndusercombo, CB_ADDSTRING, 0, (LPARAM)temp.GetAsWideChar());
+
+
+		wyInt32 width = SetComboWidth(hwndusercombo);
+		SendMessage(hwndusercombo, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
+
         SendMessage(hwndusercombo, CB_SETITEMDATA, (WPARAM)index, (LPARAM)length);
 		tempnode->m_uname.SetAs(temp.GetString());
 		tempnode->m_dropdown = wyTrue;
@@ -1452,6 +1482,7 @@ UserManager::PopulateAuthPluginCombo()
 
 		length = temp.GetLength();
 		index = SendMessage(hwndPlugincombo, CB_ADDSTRING, 0, (LPARAM)temp.GetAsWideChar());
+
 		SendMessage(hwndPlugincombo, CB_SETITEMDATA, (WPARAM)index, (LPARAM)length);
 	}
 
@@ -1749,6 +1780,7 @@ UserManager::OnHandleEditChange()
 			{
 				index=SendMessage(hwndusercombo, CB_ADDSTRING, 0,(LPARAM)itr->m_uname.GetAsWideChar());
 				VERIFY(SendMessage(hwndusercombo, CB_SETITEMDATA, index,itr->m_itemvalue.GetAsInt32()));
+
 				itr->m_dropdown=wyTrue;	
 			}
 			

@@ -1096,6 +1096,12 @@ typedef unsigned long long intptr;
 #define IF_WIN(A,B) B 
 #endif
 
+#if defined(SOLARIS) || defined(__sun)
+#define IF_SOLARIS(A,B) A
+#else
+#define IF_SOLARIS(A,B) B
+#endif
+
 #ifndef RTLD_NOW
 #define RTLD_NOW 1
 #endif

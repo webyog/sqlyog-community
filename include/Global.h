@@ -433,6 +433,7 @@ struct ConnectionInfo
     wyString    m_clicert;
     wyString    m_cacert;
     wyString    m_cipher;	
+	wyBool      m_no_ca;		//Flag for not giving CA certificate while connecting through SSL
 
 	wyString	m_sqlmode;
     wyString    m_initcommand;

@@ -30,6 +30,7 @@
 #include "DataType.h"
 #include "GUIHelper.h"
 #include "EditorFont.h"
+#include "CCustomComboBox.h"
 
 #include <string>
 
@@ -3107,6 +3108,8 @@ TableDiag::InitializeCOMBOBOX()
         dbname.SetAs(db);
 
 		VERIFY(ret = SendMessage(m_hwndcombo, CB_INSERTSTRING, (WPARAM)-1, (LPARAM)dbname.GetAsWideChar())!= CB_ERR);
+		wyInt32 width = SetComboWidth(m_hwndcombo);
+		SendMessage(m_hwndcombo, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
 	}
 
 	// Now get the selected textbox from the main COMBOBOX.

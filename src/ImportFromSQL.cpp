@@ -191,7 +191,7 @@ wyBool
 ImportFromSQL::OnError(const wyChar * errmsg)
 {
    wyString timeString;
-
+ 
 	m_errno = m_tunnel->mysql_errno(m_mysql);
 	m_error = m_tunnel->mysql_error(m_mysql);
 
@@ -234,16 +234,40 @@ ImportFromSQL::MySQLConnect()
 	//Session wait_timeout(to avoid of server gone away)
 	m_tunnel->mysql_options(m_mysql, MYSQL_INIT_COMMAND, "/*!40101 set @@session.wait_timeout=28800 */");
 
+	//If CA-cert is not provided then m_no_ca = TRUE
+	if (wnd->m_conninfo.m_cacert.Compare("") == 0)
+	{
+		wnd->m_conninfo.m_no_ca = wyTrue;
+	}
+	else
+	{
+		wnd->m_conninfo.m_no_ca = wyFalse;
+	}
     /// Set up source SSL
     if(wnd->m_conninfo.m_issslchecked == wyTrue)
     {
-        if(wnd->m_conninfo.m_issslauthchecked == wyTrue)
+		/*If we provide all Cert and Keys*/
+        if(wnd->m_conninfo.m_issslauthchecked == wyTrue && wnd->m_conninfo.m_no_ca == wyFalse)
         {
             mysql_ssl_set(m_mysql, wnd->m_conninfo.m_clikey.GetString(), wnd->m_conninfo.m_clicert.GetString(), 
                             wnd->m_conninfo.m_cacert.GetString(), NULL, 
                             wnd->m_conninfo.m_cipher.GetLength() ? wnd->m_conninfo.m_cipher.GetString() : NULL);
         }
-        else
+		/*If we select Use Authentication and do not provide CA-cert, but we need to give Client-cert, and Client-key*/
+		else if (wnd->m_conninfo.m_issslauthchecked == wyTrue && wnd->m_conninfo.m_no_ca == wyTrue)
+		{
+			mysql_ssl_set(m_mysql, wnd->m_conninfo.m_clikey.GetString(), wnd->m_conninfo.m_clicert.GetString(),
+				NULL, NULL,
+				wnd->m_conninfo.m_cipher.GetLength() ? wnd->m_conninfo.m_cipher.GetString() : NULL);
+
+		}
+		/*If we don't select Use Authentication and do not provide CA-cert, Client-cert, and Client-key*/
+		else if (wnd->m_conninfo.m_issslauthchecked == wyFalse && wnd->m_conninfo.m_no_ca == wyTrue)
+		{
+			mysql_ssl_set(m_mysql, NULL, NULL, NULL,
+				NULL, wnd->m_conninfo.m_cipher.GetLength() ? wnd->m_conninfo.m_cipher.GetString() : NULL);
+		}
+        else     /*If we don't select Use Authentication and provide CA-cert*/
         {
             mysql_ssl_set(m_mysql, NULL, NULL, wnd->m_conninfo.m_cacert.GetString(), NULL, 
                 wnd->m_conninfo.m_cipher.GetLength() ? wnd->m_conninfo.m_cipher.GetString() : NULL);
@@ -364,8 +388,8 @@ ImportFromSQL::DoImport(wyBool * stopquery, wyBool isfkchkhttp)
 	wyChar				deli[12] = {0};
 	wyBool				test;
 	SQLTokenizer		*tok;
-	
-	
+	 
+
 	m_bytesread = 0;
 	m_numquery	= 0;
 
@@ -389,7 +413,15 @@ ImportFromSQL::DoImport(wyBool * stopquery, wyBool isfkchkhttp)
 				if(m_tunnel->IsTunnel() == wyFalse)
 					continue;
 			}
-			query.SetAs(str);
+			if (isdeli && strcmp(deli, ";;") == 0)
+			{
+				// we've problem in dealing with DELIMITER ;;
+				// replace it with DELIMITER ||
+				query.SetAs("DELIMITER ||");
+				strcpy_s(deli, sizeof(wyChar) * 3, "||");
+			}
+			else
+				query.SetAs(str);
 			test = ExecuteQuery(query, len, true, isfkchkhttp);
 
 			if(!test && !m_abort_on_error)//checking if there is an error then setting the errorfree flag off.
@@ -430,10 +462,13 @@ ImportFromSQL::DoImport(wyBool * stopquery, wyBool isfkchkhttp)
 		MYSQL_RES		*res;
 
 		qret = HandleMySQLRealQuery(m_tunnel, m_mysql, NULL, 0, wyTrue, wyTrue, wyTrue);
-
+		
 		res = m_tunnel->mysql_store_result(m_mysql, wyTrue);
+
+		auto e = m_tunnel->mysql_errno(m_mysql);
 		/* we specifically ignore empty queries */
-		if(res == NULL && m_mysql->affected_rows == -1 && m_tunnel->mysql_errno(m_mysql) != ER_EMPTY_QUERY)
+
+		if(res == NULL && m_mysql->affected_rows == -1 &&  e != ER_EMPTY_QUERY)
         {
 			delete tok;
 			return OnError(_("Unable to get resultset"));

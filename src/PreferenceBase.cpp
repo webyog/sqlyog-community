@@ -1244,18 +1244,23 @@ PreferenceBase::EnableBulkInsert(HWND hwnd, wyInt32 enable)
 		EnableWindow(GetDlgItem(hwnd, IDC_BULKINSERT), TRUE);
 }
 
-void 
+void
 PreferenceBase::GetGeneralPrefSizeValues(HWND hwnd)
 {
-    wyInt32	    bulksize = 0;
-	wyWChar     limit[32] = {0};
+	wyInt32	    bulksize = 0;
+	wyWChar     limit[32] = { 0 };
 	wyString	dirstr(m_directory);
-    	
-	bulksize	= wyIni::IniGetInt(GENERALPREFA, "RowLimit", ROW_LIMIT_DEFAULT, dirstr.GetString());
+	int ret;
+
+	bulksize = wyIni::IniGetInt(GENERALPREFA, "RowLimit", ROW_LIMIT_DEFAULT, dirstr.GetString());
+	if (bulksize <= 0)
+	{
+		bulksize = 1000;
+	}
 	_snwprintf(limit, 31, L"%d", bulksize);
 	SetWindowText(GetDlgItem(hwnd, IDC_ROW_LIMIT), limit);
-	
-	bulksize	= wyIni::IniGetInt(GENERALPREFA, "BulkSize", BULKINSERT_DEFAULT, dirstr.GetString());
+
+	bulksize = wyIni::IniGetInt(GENERALPREFA, "BulkSize", BULKINSERT_DEFAULT, dirstr.GetString());
 	_snwprintf(limit, 31, L"%d", bulksize);
 	SetWindowText(GetDlgItem(hwnd, IDC_BULKINSERT), limit);
 }

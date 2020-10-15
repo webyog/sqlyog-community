@@ -38,7 +38,9 @@
 { \
   (a)->last_errno= (b);\
   strncpy((a)->sqlstate, (c), SQLSTATE_LENGTH);\
-  strncpy((a)->last_error, (d) ? (d) : ER((b)), MYSQL_ERRMSG_SIZE - 1);\
+  (a)->sqlstate[SQLSTATE_LENGTH]= 0;\
+  strncpy((a)->last_error, (d) ? (d) : ER((b)), MYSQL_ERRMSG_SIZE);\
+  (a)->last_error[MYSQL_ERRMSG_SIZE - 1]= 0;\
 }
 
 #define CLEAR_CLIENT_STMT_ERROR(a) \
@@ -62,10 +64,15 @@ enum enum_stmt_attr_type
   STMT_ATTR_UPDATE_MAX_LENGTH,
   STMT_ATTR_CURSOR_TYPE,
   STMT_ATTR_PREFETCH_ROWS,
+
+  /* MariaDB only */
   STMT_ATTR_PREBIND_PARAMS=200,
   STMT_ATTR_ARRAY_SIZE,
   STMT_ATTR_ROW_SIZE,
-  STMT_ATTR_STATE
+  STMT_ATTR_STATE,
+  STMT_ATTR_CB_USER_DATA,
+  STMT_ATTR_CB_PARAM,
+  STMT_ATTR_CB_RESULT
 };
 
 enum enum_cursor_type
@@ -195,6 +202,8 @@ struct st_mysqlnd_stmt_methods
 };
 
 typedef int  (*mysql_stmt_fetch_row_func)(MYSQL_STMT *stmt, unsigned char **row);
+typedef void (*ps_result_callback)(void *data, unsigned int column, unsigned char **row);
+typedef my_bool *(*ps_param_callback)(void *data, MYSQL_BIND *bind, unsigned int row_nr);
 
 struct st_mysql_stmt
 {
@@ -234,6 +243,9 @@ struct st_mysql_stmt
   unsigned int             array_size;
   size_t row_size;
   unsigned int prebind_params;
+  void *user_data;
+  ps_result_callback result_callback;
+  ps_param_callback param_callback;
 };
 
 typedef void (*ps_field_fetch_func)(MYSQL_BIND *r_param, const MYSQL_FIELD * field, unsigned char **row);
@@ -283,3 +295,4 @@ unsigned int STDCALL mysql_stmt_field_count(MYSQL_STMT *stmt);
 int STDCALL mysql_stmt_next_result(MYSQL_STMT *stmt);
 my_bool STDCALL mysql_stmt_more_results(MYSQL_STMT *stmt);
 int STDCALL mariadb_stmt_execute_direct(MYSQL_STMT *stmt, const char *stmt_str, size_t length);
+MYSQL_FIELD * STDCALL mariadb_stmt_fetch_fields(MYSQL_STMT *stmt);

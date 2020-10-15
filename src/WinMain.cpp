@@ -29,9 +29,9 @@
 #include "GUIHelper.h"
 #include "MiniDump.h"
 
-#ifndef COMMUNITY
+/*#ifndef COMMUNITY
 #include"openssl\applink.c"
-#endif
+#endif*/
 
 #ifndef VC6
 #include <gdiplus.h>
