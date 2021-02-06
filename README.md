@@ -1,16 +1,23 @@
 # SQLyog Community Edition
 
-SQLyog is an all-round Management Tool (/'GUI'/'Frontend') for MySQL.
+SQLyog is a powerful GUI tool to manage MySQL and MariaDB servers and databases in physical, virtual, and cloud environments.
 
-## [Download SQLyog Community Version](https://github.com/webyog/sqlyog-community/wiki/Downloads)
+SQLyog has no dependencies on runtimes (such as Microsoft .NET and Java) and database abstraction layers (such as ODBC and JDBC).
 
-### Experience SQLyog power tools
-SQLyog comes in 3 editions. Compare all our editions-[Learn more](https://www.webyog.com/product/sqlyogFeatureListExpanded/)
+SQLyog runs on Microsoft Windows. It may also run on Linux and Unix via Wine.
 
-### SQLyog Trial
-You can download a 14-day trial from-[Webyog download page](https://www.webyog.com/product/downloads/)
+Users of SQLyog’s Community edition can get support through Webyog’s [forums for SQLyog](https://forums.webyog.com/forums/forum/sqlyog-2/). Webyog also maintains an extensive [FAQ for SQLyog](http://faq.webyog.com/) for frequently asked questions.
 
-### SQLyog Professional, Enterprise, Ultimate Editions
-Prices start from $69/user, with free updates (for major & minor versions) for one year.
+Download SQLyog’s Community edition [here](https://github.com/webyog/sqlyog-community/wiki/Downloads).
 
-[Price list for various editions of SQLyog](https://www.webyog.com/shop/)
+Learn more about SQLyog’s commercial edition [here](https://webyog.com/product/sqlyog/).
+
+Download a free, fully functional, 14-day trial of SQLyog’s commercial edition [here](https://webyog.com/product/sqlyog/trial/).
+
+Schedule a free product demonstration [here](https://webyog.com/demo).
+
+View prices and purchase SQLyog’s commercial edition [here](https://store.webyog.com/product/sqlyogpricing).
+
+Learn more about the latest releases of SQLyog in Webyog’s [blog](https://blog.sqlyog.com/category/releases/).
+
+Also learn more about Webyog’s GUI tool to monitor the performance of MySQL and MariaDB, [SQL DM for MySQL](https://webyog.com/product/monyog/).
