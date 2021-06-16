@@ -10,6 +10,8 @@ Users of SQLyog’s Community edition can get support through Webyog’s [forums
 
 Download SQLyog’s Community edition [here](https://github.com/webyog/sqlyog-community/wiki/Downloads).
 
+Learn about why you should consider upgrading from the Community edition to the Ultimate edition [here](https://www.idera.com/resourcecentral/infographics/sqlyog-ultimate-edition-vs-sqlyog-community-edition).
+
 Learn more about SQLyog’s commercial edition [here](https://webyog.com/product/sqlyog/).
 
 Download a free, fully functional, 14-day trial of SQLyog’s commercial edition [here](https://webyog.com/product/sqlyog/trial/).
