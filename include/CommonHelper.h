@@ -944,6 +944,11 @@ MYSQL_RES*      GetConstraintRes(Tunnel* ptunnel, PMYSQL pmysql, const wyChar* d
 */
 wyBool          IsDatatypeNumeric(wyString  &datatype);
 
+/// Checks whether the datatype belongs to the deprecated numeric size datatypes or not
+/*
+@param datatype             :   IN  the datatype
+*/
+wyBool          IsDatatypeDeprecatedSizeType(wyString  &datatype);
 
 /// Decoding of password
 /**
@@ -997,6 +1002,10 @@ wyBool	MigrateAllPassword(wyString conn, wyString dirstr);
 wyBool	MigratePassword(wyString conn, wyString dirstr, wyString &pwdstr);
 
 wyBool	MigratePassword(wyString &pwdstr);
+
+void	RemoveDefaultIntWidth(wyString &datatypestr);
+
+void	RemovePattern(wyString &text, const wyChar* pattern);
 
 //void DebugLog(const char *buffer);
 #ifdef _WIN32

@@ -623,7 +623,7 @@ DataView::OnWMCommand(WPARAM wparam, LPARAM lparam)
 #ifndef COMMUNITY
             SwitchView(FORM);
 #else
-            pGlobals->m_pcmainwin->m_connection->GetSQLyogEntDialog();
+            pGlobals->m_pcmainwin->m_connection->GetSQLyogUltimateDialog();
 #endif
 		    break;
 
@@ -8361,7 +8361,7 @@ DataView::ShowFormView(wyInt32 show, wyBool isprobe)
     //with community we show the ad dialog
     if(show != SW_HIDE && isprobe == wyFalse)
     {
-        pGlobals->m_pcmainwin->m_connection->GetSQLyogEntDialog();
+        pGlobals->m_pcmainwin->m_connection->GetSQLyogUltimateDialog();
     }
 #endif
 

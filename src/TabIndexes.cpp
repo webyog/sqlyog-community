@@ -141,7 +141,7 @@ TabIndexes::TabIndexes(HWND hwnd, TableTabInterfaceTabMgmt* ptabmgmt)
 	m_ismysql553			=	IsMySQL553MariaDB55(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
 
 	// safe guard for convinience in case some DB version does not support it. it is "supported" at least since 5 but does not do anything.
-	// onçy after ver 8 on mysql does something. but not maria db yet
+	// onÃ§y after ver 8 on mysql does something. but not maria db yet
 	m_supportsordering		= wyBool(IsMySQL80011(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql)) && !IsMariaDB(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql)));
 	// it is supported after mysql800 but not for mariadb 
 	m_supportsvisibility	= wyBool(IsMySQL80011(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql)) && !IsMariaDB(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql))) ;
@@ -186,9 +186,9 @@ TabIndexes::FetchIndexValuesIntoWrapper()
 {
     wyString query;
     MYSQL_RES	*myres;
-	MYSQL_ROW	myrow;
+    MYSQL_ROW	myrow;
     wyString    tblname(""), dbname("");
-    wyString    colstr, indexname(""), indcolsstr(""), indexlength(""),indexcomment(""), indexorder(""), previndexvisibility(""), indexvisibility("");
+    wyString    tobeignoredstr,colstr, indexname(""), indcolsstr(""), indexlength(""),indexcomment(""), indexorder(""), previndexvisibility(""), indexvisibility("");
     wyBool	    isunique = wyFalse, isfulltext = wyFalse;
     wyInt32     ind_keyname = -1, ind_colname = -1, ind_subpart = -1, ind_nonunique = -1, ind_indextype = -1,ind_indexcomment= -1, ind_indexorder=-1, ind_indexvis=-1;
     IndexesStructWrapper   *cwrapobj = NULL;
@@ -196,8 +196,10 @@ TabIndexes::FetchIndexValuesIntoWrapper()
     IndexColumn           *indcols = NULL;
     List                    *listindcols = NULL;
     FieldStructWrapper      *fieldswrap = NULL;
-	wyChar* temp;	
+    wyChar* temp;	
 
+    //assigning value row_end
+    tobeignoredstr.SetAs("row_end");
     //..Escaping table name and database name
     tblname.SetAs(m_ptabmgmt->m_tabinterfaceptr->m_origtblname);
     tblname.FindAndReplace("`", "``");
@@ -226,206 +228,210 @@ TabIndexes::FetchIndexValuesIntoWrapper()
 
     while(myrow = m_mdiwnd->m_tunnel->mysql_fetch_row(myres))
     {
-		if (ind_indexorder != -1) { // collation field was found, we're good
-			// collatiob may be NULL when index type is fulltext
-			wyString temp("");
-			temp.SetAs(myrow[ind_indexorder]);
-			indexorder.SetAs(DecodeIndexOrder(temp.GetString()));
-			
-		}else // no collation column -> no order is supported
-			indexorder.SetAs("");
+	    //need not check row_end as this is system generated column , not user created one and shouldn't checked for index
+	    if (strcmp(tobeignoredstr.GetString(), myrow[ind_colname]) != 0)
+	    {
+		    if (ind_indexorder != -1) { // collation field was found, we're good
+			    // collatiob may be NULL when index type is fulltext
+			    wyString temp("");
+			    temp.SetAs(myrow[ind_indexorder]);
+			    indexorder.SetAs(DecodeIndexOrder(temp.GetString()));
 
-        //..Will be true when mysql_fetch will fetch another column for the same index as was previously fetched
-        if((strcmp(indexname.GetString(), myrow[ind_keyname]))== 0)
-		{
-			colstr.SetAs(myrow[ind_colname], m_ismysql41);
+		    }else // no collation column -> no order is supported
+			    indexorder.SetAs("");
 
-            wyString tmpstr;
-            tmpstr.SetAs(colstr);
+		    //..Will be true when mysql_fetch will fetch another column for the same index as was previously fetched
+		    if((strcmp(indexname.GetString(), myrow[ind_keyname]))== 0)
+		    {
+			    colstr.SetAs(myrow[ind_colname], m_ismysql41);
 
-            tmpstr.FindAndReplace("`", "``");
-            indcolsstr.AddSprintf("%s%s%s", m_backtick, tmpstr.GetString(), m_backtick);
-            
-            fieldswrap = m_ptabmgmt->m_tabfields->GetWrapperObjectPointer(colstr);
-            if(!fieldswrap)     //..If fieldwrapper not found, then return false
-                return wyFalse;
+			    wyString tmpstr;
+			    tmpstr.SetAs(colstr);
 
-            //..Inserting index-wrapper object pointer to the fields-wraper's m_listindexes member
-            fieldswrap->m_listindexesbackupcopy.Insert(new IndexedBy(cwrapobj));
-            indcols = new IndexColumn(fieldswrap);
-            
-            if(myrow[ind_subpart])
-            {
-                indexlength.SetAs(myrow[ind_subpart]);
-                indcols->m_lenth = indexlength.GetAsInt32();
-                indcolsstr.AddSprintf("(%s)", indexlength.GetString());
-            }
+			    tmpstr.FindAndReplace("`", "``");
+			    indcolsstr.AddSprintf("%s%s%s", m_backtick, tmpstr.GetString(), m_backtick);
 
-			indcolsstr.AddSprintf(" %s", indexorder.GetString()); // set it either to ASC/DESC or to "" if not available in this version
-			indcols->m_order.SetAs(indexorder.GetString());
-            indcolsstr.Add(", ");
-            if(!listindcols)
-                listindcols = new List();
+			    fieldswrap = m_ptabmgmt->m_tabfields->GetWrapperObjectPointer(colstr);
+			    if(!fieldswrap)     //..If fieldwrapper not found, then return false
+				    return wyFalse;
 
-            listindcols->Insert(indcols);
-	//	if(m_ismysql553 && myrow[ind_indexcomment])
-	//			indexcomment.SetAs(myrow[ind_indexcomment]);
-		}
-        else
-        {
-            //..will be true only when mysql_fetch fetches the very first index..
-            if(indexname.GetLength() == 0)
-			{
-                cwrapobj = new IndexesStructWrapper(NULL, wyFalse);
-                m_listwrapperstruct.Insert(cwrapobj);
+			    //..Inserting index-wrapper object pointer to the fields-wraper's m_listindexes member
+			    fieldswrap->m_listindexesbackupcopy.Insert(new IndexedBy(cwrapobj));
+			    indcols = new IndexColumn(fieldswrap);
 
-				// First index column definition being read. Set the visibility for the index
-				if (ind_indexvis != -1) // visible field was found, we're good
-					indexvisibility.SetAs(DecodeIndexVisibility(myrow[ind_indexvis]));
-				else // no visible column -> no visibility is supported
-					indexvisibility.SetAs("");
+			    if(myrow[ind_subpart])
+			    {
+				    indexlength.SetAs(myrow[ind_subpart]);
+				    indcols->m_lenth = indexlength.GetAsInt32();
+				    indcolsstr.AddSprintf("(%s)", indexlength.GetString());
+			    }
 
-                indexname.SetAs(myrow[ind_keyname], m_ismysql41);
-                colstr.SetAs(myrow[ind_colname], m_ismysql41);
-				if(m_ismysql553 && myrow[ind_indexcomment])
-					indexcomment.SetAs(myrow[ind_indexcomment], m_ismysql41);
-                fieldswrap = m_ptabmgmt->m_tabfields->GetWrapperObjectPointer(colstr);
-                //..If fieldwrapper not found, then return false
-                if(!fieldswrap)
-                    return wyFalse;
+			    indcolsstr.AddSprintf(" %s", indexorder.GetString()); // set it either to ASC/DESC or to "" if not available in this version
+			    indcols->m_order.SetAs(indexorder.GetString());
+			    indcolsstr.Add(", ");
+			    if(!listindcols)
+				    listindcols = new List();
 
-                //..Inserting index-wrapper object pointer to the fields-wraper m_listindexes
-                fieldswrap->m_listindexesbackupcopy.Insert(new IndexedBy(cwrapobj));
+			    listindcols->Insert(indcols);
+			    //	if(m_ismysql553 && myrow[ind_indexcomment])
+			    //			indexcomment.SetAs(myrow[ind_indexcomment]);
+		    }
+		    else
+		    {
+			    //..will be true only when mysql_fetch fetches the very first index..
+			    if(indexname.GetLength() == 0)
+			    {
+				    cwrapobj = new IndexesStructWrapper(NULL, wyFalse);
+				    m_listwrapperstruct.Insert(cwrapobj);
 
-                indcols = new IndexColumn(fieldswrap);
-                
-                if(myrow[ind_subpart])
-                {
-                    indexlength.SetAs(myrow[ind_subpart]);
-                    indcols->m_lenth = indexlength.GetAsInt32();
-                    
-                }
-				indcols->m_order.SetAs(indexorder.GetString());
+				    // First index column definition being read. Set the visibility for the index
+				    if (ind_indexvis != -1) // visible field was found, we're good
+					    indexvisibility.SetAs(DecodeIndexVisibility(myrow[ind_indexvis]));
+				    else // no visible column -> no visibility is supported
+					    indexvisibility.SetAs("");
 
-                if(!listindcols)
-                    listindcols = new List();
-                listindcols->Insert(indcols);
-                
-                indcolsstr.AddSprintf("%s%s%s", m_backtick, colstr.GetString(), m_backtick);
-                if(indexlength.GetLength())
-                    indcolsstr.AddSprintf("(%s)", indexlength.GetString());
+				    indexname.SetAs(myrow[ind_keyname], m_ismysql41);
+				    colstr.SetAs(myrow[ind_colname], m_ismysql41);
+				    if(m_ismysql553 && myrow[ind_indexcomment])
+					    indexcomment.SetAs(myrow[ind_indexcomment], m_ismysql41);
+				    fieldswrap = m_ptabmgmt->m_tabfields->GetWrapperObjectPointer(colstr);
+				    //..If fieldwrapper not found, then return false
+				    if(!fieldswrap)
+					    return wyFalse;
 
-				indcolsstr.AddSprintf(" %s", indexorder.GetString());
+				    //..Inserting index-wrapper object pointer to the fields-wraper m_listindexes
+				    fieldswrap->m_listindexesbackupcopy.Insert(new IndexedBy(cwrapobj));
 
-                indcolsstr.Add(", ");
+				    indcols = new IndexColumn(fieldswrap);
 
-				//..check whether its unique.
-				if(stricmp(myrow[ind_nonunique], "0")== 0)
-					isunique = wyTrue;
+				    if(myrow[ind_subpart])
+				    {
+					    indexlength.SetAs(myrow[ind_subpart]);
+					    indcols->m_lenth = indexlength.GetAsInt32();
 
-				if(IsMySQL402(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql)))
-                {
-					if(myrow[ind_indextype] && strstr(myrow[ind_indextype], "FULLTEXT")){
-						isfulltext = wyTrue;
-					}
-				} 
-            }
-            else    //..will be true when mysql_fetch fetches the different index (except the first-one)
-            {
-				// sets the row for the previous read values from mysql...
-                indcolsstr.Strip(2);    //..will strip last 2 chars. (Last 2 chars will be ','(comma) and ' '(1 space))
-                
-                iindex = new IndexInfo();
-                cwrapobj->m_oldval = cwrapobj->m_newval = iindex;
-                iindex->m_name.SetAs(indexname);
-                iindex->m_colsstr.SetAs(indcolsstr);
-                iindex->m_listcolumns = listindcols;
-				iindex->m_visible.SetAs(indexvisibility.GetString());
-				
-				if(m_ismysql553)
-					iindex->m_indexcomment.SetAs(indexcomment.GetString());
+				    }
+				    indcols->m_order.SetAs(indexorder.GetString());
 
-				if(isunique)
-                {
-                    if(iindex->m_name.CompareI("PRIMARY") == 0)
-                        iindex->m_indextype.SetAs("PRIMARY");
-                    else
-                        iindex->m_indextype.SetAs("UNIQUE");
-                }
-				else if(isfulltext)
-                    iindex->m_indextype.SetAs("FULLTEXT");
-				else
-					iindex->m_indextype.SetAs("KEY");
-				
-                listindcols = NULL;
+				    if(!listindcols)
+					    listindcols = new List();
+				    listindcols->Insert(indcols);
 
-                indcolsstr.Clear();
-				indexname.Clear();
-				indexcomment.Clear();
-					
-				isunique = wyFalse;
-				isfulltext = wyFalse;
+				    indcolsstr.AddSprintf("%s%s%s", m_backtick, colstr.GetString(), m_backtick);
+				    if(indexlength.GetLength())
+					    indcolsstr.AddSprintf("(%s)", indexlength.GetString());
 
-				// Read the new values for the current row...
+				    indcolsstr.AddSprintf(" %s", indexorder.GetString());
 
-				// First index column definition being read. Set the visibility for the index
-				if (ind_indexvis != -1) // visible field was found, we're good
-					indexvisibility.SetAs(DecodeIndexVisibility(myrow[ind_indexvis]));
-				else // no visible column -> no visibility is supported
-					indexvisibility.SetAs("");
+				    indcolsstr.Add(", ");
 
-                cwrapobj = new IndexesStructWrapper(NULL, wyFalse);
-                m_listwrapperstruct.Insert(cwrapobj);
-				// now copy this key into the buffer.
-                indexname.SetAs(myrow[ind_keyname], m_ismysql41);
-                colstr.SetAs(myrow[ind_colname], m_ismysql41);
+				    //..check whether its unique.
+				    if(stricmp(myrow[ind_nonunique], "0")== 0)
+					    isunique = wyTrue;
 
-				if(m_ismysql553)
-				{
-					temp = (wyChar *) myrow[ind_indexcomment];
-					indexcomment.SetAs(temp, m_ismysql41);
-				}
-                fieldswrap = m_ptabmgmt->m_tabfields->GetWrapperObjectPointer(colstr);
-                //..If fieldwrapper not found, then return false
-                if(!fieldswrap)
-                    return wyFalse;
+				    if(IsMySQL402(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql)))
+				    {
+					    if(myrow[ind_indextype] && strstr(myrow[ind_indextype], "FULLTEXT")) {
+						    isfulltext = wyTrue;
+					    }
+				    }
+			    }
+			    else    //..will be true when mysql_fetch fetches the different index (except the first-one)
+			    {
+				    // sets the row for the previous read values from mysql...
+				    indcolsstr.Strip(2);    //..will strip last 2 chars. (Last 2 chars will be ','(comma) and ' '(1 space))
 
-                //..Inserting index-wrapper object pointer to the fields-wraper's m_listindexes member
-                fieldswrap->m_listindexesbackupcopy.Insert(new IndexedBy(cwrapobj));
-                indcols = new IndexColumn(fieldswrap);
-                
-                if(myrow[ind_subpart])
-                {
-                    indexlength.SetAs(myrow[ind_subpart]);
-                    indcols->m_lenth = indexlength.GetAsInt32();
-                }
+				    iindex = new IndexInfo();
+				    cwrapobj->m_oldval = cwrapobj->m_newval = iindex;
+				    iindex->m_name.SetAs(indexname);
+				    iindex->m_colsstr.SetAs(indcolsstr);
+				    iindex->m_listcolumns = listindcols;
+				    iindex->m_visible.SetAs(indexvisibility.GetString());
 
-				indcols->m_order.SetAs(indexorder.GetString());
-                
-				//..Create list
-                listindcols = new List();
-                listindcols->Insert(indcols);
+				    if(m_ismysql553)
+					    iindex->m_indexcomment.SetAs(indexcomment.GetString());
 
-                wyString tmpstr;
-                tmpstr.SetAs(colstr);
-                tmpstr.FindAndReplace("`", "``");
+				    if(isunique)
+				    {
+					    if(iindex->m_name.CompareI("PRIMARY")== 0)
+						    iindex->m_indextype.SetAs("PRIMARY");
+					    else
+						    iindex->m_indextype.SetAs("UNIQUE");
+				    }
+				    else if(isfulltext)
+					    iindex->m_indextype.SetAs("FULLTEXT");
+				    else
+					    iindex->m_indextype.SetAs("KEY");
 
-                indcolsstr.AddSprintf("%s%s%s", m_backtick, tmpstr.GetString(), m_backtick);
-				
-                if(indexlength.GetLength())
-                    indcolsstr.AddSprintf("(%s)", indexlength.GetString());
+				    listindcols = NULL;
 
-				indcolsstr.AddSprintf(" %s", indexorder.GetString());
+				    indcolsstr.Clear();
+				    indexname.Clear();
+				    indexcomment.Clear();
 
-                indcolsstr.Add(", ");
+				    isunique = wyFalse;
+				    isfulltext = wyFalse;
 
-				if(stricmp(myrow[ind_nonunique], "0")== 0)
-					isunique = wyTrue;
+				    // Read the new values for the current row...
 
-				if(IsMySQL402(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql))&& myrow[ind_indextype] && strstr(myrow[ind_indextype], "FULLTEXT"))
-					isfulltext = wyTrue;
-            }
-        }
+				    // First index column definition being read. Set the visibility for the index
+				    if (ind_indexvis != -1) // visible field was found, we're good
+					    indexvisibility.SetAs(DecodeIndexVisibility(myrow[ind_indexvis]));
+				    else // no visible column -> no visibility is supported
+					    indexvisibility.SetAs("");
+
+				    cwrapobj = new IndexesStructWrapper(NULL, wyFalse);
+				    m_listwrapperstruct.Insert(cwrapobj);
+				    // now copy this key into the buffer.
+				    indexname.SetAs(myrow[ind_keyname], m_ismysql41);
+				    colstr.SetAs(myrow[ind_colname], m_ismysql41);
+
+				    if(m_ismysql553)
+				    {
+					    temp = (wyChar *) myrow[ind_indexcomment];
+					    indexcomment.SetAs(temp, m_ismysql41);
+				    }
+				    fieldswrap = m_ptabmgmt->m_tabfields->GetWrapperObjectPointer(colstr);
+				    //..If fieldwrapper not found, then return false
+				    if(!fieldswrap)
+					    return wyFalse;
+
+				    //..Inserting index-wrapper object pointer to the fields-wraper's m_listindexes member
+				    fieldswrap->m_listindexesbackupcopy.Insert(new IndexedBy(cwrapobj));
+				    indcols = new IndexColumn(fieldswrap);
+
+				    if(myrow[ind_subpart])
+				    {
+					    indexlength.SetAs(myrow[ind_subpart]);
+					    indcols->m_lenth = indexlength.GetAsInt32();
+				    }
+
+				    indcols->m_order.SetAs(indexorder.GetString());
+
+				    //..Create list
+				    listindcols = new List();
+				    listindcols->Insert(indcols);
+
+				    wyString tmpstr;
+				    tmpstr.SetAs(colstr);
+				    tmpstr.FindAndReplace("`", "``");
+
+				    indcolsstr.AddSprintf("%s%s%s", m_backtick, tmpstr.GetString(), m_backtick);
+
+				    if(indexlength.GetLength())
+					    indcolsstr.AddSprintf("(%s)", indexlength.GetString());
+
+				    indcolsstr.AddSprintf(" %s", indexorder.GetString());
+
+				    indcolsstr.Add(", ");
+
+				    if(stricmp(myrow[ind_nonunique], "0")== 0)
+					    isunique = wyTrue;
+
+				    if(IsMySQL402(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql)) && myrow[ind_indextype] && strstr(myrow[ind_indextype], "FULLTEXT"))
+					    isfulltext = wyTrue;
+			    }
+		    }
+	    }
         indexlength.Clear();
 		
     }

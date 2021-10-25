@@ -295,6 +295,17 @@ IsMySQL80011(Tunnel * tunnel, PMYSQL mysql)
 	else
 		return wyFalse;
 }
+wyBool
+IsMySQL80023(Tunnel * tunnel, PMYSQL mysql)
+{
+	wyUInt32 me = mysql_get_server_version(*mysql);/* Only available from MySQLv8.1*/
+	const char *dbString = mysql_get_server_info(*mysql);
+
+	if (me >= 80023 && !strstr(dbString, "MariaDB"))
+		return wyTrue;
+	else
+		return wyFalse;
+}
 /*For bug issue 2250*/
 wyBool 
 IsMySQL800(PMYSQL mysql)

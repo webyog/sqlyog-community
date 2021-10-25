@@ -212,6 +212,14 @@ void SetCharacterSet(Tunnel *tunnel, MYSQL * mysql, wyChar * charset);
 */
 wyBool IsMySQL80011(Tunnel * tunnel, PMYSQL mysql);
 
+/// Checks the server version is greater than or equal to 8.0.23
+/**
+@param tunnel: IN tunnel pointer
+@param mysql: IN PMYSQL value
+@returns wyBool, wyTrue if it is SUCCESS, else wyFalse
+*/
+wyBool IsMySQL80023(Tunnel * tunnel, PMYSQL mysql);
+
 /// Checks the server version is greater than or equal to 8.0.0
 /**
 @param tunnel: IN tunnel pointer

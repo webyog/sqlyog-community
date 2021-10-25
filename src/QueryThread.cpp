@@ -181,14 +181,15 @@ wyInt32
 HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query,wyBool ismultiplequeries)
 {
 	wyUInt32        len;
-	wyInt32         ret;
+	wyInt32         ret, matchret;
 	MYSQL_RES       *myres;
 	QueryResultElem *elem = NULL;
 	wyInt64			exectime =0, transfertime = 0, totaltime = 0;
 	wyBool			isselectrange = wyFalse, ismultiresult = wyFalse;
 	wyString		querytemp;
     const wyChar*   ptrquery;
-		
+	wyString         rectifiedquery, tempquery, pattern;
+
 	/* just check if query has been asked to stop */
 	len = strlen(query);
     
@@ -213,8 +214,32 @@ HelperExecuteQuery(QUERYTHREADPARAMS * param, const wyChar* query,wyBool ismulti
 	}
 
 #endif
-    	
-	querytemp.SetAs(query);
+    
+	tempquery.SetAs(query);
+	rectifiedquery.SetAs(query);
+	tempquery.ToLower();
+	//checking whether the query containing load data local infile query, if it will contains the keyword, it will go for removing comment and space
+	if (tempquery.Find("load", 0) >= 0 && tempquery.Find("data", 0) > 0 && tempquery.Find("local", 0) > 0 && tempquery.Find("infile", 0) > 0)
+	{
+		//creating a pattern for checking LOAD DATA LOCAL INFILE query
+		pattern.SetAs("[\\s]*LOAD[\\s]+DATA[\\s]+LOCAL[\\s]+INFILE");
+		//checking if it is valid LOAD DATA LOCAL INFILE
+		matchret = IsMatchStringPattern(rectifiedquery.GetString(), (wyChar*)pattern.GetString(),
+			PCRE_UTF8 | PCRE_CASELESS);
+		if (matchret == MATCHED)
+		{
+			SQLFormatter    formatter;
+			//removing the comments
+			formatter.GetQueryWtOutComments(&rectifiedquery, &querytemp);
+			//removing the space
+			querytemp.LTrim();
+		}
+	}
+	else
+	{
+		querytemp.SetAs(query);
+	}
+
 
 #ifndef COMMUNITY
 	if(pGlobals->m_entlicense.CompareI("Professional") != 0 && param->tunnel->IsTunnel() == wyTrue)

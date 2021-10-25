@@ -37,11 +37,11 @@
 #include "filters.h"
 
 
-#define COMUNITY_HTTP	_(L"HTTP Tunneling (Professional/Enterprise/Ultimate only)")
-#define COMUNITY_SSH	_(L"SSH Tunneling (Professional/Enterprise/Ultimate only)")
-#define COMUNITY_SSL	_(L"SSL Encryption (Professional/Enterprise/Ultimate only)")
+#define COMUNITY_HTTP	_(L"HTTP Tunneling (Ultimate only)")
+#define COMUNITY_SSH	_(L"SSH Tunneling (Ultimate only)")
+#define COMUNITY_SSL	_(L"SSL Encryption (Ultimate only)")
 
-#define GETENT_DLG_TEXT _(L"Get SQLyog PROFESSIONAL/ENTERPRISE/ULTIMATE today to enable this and dozens of other great features.")
+#define GETENT_DLG_TEXT _(L"Get SQLyog ULTIMATE today to enable this and dozens of other great features.")
 
 ConnectionBase::ConnectionBase()
 {
@@ -458,7 +458,7 @@ ConnectionBase::InitConnDialog(HWND hdlg, HWND combo, wyBool toadd, wyBool selec
 		index = SendMessage(hwndcombo, CB_ADDSTRING, 0,(LPARAM)connnamestr.GetAsWideChar());
 		VERIFY(SendMessage(hwndcombo, CB_SETITEMDATA, index, (LPARAM)tempnumstr.GetAsInt32()));
 
-        tempconsecname = strtok(NULL, seps);
+        tempconsecname = strtok(NULL, seps);		
     }
 
 	width = SetComboWidth(hwndcombo);

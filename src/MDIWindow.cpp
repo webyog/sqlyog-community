@@ -4509,6 +4509,7 @@ MDIWindow::ReConnect(Tunnel * tunnel, PMYSQL mysql, wyBool isssh, wyBool isimpor
 	wyWChar     curdb[SIZE_512]= {0};
 	MYSQL		*newmysql;
 	wyString	currentdb;
+	wyUInt32		client = 0;
 	
 	newmysql = tunnel->mysql_init((MYSQL*)NULL);
 
@@ -4534,7 +4535,7 @@ MDIWindow::ReConnect(Tunnel * tunnel, PMYSQL mysql, wyBool isssh, wyBool isimpor
 
 		newmysql = tunnel->mysql_real_connect(newmysql,(*mysql)->host, 
 			(*mysql)->user,(*mysql)->passwd, NULL, 
-					m_conninfo.m_localport, NULL,(*mysql)->client_flag | CLIENT_MULTI_RESULTS | CLIENT_REMEMBER_OPTIONS, NULL);	
+					m_conninfo.m_localport, NULL, client | CLIENT_MULTI_RESULTS | CLIENT_REMEMBER_OPTIONS, NULL);	
 		
 		if(newmysql)
 		{

@@ -3681,7 +3681,7 @@ BEGIN
     ID_OBJECT_UPDATESTMT    " Create a valid SQL UPDATE statement for the table"
     ID_OBJECT_DELETESTMT    " Create a valid SQL DELETE statement for the table"
     IDS_DSYNCTYPETITLE      " How do you want to perform synchronization?"
-    IDS_DSYNCTYPESUBTITLE   " Why upgrade to Professional/Enterprise/Ultimate? Scheduled Jobs allows you to schedule important jobs like backups, data sync, etc"
+    IDS_DSYNCTYPESUBTITLE   " Why upgrade to Ultimate? Scheduled Jobs allows you to schedule important jobs like backups, data sync, etc"
     IDM_EDIT_TEMP_ALTERDB   "/*\r\nAlter Database Statement\r\nSource : MySQL documentation\r\n*/\r\nALTER DATABASE db_name\r\n   [DEFAULT] CHARACTER SET charset_name\r\n | [DEFAULT] COLLATE collation_name"
 END
 

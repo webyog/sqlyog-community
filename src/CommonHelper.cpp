@@ -4378,6 +4378,23 @@ IsDatatypeNumeric(wyString  &datatype)
     return wyTrue;
 }
 
+//Checks whether the datatype belongs to the deprecated numeric size datatypes or not
+wyBool
+IsDatatypeDeprecatedSizeType(wyString  &datatype)
+{
+	if (!(		
+		datatype.CompareI("tinyint") == 0 ||		
+		datatype.CompareI("smallint") == 0 ||
+		datatype.CompareI("mediumint") == 0 ||
+		datatype.CompareI("int") == 0 ||
+		datatype.CompareI("integer") == 0 ||
+		datatype.CompareI("bigint") == 0 ||
+		datatype.CompareI("year") == 0
+		))
+		return wyFalse;
+
+	return wyTrue;
+}
 
 wyBool
 DecodePassword_Absolute(wyString &text)
@@ -4670,3 +4687,63 @@ MigratePassword(wyString &pwdstr)
 	return wyTrue;
 
 }
+
+/*
+Remove width from Int DataTypes
+*/
+void
+RemoveDefaultIntWidth(wyString &datatypestr)
+{
+	RemovePattern(datatypestr, "\\(\\d+\\)");
+}
+
+/*
+Currently it only removes first occurance. we can add a while loop to remove further occurances.
+*/
+void
+RemovePattern(wyString &text, const wyChar* pattern)
+{
+	wyInt32   ovector[30];
+	pcre           *re;
+	wyInt32         erroffset, rc = -1, sucess = 0;//, i = 0;
+	const char      *error;
+
+	re = pcre_compile(
+		pattern,              /* the pattern */
+		PCRE_UTF8 | PCRE_CASELESS | PCRE_NEWLINE_CR,/* default options */ //match is a case insensitive 
+		&error,               /* for error message */
+		&erroffset,           /* for error offset */
+		NULL);                /* use default character tables */
+
+							  /* Compilation failed: print the error message and exit */
+
+	if (re == NULL)
+		return;
+
+	/*************************************************************************
+	* If the compilation succeeded, we call PCRE again, in order to do a     *
+	* pattern match against the subject string. This does just ONE match *
+	*************************************************************************/
+
+	rc = pcre_exec(
+		re,                   /* the compiled pattern */
+		NULL,                 /* no extra data - we didn't study the pattern */
+		text.GetString(),              /* the subject string */
+		text.GetLength(),       /* the length of the subject */
+		0,                    /* start at offset 0 in the subject */
+		PCRE_NO_UTF8_CHECK,             /* default options */
+		ovector,              /* output vector for substring information */
+		30);           /* number of elements in the output vector */
+
+	if (re)
+	{
+		pcre_free(re);
+	}
+
+	if (rc == 1)
+	{
+		text.Erase(ovector[0], ovector[1] - ovector[0]);
+	}
+
+}
+

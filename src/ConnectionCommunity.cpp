@@ -30,7 +30,7 @@
 which is probably the best known Open Source licence. The formal terms of GPL licence \
 can be found at http://www.fsf.org/licence/.")
 
-#define STATUS_LINK _("Upgrade to SQLyog Professional/Enterprise/Ultimate")
+#define STATUS_LINK _("Upgrade to SQLyog Ultimate")
 
 ConnectionCommunity::ConnectionCommunity()
 {
@@ -763,6 +763,7 @@ ConnectionCommunity::OnNewSameConnection(HWND hwndactive, MDIWindow *pcquerywnd,
     MYSQL       *mysqlnew, *mysqlold, *mysqltemp;
     Tunnel	    *oldtunnel, *newtunnel;	
     wyString    msg;
+	wyUInt32		client = 0;
 
 	if(hwndactive)
 	{
@@ -797,7 +798,7 @@ ConnectionCommunity::OnNewSameConnection(HWND hwndactive, MDIWindow *pcquerywnd,
 		
         mysqltemp = newtunnel->mysql_real_connect(mysqlnew, mysqlold->host, mysqlold->user, 
                     mysqlold->passwd, NULL, mysqlold->port, NULL, 
-                    mysqlold->client_flag | CLIENT_MULTI_RESULTS, NULL);
+					client | CLIENT_MULTI_RESULTS | CLIENT_REMEMBER_OPTIONS, NULL);
 		
 		if(!mysqltemp)
         {
@@ -1215,6 +1216,7 @@ wyBool
 ConnectionCommunity::CreateSourceInstance(CopyDatabase *copydb)
 {
 	MYSQL *tempmysql, *newsrcmysql;
+	wyUInt32		client = 0;
 
 	copydb->m_newsrctunnel   = NULL;
 	copydb->m_srcprocess     = INVALID_HANDLE_VALUE;
@@ -1235,7 +1237,7 @@ ConnectionCommunity::CreateSourceInstance(CopyDatabase *copydb)
                              (*copydb->m_srcmysql)->host, (*copydb->m_srcmysql)->user, 
                              (*copydb->m_srcmysql)->passwd, NULL, 
                              (*copydb->m_srcmysql)->port, NULL, 
-                             (*copydb->m_srcmysql)->client_flag | CLIENT_MULTI_RESULTS, NULL);
+							 client | CLIENT_MULTI_RESULTS | CLIENT_REMEMBER_OPTIONS, NULL);
 
 	if(!newsrcmysql)
     {
@@ -1258,6 +1260,7 @@ wyBool
 ConnectionCommunity::CreateTargetInstance(CopyDatabase *copydb)
 {
 	MYSQL *tempmysql, *newtargetmysql;
+	wyUInt32		client = 0;
    
 	copydb->m_newtargettunnel   = NULL;
 	copydb->m_tgtprocess        = INVALID_HANDLE_VALUE;
@@ -1273,7 +1276,8 @@ ConnectionCommunity::CreateTargetInstance(CopyDatabase *copydb)
                              (*copydb->m_targetmysql)->host, (*copydb->m_targetmysql)->user, 
                              (*copydb->m_targetmysql)->passwd, NULL, 
                              (*copydb->m_targetmysql)->port, NULL, 
-                             (*copydb->m_targetmysql)->client_flag | CLIENT_MULTI_RESULTS, NULL);
+							 client | CLIENT_MULTI_RESULTS | CLIENT_REMEMBER_OPTIONS
+							 , NULL);
 
 	if(!newtargetmysql)
     {
@@ -1330,14 +1334,7 @@ ConnectionCommunity::OnWmCommand(HWND hwndactive, MDIWindow *wnd, WPARAM wparam)
 	case ID_FORMATCURRENTQUERY:
 	case ACCEL_FORMATCURRENTQUERY:
 	case ACCEL_FORMATSELECTEDQUERY:	
-		{
-			m_powertoolsID = LOWORD(wparam);
-			GetSQLyogEntDialog();
-			m_powertoolsID = 0;
-		}
-		break;
-
-    case ACCEL_DATASEARCH:
+	case ACCEL_DATASEARCH:
 	case ID_DATASEARCH:
 	case ID_DB_DATASEARCH:
     case ACCEL_VDDTOOL:
@@ -1372,7 +1369,7 @@ ConnectionCommunity::OnWmCommand(HWND hwndactive, MDIWindow *wnd, WPARAM wparam)
 	case ID_SAVEPOINT_CREATESAVEPOINT:	
 	case ID_SAVEPOINT_RELEASESAVEPOINT:
 		{
-			GetSQLyogEntDialog();
+			GetSQLyogUltimateDialog();
 			break;
 		}
 		
@@ -1624,14 +1621,14 @@ ConnectionCommunity::RepaintTabs(WPARAM wparam)
 void 
 ConnectionCommunity::OnSchdOdbcImport()
 {
-	GetSQLyogEntDialog();	
+	GetSQLyogUltimateDialog();
 	return;
 }
 
 void 
 ConnectionCommunity::OnScheduleExport()
 {
-	GetSQLyogEntDialog();
+	GetSQLyogUltimateDialog();
 	return;
 }
 
