@@ -8520,6 +8520,15 @@ FrameWindow::OnAlterDatabase(HWND hwndactive, MDIWindow *wnd)
 	}
 	return;
 }
+
+// replaces all \n with \r\n in the given string
+void
+FrameWindow::FormatStringFromDatabase(wyString &value)
+{
+	value.FindIAndReplace("\n", "\r\n");
+	value.FindIAndReplace("\r\r", "\r");
+}
+
 void 
 FrameWindow::OnAlterEvent(MDIWindow *wnd)
 {
@@ -8538,6 +8547,9 @@ FrameWindow::OnAlterEvent(MDIWindow *wnd)
 
 	if(ret == wyFalse)
 		return;
+
+	// replace \n with \r\n in altereventstmt
+	FormatStringFromDatabase(altereventstmt);
 
 	wnd->m_pctabmodule->CreateAdvEditorTab(wnd, (wyChar*)wnd->m_pcqueryobject->m_seltable.GetString()
 											, IDI_ALTEREVENT, TreeView_GetParent(wnd->m_pcqueryobject->m_hwnd, hitem));
@@ -8574,6 +8586,9 @@ FrameWindow::OnAlterView(MDIWindow *wnd)
 	wnd->m_pcqueryobject->GetAlterView(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, alterview);
 	if(alterview.GetLength()== 0)
 		return;
+
+	// replace \n with \r\n in alterview
+	FormatStringFromDatabase(alterview);
 	
 	pGlobals->m_pcmainwin->GetObjectName(wnd, viewname);
 	
@@ -8615,6 +8630,8 @@ FrameWindow::OnAlterProcedure(MDIWindow *wnd)
 
     if(createsp.GetLength()== 0)
 	    return;
+	// replace \n with \r\n in creatsp
+	FormatStringFromDatabase(createsp);
 
     wnd->m_pcqueryobject->GetDropProcedure(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, dropsp);
     pGlobals->m_pcmainwin->GetObjectName(wnd, spname);
@@ -8654,6 +8671,8 @@ FrameWindow::OnAlterFunction(MDIWindow *wnd)
 
 	if(createfunction.GetLength()== 0)
 		return;
+	// replace \n with \r\n in createfunction
+	FormatStringFromDatabase(createfunction);
 
 	wnd->m_pcqueryobject->GetDropFunction(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, dropfunction);
 	pGlobals->m_pcmainwin->GetObjectName(wnd, functionname);
@@ -8693,6 +8712,8 @@ FrameWindow::OnAlterTrigger(MDIWindow *wnd)
 
 	if(createtrigger.GetLength()== 0)
 		return;
+	// replace \n with \r\n in createtrigger
+	FormatStringFromDatabase(createtrigger);
 
 	wnd->m_pcqueryobject->GetDropTrigger(wnd->m_hwnd, wnd->m_tunnel, &wnd->m_mysql, droptrigger);
 	pGlobals->m_pcmainwin->GetObjectName(wnd, triggername);

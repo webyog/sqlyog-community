@@ -35,24 +35,24 @@
 #include "pcre.h"
 #include "Verify.h"
 #include "AppInfo.h"
-#include "CommonHelper.h" 
+#include "CommonHelper.h"
 #include "L10nText.h"
 #include "SQLTokenizer.h"
-#ifdef COMMUNITY 
+#ifdef COMMUNITY
 #include "Global.h"
 #else
 #include "CommonJobStructures.h"
 #endif
 
-#include "MySQLVersionHelper.h" 
+#include "MySQLVersionHelper.h"
 
 #if defined WIN32 && ! defined _CONSOLE
-#include "GUIHelper.h" 
+#include "GUIHelper.h"
 #include "FrameWindowHelper.h"
 extern	PGLOBALS		pGlobals;
 #else
 	#include "Main.h"
-	
+
 #endif
 
 extern	FILE	*logfilehandle;
@@ -78,7 +78,7 @@ static wyChar table64[]=
 static CryptoPP::byte AESKey[16] = { };//provide any Key
 static CryptoPP::byte AESiv[16] = {}; //Provide any IV
 
-Tunnel * 
+Tunnel *
 CreateTunnel(wyBool istunnel)
 {
 #ifdef COMMUNITY
@@ -94,11 +94,11 @@ GetTimeString(wyString& buff, wyChar *timesep)
 {
 	tm			*newtime;
 	time_t		aclock;
-	
+
 	time(&aclock);
 	newtime = localtime(&aclock);
 
-	buff.Sprintf("%04d-%02d-%02d %02d%s%02d%s%02d", 
+	buff.Sprintf("%04d-%02d-%02d %02d%s%02d%s%02d",
 							1900 + newtime->tm_year,
 							newtime->tm_mon + 1,
 							newtime->tm_mday,
@@ -118,10 +118,10 @@ void YogDebugLog(int errcode, const char* msg, char* file, int line)
 	wyWChar		directory[MAX_PATH+1];
 	wyWChar		*lpfileport;
 	wyBool		ret;
-        
+
 	ret = SearchFilePath(L"sqlyog_logx", L".log", MAX_PATH, directory, &lpfileport);
 
-	if(ret != wyTrue) 
+	if(ret != wyTrue)
 	{
 		return;
 	}
@@ -129,23 +129,23 @@ void YogDebugLog(int errcode, const char* msg, char* file, int line)
 	wyString buffer;
 	wyString strtime;
 	GetTimeString(strtime, ":");
-	buffer.Sprintf("[%s] %s [F]: %s (%d), [E]: %d, [M]: %s",  APPVERSION, 
-															  strtime.GetString(), 
-															  (file?file:"(n/a)"), 
-															  line, 
+	buffer.Sprintf("[%s] %s [F]: %s (%d), [E]: %d, [M]: %s",  APPVERSION,
+															  strtime.GetString(),
+															  (file?file:"(n/a)"),
+															  line,
 															  errcode,
 															  (msg?msg:"(n/a)")
 															);
 
 	FILE* fp = _wfopen(directory, L"a+");
-	if(!fp) 
+	if(!fp)
 	{
 		return;
 	}
 
 	fprintf(fp, "%s\r\n", buffer.GetString());
 	fclose(fp);
-	
+
 #else
 	/*UNREFERENCED_PARAMETER(msg);
 	UNREFERENCED_PARAMETER(file);
@@ -154,8 +154,8 @@ void YogDebugLog(int errcode, const char* msg, char* file, int line)
 //#endif
 }
 
-wyBool 
-SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength, 
+wyBool
+SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
                                                 wyWChar *buffer, wyWChar **lpfileport)
 {
 
@@ -178,12 +178,12 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
 
 	//Set flag to wyTrue if the file name to search is .exe
 	issqlyogexefiles = CheckSQLyogFiles(filename);
-    
+
 	/*Look files other than .exe in AppData Folder.
 	.exe files looks into Installed folder only*/
 	if(issqlyogexefiles == wyFalse)
 	{
-		filenamestr.SetAs(filename);	
+		filenamestr.SetAs(filename);
 		extensionstr.SetAs(extension);
 
 		if(isdefaultconfigpath == wyFalse)
@@ -194,16 +194,16 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
 				fullpathstr.Add("\\SQLyog");
 
 				if(extension && !wcsicmp(extension, L".ini"))
-				{					
+				{
 					strpath.Sprintf("%s%s", filenamestr.GetString(), extensionstr.GetString());
 					fullpathstr.AddSprintf("\\%s", strpath.GetString());
-					
-					//wcscpy(buffer, fullpathstr.GetAsWideChar());					
-					wcsncpy(buffer, fullpathstr.GetAsWideChar(), bufferlength - 1);					
+
+					//wcscpy(buffer, fullpathstr.GetAsWideChar());
+					wcsncpy(buffer, fullpathstr.GetAsWideChar(), bufferlength - 1);
 					buffer[bufferlength - 1] = '\0';
 
 					return wyTrue;
-				}				
+				}
 			}
 
 			else
@@ -213,13 +213,13 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
 		else
 		{
 			fullpathstr.SetAs(pGlobals->m_configdirpath);
-			
+
 			if(extension && !wcsicmp(extension, L".ini"))
 			{
 				fullpathstr.AddSprintf("\\%s%s", filenamestr.GetString(), extensionstr.GetString());
 
 				//wcscpy(buffer, fullpathstr.GetAsWideChar());
-				wcsncpy(buffer, fullpathstr.GetAsWideChar(), bufferlength - 1);					
+				wcsncpy(buffer, fullpathstr.GetAsWideChar(), bufferlength - 1);
 				buffer[bufferlength - 1] = '\0';
 
 				return wyTrue;
@@ -233,7 +233,7 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
     {
         // If not found search in installation folder
 		if(SearchPath(NULL, filename, extension, bufferlength, buffer, lpfileport) == 0)
-        {   
+        {
             /*Look files other than .exe in AppData Folder.
 			.exe files looks into Installed folder only*/
 			if(issqlyogexefiles == wyTrue)
@@ -245,7 +245,7 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
 		    if(extension)
 		    {
 			    wcscat(buffer, extension);
-			    filenamestr.SetAs(filename);	
+			    filenamestr.SetAs(filename);
 			    extensionstr.SetAs(extension);
 			    strpath.Sprintf("%s%s", filenamestr.GetString(), extensionstr.GetString());
                 fullpathstr.AddSprintf("\\%s", strpath.GetString());
@@ -253,14 +253,14 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
                 if(CheckSQLyogFiles(strpath.GetAsWideChar()) == wyTrue)
 	                return wyFalse;
 		    }
-        	
+
             fp = _wfopen(fullpathstr.GetAsWideChar(), L"a");
 
 		    if(fp != NULL)
 		    {
                 fullpathstr.Strip(strpath.GetLength());
                 SearchPath(fullpathstr.GetAsWideChar(), filename, extension, bufferlength, buffer, lpfileport);
-			    fclose(fp);	
+			    fclose(fp);
 			    return wyTrue;
 		    }
 
@@ -272,22 +272,22 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
 				wcsncpy(path, pGlobals->m_configdirpath.GetAsWideChar(), MAX_PATH);
 				path[MAX_PATH] = '\0';
 			}
-            			
+
 		    else if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path)))
 		    {
 			    wcscat(path, L"\\SQLyog");
 			}
 #endif
-        		
+
 			if(!SearchPath(path, filename, extension, bufferlength, buffer, lpfileport))
 			{
-				/*	if the file is not there(normally .ini file must be there , but .log or session file may not, 
+				/*	if the file is not there(normally .ini file must be there , but .log or session file may not,
 					so we will create a dummy file */
 
                 if(CheckFileExists(buffer, path, filename, extension) == wyFalse)
                     return wyFalse;
 			}
-		    
+
 		}
 
 		else
@@ -302,11 +302,11 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
 			    filenamestr.SetAs(filename);
 			    extensionstr.SetAs(extension);
 			    strpath.Sprintf("%s%s", filenamestr.GetString(), extensionstr.GetString());
-        	
+
 		        if(CheckSQLyogFiles(strpath.GetAsWideChar()) == wyTrue)
 			        return wyTrue;
 		    }
-        
+
 		    fp = _wfopen(buffer, L"r+");
 
 		    if(fp == NULL)
@@ -315,15 +315,15 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
 			    if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path)))
 			    {
 				    wcscat(path, L"\\SQLyog");
-        		
+
 				    if(!SearchPath(path, filename, extension, bufferlength, buffer, lpfileport))
 				    {
-					    /*	if the file is not ther(normally .ini file must be ther , but .log or session file may not, 
+					    /*	if the file is not ther(normally .ini file must be ther , but .log or session file may not,
 						    so we will create a dummy file */
                         if(CheckFileExists(buffer, path, filename, extension) == wyFalse)
                             return wyFalse;
 				    }
-			    }		
+			    }
 		    }
 		    else
 			    fclose(fp);
@@ -341,11 +341,11 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
 			filenamestr.SetAs(filename);
 			extensionstr.SetAs(extension);
 			strpath.Sprintf("%s%s", filenamestr.GetString(), extensionstr.GetString());
-    	
+
 		    if(CheckSQLyogFiles(strpath.GetAsWideChar()) == wyTrue)
 			    return wyTrue;
 		}
-    
+
 		fp = _wfopen(buffer, L"r+");
 
 		if(fp == NULL)
@@ -354,15 +354,15 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
 			if(SUCCEEDED(SHGetFolderPath(NULL, CSIDL_APPDATA, NULL, 0, path)))
 			{
 				wcscat(path, L"\\SQLyog");
-    		
+
 				if(!SearchPath(path, filename, extension, bufferlength, buffer, lpfileport))
 				{
-					/*	if the file is not ther(normally .ini file must be ther , but .log or session file may not, 
+					/*	if the file is not ther(normally .ini file must be ther , but .log or session file may not,
 						so we will create a dummy file */
                     if(CheckFileExists(buffer, path, filename, extension) == wyFalse)
                         return wyFalse;
 				}
-			}		
+			}
 		}
 		else
 			fclose(fp);
@@ -372,7 +372,7 @@ SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
 }
 
 #ifdef _WIN32
-wyBool 
+wyBool
 CheckSQLyogFiles(const wyWChar *filename)
 {
      if((wcsicmp(filename, L"sja.exe")== 0)||
@@ -383,7 +383,7 @@ CheckSQLyogFiles(const wyWChar *filename)
 }
 #endif
 
-wyBool 
+wyBool
 CheckFileExists(wyWChar *buffer, const wyWChar *path, const wyWChar *filename, const wyWChar *extension)
 {
     FILE    *fp;
@@ -413,7 +413,7 @@ CheckFileExists(wyWChar *buffer, const wyWChar *path, const wyWChar *filename, c
 
 
 wyInt32
-CopyTableFromNewToOld(Tunnel * tunnel, PMYSQL mysql, Tunnel * newtargettunnel, 
+CopyTableFromNewToOld(Tunnel * tunnel, PMYSQL mysql, Tunnel * newtargettunnel,
 					  PMYSQL newtargetmysql, const wyChar *db, const wyChar *table, wyString & query)
 /* issue in Char set. it will return 0 if success, 1 if failure in source, 2 if failure in target */
 
@@ -428,11 +428,11 @@ CopyTableFromNewToOld(Tunnel * tunnel, PMYSQL mysql, Tunnel * newtargettunnel,
     myres = SjaExecuteAndGetResult(tunnel, mysql, query);
 	if(!myres)
 		return 1;
-		
+
     strcreate.Sprintf("Create table `%s`(", table);
     GetFieldInfoString(tunnel, myres, strcreate, newtargettunnel, newtargetmysql);
 	sja_mysql_free_result(tunnel, myres);
-		
+
 	query.Sprintf("show keys from `%s`.`%s` ", db, table);
 
     myres = SjaExecuteAndGetResult(tunnel, mysql, query);
@@ -458,7 +458,7 @@ CopyTableFromNewToOld(Tunnel * tunnel, PMYSQL mysql, Tunnel * newtargettunnel,
 
 				if(IsMySQL402(tunnel, mysql))
                 {
-					if(myrow[GetFieldIndex(tunnel, myres, "index_type")] && 
+					if(myrow[GetFieldIndex(tunnel, myres, "index_type")] &&
                        strstr(myrow[GetFieldIndex(tunnel, myres, "index_type")], "FULLTEXT"))
 						isfulltext = wyTrue;
 				}
@@ -473,7 +473,7 @@ CopyTableFromNewToOld(Tunnel * tunnel, PMYSQL mysql, Tunnel * newtargettunnel,
 					if(indexname.CompareI("PRIMARY") == 0)
 						strcreate.Add("primary key ");
 					else
-					{	
+					{
 						if(isunique == wyTrue)
 							strcreate.Add("unique ");
 						else if(isfulltext == wyTrue)
@@ -498,7 +498,7 @@ CopyTableFromNewToOld(Tunnel * tunnel, PMYSQL mysql, Tunnel * newtargettunnel,
 					if(stricmp(myrow[GetFieldIndex(tunnel, myres, "non_unique")], "0") == 0)
 						isunique = wyTrue;
 
-					if(IsMySQL402(tunnel, mysql) && myrow[GetFieldIndex(tunnel, myres, "index_type")] && 
+					if(IsMySQL402(tunnel, mysql) && myrow[GetFieldIndex(tunnel, myres, "index_type")] &&
                         strstr(myrow[GetFieldIndex(tunnel, myres, "index_type")], "FULLTEXT"))
 						isfulltext = wyTrue;
 				}
@@ -534,41 +534,41 @@ CopyTableFromNewToOld(Tunnel * tunnel, PMYSQL mysql, Tunnel * newtargettunnel,
 	if(!myres)
 		return 1;
 
-	typeindex = (IsMySQL41(tunnel, mysql)? 
-                GetFieldIndex(tunnel, myres, "engine") : 
+	typeindex = (IsMySQL41(tunnel, mysql)?
+                GetFieldIndex(tunnel, myres, "engine") :
                 GetFieldIndex(tunnel, myres, "Engine"));
 
 	nameindex = GetFieldIndex(tunnel, myres, "Name");
 	strcreate.Add(")");
-    
+
 	while((myrow = sja_mysql_fetch_row(tunnel, myres))!= NULL)
 	{
 		if(stricmp(myrow[nameindex], table) == 0)
 		{
             if(IsMySQL4(newtargettunnel, newtargetmysql) == wyTrue)
-			    strcreate.AddSprintf("%s%s", 
-                    (IsMySQL41(newtargettunnel, newtargetmysql)? "Engine = " :  "Type = "), 
+			    strcreate.AddSprintf("%s%s",
+                    (IsMySQL41(newtargettunnel, newtargetmysql)? "Engine = " :  "Type = "),
                     myrow[typeindex]);
 
 			break;
 		}
 	}
-	
+
 	if(myres)
 		sja_mysql_free_result(tunnel, myres);
-  
+
 	query.SetAs(strcreate);
 
 	return 0;
 }
 
-void 
-GetFieldInfoString(Tunnel *tunnel, MYSQL_RES *myres, 
+void
+GetFieldInfoString(Tunnel *tunnel, MYSQL_RES *myres,
                    wyString &strcreate, Tunnel *tgttunnel, PMYSQL tgtmysql)
 {
     MYSQL_ROW   myrow;
     wyBool      first = wyTrue;
-    wyInt32     nfieldval, ntypeval,nnullval; 
+    wyInt32     nfieldval, ntypeval,nnullval;
     wyInt32     ndefval, nextraval, ncommentval;
 	wyString	type;
 
@@ -586,7 +586,7 @@ GetFieldInfoString(Tunnel *tunnel, MYSQL_RES *myres,
 
 		if(myrow[nfieldval])
 			strcreate.AddSprintf("`%s` ", myrow[nfieldval]);
-		
+
         if(myrow[ntypeval])
 		{
 			type.SetAs(myrow[ntypeval]);
@@ -616,14 +616,14 @@ GetFieldInfoString(Tunnel *tunnel, MYSQL_RES *myres,
 
 		if(myrow[ncommentval] && IsMySQL41(tgttunnel, tgtmysql))
 			strcreate.AddSprintf(" comment '%s' ", myrow[ncommentval]);
-		
+
         first = wyFalse;
-	}    
+	}
 }
 
 
 /* function only required in SQLyog GUI as its already defined in SQLyogJob */
-wyInt32 
+wyInt32
 GetFieldIndex(Tunnel *tunnel, MYSQL_RES * result, wyChar * colname)
 {
 	wyUInt32        num_fields;
@@ -644,7 +644,7 @@ GetFieldIndex(Tunnel *tunnel, MYSQL_RES * result, wyChar * colname)
 	}
 
 //    assert(0);
-    
+
 	return -1;
 }
 wyInt32 GetBodyOfTrigger(wyString *body )
@@ -664,7 +664,7 @@ return 1;
 else return -1;
 }
 #ifdef _WIN32
-wyBool 
+wyBool
 GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *trigger, wyString &strtrigger, wyString &strmsg, wyBool isdefiner)
 {
 	wyInt32		pos;
@@ -672,7 +672,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	wyString    deftemp, def, query,query1, definer,bodyoftrigger;
 	MYSQL_RES	*myres,*myres1;
 	MYSQL_ROW	myrow,myrow1=NULL;
-	wyInt32		coldefiner = -1; 
+	wyInt32		coldefiner = -1;
 	wyInt32		coltablename = -1;
 	wyInt32		colevent = -1;
 	wyInt32		colstmt = -1;
@@ -694,7 +694,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 
 	query.Sprintf("show triggers from `%s` where `trigger` = '%s'", db, trigger);
     myres = SjaExecuteAndGetResult(tunnel, mysql, query);
-	
+
 	query1.Sprintf("show create trigger `%s`. `%s`", db, trigger);
 	myres1 = SjaExecuteAndGetResult(tunnel, mysql, query1);
 	if(!myres)
@@ -706,7 +706,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	{
 	isshowcreateworked=wyFalse;
 	}
-		
+
 	if(sja_mysql_num_rows(tunnel, myres)== 0)
 	{
 		strmsg.Sprintf("Trigger '%s' doesn't exists!", trigger);
@@ -721,9 +721,9 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	{
 		strmsg.SetAs(_("Unable to retrieve information. Please check your permission."));
 		sja_mysql_free_result(tunnel, myres);
-        return wyFalse;		
+        return wyFalse;
 	}
-		
+
 	//body of trigger using show create triger
 	if(isshowcreateworked && myrow1[2])
 	{
@@ -739,7 +739,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	}
 //	Trigger Definer
 	if(!isdefiner)
-		if(ismysql5017 == wyTrue) 
+		if(ismysql5017 == wyTrue)
 		{
 			coldefiner = GetFieldIndex(tunnel, myres, "Definer");
 
@@ -750,7 +750,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 		        sja_mysql_free_result(tunnel, myres1);
 				return wyFalse;
 			}
-		
+
 			if(myrow[coldefiner])
 			{
 				definer.SetAs(myrow[coldefiner], ismysql41);
@@ -762,8 +762,8 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 	if(coltablename == -1)
 	{
 #if defined _WIN32 && ! defined  _CONSOLE
-		
-		MessageBox(hwnd, _(L"Unable to retrive the table for this trigger"), 
+
+		MessageBox(hwnd, _(L"Unable to retrive the table for this trigger"),
 					pGlobals->m_appname.GetAsWideChar(), MB_OK | MB_ICONINFORMATION);
 		  sja_mysql_free_result(tunnel, myres);
 		  if(myres1)
@@ -772,7 +772,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 #endif
 		return wyFalse;
 	}
-		
+
 	//Timing
 	coltiming = GetFieldIndex(tunnel, myres, "Timing");
 	if(coltiming == -1)// || !myrow[coltiming])
@@ -782,7 +782,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 		        sja_mysql_free_result(tunnel, myres1);
 		return wyFalse;
 	}
-		
+
 	//Event
 	colevent = GetFieldIndex(tunnel, myres, "Event");
 	if(colevent == -1)
@@ -792,7 +792,7 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 		        sja_mysql_free_result(tunnel, myres1);
 		return wyFalse;
 	}
-			
+
 
 	//Trgger Statement
 	colstmt = GetFieldIndex(tunnel, myres, "Statement");
@@ -803,17 +803,17 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 		        sja_mysql_free_result(tunnel, myres1);
 		return wyFalse;
 	}
-		
+
 	//Parse the Definer and inserts single quotes ('user'@'host')
 	if(!isdefiner)
 		if(definer.GetLength())
 		{
 			ch = strrchr((wyChar*)definer.GetString(), '@');
-		
+
 			pos = ch - definer.GetString();
-		
+
 			if(pos > 0)
-			{	
+			{
 				definer.Substr(0, pos);
 
 				ch++;
@@ -821,41 +821,41 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 				deftemp.Sprintf("'%s'@'%s'", definer.Substr(0, pos), ch);
 
 				//Keeps the definer
-				def.Sprintf("/*!50017 DEFINER = %s */", deftemp.GetString()); 
+				def.Sprintf("/*!50017 DEFINER = %s */", deftemp.GetString());
 			}
 		}
-		
+
 	//if(myrow && myrow[0] && myrow[1] && myrow[3] && myrow[4])
 	if(myrow && myrow[colevent] && myrow[colstmt] && myrow[coltiming] && myrow[coltablename])
     {
-		/*strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s`.`%s` %s %s ON `%s`.`%s` \n%sFOR EACH ROW %s;\n", 
+		/*strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s`.`%s` %s %s ON `%s`.`%s` \n%sFOR EACH ROW %s;\n",
 			FMT_SPACE_4, def.GetString(), FMT_SPACE_4,db, myrow[0], myrow[4], myrow[1], db, table, FMT_SPACE_4, myrow[3]);*/
-		/*strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
+		/*strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n",
 			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, myrow[0], myrow[4], myrow[1], table, FMT_SPACE_4, myrow[3]);*/
 
 		if(isdefiner)
 		{
 			if(isshowcreateworked && bodyoftrigger.GetLength()!=0)
-			{strtrigger.Sprintf("CREATE\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
+			{strtrigger.Sprintf("CREATE\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n",
 			FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, bodyoftrigger.GetString());}
 			else
 			{
-			strtrigger.Sprintf("CREATE\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
+			strtrigger.Sprintf("CREATE\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n",
 			FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4,myrow[colstmt]);
 			}
 		}
 		else
 		{
 			if(isshowcreateworked && bodyoftrigger.GetLength()!=0)
-			{strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
+			{strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n",
 			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, bodyoftrigger.GetString());}
 			else
 			{
-			strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n", 
+			strtrigger.Sprintf("CREATE\n%s%s\n%sTRIGGER `%s` %s %s ON `%s` \n%sFOR EACH ROW %s;\n",
 			FMT_SPACE_4, def.GetString(), FMT_SPACE_4, trigger, myrow[coltiming], myrow[colevent], myrow[coltablename], FMT_SPACE_4, myrow[colstmt]);
 			}
 		}
-		
+
     }
     else
     {
@@ -871,13 +871,13 @@ GetCreateTriggerString(HWND hwnd, Tunnel * tunnel, PMYSQL mysql, const wyChar *d
 
 void GetError(Tunnel *tunnel, PMYSQL mysql, wyString &strmsg)
 {
-	strmsg.Sprintf("Error No. %d\n%s", sja_mysql_errno(tunnel, *mysql), 
+	strmsg.Sprintf("Error No. %d\n%s", sja_mysql_errno(tunnel, *mysql),
                         sja_mysql_error(tunnel, *mysql));
 	return ;
 }
 
-wyBool 
-GetCreateFunctionString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar * function, 
+wyBool
+GetCreateFunctionString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar * function,
                                 wyString &strfunction, wyString &strmsg, wyString *queryex)
 {
 	wyString    query;
@@ -891,10 +891,10 @@ GetCreateFunctionString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const w
 
 #if defined WIN32 && ! defined _CONSOLE
 	myres = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query);
-#else	
+#else
 	myres = SjaExecuteAndGetResult(tunnel, mysql, query);
 #endif
-	
+
 	if(!myres)
 	{
 		GetError(tunnel, mysql, strmsg);
@@ -909,7 +909,7 @@ GetCreateFunctionString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const w
 	}
 
 	myrow = sja_mysql_fetch_row(tunnel, myres);
-	
+
     if(myrow && myrow[2])
 	    strfunction.SetAs(myrow[2]);
     else
@@ -924,31 +924,31 @@ GetCreateFunctionString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const w
 	return wyTrue;
 }
 
-wyBool 
-GetCreateProcedureString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *procedure, 
+wyBool
+GetCreateProcedureString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *procedure,
                          wyString &strprocedure, wyString &strmsg, wyString  *queryex)
-{	
+{
 	MYSQL_RES	*myres;
 	MYSQL_ROW	myrow;
 	wyString    query;
-	
+
 	query.Sprintf("show create procedure `%s`.`%s`", db, procedure);
 	if(queryex)
 		queryex->SetAs(query);
 
 #if defined WIN32 && ! defined _CONSOLE
 	myres = ExecuteAndGetResult(GetActiveWin(), tunnel, mysql, query);
-#else	
+#else
 	myres = SjaExecuteAndGetResult(tunnel, mysql, query);
 #endif
-	
-	
+
+
 	if(!myres)
     {
 		GetError(tunnel, mysql, strmsg);
 		return wyFalse;
 	}
-	
+
 	if(sja_mysql_num_rows(tunnel, myres)== 0)
 	{
 		strmsg.Sprintf("Procedure '%s' doesn't exists!", procedure);
@@ -972,28 +972,28 @@ GetCreateProcedureString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const 
 	sja_mysql_free_result(tunnel, myres);
 	return wyTrue;
 }
-wyBool 
-GetCreateEventString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *event, 
+wyBool
+GetCreateEventString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *event,
 					 wyString &strevent, wyString &strmsg, wyString *queryex)
 {
 	wyString    query;
 	MYSQL_RES	*myres;
 	MYSQL_ROW	myrow;
 	wyInt32     index = 0;
-	
+
 	query.Sprintf("show create event `%s`.`%s`", db, event);
 
 	if(queryex)
 		queryex->SetAs(query);
 
     myres = SjaExecuteAndGetResult(tunnel, mysql, query);
-	
+
 	if(!myres)
     {
 		GetError(tunnel, mysql, strmsg);
 		return wyFalse;
 	}
-	
+
 	if(sja_mysql_num_rows(tunnel, myres)== 0)
 	{
 		strmsg.Sprintf("Event '%s' doesn't exists!", event);
@@ -1002,7 +1002,7 @@ GetCreateEventString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyCh
 	}
 
 	myrow = sja_mysql_fetch_row(tunnel, myres);
-	index = GetFieldIndex(tunnel, myres, "Create Event"); 
+	index = GetFieldIndex(tunnel, myres, "Create Event");
 
 	if(index >= 0)
     {
@@ -1018,19 +1018,19 @@ GetCreateEventString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyCh
 	return wyTrue;
 }
 
-wyUInt32 
-GetRowCount(Tunnel * m_tunnel, MYSQL *m_mysql, const wyChar *db, 
+wyUInt32
+GetRowCount(Tunnel * m_tunnel, MYSQL *m_mysql, const wyChar *db,
             const wyChar *table, const wyChar *whereclause)
 {
 	wyInt32             rcount;
-	MYSQL_ROW			rownum;	
+	MYSQL_ROW			rownum;
 	MYSQL_RES			*rowinfo=NULL;
     wyString            query;
 
-	/* select count(*)to get the number of rows from desired table */ 
-    query.Sprintf("select count(*)from `%s`.`%s`%s%s", 
+	/* select count(*)to get the number of rows from desired table */
+    query.Sprintf("select count(*)from `%s`.`%s`%s%s",
         db, table, (whereclause)?(" where "):(""),(whereclause)?(whereclause):(""));
-		
+
     rowinfo = SjaExecuteAndGetResult(m_tunnel, &m_mysql, query);
     if(!rowinfo)
 		return 0;
@@ -1038,31 +1038,31 @@ GetRowCount(Tunnel * m_tunnel, MYSQL *m_mysql, const wyChar *db,
 	rownum = sja_mysql_fetch_row(m_tunnel, rowinfo);
 	rcount = atoi(rownum[0]);
 	sja_mysql_free_result(m_tunnel, rowinfo);
-	
+
 	return  rcount;
 }
 
 
-wyBool 
-GetCreateTableString(Tunnel * tunnel, PMYSQL pmysql, const wyChar *db, 
+wyBool
+GetCreateTableString(Tunnel * tunnel, PMYSQL pmysql, const wyChar *db,
 					 const wyChar* tbl, wyString &strcreate, wyString &query)
 {
-	MYSQL_ROW			myrow;	
+	MYSQL_ROW			myrow;
 	MYSQL_RES			*res = NULL;
 	wyChar              *err;
     wyBool              find = wyFalse;
 
 	strcreate.Clear();
 
-	/* select count(*)to get the number of rows from desired table */ 
+	/* select count(*)to get the number of rows from desired table */
 	if(!query.GetLength())
 	{
 		if(db)
 			query.Sprintf("show create table `%s`.`%s`", db, tbl);
 		else
 			query.Sprintf("show create table `%s`", tbl);
-	}													
-		
+	}
+
     res = SjaExecuteAndGetResult(tunnel, pmysql, query);
     if(!res)
 	{
@@ -1071,52 +1071,52 @@ GetCreateTableString(Tunnel * tunnel, PMYSQL pmysql, const wyChar *db,
 	}
 
 	myrow = sja_mysql_fetch_row(tunnel, res);
-	
+
 	if(myrow && myrow[1])// check for the on update current_timestamp
 	{
 		strcreate.SetAs(myrow[1]);
 		find = wyTrue;
 	}
-	
+
 	if(res)
 		sja_mysql_free_result(tunnel, res);
 
 	return  find;
 }
 
-wyBool 
+wyBool
 CheckForOnUpdate(wyString &strcreate, wyInt32 fieldpos)
 {
 	wyChar      *create, *row, *sep = "\n";
 	wyInt32     count=0;
 	wyString    strtemp;
 	wyBool      find = wyFalse;
-	
+
 	if(!strcreate.GetLength())
 		return find;
 
 	create = (wyChar*)calloc(strcreate.GetLength()+ 1, sizeof(wyChar));
 	strcpy(create, strcreate.GetString());
 	row = strtok(create, sep);
-	
+
 	while(count <= fieldpos)
 	{
 		row = strtok(NULL, sep);
-		
+
 		if(!row)
 		{
 			free(create);
 			return find;
 		}
-		
+
 		count++;
 	}
-	
+
 	strtemp.SetAs(row);
-	
+
 	if(strtemp.FindI("on update CURRENT_TIMESTAMP", 0) != -1)
 		find = wyTrue;
-	
+
 	free(create);
 	return find;
 }
@@ -1131,7 +1131,7 @@ if(ptr) {
    while(currentrow[index]!='S'&& currentrow[index]!='P'&& currentrow[index]!='V' )
    {
 	   expression->AddSprintf("%c",currentrow[index]);
-   
+
      index++;
    }
 }
@@ -1269,12 +1269,12 @@ GetBitFieldColumnWidth(wyString &strcreate, wyInt32 fieldpos)
 	while(count <= fieldpos)
 	{
 		row = strtok(NULL, sep);
-		
+
 		if(!row)
 		{
 			free(create);
 			return -1;
-		}		
+		}
 		count++;
 	}
 
@@ -1293,7 +1293,7 @@ GetBitFieldColumnWidth(wyString &strcreate, wyInt32 fieldpos)
 		free(create);
 		return -1;
 	}
-	
+
 	tok = strtok(NULL, tok);
 	if(tok)
 	{
@@ -1305,7 +1305,7 @@ GetBitFieldColumnWidth(wyString &strcreate, wyInt32 fieldpos)
 	return -1;
 }
 
-wyBool 
+wyBool
 CheckForVariable(const wyChar *val)
 {
 	if((stricmp(val, "CURRENT_TIMESTAMP"	)== 0)||
@@ -1314,26 +1314,26 @@ CheckForVariable(const wyChar *val)
 		(stricmp(val, "CURRENT_USER"		)== 0)||
 		(stricmp(val, "LOCALTIMESTAMP"		)== 0))
 		return wyTrue;
-	
+
 	return wyFalse;
 }
 
-wyInt32 
+wyInt32
 GetSelectViewStmt(const wyChar *db, wyString &selectstmt)
 {
     wyInt32 len;
 	wyString dbnameasstring(db);
-	// depends on the preferences we can go for whether to use "show" command or not 
+	// depends on the preferences we can go for whether to use "show" command or not
 	len = selectstmt.Sprintf("select `TABLE_NAME` from `INFORMATION_SCHEMA`.`TABLES` where `TABLE_SCHEMA` = '%s' and `TABLE_TYPE` = 'VIEW'", dbnameasstring.GetString());
-    
+
 	return len;
 }
-wyInt32 
+wyInt32
 GetSelectProcedureStmt(const wyChar *db, wyString &selectstmt, wyBool iscollate)
 {
 	wyInt32 len;
  	wyString dbname(db);    // This will convert to Widechar to UTF8 format.
-	// depends on the preferences we can go for whether to use "show" command or not 
+	// depends on the preferences we can go for whether to use "show" command or not
 	if(iscollate)
 		len = selectstmt.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where BINARY `ROUTINE_SCHEMA` = '%s' and ROUTINE_TYPE = 'PROCEDURE'", dbname.GetString());
 	else
@@ -1341,19 +1341,19 @@ GetSelectProcedureStmt(const wyChar *db, wyString &selectstmt, wyBool iscollate)
 	return len;
 }
 
-wyInt32 
+wyInt32
 GetSelectFunctionStmt(const wyChar *db, wyString &selectstmt, wyBool iscollate)
 {
 	wyInt32 len;
 	wyString dbnamestr(db);
-	// depends on the preferences we can go for whether to use "show" command or not 
+	// depends on the preferences we can go for whether to use "show" command or not
 	if(iscollate)
 		len = selectstmt.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where BINARY `ROUTINE_SCHEMA` = '%s' and ROUTINE_TYPE = 'FUNCTION'", dbnamestr.GetString());
 	else
 		len = selectstmt.Sprintf("select `SPECIFIC_NAME` from `INFORMATION_SCHEMA`.`ROUTINES` where `ROUTINE_SCHEMA` = '%s'and ROUTINE_TYPE = 'FUNCTION'", dbnamestr.GetString());
 	return len;
 }
-wyInt32 
+wyInt32
 GetSelectEventStmt(const wyChar *db, wyString &selectstmt, wyBool iscollate)
 {
 	wyInt32 len = 0;
@@ -1365,7 +1365,7 @@ GetSelectEventStmt(const wyChar *db, wyString &selectstmt, wyBool iscollate)
 	return len;
 }
 
-wyInt32 
+wyInt32
 GetSelectTriggerStmt(const wyChar *db, wyString &selectstmt)
 {
 	wyInt32 len = 0;
@@ -1383,7 +1383,7 @@ GetApplicationFolder(wyWChar * path)
     wyInt32 index = 0;
 
     filelen =(GetModuleFileName(NULL, path, MAX_PATH));
-    
+
     if(filelen == 0)
     {
         path[0] = 0;
@@ -1415,13 +1415,13 @@ AllocateBuffWChar(wyInt32 size)
 	return((wyWChar*)calloc(sizeof(wyWChar), size * sizeof(wyWChar)));
 }
 
-wyChar* 
+wyChar*
 AllocateBuff(wyInt32 size)
 {
     return((wyChar*)calloc(sizeof(wyChar), size));
 }
 
-wyChar* 
+wyChar*
 ReAllocateBuff(wyChar *buff, wyInt32 size)
 {
     return((wyChar*)realloc(buff, sizeof(wyChar)*size));
@@ -1430,7 +1430,7 @@ ReAllocateBuff(wyChar *buff, wyInt32 size)
 
 #ifdef _WIN32
 
-wyInt32  
+wyInt32
 GetModuleNameLength()
 {
     wyWChar fullpath[MAX_PATH+1] = {0};
@@ -1444,7 +1444,7 @@ GetModuleNameLength()
 
 	// extract the directory
 	if(GetFullPathName(fullpath, MAX_PATH, extractpath, &filename ) == NULL )
-    {        
+    {
 		return 0;
     }
 
@@ -1500,7 +1500,7 @@ GetEscapedValue(Tunnel *tunnel, PMYSQL mysql, const wyChar *value)
 void WriteLog(const wyChar* str)
 {
 
-//#ifndef _DEBUG 
+//#ifndef _DEBUG
     /* If it is in DEBUG mode don't perform any logging, just return...*/
     //return;
 //#endif
@@ -1519,7 +1519,7 @@ void WriteLog(const wyChar* str)
 		wyStr.SetAs(path);
 		wyStr.Add("\\sqlyog.log");		/* Creates the full file path */
 
-   logfile = CreateFile ( wyStr.GetAsWideChar(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, NULL, NULL ); 
+   logfile = CreateFile ( wyStr.GetAsWideChar(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, NULL, NULL );
 
    if(logfile == INVALID_HANDLE_VALUE)
        return;
@@ -1532,7 +1532,7 @@ void WriteLog(const wyChar* str)
 
 	fprintf(log, "\n%s", str);
 	fclose(log);
-    
+
     return;
 }
 #endif
@@ -1541,7 +1541,7 @@ wyUInt32
 PrepareShowTableInfo(Tunnel * tunnel, PMYSQL mysql, wyString& db, wyString &query)
 {
 	wyUInt32 count;
-	
+
 	if(IsMySQL5010(tunnel, mysql))
 	{
 		if(db.CompareI("INFORMATION_SCHEMA") != 0)
@@ -1551,7 +1551,7 @@ PrepareShowTableInfo(Tunnel * tunnel, PMYSQL mysql, wyString& db, wyString &quer
 			return count;
 		}
 	}
-	
+
 	count = query.Sprintf("show tables from `%s`", db.GetString());
 	return count;
 }
@@ -1560,7 +1560,7 @@ wyUInt32
 PrepareShowTable(Tunnel * tunnel, PMYSQL mysql, wyString& db, wyString &query)
 {
 	wyUInt32 count = 0;
-	
+
 	if(IsMySQL5010(tunnel, mysql))
 	{
 		if(db.CompareI("INFORMATION_SCHEMA") != 0)
@@ -1570,7 +1570,7 @@ PrepareShowTable(Tunnel * tunnel, PMYSQL mysql, wyString& db, wyString &query)
 			return count;
 		}
 	}
-	
+
 	count = query.Sprintf("show tables from `%s`", db.GetString());
 	return count;
 }
@@ -1585,7 +1585,7 @@ PrepareShowTable(Tunnel * tunnel, PMYSQL mysql, wyString& db, wyString &query)
 *
 */
 
-wyInt32 
+wyInt32
 EncodeBase64( const wyChar *inp, size_t insize, wyChar ** outptr)
 {
 	wyUChar  ibuf[3];
@@ -1631,7 +1631,7 @@ EncodeBase64( const wyChar *inp, size_t insize, wyChar ** outptr)
 			table64[obuf[1]]);
 		break;
 
-	case 2: // two bytes read 
+	case 2: // two bytes read
 		len += sprintf(output, "%c%c%c=",
 			table64[obuf[0]],
 			table64[obuf[1]],
@@ -1651,13 +1651,13 @@ EncodeBase64( const wyChar *inp, size_t insize, wyChar ** outptr)
 	}
 
 	*output=0;
-	*outptr = base64data; // make it return the actual data memory 
+	*outptr = base64data; // make it return the actual data memory
 
-	return len; // return true 
+	return len; // return true
 }
 
 // decode a base64 buffer
-size_t 
+size_t
 DecodeBase64 (const wyChar *src, wyChar *dest)
 {
 	wyInt32 length = 0;
@@ -1688,7 +1688,7 @@ DecodeBase64 (const wyChar *src, wyChar *dest)
 	return rawlen;
 }
 
-void 
+void
 DecodeQuantum(wyUChar *dest, const wyChar *src)
 {
 	wyUInt32    x = 0;
@@ -1756,10 +1756,10 @@ ExtractEngineName(wyChar *engine, wyString &enginename)
     return;
 }
 
-wyBool 
-IsSupportedEngine(wyString &enginename) 
+wyBool
+IsSupportedEngine(wyString &enginename)
 {
-    wyChar  supported[][20] = { "MyISAM", "ISAM", "InnoDB", "HEAP", "BDB", 
+    wyChar  supported[][20] = { "MyISAM", "ISAM", "InnoDB", "HEAP", "BDB",
                                 "EXAMPLE", "ARCHIVE", "CSV", "BLACKHOLE", "SolidDB",
                                 NULL};
     wyInt32 index = 0;
@@ -1772,7 +1772,7 @@ IsSupportedEngine(wyString &enginename)
             return wyTrue;
         }
     }
-    
+
     return wyFalse;
 }
 
@@ -1792,7 +1792,7 @@ GetTableEngineString(Tunnel *tunnel, PMYSQL mysql, wyString &strengine)
     {
         // Frame the query to get Engines/Type from the information schema
         query.Sprintf("select `ENGINE`, `SUPPORT` from information_schema.Engines");
-        
+
         myres = SjaExecuteAndGetResult(tunnel, mysql, query);
 
         if(!myres)
@@ -1816,7 +1816,7 @@ GetTableEngineString(Tunnel *tunnel, PMYSQL mysql, wyString &strengine)
 	{
 		// Frame the query to get Engines/Type from the information schema
         query.Sprintf("SHOW ENGINES");
-        
+
         myres = SjaExecuteAndGetResult(tunnel, mysql, query);
 
         if(!myres)
@@ -1845,7 +1845,7 @@ GetTableEngineString(Tunnel *tunnel, PMYSQL mysql, wyString &strengine)
         {
             return;
         }
-        
+
         while(myrow = sja_mysql_fetch_row(tunnel, myres))
         {
             if(myrow[0] && myrow[1] && stricmp(myrow[1], "YES") == 0)
@@ -1856,7 +1856,7 @@ GetTableEngineString(Tunnel *tunnel, PMYSQL mysql, wyString &strengine)
                                     strengine.AddSprintf("%s;", enginename.GetString());
                 }
             }
-                
+
         strengine.Add("MyISAM;");
     }
 
@@ -1870,17 +1870,17 @@ GetTableEngineString(Tunnel *tunnel, PMYSQL mysql, wyString &strengine)
 }
 
 #if defined _WIN32 && ! defined  _CONSOLE
-wyInt32 
+wyInt32
 GetChunkLimit(wyInt32 *chunksize)
 {
 	wyWChar		*lpfileport=0;
 	wyWChar		directory[MAX_PATH +1] = {0};
 	wyString	dirstr;
-		
+
 	// Get the complete path.
 	SearchFilePath( L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
 	dirstr.SetAs(directory);
-	
+
 	*chunksize = wyIni::IniGetInt("GENERALPREF", "RowLimit", 1000, dirstr.GetString());
 
 	return 1;
@@ -1897,18 +1897,18 @@ DeletePrivateProfileString(wyChar *strkey, wyChar *section, wyChar *filename)
     return retvalue;
 }
 
-wyBool 
+wyBool
 IsChunkInsert()
 {
 	wyWChar		*lpfileport=0;
 	wyWChar		directory[MAX_PATH +1] = {0};
 	wyString	dirstr;
-	wyInt32		ischunkinsert;	
-		
+	wyInt32		ischunkinsert;
+
 	// Get the complete path.
 	SearchFilePath( L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport);
 	dirstr.SetAs(directory);
-	
+
 	ischunkinsert = wyIni::IniGetInt("GENERALPREF", "SetMaxRow", 1, dirstr.GetString());
 
 	return (ischunkinsert == 1)?wyFalse:wyTrue;
@@ -1917,11 +1917,11 @@ IsChunkInsert()
 
 #endif
 
-wyInt32  
+wyInt32
 Comparestring(wyWChar **arg1, wyWChar **arg2)
 {
 #ifdef _WIN32
-   // Compare all of both strings: 
+   // Compare all of both strings:
    return _wcsicmp(*arg1, *arg2);
 #else
    wyString comparg1, comparg2;
@@ -1944,17 +1944,17 @@ GetMySqlDataType(MysqlDataType *rettypedata, MYSQL_FIELD *fields, wyInt32 fieldn
 		rettypedata->m_exceltype.SetAs("Number");
 		rettypedata->m_mysqltype.SetAs("decimal");
 		break;
-		
+
 	case MYSQL_TYPE_TINY:
 		rettypedata->m_exceltype.SetAs("Number");
 		rettypedata->m_mysqltype.SetAs("tinyint");
 		break;
-	
+
 	case MYSQL_TYPE_SHORT:
 		rettypedata->m_exceltype.SetAs("Number");
 		rettypedata->m_mysqltype.SetAs("smallint");
 		break;
-	
+
 	case MYSQL_TYPE_LONG:
 		rettypedata->m_exceltype.SetAs("Number");
 		rettypedata->m_mysqltype.SetAs("int");
@@ -1964,7 +1964,7 @@ GetMySqlDataType(MysqlDataType *rettypedata, MYSQL_FIELD *fields, wyInt32 fieldn
 		rettypedata->m_exceltype.SetAs("Number");
 		rettypedata->m_mysqltype.SetAs("float");
 		break;
-		
+
 	case MYSQL_TYPE_DOUBLE:
 		rettypedata->m_exceltype.SetAs("Number");
 		rettypedata->m_mysqltype.SetAs("double");
@@ -1974,7 +1974,7 @@ GetMySqlDataType(MysqlDataType *rettypedata, MYSQL_FIELD *fields, wyInt32 fieldn
 		rettypedata->m_exceltype.SetAs("Number");
 		rettypedata->m_mysqltype.SetAs("bigint");
 		break;
-			
+
 	case MYSQL_TYPE_BIT:
 		rettypedata->m_exceltype.SetAs("String");
 		rettypedata->m_mysqltype.SetAs("bit");
@@ -1984,22 +1984,22 @@ GetMySqlDataType(MysqlDataType *rettypedata, MYSQL_FIELD *fields, wyInt32 fieldn
 		rettypedata->m_exceltype.SetAs("Number");
 		rettypedata->m_mysqltype.SetAs("mediumint");
 		break;
-	
+
 	case MYSQL_TYPE_NEWDECIMAL:
 		rettypedata->m_exceltype.SetAs("Number");
 		rettypedata->m_mysqltype.SetAs("Decimal");
 		break;
-	
+
 	case MYSQL_TYPE_NULL:
 		rettypedata->m_exceltype.SetAs("String");
 		rettypedata->m_mysqltype.SetAs("NULL");
 		break;
-		
+
 	case MYSQL_TYPE_TIMESTAMP:
 		rettypedata->m_exceltype.SetAs("DateTime");
 		rettypedata->m_mysqltype.SetAs("timestamp");
 		break;
-		
+
 	case MYSQL_TYPE_DATE:
 		rettypedata->m_exceltype.SetAs("DateTime");
 		rettypedata->m_mysqltype.SetAs("date");
@@ -2014,7 +2014,7 @@ GetMySqlDataType(MysqlDataType *rettypedata, MYSQL_FIELD *fields, wyInt32 fieldn
 		rettypedata->m_exceltype.SetAs("DateTime");
 		rettypedata->m_mysqltype.SetAs("datetime");
 		break;
-		
+
 	case MYSQL_TYPE_YEAR:
 		rettypedata->m_exceltype.SetAs("DateTime");
 		rettypedata->m_mysqltype.SetAs("year");
@@ -2024,12 +2024,12 @@ GetMySqlDataType(MysqlDataType *rettypedata, MYSQL_FIELD *fields, wyInt32 fieldn
 		rettypedata->m_exceltype.SetAs("DateTime");
 		rettypedata->m_mysqltype.SetAs("newdate");
 		break;
-		
+
 	case MYSQL_TYPE_VARCHAR:
 		rettypedata->m_exceltype.SetAs("String");
 		rettypedata->m_mysqltype.SetAs("varchar");
 		break;
-		
+
 	case MYSQL_TYPE_VAR_STRING:
 		rettypedata->m_exceltype.SetAs("String");
 		rettypedata->m_mysqltype.SetAs("varchar");
@@ -2044,7 +2044,7 @@ GetMySqlDataType(MysqlDataType *rettypedata, MYSQL_FIELD *fields, wyInt32 fieldn
 		rettypedata->m_exceltype.SetAs("String");
 		rettypedata->m_mysqltype.SetAs("enum");
 		break;
-		
+
 	case MYSQL_TYPE_SET:
 		rettypedata->m_exceltype.SetAs("String");
 		rettypedata->m_mysqltype.SetAs("set");
@@ -2056,7 +2056,7 @@ GetMySqlDataType(MysqlDataType *rettypedata, MYSQL_FIELD *fields, wyInt32 fieldn
         else
             rettypedata->m_mysqltype.SetAs("text");
 		break;
-		
+
 	case MYSQL_TYPE_MEDIUM_BLOB:
 		rettypedata->m_exceltype.SetAs("String");
 		if(fields[fieldno].flags&BINARY_FLAG)
@@ -2080,7 +2080,7 @@ GetMySqlDataType(MysqlDataType *rettypedata, MYSQL_FIELD *fields, wyInt32 fieldn
         else
             rettypedata->m_mysqltype.SetAs("text");
 		break;
-	
+
 	case MYSQL_TYPE_JSON:
 		rettypedata->m_exceltype.SetAs("JSON");
         rettypedata->m_mysqltype.SetAs("JSON");
@@ -2116,7 +2116,7 @@ GetCommentString(wyString &commentstring)
 
 	else
 		commentstring.Strip(commentstring.GetLength() - newpos);
-			
+
 	return wyTrue;
 }
 
@@ -2127,7 +2127,7 @@ GetCharsetString(wyString &charsetstring)
     pos = charsetstring.Find("_", pos + 1);
 
 	charsetstring.Strip(charsetstring.GetLength() - (pos));
-		
+
 	return wyTrue;
 }
 
@@ -2139,11 +2139,11 @@ ReverseString(wyChar *text)
     wyString    str;
 
     str.SetAs(text);
-    
+
     temptext = (wyChar *)calloc(sizeof(wyChar), str.GetLength());
-    
+
     strcpy(temptext, text);
-    
+
     for(count = 0; count < str.GetLength(); count++)
     {
         text[count] = text[str.GetLength() - count -1];
@@ -2156,16 +2156,16 @@ wyBool
 UseDatabase(wyString &dbname, MYSQL *mysql, Tunnel *tunnel)
 {
 	wyString		query;
-	
+
 	wyInt32			ret;
 	MYSQL_RES		*res;
 
 	query.Sprintf("use `%s`", dbname.GetString());
-	
+
 	ret = HandleMySQLRealQuery(tunnel, mysql, query.GetString(), query.GetLength(), wyFalse);
 	if(ret)
 		return wyFalse;
-#ifdef _WIN32   
+#ifdef _WIN32
 	res = tunnel->mysql_store_result(mysql);
 	if(!res &&mysql->affected_rows == -1)
 		return wyFalse;
@@ -2182,9 +2182,9 @@ UseDatabase(wyString &dbname, MYSQL *mysql, Tunnel *tunnel)
 	return wyTrue;
 }
 
-wyInt32	
-HandleMySQLRealQuery(Tunnel *tunnel, MYSQL * mysql, const char * query, 
-					 unsigned long length, bool isbadforxml, bool batch, 
+wyInt32
+HandleMySQLRealQuery(Tunnel *tunnel, MYSQL * mysql, const char * query,
+					 unsigned long length, bool isbadforxml, bool batch,
 					 bool isend, bool * stop, bool isread, bool fksethttpimport)
 {
     wyBool			ismysql41 = wyFalse;
@@ -2194,7 +2194,7 @@ HandleMySQLRealQuery(Tunnel *tunnel, MYSQL * mysql, const char * query,
 
 	if(mysql->server_version)
         ismysql41 = IsMySQL41(NULL, &mysql);
-	
+
 	if(ismysql41 == wyFalse && isread == false)
 	{
 		query = cnvstr.Utf8toAnsi(query, length);
@@ -2219,14 +2219,14 @@ HandleMySQLRealQuery(Tunnel *tunnel, MYSQL * mysql, const char * query,
 #endif
 }
 
-wyInt32 
+wyInt32
 HandleSjaMySQLRealQuery(Tunnel * tunnel, MYSQL* mysql,const char * query, unsigned long len, bool isbatch, bool* stop)
 {
 	wyBool			ismysql41 = wyFalse;
 
 #ifdef _WIN32
 	ConvertString	cnvstr;
-	
+
 	if(mysql->server_version)
         ismysql41 = IsMySQL41(NULL, &mysql);
 
@@ -2234,7 +2234,7 @@ HandleSjaMySQLRealQuery(Tunnel * tunnel, MYSQL* mysql,const char * query, unsign
 	{
 		query = cnvstr.Utf8toAnsi(query, len);
 		len = strlen(query);
-	}	
+	}
 	return tunnel->mysql_real_query(mysql, query, len, (bool)IsBadforXML (query), isbatch, false, stop);
 #else
     wyString querystr;
@@ -2248,13 +2248,13 @@ HandleSjaMySQLRealQuery(Tunnel * tunnel, MYSQL* mysql,const char * query, unsign
     {
         query = querystr.GetAsAnsi();
         len = strlen(query);
-    }   
+    }
 	return ::mysql_real_query( mysql, query, len);
 #endif
 }
 
 #ifdef _WIN32
-void 
+void
 ExamineData(wyString &codepage, wyString &buffer)
 {
 	IMultiLanguage2		*mlang;
@@ -2262,7 +2262,7 @@ ExamineData(wyString &codepage, wyString &buffer)
     MIMECPINFO          codepageinfo;
 	wyInt32				length = 0, cnt = 1;
 	wyString			codepagestr;
-        
+
     if(buffer.GetString())
 	   length = buffer.GetLength();
 
@@ -2275,9 +2275,9 @@ ExamineData(wyString &codepage, wyString &buffer)
         codepage.SetAs("Unicode (UTF-8)");
         return;
     }
-       
+
     hr = CoCreateInstance(CLSID_CMultiLanguage, NULL, CLSCTX_INPROC_SERVER, IID_IMultiLanguage2,(void **)&mlang);
-    
+
     //hr = CoCreateInstance(__uuidof(CMultiLanguage), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMultiLanguage2),(void **)&mlang);
 
     if(SUCCEEDED(hr) == false)
@@ -2297,7 +2297,7 @@ ExamineData(wyString &codepage, wyString &buffer)
     }
     else
     {
-        codepage.SetAs("Unicode (UTF-8)");    
+        codepage.SetAs("Unicode (UTF-8)");
         mlang->Release();
 	    CoUninitialize();
         return;
@@ -2313,7 +2313,7 @@ wyInt32 DetectFileFormat(wyChar *pBuffer, wyInt32 pBytesRead, wyInt32 *pHeaderSi
     wyInt32 i;
     wyInt32 filelen = pBytesRead;
 
-    struct BomLookup bomlook[] = 
+    struct BomLookup bomlook[] =
     {
 	    // define longest headers first
 	    { 0xBFBBEF,	  3, NCP_UTF8	  },
@@ -2425,7 +2425,7 @@ CheckForUtf8(wyString &pBuffer)
                 }
             }
         }
-        
+
         if(j == 0) // non UTF8
         {
             isutf8 = wyFalse;
@@ -2458,7 +2458,7 @@ CheckForUtf8Bom(wyString &filename)
 	for(counter = 0; counter < 3; counter++)
 	{
 		 bytes[counter] = fgetc(fp);
-		 
+
 		 //239 = 0xEF, 187 = 0xBB and 191 = 0xBF are BOM's for UTF-8
 		 //if it is a utf-8 encoded file, here it is checked.
 		 if(bytes[counter] == 239 || bytes[counter] == 187 || bytes[counter] == 191)
@@ -2466,12 +2466,12 @@ CheckForUtf8Bom(wyString &filename)
 		 else
 			 break;
 	}
-	
+
 	if(bomcounter == 3)
 		isansifile = wyFalse;
 	else
 		isansifile = wyTrue;
-	
+
 	fclose(fp);
 	return isansifile;
 }
@@ -2504,7 +2504,7 @@ ConvertString::~ConvertString()
    m_utf8str = NULL;
 }
 
-wyWChar * 
+wyWChar *
 ConvertString::ConvertUtf8ToWideChar(wyChar* utf8str)
 {
     wyInt32  length;
@@ -2523,7 +2523,7 @@ ConvertString::ConvertUtf8ToWideChar(wyChar* utf8str)
 	return m_widestr;
 }
 
-wyWChar * 
+wyWChar *
 ConvertString::ConvertAnsiToWideChar(wyChar* ansistr)
 {
     wyInt32  length;
@@ -2542,7 +2542,7 @@ ConvertString::ConvertAnsiToWideChar(wyChar* ansistr)
 	return m_widestr;
 }
 
-wyChar* 
+wyChar*
 ConvertString::ConvertWideCharToUtf8(wyWChar * widestr)
 {
     wyInt32 length;
@@ -2558,7 +2558,7 @@ ConvertString::ConvertWideCharToUtf8(wyWChar * widestr)
     m_utf8str = AllocateBuff(length + 1);
 
 	WideCharToMultiByte(CP_UTF8, 0,(LPWSTR)widestr, -1,(LPSTR)m_utf8str, length, NULL, NULL);
-    
+
     return m_utf8str;
 }
 
@@ -2604,18 +2604,18 @@ GetForeignKeyInfo(wyString *showcreate, wyString &key, wyInt32 relno, FKEYINFOPA
 
 	if(key.GetLength())
 		key.Clear();
-	  
+
 	token = strtok((wyChar*)createstmt.GetString(), seps);
 
 	while(token && count < relno)
 	{
-		/* to know if the line has FK definition, we can check for either 
+		/* to know if the line has FK definition, we can check for either
 		   CONSTRAINT..FOREIGN KEY or REFERENCES
 		   but for triple sureity we check for all. its one in million chance
 		   if we will have all three in non-FK definition line */
-		
-		if(strstr(token, "CONSTRAINT")&& 
-			 strstr(token, "FOREIGN KEY")&& 
+
+		if(strstr(token, "CONSTRAINT")&&
+			 strstr(token, "FOREIGN KEY")&&
 			 strstr(token, "REFERENCES"))
 		{
 			/* it indeed is a reference so we add the definition in the grid */
@@ -2632,7 +2632,7 @@ GetForeignKeyInfo(wyString *showcreate, wyString &key, wyInt32 relno, FKEYINFOPA
 
 	if(count != relno)
         key.Clear();
-  
+
     //Gets all F-key detais and sets into a struct
 	if(fkeyparam)
 	{
@@ -2654,12 +2654,12 @@ GetForeignKeyDetails(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam, const wyChar*
 		return wyFalse;
 
 	fkey.SetAs(*fkeyinfo);
-		
+
 	if(!fkeyparam && !fkey.GetLength())
 		return wyFalse;
 
 	//Parse the Relationship infos and store it in to the structure
-	
+
 	//gets F-key name
 	retbool = GetConstraintName(&fkey, &constrintname);
 	if(retbool == wyFalse)
@@ -2669,7 +2669,7 @@ GetForeignKeyDetails(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam, const wyChar*
 	retbool = GetParentTable(&fkey, &parenttable, dbname ? &parentdb : NULL);
 	if(retbool == wyFalse)
 		return wyFalse;
-			
+
 	//Referenced table field(s) involved in the relationship
 	retbool = GetParentTableFlds(&fkey, fkeyparam);
 	if(retbool == wyFalse)
@@ -2679,18 +2679,18 @@ GetForeignKeyDetails(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam, const wyChar*
 	retbool = GetChildTableFlds(&fkey, fkeyparam);
 	if(retbool == wyFalse)
 		return wyFalse;
-			
+
 	//Gets the ON UPDATE option if any
 	updateoption    = GetOnFkeyOption(&fkey, fkeyparam);
 	fkeyparam->m_onupdate = updateoption;
-	
+
 	//Gets the ON DELETE option if any
 	deloption = GetOnFkeyOption(&fkey, fkeyparam, wyFalse);
 	fkeyparam->m_ondelete = deloption;
 
 	fkeyparam->m_constraint.SetAs(constrintname);
 	fkeyparam->m_parenttable.SetAs(parenttable);
-	
+
     if(!parentdb.GetLength() && dbname)
     {
         parentdb.SetAs(dbname);
@@ -2712,8 +2712,8 @@ GetConstraintName(wyString *fkeyinfo, wyString *constraintname)
 	if(!tok)
 		return wyFalse;
 
-	*tok = 0; 
-	constraintname->SetAs(fkey);	
+	*tok = 0;
+	constraintname->SetAs(fkey);
     constraintname->LTrim();
 
     wyChar  escchar = constraintname->GetCharAt(0);
@@ -2733,7 +2733,7 @@ GetConstraintName(wyString *fkeyinfo, wyString *constraintname)
 
     constraintname->Sprintf("\"%s\"",tmpstr.GetString());
 
-	return wyTrue;	
+	return wyTrue;
 }
 
 wyBool
@@ -2746,9 +2746,9 @@ GetParentTable(wyString *fkeyinfo, wyString *parenttable, wyString* parentdb)
     wyChar      encodedby = NULL;
 
     fkey.SetAs(*fkeyinfo);
-    
+
 	par = strstr((wyChar*)fkey.GetString(), "REFERENCES");
-	
+
     if(!par)
 		return wyFalse;
 
@@ -2756,7 +2756,7 @@ GetParentTable(wyString *fkeyinfo, wyString *parenttable, wyString* parentdb)
     temp.Erase(0, strlen("REFERENCES") + 1);
 
     encodedby = temp.GetCharAt(0);
-    
+
     wyString enclstr;
 
     enclstr.Sprintf("%c", encodedby);
@@ -2844,7 +2844,7 @@ GetParentTable(wyString *fkeyinfo, wyString *parenttable, wyString* parentdb)
             {
                 break;
             }
-        }     
+        }
 
         if(dotfound == wyTrue)
         {
@@ -2856,7 +2856,7 @@ GetParentTable(wyString *fkeyinfo, wyString *parenttable, wyString* parentdb)
             parentdb->Clear();
         }
     }
-    
+
     par = strtok(par, enclstr.GetString());
 	if(!par)
 		return wyFalse;
@@ -2867,7 +2867,7 @@ GetParentTable(wyString *fkeyinfo, wyString *parenttable, wyString* parentdb)
 	    if(!par)
 		    return wyFalse;
     }
-        
+
 	parenttable->SetAs(par);
 	*/
 
@@ -2884,9 +2884,9 @@ GetParentTable(wyString *fkeyinfo, wyString *parenttable, wyString* parentdb)
     wyBool      dotfound = wyFalse, backquotefound = wyFalse;
 
     fkey.SetAs(*fkeyinfo);
-    
+
 	par = strstr((wyChar*)fkey.GetString(), "REFERENCES");
-	
+
     if(!par)
         return wyFalse;
 
@@ -2952,9 +2952,9 @@ GetParentTable(wyString *fkeyinfo, wyString *parenttable, wyString* parentdb)
         if(!par)
 		    return wyFalse;
     }
-        
+
 	parenttable->SetAs(par);
-	
+
 	return wyTrue;
 }
 */
@@ -2965,11 +2965,11 @@ GetParentTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
 	wyString		fkey;
 	RelTableFldInfo *parentfldinfo = NULL;
 	List			parentfldlist;
-	
+
 	fkey.SetAs(*fkeyinfo);
-    
+
 	par = strstr((wyChar*)fkey.GetString(), "REFERENCES");
-	    
+
 	wyString    fk;
 
     if(par)
@@ -2992,7 +2992,7 @@ GetParentTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
     {
         if(fk.GetCharAt(ind) == enclosedstr.GetCharAt(0))
             nticks++;
-        
+
 
         if(nticks%2 == 1 && flag)
         {
@@ -3001,7 +3001,7 @@ GetParentTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
                 nticks = 0;
                 wyString tmpstr;
                 tmpstr.Sprintf("%c%c", enclosedstr.GetCharAt(0), enclosedstr.GetCharAt(0));
-                
+
                 colname.FindAndReplace(tmpstr.GetString(), enclosedstr.GetString());
 
                 parentfldinfo = new RelTableFldInfo(colname.GetString());
@@ -3042,16 +3042,16 @@ GetParentTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
 
     if(flag == wyFalse)
         return wyFalse;
-    
-    
-    
+
+
+
 
 
 
     /*
     par = strtok(par, "`");
-	par = strtok(NULL, "`");	
-	par = strtok(NULL, "`");	
+	par = strtok(NULL, "`");
+	par = strtok(NULL, "`");
 	if(!par)
 		return wyFalse;
 
@@ -3062,25 +3062,25 @@ GetParentTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
     }
     while(par)
 	{
-		par = strtok(NULL, "`"); 
+		par = strtok(NULL, "`");
 		if(!par)
 			break;
 
 		ret = strcmp(par, ")");
 		if(!ret)
 			break;
-		
-		parentfldinfo = new RelTableFldInfo(par); 
+
+		parentfldinfo = new RelTableFldInfo(par);
 		if(parentfldinfo)
 			*fkeyparam->m_pkeyfldlist->Insert(parentfldinfo);
-		
-		par = strtok(NULL, "`"); 		
-	}	
+
+		par = strtok(NULL, "`");
+	}
     */
-	return wyTrue;	
+	return wyTrue;
 }
 
-wyBool			
+wyBool
 GetChildTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
 {
 	wyChar			*par;
@@ -3089,14 +3089,14 @@ GetChildTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
 	RelTableFldInfo *childfldinfo = NULL;
 
 	fkey.SetAs(*fkeyinfo);
-    
+
 	par = strstr((wyChar*)fkey.GetString(), "FOREIGN KEY (");
-	
+
 	///in cluster version 7.3.0 the show create table returns "FOREIGN KEY(" instead of "FOREIGN KEY ("
 	if(!par)
 		par = strstr((wyChar*)fkey.GetString(), "FOREIGN KEY(");
     wyString fk;
-    
+
     if(par)
         fk.SetAs(par);
 
@@ -3117,9 +3117,9 @@ GetChildTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
     {
         if(fk.GetCharAt(ind) == enclosedby)
 			nticks++;
-        
+
         colname.AddSprintf("%c", fk.GetCharAt(ind));
-        
+
         //..checking for the enclosing backtick
 		if(nticks%2 == 1)
 		{
@@ -3130,8 +3130,8 @@ GetChildTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
 				colname.Strip(1);
                 if(enclosedby == '`')
                     colname.FindAndReplace("``", "`");
-                
-                childfldinfo = new RelTableFldInfo(colname.GetString()); 
+
+                childfldinfo = new RelTableFldInfo(colname.GetString());
 		        if(childfldinfo)
 		        {
 			        *fkeyparam->m_fkeyfldlist->Insert(childfldinfo);
@@ -3145,7 +3145,7 @@ GetChildTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
                 ind++;
                 while(fk.GetCharAt(ind) != enclosedby)
                     ind++;
-                
+
                 //..reseting variable
                 nticks = 0;
                 //..Reseting the variable
@@ -3154,7 +3154,7 @@ GetChildTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam)
 		}
         ind++;
     }
-	return wyTrue;	
+	return wyTrue;
 }
 
 //Function gets corresponding F-key option : ON DELETE or ON UPDATE if defined
@@ -3169,7 +3169,7 @@ GetOnFkeyOption(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam, wyBool isupdate)
 
 	update = strstr((wyChar*)fkey.GetString(), "ON UPDATE");
 	del = strstr((wyChar*)fkey.GetString(), "ON DELETE");
-	
+
 	if(!update && !del)
 		return NOOPTION;
 
@@ -3178,17 +3178,17 @@ GetOnFkeyOption(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam, wyBool isupdate)
 		if(!update)
 			return NOOPTION;
 
-		tempbuf.SetAs(update);        
+		tempbuf.SetAs(update);
 		pos = tempbuf.Find("ON UPDATE", 0);
 		if(pos == -1)
 			return NOOPTION;
 
 		tempbuf.Erase(pos, strlen("ON UPDATE"));
 		tempbuf.LTrim();
-		tempbuf.RTrim();		
+		tempbuf.RTrim();
 	}
 	else
-	{	
+	{
 		if(!del)
 			return NOOPTION;
 
@@ -3205,7 +3205,7 @@ GetOnFkeyOption(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam, wyBool isupdate)
 			pos = tempbuf.Find("ON DELETE", 0);
 			tempbuf.Erase(pos, strlen("ON DELETE"));
 			tempbuf.LTrim();
-			tempbuf.RTrim();		
+			tempbuf.RTrim();
 		}
 
 		else if(del && !update)
@@ -3233,9 +3233,9 @@ GetOnFkeyOption(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam, wyBool isupdate)
 
 	else if(!tempbuf.Compare("NO ACTION"))
 		return NOACTION;
-	
+
 	else
-		return NOOPTION;	
+		return NOOPTION;
 }
 
 wyBool
@@ -3244,7 +3244,7 @@ GetDbCollation(Tunnel *tunnel, MYSQL *mysql, wyString &collation)
     MYSQL_RES   *myres;
     MYSQL_ROW   myrow;
 	wyString	query;
-    query.SetAs("SHOW VARIABLES LIKE 'collation_database';");    
+    query.SetAs("SHOW VARIABLES LIKE 'collation_database';");
     myres = SjaExecuteAndGetResult(tunnel, &mysql, query);
     if(!myres)
     {
@@ -3253,10 +3253,10 @@ GetDbCollation(Tunnel *tunnel, MYSQL *mysql, wyString &collation)
 	}
 
     myrow =tunnel->mysql_fetch_row(myres);
-    
+
     if(myrow[1])
         collation.SetAs(myrow[1]);
-    
+
     if(myres)
         tunnel->mysql_free_result(myres);
 
@@ -3269,7 +3269,7 @@ GetServerDefaultCharset(Tunnel *tunnel, MYSQL *mysql, wyString &charset, wyStrin
     MYSQL_RES   *myres;
     MYSQL_ROW   myrow;
 
-    query.SetAs("show variables like '%character%';");    
+    query.SetAs("show variables like '%character%';");
     myres = SjaExecuteAndGetResult(tunnel, &mysql, query);
     if(!myres)
     {
@@ -3278,21 +3278,21 @@ GetServerDefaultCharset(Tunnel *tunnel, MYSQL *mysql, wyString &charset, wyStrin
 	}
 
     myrow =tunnel->mysql_fetch_row(myres);
-    
+
     if(myrow[1])
         charset.SetAs(myrow[1]);
-    
+
     if(myres)
         tunnel->mysql_free_result(myres);
 
     return wyTrue;
 }
-#endif // _WIN32 
+#endif // _WIN32
 
 // helper function to get the column length in bytes for a given col
-// mysql_fetch_lengths() is valid only for the current row of the result set. 
-// It returns NULL if you call it before calling mysql_fetch_row() or 
-// after retrieving all rows in the result. 
+// mysql_fetch_lengths() is valid only for the current row of the result set.
+// It returns NULL if you call it before calling mysql_fetch_row() or
+// after retrieving all rows in the result.
 void
 GetColLength(MYSQL_ROW row, wyInt32 numcols, wyInt32 col, wyUInt32 *len)
 {
@@ -3305,12 +3305,12 @@ GetColLength(MYSQL_ROW row, wyInt32 numcols, wyInt32 col, wyUInt32 *len)
 #else
     unsigned char *start = 0;
 #endif
-    
+
 	MYSQL_ROW   end;
 
     VERIFY (len);
 	arr = lengtharray;
-	
+
 	if(!column)
 		return;
 
@@ -3318,12 +3318,12 @@ GetColLength(MYSQL_ROW row, wyInt32 numcols, wyInt32 col, wyUInt32 *len)
 	{
 		if (!column || !*column)
 		{
-			*arr= 0;				
+			*arr= 0;
             continue;
 		}
-		
-		if(start)					
-        {   
+
+		if(start)
+        {
 #ifdef _WIN32
 			*plen = (wyUInt32)((byte*)*column - start - 1);
 #else
@@ -3335,39 +3335,39 @@ GetColLength(MYSQL_ROW row, wyInt32 numcols, wyInt32 col, wyUInt32 *len)
 #else
         start= (unsigned char*)*column;
 #endif
-		
+
 		plen = arr;
 	}
-	
+
 	*len = lengtharray[col];
 }
 
 wyBool IsDatabaseValid(wyString &dbname, MYSQL *mysql, Tunnel *tunnel)
-{	
+{
 	wyBool      flag = wyTrue;
 
 #if defined _WIN32 && ! defined  _CONSOLE
 	wyWChar		*tempfilter, *filterdatabase;
 	wyUInt32	length = 1;
 	wyString    db;
-	
+
 	dbname.GetAsWideChar(&length);
-    tempfilter = AllocateBuffWChar(length + 1); 
+    tempfilter = AllocateBuffWChar(length + 1);
 	wcsncpy(tempfilter, dbname.GetAsWideChar(), length);
 	filterdatabase = wcstok(tempfilter, L";");
 
 	while(filterdatabase)
-	{	
+	{
 		db.SetAs(filterdatabase);
-        flag = UseDatabase(db, mysql, tunnel);	
+        flag = UseDatabase(db, mysql, tunnel);
 		if(flag == wyFalse)
 			break;
 		filterdatabase = wcstok(NULL, L";");
 	}
-    
+
     free(tempfilter);
 #endif
-	
+
 	return flag;
 }
 // before starting transaction set autocommit equal to zero
@@ -3394,7 +3394,7 @@ EndTransaction(Tunnel *tunnel, MYSQL *mysql)
 {
 	wyString query;
 	MYSQL_RES *res;
-	
+
 	query.Sprintf("commit");
 	res = SjaExecuteAndGetResult(tunnel, &mysql, query);
 
@@ -3409,12 +3409,12 @@ EndTransaction(Tunnel *tunnel, MYSQL *mysql)
 //Handles the ssh reconnection
 bool	   ReConnectSSH(ConnectionInfo *coninfo)
 {
-#if ! defined COMMUNITY	&& defined _WIN32	
-	wyInt32					sshret;    
+#if ! defined COMMUNITY	&& defined _WIN32
+	wyInt32					sshret;
 	HANDLE					hsqlyogmapfile = NULL;
 	PROCESS_INFORMATION     pi;
 
-	if(coninfo->m_hprocess != INVALID_HANDLE_VALUE) 
+	if(coninfo->m_hprocess != INVALID_HANDLE_VALUE)
 	{
 		//If SSH connection then close handles at end
 		if(coninfo->m_isssh == wyTrue)
@@ -3422,22 +3422,22 @@ bool	   ReConnectSSH(ConnectionInfo *coninfo)
 
 		if(coninfo->m_sshsocket)
 			closesocket(coninfo->m_sshsocket);
-           
+
 		coninfo->m_sshsocket = NULL;
 
 		TerminateProcess(coninfo->m_hprocess, 1);
 	}
-	
+
 	sshret = CreateSSHSession(coninfo, &pi, hsqlyogmapfile);
 
 	if(sshret)
-	{	
+	{
 #ifndef _CONSOLE
 		if(sshret != 1)//==1 if CreateProcess() is failed
 			ShowSSHError(NULL);
 //#else
 		//ShowSSHError();// it needs when we implement connect for sja features
-#endif 
+#endif
 		if(hsqlyogmapfile)
           VERIFY(CloseHandle(hsqlyogmapfile));
 
@@ -3458,12 +3458,12 @@ bool	   ReConnectSSH(ConnectionInfo *coninfo)
 	coninfo->m_hprocess      = pi.hProcess;
 
 #endif
-	
+
     return wyTrue;
 }
 
 //Instantiate the plink
-#ifdef WIN32 
+#ifdef WIN32
 wyInt32
 CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hmapfile)
 {
@@ -3474,7 +3474,7 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
 	wyString				appname ; //"c:\\temp\\plink.exe -ssh -l rohit -pw amkette -L 3307:127.0.0.1:3306 127.0.0.1";
 	wyChar					fullpath[MAX_PATH*2] = {0};
 	STARTUPINFO				si;
-	SECURITY_ATTRIBUTES		saattr; 
+	SECURITY_ATTRIBUTES		saattr;
 	HANDLE					mutex = NULL, hReadPipe = NULL, hWritePipe = NULL;
 	DWORD					retmutex;
 	wyFile					plinklock;
@@ -3518,16 +3518,16 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
 	escpass.FindAndReplace("\"","\"\"");
     if(conninfo->m_ispassword == wyTrue)
     {
-	    appname.Sprintf("\"%s\" -ssh -l \"%s\" -pw \"%s\" -L %d:%s:%d -P %d \"%s\"", 
-						fullpath, escuser.GetString(), escpass.GetString(), 
-                        conninfo->m_localport, conninfo->m_host.GetString(), conninfo->m_port, 
+	    appname.Sprintf("\"%s\" -ssh -l \"%s\" -pw \"%s\" -L %d:%s:%d -P %d \"%s\"",
+						fullpath, escuser.GetString(), escpass.GetString(),
+                        conninfo->m_localport, conninfo->m_host.GetString(), conninfo->m_port,
                         conninfo->m_sshport, conninfo->m_sshhost.GetString());
     }
     else
     {
-        appname.Sprintf("\"%s\" -ssh -l \"%s\" -pw \"%s\" -L %d:%s:%d -P %d %s -i \"%s\"", 
-						fullpath, escuser.GetString(), escpass.GetString(), 
-                        conninfo->m_localport, conninfo->m_host.GetString(), conninfo->m_port, 
+        appname.Sprintf("\"%s\" -ssh -l \"%s\" -pw \"%s\" -L %d:%s:%d -P %d %s -i \"%s\"",
+						fullpath, escuser.GetString(), escpass.GetString(),
+                        conninfo->m_localport, conninfo->m_host.GetString(), conninfo->m_port,
                         conninfo->m_sshport, conninfo->m_sshhost.GetString(), conninfo->m_privatekeypath.GetString());
 
     }
@@ -3536,12 +3536,12 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
 	memset(&si, 0, sizeof(si));
 	memset(pi, 0, sizeof(pi));
 	memset(&saattr, 0, sizeof(saattr));
-	
+
 	/* Set the bInheritHandle flag so pipe handles are inherited. */
-	saattr.nLength = sizeof(SECURITY_ATTRIBUTES); 
-	saattr.bInheritHandle = TRUE; 
+	saattr.nLength = sizeof(SECURITY_ATTRIBUTES);
+	saattr.bInheritHandle = TRUE;
 	saattr.lpSecurityDescriptor = NULL;
-	
+
 	VERIFY(CreatePipe(&hReadPipe, &hWritePipe, &saattr, 0));
 	HANDLE hReadPipe2, hWritePipe2;
 	VERIFY(CreatePipe(&hReadPipe2, &hWritePipe2, &saattr, 0));
@@ -3557,7 +3557,7 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
 #ifndef _CONSOLE
 	//EnterCriticalSection(&pGlobals->m_csiniglobal);
 #endif
-		
+
 	prret = CreateProcess(NULL, (wyWChar*)appname.GetAsWideChar(), NULL, NULL, TRUE, 0, NULL, NULL, &si, pi);
 
 	if(prret == 0)
@@ -3569,8 +3569,8 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
 #ifndef _CONSOLE
 		DisplayErrorText(GetLastError(), _("FATAL ERROR: Network error: Connection timed out"));
 		//LeaveCriticalSection(&pGlobals->m_csiniglobal);
-#endif	
-		
+#endif
+
 		return 1;		/* createprocess failed */
 	}
 
@@ -3594,11 +3594,11 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
 
     if(retmutex==WAIT_OBJECT_0)
         return 0;
-    
+
 	if(sflag)
 		return 0;
 	else {
-		
+
 		/* this happens when the create process was success but not connected so we have to terminate the process */
 		//If SSH connection then close handles at end
 		if(conninfo->m_isssh == wyTrue)
@@ -3606,12 +3606,12 @@ CreateSSHSession(ConnectionInfo *conninfo, PROCESS_INFORMATION * pi, HANDLE &hma
 
 		if(conninfo->m_sshsocket)
 			closesocket(conninfo->m_sshsocket);
-           
+
 		conninfo->m_sshsocket = NULL;
 
 		TerminateProcess(pi->hProcess, 1);
 		pi->hProcess = INVALID_HANDLE_VALUE;
-		
+
 		return 2;
 	}
 
@@ -3630,9 +3630,9 @@ OnExitSSHConnection(PIPEHANDLES *sshpipehanles)
 
 	//Executing the exit command to solve issue reporte at tickt #7953(Not stopping BASH.exe when terminating plink)
 	WriteFile(sshpipehanles->m_hwritepipe2, buffer, 5, &lpbytes, NULL);
-	
+
 	Sleep(200);
-	
+
 	if(sshpipehanles->m_hreadpipe != INVALID_HANDLE_VALUE)
 		CloseHandle(sshpipehanles->m_hreadpipe);
 
@@ -3659,17 +3659,17 @@ bool	   HandleReconnect(Tunnel *tunnel, PMYSQL mysql, ConnectionInfo *coninfo, c
 #ifdef _WIN32
 
 	wyString	currentdb;
-	
+
 	//database name for issuing database name
 	if(dbname)
 		currentdb.SetAs(dbname);
-	
-#ifndef COMMUNITY			
+
+#ifndef COMMUNITY
 	if(coninfo && coninfo->m_isssh == wyTrue)
-	{   
+	{
 		//for ssh connection
 		if(!ReConnectSSH(coninfo))
-			return false;		
+			return false;
 	}
 
 	/*
@@ -3677,23 +3677,23 @@ bool	   HandleReconnect(Tunnel *tunnel, PMYSQL mysql, ConnectionInfo *coninfo, c
     {
         if(coninfo->m_issslauthchecked == wyTrue)
         {
-            mysql_ssl_set(newmysql, coninfo->m_clikey.GetString(), coninfo->m_clicert.GetString(), 
-                            coninfo->m_cacert.GetString(), NULL, 
+            mysql_ssl_set(newmysql, coninfo->m_clikey.GetString(), coninfo->m_clicert.GetString(),
+                            coninfo->m_cacert.GetString(), NULL,
                             coninfo->m_cipher.GetLength() ? coninfo->m_cipher.GetString() : NULL);
         }
         else
         {
-            mysql_ssl_set(newmysql, NULL, NULL, 
-                            coninfo->m_cacert.GetString(), NULL, 
+            mysql_ssl_set(newmysql, NULL, NULL,
+                            coninfo->m_cacert.GetString(), NULL,
                             coninfo->m_cipher.GetLength() ? coninfo->m_cipher.GetString() : NULL);
         }
     }*/
 #endif
-	
-	
+
+
 	if(currentdb.GetLength() &&  UseDatabase(currentdb, *mysql, tunnel) == wyFalse)
 		return false;
-			    
+
 	/* if its tunnel then we need the server version */
 	if(tunnel->IsTunnel())
     {
@@ -3703,10 +3703,10 @@ bool	   HandleReconnect(Tunnel *tunnel, PMYSQL mysql, ConnectionInfo *coninfo, c
             return false;
         }
     }
-	
+
 #endif
 
-	return true;	
+	return true;
 }
 
 //Sets the fefault sql mode
@@ -3715,7 +3715,7 @@ SetDefSqlMode(Tunnel *tunnel, MYSQL *mysql)
 {
 	wyString    query;
 	MYSQL_RES   *res;
-	
+
 	query.Sprintf("set sql_mode=''");
 
     res = SjaExecuteAndGetResult(tunnel, &mysql, query);
@@ -3733,7 +3733,7 @@ SetCharacterSet(Tunnel *tunnel, MYSQL *mysql, wyString &cpname)
 	wyString		query;
 	MYSQL_RES		*res;
 	wyBool			ismysql41 = IsMySQL41(tunnel, &mysql);
-    
+
 #ifdef _WIN32
 	if(tunnel->IsTunnel())
 	{
@@ -3746,9 +3746,9 @@ SetCharacterSet(Tunnel *tunnel, MYSQL *mysql, wyString &cpname)
 
 	if(ismysql41 == wyTrue)
 	{
-		query.Sprintf("set names '%s'", "utf8");	
+		query.Sprintf("set names '%s'", "utf8");
         res = SjaExecuteAndGetResult(tunnel, &mysql, query);
-		
+
 		if(res)
 			sja_mysql_free_result(tunnel, res);
 	}
@@ -3761,7 +3761,7 @@ GetSjaExecPath(wyChar *buffer)
     wyWChar     directory[MAX_PATH + 1]={0}, *lpfileport=0;
 	DWORD       ret;
 	wyString	dirstr;
-	
+
 	ret = SearchFilePath(L"sja.exe", NULL, MAX_PATH, directory, &lpfileport);
 
 	if(ret == 0)
@@ -3799,21 +3799,21 @@ ReleaseMemory(List *list)
 	SelectedObjects *elem;
 	if(!list)
 		return ;
-	elem =  (SelectedObjects*)list->GetFirst();		
+	elem =  (SelectedObjects*)list->GetFirst();
 	while(elem)
 	{
-		temp = (SelectedObjects*)elem->m_next;		
-		elem->m_selobject.Clear();		
-		list->Remove(elem);		
+		temp = (SelectedObjects*)elem->m_next;
+		elem->m_selobject.Clear();
+		list->Remove(elem);
 		delete elem;
 		elem = temp;
-	}	
+	}
 }
 
-void 
+void
 commonlog(const char * buff)
 {
-	
+
 	//wyString    strpath, fullpathstr;
 	//FILE        *fp;
 	////wyString	filenamestr, extensionstr;
@@ -3853,9 +3853,9 @@ WriteToLogFile(wyChar *message)
     wyWChar      filepath[MAX_PATH] = {0};
 	wyString     errfile;
 	FILE		*err;
-	
+
 	errfile.SetAs(message);
-	MessageBox(NULL, errfile.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONERROR | MB_OK | MB_TASKMODAL);         
+	MessageBox(NULL, errfile.GetAsWideChar(), pGlobals->m_appname.GetAsWideChar(), MB_ICONERROR | MB_OK | MB_TASKMODAL);
 
 	SearchFilePath(L"sqlyog", L".err", MAX_PATH, (wyWChar*)filepath, &lpFilePort);
 	errfile.SetAs(filepath);
@@ -3872,8 +3872,8 @@ WriteToLogFile(wyChar *message)
 		return wyFalse;
 
 	fprintf(logfilehandle, "\n%s", message);
-	
-#endif		
+
+#endif
 
 	return wyTrue;
 }
@@ -3912,15 +3912,15 @@ SetMySQLOptions(ConnectionInfo *conn, Tunnel *tunnel, PMYSQL pmysql, wyBool isse
 {
 	wyString		strtimeout, sqlmode;
 	wyInt32		timeout = 0;
-	
+
 	if(!conn || !tunnel)
 		return;
-    
+
 	if(issetcharset == wyTrue)
 		mysql_options(*pmysql, MYSQL_SET_CHARSET_NAME, "utf8");
-    
+
 	mysql_options(*pmysql, MYSQL_OPT_RECONNECT,(const char *)"true");
-    
+
 	//Set Compress protocol
 	if(conn->m_iscompress == wyTrue)
 		mysql_options(*pmysql, MYSQL_OPT_COMPRESS, 0);
@@ -3949,15 +3949,15 @@ SetMySQLOptions(ConnectionInfo *conn, Tunnel *tunnel, PMYSQL pmysql, wyBool isse
 	mysql_options(*pmysql,MYSQL_PLUGIN_DIR ,wyDir.GetString());
 #else
 
-   
+
 	char cwd[1024];
 	int len = strlen(getcwd(cwd, sizeof(cwd)-2));
-	if (getcwd(cwd, sizeof(cwd)) != NULL) 
+	if (getcwd(cwd, sizeof(cwd)) != NULL)
 	{
 		cwd[len]='/';
 		cwd[len+1] = '\0';
 	}
-	
+
 	mysql_options(*pmysql,MYSQL_PLUGIN_DIR ,cwd);
 #endif
     //mysql_options(*pmysql, MYSQL_OPT_LOCAL_INFILE, NULL);
@@ -3967,13 +3967,13 @@ SetMySQLOptions(ConnectionInfo *conn, Tunnel *tunnel, PMYSQL pmysql, wyBool isse
 	//SQL_MODE
 #ifdef _WIN32
 	if(conn->m_isglobalsqlmode == wyFalse)
-	{	
+	{
 		sqlmode.Sprintf("/*!40101 SET SQL_MODE='%s' */", conn->m_sqlmode.GetString());
-		mysql_options(*pmysql, MYSQL_INIT_COMMAND, sqlmode.GetString());		
+		mysql_options(*pmysql, MYSQL_INIT_COMMAND, sqlmode.GetString());
 	}
 #else
 	sqlmode.SetAs("/*!40101 SET SQL_MODE=''*/");
-	mysql_options(*pmysql, MYSQL_INIT_COMMAND, sqlmode.GetString());		
+	mysql_options(*pmysql, MYSQL_INIT_COMMAND, sqlmode.GetString());
 #endif
 
 
@@ -3988,10 +3988,10 @@ SetMySQLOptions(ConnectionInfo *conn, Tunnel *tunnel, PMYSQL pmysql, wyBool isse
 }
 
 //Gets the field inforamtion of the view
-wyBool  
+wyBool
 DumpViewStruct(wyString * buffer, Tunnel * tunnel, const wyChar *view, MYSQL_RES  *res)
 {
-    
+
     MYSQL_ROW   row;
     wyInt32     fieldval, typeval;
 	wyBool      isfirst = wyTrue;
@@ -4006,17 +4006,17 @@ DumpViewStruct(wyString * buffer, Tunnel * tunnel, const wyChar *view, MYSQL_RES
 	{
 		if(isfirst == wyFalse)
 			buffer->Add(",\n");
-		
+
 		if(row[fieldval])
 		{
             value.SetAs(row[fieldval]);
             value.FindAndReplace("`", "``");
             buffer->AddSprintf(" `%s` ", value.GetString());
         }
-		
+
         if(row[typeval])
 			buffer->AddSprintf("%s ", row[typeval]);
-		
+
 		isfirst = wyFalse;
 	}
 
@@ -4039,11 +4039,11 @@ GetTableEngine(Tunnel * tunnel, MYSQL *mysql, const wyChar *tablename, const wyC
     res = SjaExecuteAndUseResult(tunnel, mysql, query);
 	if(!res)
 		return wyFalse;
-	
+
 	engineindex = (IsMySQL41(tunnel, &mysql) == wyTrue) ? GetFieldIndex(tunnel, res, "Engine") : GetFieldIndex(tunnel, res, "Type");
-	
+
 	VERIFY(myrow = sja_mysql_fetch_row(tunnel, res));
-	
+
 	if(!myrow || !myrow[engineindex] || engineindex == -1)
 	{
 		if(res)
@@ -4065,8 +4065,8 @@ wyInt32
 GetLocalEmptyPort(ConnectionInfo *con)
 {
 	wyInt32 namelen = 0, retval = 0, ret, port = 0;
-#ifdef _WIN32	
-	SOCKET	psocket;		
+#ifdef _WIN32
+	SOCKET	psocket;
 	sockaddr_in name;
 
 	memset(&name,0, sizeof(sockaddr_in));
@@ -4101,7 +4101,7 @@ GetLocalEmptyPort(ConnectionInfo *con)
 		con->m_sshsocket = NULL;
 		return -1;
 	}
-		
+
 	port = ntohs(name.sin_port);
 
 	con->m_localport = port;
@@ -4110,26 +4110,26 @@ GetLocalEmptyPort(ConnectionInfo *con)
 	/*Handle the local port in between processe and threads
 	- Concern is time lap between closesocket and PLINK, another SQLyog/sja could get the same port.
 	- To avoid this we keep a file open and it would close only once the PLINK is connected
-	-Also we always allow connect plink whether the 'lock-file' functionalites got failed or not 
+	-Also we always allow connect plink whether the 'lock-file' functionalites got failed or not
 	*/
 	//if(LockPlinkLockFile(plinklock) == wyFalse)
 	//{
 	//	closesocket(psocket);
-	//	con->m_sshsocket = NULL;	
-	//	
+	//	con->m_sshsocket = NULL;
+	//
 	//	return port;
 	//}
 
 	if(psocket)
 		closesocket(psocket);
 
-	
+
 	psocket = NULL;
-	
+
 	con->m_sshsocket = NULL;
 
 #endif
-	
+
 	return port;
 }
 #endif
@@ -4142,47 +4142,47 @@ InitWinSock()
 	WSADATA data;
 
 	ver = MAKEWORD(2, 0);
-	VERIFY(WSAStartup(ver, &data)== 0);	
-#endif 
+	VERIFY(WSAStartup(ver, &data)== 0);
+#endif
 	return wyTrue;
 }
 
 #if defined _WIN32
-wyBool 
-LockPlinkLockFile(wyFile *plinklock) 
-{		
+wyBool
+LockPlinkLockFile(wyFile *plinklock)
+{
 	//wyInt32 trycount = 1;
 	wyString tempfile;
 
 	if(!plinklock)
 		return wyFalse;
-	
+
 	//Gets the temp folder path
 	if(plinklock->GetTempFilePath(&tempfile) == wyFalse)
 		return wyFalse;
-	    
+
 	tempfile.Add("SQLyog_session.tmp");
-	
+
 	// make sure you are setting file before calling any common function
 	plinklock->SetFilename(&tempfile);
 
 	//do
 	//{
-		if (plinklock->CheckIfFileExists() == wyFalse || 
+		if (plinklock->CheckIfFileExists() == wyFalse ||
 			plinklock->RemoveFile())
 		{
 			if(plinklock->OpenWithPermission(GENERIC_WRITE, CREATE_NEW) != -1)
 			{
-				return wyTrue;				
-			}			
+				return wyTrue;
+			}
 		}
-		
+
 		//Sleep(PLINK_LOCK_WAIT);
-		//trycount++;		
-	
+		//trycount++;
+
 	//}while(trycount <= PLINK_LOCK_WAIT_TRY_COUNT);
-	
-	return wyFalse;	
+
+	return wyFalse;
 }
 #endif
 
@@ -4191,19 +4191,19 @@ LockPlinkLockFile(wyFile *plinklock)
 -Its for killing plink.exe when user click on 'Terminate' button on wizard to terminate SJA.exe
 */
 #ifdef _WIN32
-void			
+void
 KillProcessTree(HANDLE parentproc)
 {
 	BOOL			bContinue = TRUE;
 	unsigned long	procid = 0;
 	PROCESSENTRY32	pe;
 	HANDLE			hChildProc = NULL, hSnap = NULL;
-	
+
 	procid = GetProcessId(parentproc);
-		
+
 	memset(&pe, 0, sizeof(PROCESSENTRY32));
 	pe.dwSize = sizeof(PROCESSENTRY32);
-	
+
 	hSnap = :: CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 
 	if (::Process32First(hSnap, &pe))
@@ -4222,16 +4222,16 @@ KillProcessTree(HANDLE parentproc)
 				if (hChildProc)
 				{
 					::TerminateProcess(hChildProc, 1);
-					::CloseHandle(hChildProc);												
-				}                               
+					::CloseHandle(hChildProc);
+				}
 			}
 			bContinue = ::Process32Next(hSnap, &pe);
-		}						
-	}		
+		}
+	}
 }
 #endif
 
-void 
+void
 InitConnectionDetails(ConnectionInfo *conn)
 {
     conn->m_port =0;
@@ -4248,19 +4248,19 @@ InitConnectionDetails(ConnectionInfo *conn)
     conn->m_issslchecked        = wyFalse;
     conn->m_issslauthchecked    = wyFalse;
     conn->m_issslchecked        = wyFalse;
-	conn->m_iscompress			= wyTrue;	
+	conn->m_iscompress			= wyTrue;
 	conn->m_isdeftimeout		= wyTrue;
-	conn->m_strwaittimeout.SetAs("28800"); 
+	conn->m_strwaittimeout.SetAs("28800");
 	conn->m_isreadonly			= wyFalse;
 	conn->m_isencrypted = 0;
 	//conn->m_ispwdcleartext		= wyFalse;
 
-#ifdef _WIN32	
+#ifdef _WIN32
 	conn->m_isglobalsqlmode		= wyFalse;
 	conn->m_rgbconn				= RGB(255, 255, 255);
 	conn->m_rgbfgconn				= RGB(0, 0, 0);
 #endif
-	    
+
     return;
 }
 
@@ -4268,8 +4268,8 @@ InitConnectionDetails(ConnectionInfo *conn)
 //the function is intentianally made like GetForeignKeyInfo for compliance with the existing code, thus ignoring the room for improvement
 wyBool
 GetForeignKeyInfo50(MYSQL_RES* myres, Tunnel* ptunnel, wyInt32 relno, FKEYINFOPARAM* pfkinfoparam)
-{ 
-#ifdef _WIN32	
+{
+#ifdef _WIN32
 
 	wyString    constraint, temp;
     MYSQL_ROW   myrow;
@@ -4348,7 +4348,7 @@ GROUP BY `CONSTRAINT_NAME`, \
     wyString    query;
 
     query.Sprintf(constraintquery,
-        dbname, dbname, dbname, tablename, 
+        dbname, dbname, dbname, tablename,
         dbname, dbname, tablename);
 
     myres = SjaExecuteAndGetResult(ptunnel, pmysql, query);
@@ -4382,8 +4382,8 @@ IsDatatypeNumeric(wyString  &datatype)
 wyBool
 IsDatatypeDeprecatedSizeType(wyString  &datatype)
 {
-	if (!(		
-		datatype.CompareI("tinyint") == 0 ||		
+	if (!(
+		datatype.CompareI("tinyint") == 0 ||
 		datatype.CompareI("smallint") == 0 ||
 		datatype.CompareI("mediumint") == 0 ||
 		datatype.CompareI("int") == 0 ||
@@ -4402,12 +4402,12 @@ DecodePassword_Absolute(wyString &text)
 	wyChar      pwd[512]={0}, pwdutf8[512] = {0};
 
 	strcpy(pwdutf8, text.GetString());
-	
+
 	DecodeBase64(pwdutf8, pwd);
 	RotateBitLeft((wyUChar*)pwd);
 	strncpy(pwdutf8, pwd, 511);
 	text.SetAs(pwdutf8);
-	
+
 	return wyTrue;
 }
 
@@ -4426,7 +4426,7 @@ RotateBitRight(wyUChar *str)
 
 // We keep the name in encrypted form.
 // so we do a bit rotation of 1 on the left before writing it into the registry.
-void 
+void
 RotateBitLeft(wyUChar *str)
 {
 	wyInt32     count;
@@ -4443,12 +4443,12 @@ EncodePassword_Absolute(wyString &text)
 	wyChar *encode = NULL, pwdutf8[512] = {0};
 
 	strcpy(pwdutf8, text.GetString());
-	RotateBitRight((wyUChar*)pwdutf8); 
+	RotateBitRight((wyUChar*)pwdutf8);
 	EncodeBase64(pwdutf8, strlen(pwdutf8), &encode);
 	strncpy(pwdutf8, encode, 511);
 
 	text.SetAs(pwdutf8);
-	
+
 	if(encode)
 		free(encode);
 
@@ -4460,21 +4460,21 @@ void
 RemoveDefiner(wyString &text, const wyChar* pattern, wyInt32 extra)
 {
 	//wyString pattern("DEFINER=`.*`@`.*`\\s");
-	//wyInt32   regexret = 0;	
-	wyInt32   ovector[30];  
+	//wyInt32   regexret = 0;
+	wyInt32   ovector[30];
 	pcre           *re;
 	wyInt32         erroffset, rc = -1;//, i = 0;
-	wyInt32         subject_length;	
+	wyInt32         subject_length;
 	const char      *error;
 	wyString        tempstr;
 
-	
+
 
 	subject_length = (wyInt32)strlen(text.GetString());
 
 	re = pcre_compile(
 		pattern,              /* the pattern */
-		PCRE_UTF8|PCRE_CASELESS|PCRE_NEWLINE_CR,/* default options */ //match is a case insensitive 
+		PCRE_UTF8|PCRE_CASELESS|PCRE_NEWLINE_CR,/* default options */ //match is a case insensitive
 		&error,               /* for error message */
 		&erroffset,           /* for error offset */
 		NULL);                /* use default character tables */
@@ -4482,7 +4482,7 @@ RemoveDefiner(wyString &text, const wyChar* pattern, wyInt32 extra)
 	/* Compilation failed: print the error message and exit */
 
 	if (re == NULL)
-		return ; 
+		return ;
 
 	/*************************************************************************
 	* If the compilation succeeded, we call PCRE again, in order to do a     *
@@ -4513,7 +4513,7 @@ RemoveDefiner(wyString &text, const wyChar* pattern, wyInt32 extra)
 void
 RemoveBrackets(wyString &text, const wyChar* pattern)
 {
-	
+
 	wyInt32   ovector[30];
 	pcre           *re;
 	wyInt32         erroffset, rc = -1, sucess = 0;//, i = 0;
@@ -4521,14 +4521,14 @@ RemoveBrackets(wyString &text, const wyChar* pattern)
 	const char      *error;
 	wyString tempstr, strfirst,strlast;
 	wyChar * tempstr1 = NULL;
-	
+
 
 
 	subject_length = (wyInt32)strlen(text.GetString());
 
 	re = pcre_compile(
 		pattern,              /* the pattern */
-		PCRE_UTF8 | PCRE_CASELESS | PCRE_NEWLINE_CR,/* default options */ //match is a case insensitive 
+		PCRE_UTF8 | PCRE_CASELESS | PCRE_NEWLINE_CR,/* default options */ //match is a case insensitive
 		&error,               /* for error message */
 		&erroffset,           /* for error offset */
 		NULL);                /* use default character tables */
@@ -4570,10 +4570,10 @@ RemoveBrackets(wyString &text, const wyChar* pattern)
 	}
 		//Add method to remove the opening and closing brackets
 		text_length = (wyInt32)strlen(strlast.GetString());
-		
+
 		const char first = strlast.GetCharAt(0);
 		const char last = strlast.GetCharAt(text_length - 1);
-	
+
 
 		if (strcmp(&first,"(")==0  && strcmp(&last, ")")==0)
 		{
@@ -4590,7 +4590,7 @@ RemoveBrackets(wyString &text, const wyChar* pattern)
 //        wyWChar                directory[MAX_PATH+1];
 //        wyWChar                *lpfileport;
 //        wyBool                ret;
-//        
+//
 //        ret = SearchFilePath(L"sqlyog_debug1", L".log", MAX_PATH, directory, &lpfileport);
 //
 //        if(ret != wyTrue)
@@ -4626,7 +4626,7 @@ EncodePassword(wyString &text)
 	encFilter.Put(reinterpret_cast<const CryptoPP::byte*>(plaintext.GetString()), plaintext.GetLength());
 	encFilter.MessageEnd();
 	text.SetAsDirect(encText.data(), encText.length());
-	
+
 	return wyTrue;
 }
 
@@ -4669,7 +4669,7 @@ MigratePassword(wyString conn, wyString dirstr, wyString &pwdstr)
 	if (encodestr)
 		free(encodestr);
 	return wyTrue;
-	
+
 }
 
 wyBool
@@ -4710,7 +4710,7 @@ RemovePattern(wyString &text, const wyChar* pattern)
 
 	re = pcre_compile(
 		pattern,              /* the pattern */
-		PCRE_UTF8 | PCRE_CASELESS | PCRE_NEWLINE_CR,/* default options */ //match is a case insensitive 
+		PCRE_UTF8 | PCRE_CASELESS | PCRE_NEWLINE_CR,/* default options */ //match is a case insensitive
 		&error,               /* for error message */
 		&erroffset,           /* for error offset */
 		NULL);                /* use default character tables */
@@ -4747,3 +4747,35 @@ RemovePattern(wyString &text, const wyChar* pattern)
 
 }
 
+void
+SetSslAuthentication(MYSQL *mysql, ConnectionInfo *conninfo)
+{
+	/// SSL Connection if ssl is selected
+	if (conninfo->m_issslchecked == wyTrue)
+	{
+		/*If we provide all Cert and Keys*/
+		if (conninfo->m_issslauthchecked == wyTrue && conninfo->m_no_ca == wyFalse)
+		{
+			mysql_ssl_set(mysql, conninfo->m_clikey.GetString(), conninfo->m_clicert.GetString(),
+				conninfo->m_cacert.GetString(), NULL,
+				conninfo->m_cipher.GetLength() ? conninfo->m_cipher.GetString() : NULL);
+		}/*If we select Use Authentication and do not provide CA-cert, but we need to give Client-cert, and Client-key*/
+		else if (conninfo->m_issslauthchecked == wyTrue && conninfo->m_no_ca == wyTrue)
+		{
+			mysql_ssl_set(mysql, conninfo->m_clikey.GetString(), conninfo->m_clicert.GetString(),
+				NULL, NULL,
+				conninfo->m_cipher.GetLength() ? conninfo->m_cipher.GetString() : NULL);
+
+		}	/*If we don't select Use Authentication and do not provide CA-cert, Client-cert, and Client-key*/
+		else if (conninfo->m_issslauthchecked == wyFalse && conninfo->m_no_ca == wyTrue)
+		{
+			mysql_ssl_set(mysql, NULL, NULL, NULL,
+				NULL, conninfo->m_cipher.GetLength() ? conninfo->m_cipher.GetString() : NULL);
+		}
+		else  /*If we don't select Use Authentication and provide CA-cert*/
+		{
+			mysql_ssl_set(mysql, NULL, NULL, conninfo->m_cacert.GetString(),
+				NULL, conninfo->m_cipher.GetLength() ? conninfo->m_cipher.GetString() : NULL);
+		}
+	}
+}

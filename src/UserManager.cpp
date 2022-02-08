@@ -92,6 +92,24 @@ wyChar* UserManager::m_privmapping[] = {
     "UPDATE", "Update_priv",
 };
 
+// New privilege for MariaDB 10.5.2 and above
+wyChar* UserManager::m_mariadb_100502_priv[] = {
+	"BINLOG ADMIN",
+	"BINLOG MONITOR",
+	"BINLOG REPLAY",
+	"CONNECTION ADMIN",
+	"FEDERATED ADMIN",
+	"READ_ONLY ADMIN",
+	"REPLICATION MASTER ADMIN",
+	"REPLICATION SLAVE ADMIN",
+	"SET USER"
+};
+
+// Privilege to remove for MariaDb 10.5.2 and above
+wyChar* UserManager::m_mariadb_100502_hide_priv[] = {
+	"REPLICATION CLIENT"
+};
+
 //default constructor
 UserManager::UserManager()
 {
@@ -746,7 +764,7 @@ UserManager::SavePassword()
 {
     wyString    query, password, password2, tempuser, temphost, temppassword, pluginname, temppluginname;
     wyWChar     buffer[SIZE_128];
-	wyBool		ispluginchanged = wyFalse;
+	wyBool		ispluginchanged = wyFalse, passwordchanged;
 
     //get the strings from the password field
     GetDlgItemText(m_hwnd, IDC_PASSWORD, buffer, SIZE_128 - 1);
@@ -802,16 +820,34 @@ UserManager::SavePassword()
 			}
 			else if (!m_ismariadb) // for sanity sake... it is mysql > 5.7 
 			{
-				if (m_ispasswordchanged == wyTrue) {  // pass has changed, set it along with plugin
-					query.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED WITH %s BY '%s'",
-						EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
-						EscapeMySQLString(m_host.GetString(), temphost).GetString(),
-						EscapeMySQLString(pluginname.GetString(), temppluginname).GetString(),
-						EscapeMySQLString(password.GetString(), temppassword).GetString());
-
-					if (ExecuteUMQuery(query) == wyFalse)
+				if (m_ispasswordchanged == wyTrue) 
+				{  // pass has changed, set it along with plugin
+				// Function call for updation of password as well as resource limitaions in single query
+					if (IsMySQL576(m_hmdi->m_tunnel, &m_hmdi->m_mysql))
 					{
-						return wyFalse;
+						passwordchanged = wyTrue;
+						CreateOrAlterUserWithResourceLimitaions(
+							EscapeMySQLString(m_username.GetString(), tempuser),
+							EscapeMySQLString(m_host.GetString(), temphost),
+							EscapeMySQLString(pluginname.GetString(), temppluginname),
+							EscapeMySQLString(password.GetString(), temppassword), passwordchanged);
+						if (ExecuteUMQuery(query) == wyFalse)
+						{
+							return wyFalse;
+						}
+					}
+					else
+					{
+						query.Sprintf("GRANT USAGE ON *.* TO '%s'@'%s' IDENTIFIED BY '%s'",
+							EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
+							EscapeMySQLString(m_host.GetString(), temphost).GetString(),
+							EscapeMySQLString(password.GetString(), temppassword).GetString());
+
+						if (ExecuteUMQuery(query) == wyFalse)
+						{
+							return wyFalse;
+						}
+					
 					}
 					m_authpluginname.SetAs(pluginname.GetString());
 				}
@@ -1212,14 +1248,14 @@ UserManager::AddNewUser()
 	//if it is mysql version > 5.02 use the CREATE USER stmt
 	if (m_ismysql502 == wyTrue)
 	{
-		// if it is higher then 5.7, but not maria db, add plugin when creating user 
-		if (m_serververno > 50700 && m_ismariadb == false) {
-			query.Sprintf("CREATE USER '%s'@'%s' IDENTIFIED WITH %s BY '%s'",
-				tempuser.GetString(),
-				temphost.GetString(),
-				tempauthplugin.GetString(),
-				temppassword.GetString());
-
+		// if it is higher than 5.7.5, but not maria db, add plugin when creating user 
+		if (m_serververno >= 50706 && m_ismariadb == false) {
+			//function call for creating a user with resource limitaion
+			CreateOrAlterUserWithResourceLimitaions(
+				tempuser,
+				temphost,
+				tempauthplugin,
+				temppassword, wyFalse);
 			if (ExecuteUMQuery(query) == wyFalse)
 			{
 				return wyFalse;
@@ -1276,7 +1312,6 @@ UserManager::AddNewUser()
 			{
 				return wyFalse;
 			}
-		
 		}
 	}//use the INSERT stmt to insert into user table
 	else
@@ -1289,7 +1324,7 @@ UserManager::AddNewUser()
 		if (ExecuteUMQuery(query) == wyFalse)
 		{
 			return wyFalse;
-		}
+		}	
 	}
 
 	m_username.SetAs(username);
@@ -1310,10 +1345,12 @@ UserManager::AddNewUser()
 		itr = itr->next;
 	itr->next = tempnode;
 
+	//checking if MySQL version is greater than 5.7.5 
+	if (!IsMySQL576(m_hmdi->m_tunnel, &m_hmdi->m_mysql))
+	{
+		ApplyLimitations();
+	}
 
-
-	ApplyLimitations();
-	
 	m_usercount += 1;
 	return wyTrue;
 }
@@ -2552,12 +2589,13 @@ UserManager::ApplyChanges(wyBool issave)
         {
             return wyFalse;
         }
-
-        //apply any modified limitations
-        if(ApplyLimitations() == wyFalse)
-        {
-            return wyFalse;
-        }
+		if (!(m_ispasswordchanged && IsMySQL576(m_hmdi->m_tunnel, &m_hmdi->m_mysql)))
+		{
+			if (ApplyLimitations() == wyFalse)
+			{
+				return wyFalse;
+			}
+		}
 
         //grant/revoke privileges
         if(ProcessGrantRevoke() == wyFalse)
@@ -2589,6 +2627,81 @@ UserManager::ApplyChanges(wyBool issave)
     return wyTrue;
 }
 
+//function defination for create new user with resource limitaion and alter user password greater than 5.7.5 in a single query
+wyBool
+UserManager::CreateOrAlterUserWithResourceLimitaions(wyString& tempuser, wyString& temphost, wyString& tempauthplugin, wyString& temppassword, wyBool passwordchanged)
+{
+	wyString    query;
+	wyInt32     temp[4], i, isintransaction = 1;
+	wyBool      flag = wyFalse, withflag = wyTrue;
+	
+
+	wyChar* limitations[] = {
+		"MAX_QUERIES_PER_HOUR",
+		"MAX_UPDATES_PER_HOUR",
+		"MAX_CONNECTIONS_PER_HOUR",
+		"MAX_USER_CONNECTIONS"
+	};
+
+	wyInt32 ctrlids[4] = { IDC_MAXQUERY_SPIN, IDC_MAXUPDATE_SPIN, IDC_MAXCONN_SPIN, IDC_MAXSIMCONN_SPIN };
+	if (!passwordchanged) {
+		query.Sprintf("CREATE USER '%s'@'%s' IDENTIFIED WITH %s BY '%s'",
+			tempuser.GetString(),
+			temphost.GetString(),
+			tempauthplugin.GetString(),
+			temppassword.GetString());
+	}
+	//form the query
+	else
+	{
+		query.Sprintf("ALTER USER '%s'@'%s' IDENTIFIED WITH %s BY '%s'",
+			tempuser.GetString(),
+			temphost.GetString(),
+			tempauthplugin.GetString(),
+			temppassword.GetString());
+	}
+	
+
+	for (i = 0; i < U_MAXLIMITATIONS; ++i)
+	{
+		if (m_showlimitations[i] == wyTrue)
+		{
+			temp[i] = SendMessage(GetDlgItem(m_hwnd, ctrlids[i]), UDM_GETPOS32, 0, (LPARAM)NULL);
+
+			if (temp[i] != m_limitations[i])
+			{
+				if (withflag) {
+					query.AddSprintf(" WITH");      //adding WITH for adding the query with resource limitaion
+					withflag = wyFalse;
+				}
+				query.AddSprintf(" %s %d", limitations[i], temp[i]);
+			}
+		}
+	}
+	SetCursor(LoadCursor(NULL, IDC_WAIT));
+	ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query, wyTrue, wyFalse, wyTrue, false, false, wyFalse, 0, wyFalse, &isintransaction, GetActiveWindow());
+
+	if (isintransaction == 1)
+		return wyFalse;
+
+	if (m_hmdi->m_tunnel->mysql_affected_rows(m_hmdi->m_mysql))
+	{
+		ShowMySQLError(m_hwnd, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query.GetString());
+		return wyFalse;
+	}
+
+	for (i = 0; i < U_MAXLIMITATIONS; ++i)
+	{
+		if (m_showlimitations[i] == wyTrue)
+		{
+			m_limitations[i] = temp[i];
+		}
+	}
+
+	SetCursor(LoadCursor(NULL, IDC_ARROW));
+	return wyTrue;
+}
+
 //function applies any modified limitations
 wyBool
 UserManager::ApplyLimitations()
@@ -2607,8 +2720,16 @@ UserManager::ApplyLimitations()
     wyInt32 ctrlids[4] = {IDC_MAXQUERY_SPIN, IDC_MAXUPDATE_SPIN, IDC_MAXCONN_SPIN, IDC_MAXSIMCONN_SPIN};
 
     //form the query
-    query.Sprintf("GRANT USAGE ON *.* TO '%s'@'%s' WITH", EscapeMySQLString(m_username.GetString(), tempuser).GetString(), EscapeMySQLString(m_host.GetString(), temphost).GetString());
-
+	//issue 2278: Modified the query for SQLv5.7.6 and above for adding max_queries_per_hour
+	if (IsMySQL576(m_hmdi->m_tunnel, &m_hmdi->m_mysql)) 
+	{
+		query.Sprintf("ALTER USER '%s'@'%s' WITH", EscapeMySQLString(m_username.GetString(), tempuser).GetString(), EscapeMySQLString(m_host.GetString(), temphost).GetString());
+	}
+	else
+	{
+		query.Sprintf("GRANT USAGE ON *.* TO '%s'@'%s' WITH", EscapeMySQLString(m_username.GetString(), tempuser).GetString(), EscapeMySQLString(m_host.GetString(), temphost).GetString());
+	}
+  
     for(i = 0; i < U_MAXLIMITATIONS; ++i)
     {
         if(m_showlimitations[i] == wyTrue)
@@ -3520,12 +3641,13 @@ UserManager::GetPrivilegeTableMapping(wyString* key, wyBool iscolumnname)
 void
 UserManager::GetGlobalPrivileges()
 {
-    wyString            query, boolvalue, value, tempuser, temphost;
-    MYSQL_RES*          myres;
-    MYSQL_ROW           row;
+    wyString            query, boolvalue, value, tempuser, temphost, grantquery;
+    MYSQL_RES*          myres, *grantqueryresult;
+    MYSQL_ROW           row, grantrow;
     PrivilegedObject*  privobject = NULL;
-    wyInt32             i, fieldindex;
+    wyInt32             i, fieldindex, mariadb100502privcount;
     wyChar*             fieldname;
+	wyBool              ismariadb100502;
 
     wyChar* limitations[] = {
         "max_questions", 
@@ -3533,6 +3655,18 @@ UserManager::GetGlobalPrivileges()
         "max_connections", 
         "max_user_connections"
     };
+
+	// Add the new privilege count if it's MariaDB 10.5.2 and above
+	ismariadb100502 = IsMariaDB100502(m_hmdi->m_tunnel, &m_hmdi->m_mysql);
+
+	if (!ismariadb100502)
+	{
+		mariadb100502privcount = 0;
+	}
+	else
+	{
+		mariadb100502privcount = sizeof(m_mariadb_100502_priv) / sizeof(m_mariadb_100502_priv[0]);
+	}
         
     SetCursor(LoadCursor(NULL, IDC_WAIT));
     query.Sprintf("SELECT * FROM `mysql`.`user` WHERE User = '%s' AND Host = '%s'",
@@ -3566,6 +3700,52 @@ UserManager::GetGlobalPrivileges()
                 }
             }
         }
+
+		// Check status of new privileges for MariaDB 10.5.2 and above 
+		if (ismariadb100502)
+		{
+			grantquery.Sprintf("SHOW GRANTS FOR '%s'@'%s'",
+				EscapeMySQLString(m_username.GetString(), tempuser).GetString(),
+				EscapeMySQLString(m_host.GetString(), temphost).GetString());
+			grantqueryresult = ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, grantquery);
+
+			if (grantqueryresult == NULL)
+			{
+				m_hmdi->m_tunnel->mysql_free_result(myres);
+				ShowMySQLError(m_hwnd, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query.GetString());
+				return;
+			}
+
+			grantrow = m_hmdi->m_tunnel->mysql_fetch_row(grantqueryresult);
+
+			char *grantlist = grantrow[0];
+			bool areallprivilages = strstr(grantlist, "GRANT ALL PRIVILEGES");
+
+			// if all privileges are granted to user mark each privilege to true else match the new privilege with the grant result
+			// and update accordingly.
+			if (areallprivilages)
+			{
+				for (i = 0; i < m_privcount; ++i)
+				{
+					privobject->m_privileges[i] = 1;
+				}
+			}
+			else
+			{
+				for (i = 0; i < mariadb100502privcount; ++i)
+				{
+					if (strstr(grantlist, m_mariadb_100502_priv[i]))
+					{
+						wyString privilege = m_mariadb_100502_priv[i];
+						fieldindex = GetPrivilegeIndex(privilege);
+						if(fieldindex != -1)
+							privobject->m_privileges[fieldindex] = 1;
+					}
+				}
+			}
+
+			m_hmdi->m_tunnel->mysql_free_result(grantqueryresult);
+		}
 
         InsertIntoSQLite(privobject);
         delete privobject;
@@ -3806,14 +3986,17 @@ UserManager::GetServerPrivileges()
     wyString    query, temp;
     MYSQL_RES*  myres;
     MYSQL_ROW   row;
-    wyInt32     i, j = 0;
+    wyInt32     i, j = 0, maria10502privcount;
     wyChar*     privname;
     wyChar* limitations[] = {"max_questions", "max_updates", "max_connections", "max_user_connections"};
+	wyBool      ismaridb100502;
     
     SetCursor(LoadCursor(NULL, IDC_WAIT));
     query.SetAs("SHOW COLUMNS FROM `mysql`.`user`");
     myres = ExecuteAndGetResult(m_hmdi, m_hmdi->m_tunnel, &m_hmdi->m_mysql, query);
     m_privcount = 0;
+	ismaridb100502 = IsMariaDB100502(m_hmdi->m_tunnel, &m_hmdi->m_mysql);
+	maria10502privcount = sizeof(m_mariadb_100502_priv) / sizeof(m_mariadb_100502_priv[0]);
 
     if(myres == NULL)
     {
@@ -3840,6 +4023,12 @@ UserManager::GetServerPrivileges()
             }
         }
     }
+
+	// Add the new privilege count to m_privcount if it's MariaDB 10.5.2 and above.
+	if (ismaridb100502)
+	{
+		m_privcount += maria10502privcount - (sizeof(m_mariadb_100502_hide_priv) / sizeof(m_mariadb_100502_hide_priv[0]));
+	}
     
     //create the privilege array used for this server
     m_privarray = new Privileges*[m_privcount];
@@ -3851,12 +4040,28 @@ UserManager::GetServerPrivileges()
 
         if((privname = GetPrivilegeTableMapping(&temp, wyTrue)) != NULL)
         {
+			// check for the hidden privilege for MariaDB 10.5.2 and don't add it to the privilege array.
+			if (ismaridb100502 && CheckHiddenPrivelegeMariaDB100502(privname) == wyTrue)
+				continue;
+
             m_privarray[j] = new Privileges;
             m_privarray[j]->priv.SetAs(privname);
             m_privarray[j]->context = 0;
             ++j;
         }
     }
+
+	// add new privileges to priv array for mariadb 10.5.2 and above.
+	if (ismaridb100502)
+	{
+		for (int i = 0; i < maria10502privcount; i++)
+		{
+			m_privarray[j] = new Privileges;
+			m_privarray[j]->priv.SetAs(m_mariadb_100502_priv[i]);
+			m_privarray[j]->context = 0;
+			++j;
+		}
+	}
 
     m_hmdi->m_tunnel->mysql_free_result(myres);
     qsort((void*)m_privarray, m_privcount, sizeof(Privileges*), UserManager::CompareFunct);
@@ -4028,6 +4233,34 @@ UserManager::GetServerPrivsForRoutine()
     m_hmdi->m_tunnel->mysql_free_result(myres);
     delete[] indexarray;
     return wyTrue;
+}
+
+// get index of hidden privilege for mariadb 10.5.2 and above using privilege name
+wyBool UserManager::CheckHiddenPrivelegeMariaDB100502(wyChar* priv)
+{
+	wyInt32 hiddenprivcount = sizeof(m_mariadb_100502_hide_priv) / sizeof(m_mariadb_100502_hide_priv[0]);
+
+	for (int i = 0; i < hiddenprivcount; i++)
+	{
+		if (strcmp(priv, m_mariadb_100502_hide_priv[i]) == 0)
+			return wyTrue;
+	}
+
+	return wyFalse;
+}
+
+// get the index of the privilege by privilege name
+wyInt32 UserManager::GetPrivilegeIndex(wyString & value)
+{
+	for (int i = 0; i < m_privcount; i++)
+	{
+		if (!m_privarray[i]->priv.CompareI(value))
+		{
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 //function identifies all the privileges given in the first parameter and stores the currusponding mapping index in the second parameter

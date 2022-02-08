@@ -2425,8 +2425,7 @@ TabModule::UpdateNameinStruc(wyInt32 itemindex, wyString newname)
 
 						if (node2->tabtype == querybuilder)
 						{
-							s2.SetAs(newname.GetString());
-							s2.SetAs(s2.Substr(0, 13));
+							s2.SetAs(newname.Substr(0, 13));
 							s2.LTrim();
 							s2.RTrim();
 
@@ -2451,8 +2450,7 @@ TabModule::UpdateNameinStruc(wyInt32 itemindex, wyString newname)
 						}
 						else if (node2->tabtype == schemadesigner)
 						{
-							s2.SetAs(newname.GetString());
-							s2.SetAs(s2.Substr(0, 15));
+							s2.SetAs(newname.Substr(0, 15));
 							s2.LTrim();
 							s2.RTrim();
 

@@ -157,8 +157,14 @@ for virtual columns Persistent->Stored
 */
 wyBool IsMariaDB10309(Tunnel * tunnel, PMYSQL mysql);
 
+//MariaDB 10.5.2 for new privileges
+wyBool IsMariaDB100502(Tunnel * tunnel, PMYSQL mysql);
+
 //MySQL 5.7.0 for Virtual/Stored columns
 wyBool IsMySQL57(Tunnel * tunnel, PMYSQL mysql);
+
+//MySQL 5.7.6 or above for Alter/Create User query
+wyBool IsMySQL576(Tunnel * tunnel, PMYSQL mysql);
 
 //MySQL 5.7.3  EXPLAIN EXTENDED is removed
 wyBool IsMySQL573(Tunnel * tunnel, PMYSQL mysql);

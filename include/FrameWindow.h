@@ -649,6 +649,13 @@ public:
     */
     void                    OnWmMenuCommand(HWND hwnd, WPARAM wparam, LPARAM lparam);
 
+	// replace all /n with /r/n in the given string
+	/**
+	@param value            : IN string that needs formatting
+	@returns void
+	*/
+	void                    FormatStringFromDatabase(wyString &value);
+
     /// Handles WM_MENUSELECT message, changes the status bar information on mouse over change
     /** 
     @param menuid           : IN Menu id

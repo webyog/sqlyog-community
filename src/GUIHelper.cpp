@@ -994,11 +994,16 @@ SetExplainMenuItems(HMENU hmenu, HWND hwnd)
         lpmii.dwTypeData = queryExplain.GetAsWideChar();
         SetMenuItemInfo(hmenu, ID_EXPLAIN_EXTENDED, FALSE, &lpmii);
         
-        if(IsQuerySELECT(query.GetString()) || 
+        if(IsQuerySELECT(query.GetString()) ||
             (IsMySQL563(wnd->m_tunnel, &wnd->m_mysql) && IsQueryDeleteInsertReplaceUpdate(query.GetString())))
         {
             VERIFY(EnableMenuItem(hmenu, ID_EXPLAIN_EXPLAIN, MF_ENABLED)!= -1);
-		    VERIFY(EnableMenuItem(hmenu, ID_EXPLAIN_EXTENDED, MF_ENABLED)!= -1);
+			
+			// ISSUE - 2259: Disabling Explain Extended menu option from MySQL 5.7.3 and above.
+			if (!IsMySQL573(wnd->m_tunnel, &wnd->m_mysql))
+			{
+				VERIFY(EnableMenuItem(hmenu, ID_EXPLAIN_EXTENDED, MF_ENABLED) != -1);
+			}
             return;
         }
     }

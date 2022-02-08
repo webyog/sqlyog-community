@@ -4533,6 +4533,8 @@ MDIWindow::ReConnect(Tunnel * tunnel, PMYSQL mysql, wyBool isssh, wyBool isimpor
 		//For SSH its requured because the above function gives new LOCAL PORT to do port-forward
 		SetMySQLOptions(&m_conninfo, tunnel, &newmysql);
 
+		SetSslAuthentication(newmysql, &m_conninfo);
+		
 		newmysql = tunnel->mysql_real_connect(newmysql,(*mysql)->host, 
 			(*mysql)->user,(*mysql)->passwd, NULL, 
 					m_conninfo.m_localport, NULL, client | CLIENT_MULTI_RESULTS | CLIENT_REMEMBER_OPTIONS, NULL);	
@@ -4548,23 +4550,7 @@ MDIWindow::ReConnect(Tunnel * tunnel, PMYSQL mysql, wyBool isssh, wyBool isimpor
 		}
 	}
 
-	/*
-	if(m_conninfo.m_issslchecked == wyTrue)
-    {
-        if(m_conninfo.m_issslauthchecked == wyTrue)
-        {
-            mysql_ssl_set(newmysql, m_conninfo.m_clikey.GetString(), m_conninfo.m_clicert.GetString(), 
-                            m_conninfo.m_cacert.GetString(), NULL, 
-                            m_conninfo.m_cipher.GetLength() ? m_conninfo.m_cipher.GetString() : NULL);
-        }
-        else
-        {
-            mysql_ssl_set(newmysql, NULL, NULL, 
-                            m_conninfo.m_cacert.GetString(), NULL, 
-                            m_conninfo.m_cipher.GetLength() ? m_conninfo.m_cipher.GetString() : NULL);
-        }
-    }
-	*/
+	
 	
 	if(isprofile == wyTrue && currentdb.GetLength() &&  UseDatabase(currentdb, *mysql, tunnel) == wyFalse)
 		return wyFalse;

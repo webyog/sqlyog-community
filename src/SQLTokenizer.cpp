@@ -185,10 +185,11 @@ const wyChar*
 SQLTokenizer::GetQuery(wyUInt32 * len, wyUInt32 * linenum, 
 						    wyInt32 *isdelimeter, wyChar * deli)
 {
-	wyString	querystr, filename;
-	wyChar		*delimiter;
+	wyString	querystr, filename, delimitstr;
+	wyChar		*delimiter, *delimiternextlines = NULL;
 	wyChar		*delipos;
     wyBool      isansi;
+	wyInt32     position;
 
     m_supportedversion = wyFalse;
 
@@ -276,15 +277,34 @@ SQLTokenizer::GetQuery(wyUInt32 * len, wyUInt32 * linenum,
                 // mark the end of the line, so allow to add the linecount in hte next iteration!
                 m_addlinenum = wyTrue;
                 m_bufend = wyTrue;
-                
+
 
 				*len = m_strsize;
 				*linenum = m_linenumber;
+					
 
-             
 
 				*isdelimeter = 1;
 				m_strsize = 0;
+
+				delimitstr.SetAs(m_query);
+				delimitstr.ToLower(); // change to lowercase to cover both uppercase and lowercase scenario for 'DELIMITER'
+				position = delimitstr.FindI("delimiter", 0); // get the position from where DELIMITER is starting in original string
+
+				// if there is any newline or spaces before DELIMITER then add that substring to the delimiter
+				if (position > 0)
+				{
+					delimiternextlines = (wyChar*)malloc((position + strlen(delimiter) + 1) * sizeof(wyChar));
+
+					strncpy(delimiternextlines, m_query, position);
+					delimiternextlines[position] = '\0';
+
+					strcat(delimiternextlines, delimiter);
+
+					strcpy(delimiter, delimiternextlines);
+
+					free(delimiternextlines);
+				}
 				return delimiter;				/* get back to next query as delimeter is not a valid query and we just ignore it */
 			}
 

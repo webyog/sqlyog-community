@@ -461,6 +461,13 @@ class UserManager
         */
         wyBool                  GetServerPrivsForRoutine();
 
+		// Function checks for the privilege in privilege array and returns its index
+		/**
+		@param value           : IN privilege to be searched
+		@returns the index of privilege
+		*/
+		wyInt32                 GetPrivilegeIndex(wyString& value);
+
         ///Function identifies all the privileges given in the first parameter and stores the currusponding mapping index in the second parameter
         /**
         @param value            : IN  string to parse
@@ -573,6 +580,12 @@ class UserManager
         */
         wyBool                  ApplyLimitations();
 
+		///Function executes the query required to apply the limiations for newly added user
+		/**
+		@returns wyTrue on success else wyFalse
+		*/
+		wyBool                  CreateOrAlterUserWithResourceLimitaions(wyString& tempuser, wyString& temphost, wyString& tempauthplugin, wyString& temppassword, wyBool passwordchanged);
+
         ///Helper function used to execute various queries in User Manager
         /**
         @param query            : IN query to be executed
@@ -662,6 +675,8 @@ class UserManager
 
         void                    SetResetDBContext(wyBool isset);
 
+		wyBool                  CheckHiddenPrivelegeMariaDB100502(wyChar* priv);
+
     private:
 
 		USERLIST				*m_userlist;
@@ -671,6 +686,12 @@ class UserManager
 
         //static array to hold the mysql privileges and currusponding column names till date
         static wyChar*          m_privmapping[];
+
+		//static array to hold new mariadb privileges introduced in version 10.5.2
+		static wyChar*          m_mariadb_100502_priv[];
+
+		//static array to hold mariadb privileges that are renamed or divided from version 10.5.2
+		static wyChar*          m_mariadb_100502_hide_priv[];
 
         //dialog handle
         HWND                    m_hwnd;
