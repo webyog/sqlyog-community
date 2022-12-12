@@ -42,6 +42,7 @@ Author: Vishal P.R, Janani SriGuha
 
 extern PGLOBALS pGlobals;
 
+
 //constructor for object represeting data
 MySQLDataEx::MySQLDataEx(MDIWindow* pmdi)
 {
@@ -177,7 +178,6 @@ MySQLDataEx::Free()
     {
 	    m_pmdi->m_tunnel->mysql_free_result(m_fieldres);
     }
-
 
     //free key result
     if(m_keyres)
@@ -967,8 +967,7 @@ DataView::IsColumnReadOnly(wyInt32 col)
 wyInt32 
 DataView::IsColumnVirtual(wyInt32 col)
 {
-    wyString query,db, table,column;
-	MYSQL_RES  *fieldres = NULL;
+    wyString query,db, table, column;
 
 	if(! IsMySQL576Maria52(m_wnd->m_tunnel, &m_wnd->m_mysql))
 		return 0;
@@ -982,34 +981,22 @@ DataView::IsColumnVirtual(wyInt32 col)
 
 		else
 		{
-			//get the db and table name 
-			if(GetDBName(db, col) == wyTrue && GetTableName(table, col) == wyTrue && GetColumnName(column, col) == wyTrue)
-			 {
-				query.Sprintf("show full fields from `%s`.`%s` WHERE FIELD='%s' AND (Extra LIKE '%%VIRTUAL%%' OR Extra LIKE '%%STORED%%' OR Extra LIKE '%%PERSISTENT%%')", db.GetString(), table.GetString(),column.GetString());
-				fieldres = SjaExecuteAndGetResult(m_wnd->m_tunnel,&m_wnd->m_mysql,query);
-
-				if(fieldres)
+			if (GetColumnName(column, col)) {
+				if (m_data->m_fieldres && IsFieldVirtual(m_wnd->m_tunnel, m_data->m_fieldres, column))
 				{
-					if(fieldres->row_count == 1)
-						{
-							m_data->m_colvirtual[col] = 1;
-						}
-					else
-						{
-							m_data->m_colvirtual[col] = 0;
-						}
-
-				m_wnd->m_tunnel->mysql_free_result(fieldres);
+					m_data->m_colvirtual[col] = 1;
 				}
-		
+				else
+				{
+					m_data->m_colvirtual[col] = 0;
+				}
 			}
 			
 			return m_data->m_colvirtual[col];
 		}
 
 	}
-    
-	else
+ 	else
 		return 0;
 }
 
@@ -5987,6 +5974,9 @@ DataView::GetViewData(wyBool selected)
 	MYSQL_ROW		myrow;
 	MYSQL_FIELD*	fields;
 
+#ifndef COMMUNITY
+	m_wnd->m_tunnel->ClearXMLDoc();
+#endif COMMUNITY
 	//get the total number of fields in the resultset.
     fields		=	m_data->m_datares->fields;
     numfields	=	m_data->m_datares->field_count;
@@ -6026,7 +6016,7 @@ DataView::GetViewData(wyBool selected)
 	esclen = strlen(fescape)+ strlen(lescape)+ 5; 
 
 	m_totalsize = GetTotalMemSize(&cesv, selected, esclen);
-    
+
     if(m_totalsize <= 0)
     {
         return 0;
@@ -6035,7 +6025,7 @@ DataView::GetViewData(wyBool selected)
     ret = OpenClipboard(m_hwndgrid);		
 	ret = EmptyClipboard();
 	ret = CloseClipboard();
-
+	
 	hglbcopy = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, m_totalsize);
 	
 	// check whether so much pof memory has been allocated or not.
@@ -6051,7 +6041,7 @@ DataView::GetViewData(wyBool selected)
 	// can copy the data into the memory.
 	lpstrcopy = (wyWChar*)GlobalLock(hglbcopy);	
 	nsize = 0;
-	//Add filednames if required
+	//Add fieldnames if required
 	if(cesv.m_esch.m_isincludefieldnames)
 	{
 		for(i = 0; i < numfields; i++)
@@ -6112,87 +6102,84 @@ DataView::GetViewData(wyBool selected)
 
     rowcount = m_data->m_rowarray->GetLength(); 
     selectedrow = CustomGrid_GetCurSelRow(m_hwndgrid);
-	
-	for(j=0; j<rowcount; j++)
+	for (j = 0; j < rowcount; j++)
 	{
 		unsigned int tj = j;
 
-        if(selected == wyTrue && m_data->m_checkcount == 0)
+		if (selected == wyTrue && m_data->m_checkcount == 0)
 		{
-		    tj = j = selectedrow;
+			tj = j = selectedrow;
 			copyselectedrow = wyTrue;
 		}
-
 		//no need to copy unsaved rows.if it is an unsaved row IsNewRow(GetCurrentRow(GetBase(), j),j) will return wyTrue
-        else if((selected == wyTrue && m_data->m_rowarray->GetRowExAt(j)->m_ischecked == wyFalse && copyselectedrow == wyFalse) 
-            || (m_data->m_rowarray->GetRowExAt(j)->IsNewRow() || j == m_data->m_modifiedrow))
+		else if ((selected == wyTrue && m_data->m_rowarray->GetRowExAt(j)->m_ischecked == wyFalse && copyselectedrow == wyFalse)
+			|| (m_data->m_rowarray->GetRowExAt(j)->IsNewRow() || j == m_data->m_modifiedrow))
 		{
-            continue;
+			continue;
 		}
 
 		// if we found any row in the result set that's been checked.
 		isrowchecked = wyTrue;
-        myrow =  m_data->m_rowarray->GetRowExAt(tj)->m_row;
+		myrow = m_data->m_rowarray->GetRowExAt(tj)->m_row;
 			
 		GetColLengthArray(myrow, numfields, len);
 		length = len;
-
-		for(i=0; i<numfields; i++)
+		for (i = 0; i < numfields; i++)
 		{
-			if(cesv.m_esch.m_isfixed)
+			if (cesv.m_esch.m_isfixed)
 			{
 				ret = WriteFixed(&hglbcopy, &lpstrcopy, &nsize, myrow[i], &fields[i], length[i], isescaped, escape[0], fterm, isfterm, lterm, islterm, encl, isencl);
-				if(!ret)
-                {
-                    DisplayErrorText(GetLastError(), _("Could not copy data to clipboard"), m_hwndgrid);
-                    GlobalFree(hglbcopy);
+				if (!ret)
+				{
+					DisplayErrorText(GetLastError(), _("Could not copy data to clipboard"), m_hwndgrid);
+					GlobalFree(hglbcopy);
 					return 0;
-                }
+				}
 			}
 			else
 			{
 				ret = WriteVarible(&hglbcopy, &lpstrcopy, &nsize, myrow[i], &fields[i], length[i], isescaped, escape[0], fterm, isfterm, lterm, islterm, encl, isencl, cesv.m_esch.m_isoptionally, cesv.m_esch.m_nullchar, cesv.m_esch.m_isnullreplaceby);
-				if(!ret)
-                {
-                    DisplayErrorText(GetLastError(), _("Could not copy data to clipboard"), m_hwndgrid);
-                    GlobalFree(hglbcopy);
+				if (!ret)
+				{
+					DisplayErrorText(GetLastError(), _("Could not copy data to clipboard"), m_hwndgrid);
+					GlobalFree(hglbcopy);
 					return 0;
-                }
-				
+				}
+
 				// we only put the field separator if its not the last field as the last field will
-				  // require line seprator 
-				if(i !=(numfields-1))
+					// require line seprator 
+				if (i != (numfields - 1))
 				{
 					fescapestr.SetAs(fescape);
 					fescapestr.GetAsWideChar(&lenwchar);
 
-                    if(VerifyMemory(&hglbcopy, &lpstrcopy, nsize, lenwchar) == wyFalse)
-                    {
-                        DisplayErrorText(GetLastError(), _("Could not copy data to clipboard"), m_hwndgrid);
-                        GlobalFree(hglbcopy);
-					    return 0;
-                    }
+					if (VerifyMemory(&hglbcopy, &lpstrcopy, nsize, lenwchar) == wyFalse)
+					{
+						DisplayErrorText(GetLastError(), _("Could not copy data to clipboard"), m_hwndgrid);
+						GlobalFree(hglbcopy);
+						return 0;
+					}
 
-					wmemcpy(lpstrcopy+nsize, fescapestr.GetAsWideChar(), lenwchar);
+					wmemcpy(lpstrcopy + nsize, fescapestr.GetAsWideChar(), lenwchar);
 					nsize += lenwchar;
 				}
 			}
 		}
 
-        lescapestr.SetAs(lescape);
+		lescapestr.SetAs(lescape);
 		lescapestr.GetAsWideChar(&lenwchar);
 
-        if(VerifyMemory(&hglbcopy, &lpstrcopy, nsize, lenwchar) == wyFalse)
-        {
-            DisplayErrorText(GetLastError(), _("Could not copy data to clipboard"), m_hwndgrid);
-            GlobalFree(hglbcopy);
+		if (VerifyMemory(&hglbcopy, &lpstrcopy, nsize, lenwchar) == wyFalse)
+		{
+			DisplayErrorText(GetLastError(), _("Could not copy data to clipboard"), m_hwndgrid);
+			GlobalFree(hglbcopy);
 			return 0;
-        }
+		}
 
-		wmemcpy(lpstrcopy+nsize, lescapestr.GetAsWideChar(), lenwchar);
+		wmemcpy(lpstrcopy + nsize, lescapestr.GetAsWideChar(), lenwchar);
 		nsize += lenwchar;
 
-		if(copyselectedrow == wyTrue)
+		if (copyselectedrow == wyTrue)
 		{
 			break;
 		}
@@ -6200,7 +6187,7 @@ DataView::GetViewData(wyBool selected)
 
 	if(nsize && lescape[0])
 		lpstrcopy[nsize - (strlen(lescape))] = 0;
-
+	
 	// Reallocate the memory so that extra memory is freed.
 	if(nsize)
 		hglbcopy = GlobalReAlloc(hglbcopy, (unsigned long)((nsize + 1) * sizeof(wyWChar)), GMEM_MOVEABLE | GMEM_ZEROINIT);
@@ -6225,29 +6212,30 @@ DataView::GetTotalMemSize(ExportCsv *cesv, wyBool selected, wyInt32 esclen)
     //now get the whole size so that we can allocate 
 	for(i = 0; i < numfields; i++)
 	{	
-		if(fields[i].max_length == 0 && fields[i].name_length == 0)
-			fields[i].length; 
-
+		if (fields[i].max_length == 0 && fields[i].name_length == 0) 
+		{
+			nsize += fields[i].length * sizeof(wyWChar) + 1;
+		}
 		else if(fields[i].name_length)
 		{                
 			if(fields[i].max_length > fields[i].name_length)
             {
-				nsize += fields[i].max_length * 2 + 1;
+				nsize += fields[i].max_length * sizeof(wyWChar) + 1;
             }
 			else
             {
-				nsize += fields[i].name_length * 2 + 1;
+				nsize += fields[i].name_length * sizeof(wyWChar) + 1;
             }
 		}			
 		else
         {
             if(fields[i].max_length == 0)
             {
-			    nsize += strlen(fields[i].name) * 2 + 1;
+			    nsize += strlen(fields[i].name) * sizeof(wyWChar) + 1;
             }
             else
             {
-                nsize += fields[i].max_length * 2 + 1;
+                nsize += fields[i].max_length * sizeof(wyWChar) + 1;
             }
         }
 	}
@@ -6257,6 +6245,9 @@ DataView::GetTotalMemSize(ExportCsv *cesv, wyBool selected, wyInt32 esclen)
 	//if its selected i.e. user wants to copy only selected rows then 
 	//we have to allocate memory only for the selected rows 
     selrowcount = m_data->m_checkcount;
+	if (selrowcount == 0 && selected) {
+		selrowcount = 1;
+	}
 
 	if(selected == wyTrue)
     {
@@ -6289,8 +6280,8 @@ DataView::VerifyMemory(HGLOBAL* hglobal, LPWSTR* buffer, wyUInt32 nsize, wyUInt3
     //check for a potential buffer overrun
     if((nsize + sizetobeadded) * sizeof(wyWChar) > m_totalsize - 2)
     {
-        //reallocate the memory
-        m_totalsize += nsize + sizetobeadded + 2;
+        //reallocate the memory (m_totalsize is in bytes)
+        m_totalsize += (nsize + sizetobeadded) * sizeof(wyWChar) + 2;
         GlobalUnlock(*hglobal);
         htemp = GlobalReAlloc(*hglobal, m_totalsize, GMEM_MOVEABLE | GMEM_ZEROINIT);
 
@@ -6538,7 +6529,7 @@ DataView::AddSelDataToClipBoard()
 
 	SetCursor(hcursor);
 	ShowCursor(1);
-	
+
 	if(!(OpenClipboard(m_hwndgrid)))
     {
 		return wyFalse;
@@ -7502,13 +7493,13 @@ DataView::GetTableDetails()
         return TE_STOPPED;
     }
 
-    //show any errors
-    if(!fieldres)
-    {
-        HandleErrors(query);
-        m_wnd->m_tunnel->mysql_free_result(myres);
-        return TE_ERROR;
-    }
+	//show any errors
+	if (!fieldres)
+	{
+		HandleErrors(query);
+		m_wnd->m_tunnel->mysql_free_result(myres);
+		return TE_ERROR;
+	}
 
 
     //get the key res
@@ -7543,13 +7534,13 @@ DataView::GetTableDetails()
     m_data->m_createtablestmt.SetAs(myrow[1], m_wnd->m_ismysql41);
     m_wnd->m_tunnel->mysql_free_result(myres);
 
-    //free any existing fied res
+    //free any existing fields res
     if(m_data->m_fieldres)
     {
         m_wnd->m_tunnel->mysql_free_result(m_data->m_fieldres);
     }
 
-    //free any existing key res
+	//free any existing key res
     if(m_data->m_keyres)
     {
         m_wnd->m_tunnel->mysql_free_result(m_data->m_keyres);

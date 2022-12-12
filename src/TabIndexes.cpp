@@ -43,7 +43,6 @@ extern PGLOBALS		pGlobals;
 #define         UM_GRIDROWFOCUSCHANGE   4628
 
 
-
 IndexColumn::IndexColumn(FieldStructWrapper *value)
 {   
     m_pcwrapobj = value;
@@ -188,7 +187,7 @@ TabIndexes::FetchIndexValuesIntoWrapper()
     MYSQL_RES	*myres;
     MYSQL_ROW	myrow;
     wyString    tblname(""), dbname("");
-    wyString    tobeignoredstr,colstr, indexname(""), indcolsstr(""), indexlength(""),indexcomment(""), indexorder(""), previndexvisibility(""), indexvisibility("");
+    wyString    tobeignoredstr,colstr, indexname(""), indcolsstr(""), indexlength(""),indexcomment(""), indexorder(""), indexvisibility("");
     wyBool	    isunique = wyFalse, isfulltext = wyFalse;
     wyInt32     ind_keyname = -1, ind_colname = -1, ind_subpart = -1, ind_nonunique = -1, ind_indextype = -1,ind_indexcomment= -1, ind_indexorder=-1, ind_indexvis=-1;
     IndexesStructWrapper   *cwrapobj = NULL;
@@ -451,7 +450,7 @@ TabIndexes::FetchIndexValuesIntoWrapper()
 		iindex->m_visible.SetAs(indexvisibility.GetString());
 
 		if(m_ismysql553)
-		iindex->m_indexcomment.SetAs(indexcomment.GetString());
+			iindex->m_indexcomment.SetAs(indexcomment.GetString());
         //..Sets the index type
         if(isunique)
         {
@@ -562,7 +561,7 @@ TabIndexes::InitDlgGrid()
 		//}
 		
 		// Just show order column if db supports ordering:: Note: 
-		// MDB "accepts" asc/desc but does not uses it. as of 10.3.21 at least. 
+		// MDB "accepts" asc/desc but does not use it. as of 10.3.21 at least. 
 		
 		memset(&gvcol, 0, sizeof(gvcol));
 		
@@ -2057,7 +2056,7 @@ TabIndexes::FillInitValues()
 		CustomGrid_SetColumnReadOnly(m_hgridindexes, row, INDEXVISIBILITY, wyTrue);
 			
 		if(m_ismysql553)
-		CustomGrid_SetText(m_hgridindexes, row, INDEXCOMMENT,cwrapobj->m_oldval->m_indexcomment.GetString());
+			CustomGrid_SetText(m_hgridindexes, row, INDEXCOMMENT,cwrapobj->m_oldval->m_indexcomment.GetString());
 
         CustomGrid_SetRowLongData(m_hgridindexes, row, (LPARAM) cwrapobj);
 
@@ -2697,7 +2696,8 @@ TabIndexes::GetNewAndModifiedIndexes(wyString &query, wyBool  execute)
 			visibilitystr.SetAs("");
 
 		if(m_ismysql553)
-		GetGridCellData(m_hgridindexes, row, INDEXCOMMENT, indexcomment);
+			GetGridCellData(m_hgridindexes, row, INDEXCOMMENT, indexcomment);
+
         if(!indextypestr.GetLength())
             indextypestr.SetAs("index");
         else

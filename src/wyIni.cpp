@@ -548,11 +548,11 @@ wyBool
 wyIni::LoadFile(const wyChar *filename, const wyChar* secname, const wyChar* keyname)
 {
 	FILE *in_stream;
-	wyChar buffer[1024]; // earlier size is 255, then if it contains more than 255 then it is truncating.
+	wyChar buffer[2048]; // earlier size is 255, then if it contains more than 255 then it is truncating. Size increased to 2048 as password limit is set to 2048.
 	wyChar comments[1024];
-	wyChar current_section[1024];	
+	wyChar current_section[2048];
 	wyChar key[1024];
-	wyChar value[1024];
+	wyChar value[2048];
 	wyChar *pdest;
 	wyInt32  index;
     wyInt32 c = 0;

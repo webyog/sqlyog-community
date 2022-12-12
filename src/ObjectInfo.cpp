@@ -3621,7 +3621,7 @@ ObjectInfo::FormatTextModeSQLStatement(MDIWindow* wnd, const wyChar* objectname,
 
 			if(strtpos != -1)
             {
-				strcolumn.Replace(strtpos, strlen(tok) + 1, "");
+				strcolumn.Replace(strtpos, strlen(tok) , "");
             }
 
 			tok = strtok(NULL, ",");

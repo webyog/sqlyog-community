@@ -2559,8 +2559,7 @@ TabModule::SetTabRename(wyWChar *name, wyBool isedited,MDIWindow *wnd, wyBool is
 					if (node2->tabtype == querytab)
 					{
 						//Fix to update sequence number from old and new session
-						s2.SetAs(newname.GetString());
-						s2.SetAs(s2.Substr(0, 5));
+						s2.SetAs(newname.Substr(0, 5));
 						s2.LTrim();
 						s2.RTrim();
 

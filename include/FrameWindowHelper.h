@@ -428,7 +428,8 @@ All Files(*.*)\0*.*\0"
 #define		SIZE_192									192
 #define		SIZE_256									256
 #define		SIZE_512									512
-#define		SIZE_1024									1024	
+#define		SIZE_1024									1024
+#define		SIZE_2048									2048
 #define		SIZE_5120									(20*1024)	
 
 #define		CURRENT_TIMESTAMP							"CURRENT_TIMESTAMP"
@@ -976,6 +977,16 @@ wyBool		IsColumnSet(Tunnel * tunnel, MYSQL_RES * myfieldres, MYSQL_RES * res, co
 @returns wyTrue if set else wyFalse
 */
 wyBool		IsColumnPrimary(Tunnel * tunnel, MYSQL_RES * myfieldres, wyChar * column);
+
+/// Searches for the column name in the virtual fields res
+/**
+@param tunnel				: IN Mysql tunnel pointer
+@param myfieldres			: IN Mysql result set
+@param column				: IN Column name
+@returns wyTrue if set else wyFalse
+*/
+wyBool
+IsFieldVirtual(Tunnel *tunnel, MYSQL_RES *myfieldres, wyString& column);
 
 /// Whether there is a primary key for the table or not.
 /**

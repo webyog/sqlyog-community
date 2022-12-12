@@ -1692,6 +1692,7 @@ InitConInfo(ConnectionInfo &consrc, ConnectionInfo &contgt)
 
 	contgt.m_issslchecked = consrc.m_issslchecked;
     contgt.m_issslauthchecked = consrc.m_issslauthchecked;
+	contgt.m_no_ca = consrc.m_no_ca;
     contgt.m_clicert.SetAs(consrc.m_clicert);
     contgt.m_clikey.SetAs(consrc.m_clikey);
     contgt.m_cacert.SetAs(consrc.m_cacert);
@@ -1709,6 +1710,9 @@ InitConInfo(ConnectionInfo &consrc, ConnectionInfo &contgt)
 	contgt.m_isglobalsqlmode = consrc.m_isglobalsqlmode;
 	contgt.m_sqlmode.SetAs(consrc.m_sqlmode);
     contgt.m_initcommand.SetAs(consrc.m_initcommand);
+
+	contgt.m_isazuredb = consrc.m_isazuredb;
+	contgt.m_connection_id = consrc.m_connection_id;
 }
 
 
@@ -1742,6 +1746,7 @@ InitializeConnectionInfo(ConnectionInfo &con)
 //	con.m_ispwdcleartext = wyFalse;
 	con.m_isstorepwd = wyFalse;
 	con.m_ishttp = wyFalse;
+	con.m_no_ca = wyFalse;
 }
 
 void 
@@ -9822,8 +9827,14 @@ wyBool GetSessionDetailsFromTable(wyWChar* path, ConnectionInfo *conninfo, wyInt
 
 
 		 colval = sqliteobj->GetText(&res , "CA");
-		 if(colval)
+		 if (colval) {
 			 conninfo->m_cacert.SetAs(colval);
+		 }
+
+		 if(conninfo->m_cacert.GetLength())
+			 conninfo->m_no_ca = wyFalse;
+		 else
+			 conninfo->m_no_ca = wyTrue;
 
 		 colval = sqliteobj->GetText(&res , "Cipher");
 		 if(colval)

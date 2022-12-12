@@ -35,6 +35,7 @@ public:
 	void			SetDB ( const char * db );
 	void			SetBatchEnd ( bool end ) {}
 	void			EmptyQueryBuffer ();
+	void			ClearXMLDoc();
 	bool			GetMySQLVersion ( MYSQL * mysql );
 
 	int				mysql_real_query ( MYSQL * mysql, const char * q, unsigned long length, bool isbadforxml, 

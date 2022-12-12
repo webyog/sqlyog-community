@@ -886,6 +886,16 @@ MySQLDump::ConnectToDataBaseNext()
     conn.m_clikey.SetAs(m_clikey);
     conn.m_cipher.SetAs(m_cipher);
 
+	//If CA-cert is not provided then m_no_ca = TRUE
+	if (conn.m_cacert.Compare("") == 0)
+	{
+		conn.m_no_ca = wyTrue;
+	}
+	else
+	{
+		conn.m_no_ca = wyFalse;
+	}
+
 	if(!m_tunnel->IsTunnel())
 		SetMySQLOptions(&conn, m_tunnel, &m_mysql, wyFalse);
 

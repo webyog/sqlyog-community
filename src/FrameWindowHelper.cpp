@@ -2552,6 +2552,38 @@ IsColumnPrimary(Tunnel *tunnel, MYSQL_RES *myfieldres, wyChar *column)
 	return wyFalse;
 }
 
+// function searches for the column name in the key res and finds if its part of a primary key column
+wyBool
+IsFieldVirtual(Tunnel *tunnel, MYSQL_RES *myfieldres, wyString& column)
+{
+	wyUInt32    count, field;
+
+	MYSQL_ROW	myrow;
+
+	if (!myfieldres)
+		return wyFalse;
+
+	if ((field = GetFieldIndex(myfieldres, "extra", tunnel)) == -1)
+		return wyFalse;
+
+	for (count = 0; count < myfieldres->row_count; count++)
+	{
+		tunnel->mysql_data_seek(myfieldres, count);
+
+		myrow = tunnel->mysql_fetch_row(myfieldres);
+
+		if (column.Compare(myrow[0]) == 0 
+				&& (strstr(myrow[field], "VIRTUAL")
+					|| strstr(myrow[field], "STORED")
+					|| strstr(myrow[field], "PERSISTENT")
+					)
+			)
+			return wyTrue;
+	}
+
+	return wyFalse;
+}
+
 // Function reads the global .ini file and returns whether to warn user on update row
 // problem
 wyBool
@@ -3145,7 +3177,16 @@ GetColLengthArray(MYSQL_ROW row, wyInt32 col, wyUInt32 *len)
 	arr = len;
 
 	// loop thru and get the length of each field
-	for (; ((INT)i) <= (col + 1); column++, arr++)
+	// Note that column is incremented to next after last column in the row to get the byte position exactly after end of last column
+	// and caclulate actual size of last column, that's why i starts from 0 and ends at <= col, not < col. When i is 0, no length is caclulated,
+	// as both column is at beginning of first column (row) and start is NULL. The first iteration is used to move the column pointer to second column
+	// (or position immediately after first column in case of 1 column row) and begin actual caclulating of bytes from this position to start position
+	// which is now in the beginning of first column. Next iterations column and start pointers move accordingly to calculate next columns until last one
+	// is calculated. There was a bug - the loop continued to i <= (col+1) which effectively makes the column and start pointers moving one more time after
+	// last column was calculated so start becomes the position after last column and column pointer points to sizeof(column) AFTER actual last column end byte.
+	// This meant that on last loop cycle a falacy column size was calculated in undefined memory space, which could be in process heap (nothing happens, except
+	// a fictional field size is saved as one more member of len array) or some other process or system memory space, which causes OS to immediately kill the app.
+	for (; ((INT)i) <= col; column++, arr++)
 	{
 		if (!*column)
 		{

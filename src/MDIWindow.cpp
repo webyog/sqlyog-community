@@ -166,6 +166,7 @@ MDIWindow::MDIWindow(HWND hwnd, ConnectionInfo * conninfo, wyString &dbname, wyS
 	m_isfromsaveas = wyFalse;
 	m_fromdirtytab = wyFalse;
 	//m_tabposition = 0;
+
 }
 
 MDIWindow::~MDIWindow()
@@ -1908,6 +1909,7 @@ MDIWindow::StopQuery()
 	MYSQL		*mysql, *temp;
     wyWChar		curdb[SIZE_512] = {0};
 	wyString	currentdatabase;
+	wyInt32		thread_id;
 
     pGlobals->m_pcmainwin->GetCurrentSelDB(curdb, SIZE_512 - 1);
 	
@@ -1995,10 +1997,16 @@ MDIWindow::StopQuery()
 	/* connection successful so now we need to kill the pid */
 	//DEBUG_LOG("StopQuery::mysql_kill");
 
-	if(mysql_kill(mysql, m_mysql->thread_id))
+	if (m_conninfo.m_isazuredb)
+		thread_id = m_conninfo.m_connection_id;
+	else
+		thread_id = m_mysql->thread_id;
+
+	if(mysql_kill(mysql, thread_id))
     {
 		ShowMySQLError(m_hwnd, m_tunnel, &mysql, NULL, wyTrue);
 		m_tunnel->mysql_close(temp);
+		ResetStopQueryExecution();
         LeaveCriticalSection(&m_cs);
 		return wyFalse;
 	}
@@ -2011,6 +2019,9 @@ MDIWindow::StopQuery()
 	//set the SQl_MODE = ''
 	if(IsMySQL5010(m_tunnel, &m_mysql))
 		SetDefaultSqlMode(m_tunnel, &m_mysql, wyFalse);
+
+	if (m_conninfo.m_isazuredb)
+		m_conninfo.m_connection_id = GetConnectionId(m_tunnel, m_mysql);
 
 	//m_executing = wyFalse;
 
@@ -4488,6 +4499,16 @@ MDIWindow::StopQueryExecution()
     return ;
 }
 
+void
+MDIWindow::ResetStopQueryExecution()
+{
+	// Access the shared resource.
+	EnterCriticalSection(&m_cs);
+	m_stopquery = 0;
+	LeaveCriticalSection(&m_cs);
+	return;
+}
+
 wyBool
 MDIWindow::IsStopQueryVariableReset()
 {
@@ -4555,7 +4576,10 @@ MDIWindow::ReConnect(Tunnel * tunnel, PMYSQL mysql, wyBool isssh, wyBool isimpor
 	if(isprofile == wyTrue && currentdb.GetLength() &&  UseDatabase(currentdb, *mysql, tunnel) == wyFalse)
 		return wyFalse;
 
-		
+	if (m_conninfo.m_isazuredb) {
+		m_conninfo.m_connection_id = GetConnectionId(tunnel, *mysql);
+	}
+	
 	/* if its tunnel then we need the server version */
 	if(tunnel->IsTunnel())
     {

@@ -981,6 +981,8 @@ public:
     /// Stop query execution
     void        StopQueryExecution();
 
+	void		ResetStopQueryExecution();
+
 	///CHecking if currenet execution stopped or not
 	/**
 	@return wyTrue if stopped/not executing anything, or return wyFalse

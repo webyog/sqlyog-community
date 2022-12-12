@@ -451,6 +451,9 @@ struct ConnectionInfo
 	wyBool		m_isInfoOpen;
 
 	wyUInt32	m_isencrypted;
+
+	wyBool		m_isazuredb;
+	wyUInt32	m_connection_id;
 	
 };
 

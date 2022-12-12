@@ -380,7 +380,7 @@ ConnectionCommunity::ConnectToMySQL(HWND hdlg, ConnectionInfo *coninfo)
 	wyUInt32		portno, client=0;
 	wyInt32         ret;
     wyWChar         host[SIZE_512]={0}, user[SIZE_512]={0}, timeout[32] = {0};
-	wyWChar			pwd[SIZE_512]={0}, port[10]={0};
+	wyWChar			pwd[SIZE_2048]={0}, port[10]={0};
 	MYSQL           *mysql, *temp;
     wyString        strinitcommand;
 
@@ -396,7 +396,7 @@ ConnectionCommunity::ConnectToMySQL(HWND hdlg, ConnectionInfo *coninfo)
 	ret = SendMessage(GetDlgItem(hdlg, IDC_DLGCONNECT_HOST), WM_GETTEXT,(WPARAM)SIZE_512-1, (LPARAM)host);
 	ret = SendMessage(GetDlgItem(hdlg, IDC_DLGCONNECT_USER), WM_GETTEXT,(WPARAM)SIZE_512-1, (LPARAM)user);
 	ret = SendMessage(GetDlgItem(hdlg, IDC_DLGCONNECT_PORT), WM_GETTEXT,(WPARAM)9, (LPARAM)port);
-	ret = SendMessage(GetDlgItem(hdlg, IDC_DLGCONNECT_PASSWORD), WM_GETTEXT,(WPARAM)SIZE_512-1, (LPARAM)pwd);
+	ret = SendMessage(GetDlgItem(hdlg, IDC_DLGCONNECT_PASSWORD), WM_GETTEXT,(WPARAM)SIZE_2048-1, (LPARAM)pwd);
 
 	portno = _wtoi(port);
 
@@ -488,7 +488,7 @@ ConnectionCommunity::OnConnect(HWND hwnd, ConnectionInfo * dbname)
     MYSQL		*mysql;
 	HWND		lastfocus = GetFocus();
 	wyString	conn, temp, dirnamestr;
-	wyWChar		directory[MAX_PATH + 1] = {0}, *lpfileport = 0, pass[MAX_PATH + 1] = {0};
+	wyWChar		directory[MAX_PATH + 1] = {0}, *lpfileport = 0, pass[SIZE_2048] = {0};
 	HWND		hwndcombo;
 	wyInt32		count, storepwd, ret;
 
@@ -567,7 +567,7 @@ ConnectionCommunity::OnConnect(HWND hwnd, ConnectionInfo * dbname)
             }
             else
             {
-                GetWindowText(GetDlgItem(hwnd, IDC_DLGCONNECT_PASSWORD), pass, MAX_PATH);
+                GetWindowText(GetDlgItem(hwnd, IDC_DLGCONNECT_PASSWORD), pass, SIZE_2048);
                 temp.SetAs(pass);
                 EncodePassword(temp);
 				wyChar *encodestr = temp.EncodeBase64Password();

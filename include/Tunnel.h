@@ -42,6 +42,7 @@ public:
 	virtual void			SetDB ( const char * db ) = 0;
 	virtual void			SetBatchEnd ( bool end )  = 0;
 	virtual void			EmptyQueryBuffer () = 0;
+	virtual void			ClearXMLDoc() = 0;
 	virtual bool			GetMySQLVersion ( MYSQL * mysql ) = 0;
 
 	virtual int				mysql_real_query ( MYSQL * mysql, const char * q, unsigned long length, bool isbadforxml, bool batch = false, 

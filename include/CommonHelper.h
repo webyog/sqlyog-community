@@ -75,6 +75,8 @@
 #define  WAIT_TIMEOUT_SERVER  "28800"
 #define  PROCEDURE_FUNC_ERRMSG _("Unable to retrieve information. Please check your privileges. For routines (stored procedures and functions) you need SELECT privilege to mysql.proc if you are not the owner of the routines.")
 
+#define	AZURE_ENDPOINT "database.azure.com"
+
 #define  CPI_BIG5   950
 #define  CPI_CP850  850
 #define  CPI_KOI8R 20866
@@ -1009,6 +1011,8 @@ void	RemovePattern(wyString &text, const wyChar* pattern);
 
 
 void SetSslAuthentication(MYSQL *mysql, ConnectionInfo *conninfo);
+
+wyUInt32 GetConnectionId(Tunnel *tunnel, MYSQL *mysql);
 
 //void DebugLog(const char *buffer);
 #ifdef _WIN32

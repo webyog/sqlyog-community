@@ -311,8 +311,9 @@ wyBool
 IsMySQL800(PMYSQL mysql)
 {
 	wyUInt32 me = mysql_get_server_version(*mysql);/* Only available from MySQLv8.0*/
+	const char *dbString = mysql_get_server_info(*mysql);
 
-	if (me >= 80000)
+	if (me >= 80000 && !strstr(dbString, "MariaDB"))
 		return wyTrue;
 	else
 		return wyFalse;

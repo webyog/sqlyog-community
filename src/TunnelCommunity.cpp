@@ -320,6 +320,11 @@ TunnelCommunity::EmptyQueryBuffer()
     VERIFY(false);
 }
 
+void
+TunnelCommunity::ClearXMLDoc()
+{
+	VERIFY(false);
+}
 
 bool
 TunnelCommunity::CheckCorrectTunnelVersion(MYSQL * mysql)

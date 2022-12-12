@@ -3249,7 +3249,7 @@ CCustGrid::DrawRowColumns(HDC hdcmem, PRECT rect, PRECT rectwin, wyUInt32 *totcx
             if(temprowlist)
 	    	    rect->right = rect->right + temprowlist->rowcx;
         }
-        else if(pgvcolnode && pgvcolnode->isshow == wyTrue)
+        else // if(pgvcolnode && pgvcolnode->isshow == wyTrue)
         {
 			rect->top = rect->top + m_hight;
 			rect->bottom = rect->top + m_hight;

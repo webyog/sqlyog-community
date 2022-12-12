@@ -1578,7 +1578,7 @@ void wyString::EscapeNullFromPassword()
 void wyString::DecodeBase64Password(wyString &pwdstr)
 {
 	wyChar *decodedstr = NULL;
-	decodedstr = AllocateBuff(512);
+	decodedstr = AllocateBuff(2048*2);
 	wyInt32 len = DecodeBase64(pwdstr.GetString(), decodedstr);
 	pwdstr.SetAsDirect(decodedstr, len);
 
@@ -1588,7 +1588,7 @@ void wyString::DecodeBase64Password(wyString &pwdstr)
 
 wyChar* wyString::EncodeBase64Password()
 {
-	wyChar *encodestr = AllocateBuff(512);
+	wyChar *encodestr = AllocateBuff(2048*2);
 	EncodeBase64(GetString(), GetLength(), &encodestr);
 	return encodestr;
 }

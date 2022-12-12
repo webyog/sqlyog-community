@@ -93,7 +93,7 @@ ConnectionBase::OnInitDialog(HWND hwnd, LPARAM lparam)
 	// also sets the maximum text which can be entered into the value fields.
 	SendMessage(GetDlgItem(hwnd, IDC_DLGCONNECT_HOST), EM_LIMITTEXT, 255, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_DLGCONNECT_USER), EM_LIMITTEXT, 255, 0);
-	SendMessage(GetDlgItem(hwnd, IDC_DLGCONNECT_PASSWORD), EM_LIMITTEXT, 255, 0);
+	SendMessage(GetDlgItem(hwnd, IDC_DLGCONNECT_PASSWORD), EM_LIMITTEXT, SIZE_2048, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_DLGCONNECT_PORT), EM_LIMITTEXT, 5, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_TIMEOUTEDIT), EM_LIMITTEXT, 6, 0);
 	SendMessage(GetDlgItem(hwnd, IDC_PINGINTERVAL), EM_LIMITTEXT, 6, 0);
@@ -1557,7 +1557,7 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
 	wyString    timeout, conn, dirstr, pwdstr, tempstr, isencrypted;
 	wyString	codepage, userstr, hoststr, portstr, dbstr;
 	wyWChar     directory[MAX_PATH+1]={0}, *lpfileport=0;
-	wyChar	 	pwd[SIZE_512]={0};
+	wyChar	 	pwd[SIZE_2048]={0};
 	wyBool      decodepwd = wyTrue;
 	wyUInt32    ret, usecompress = 1, isdefwaittimeout = 1, readonly = 0/*, usecleartext = 0*/;
 	ConnectionInfo  conninfo;
@@ -2629,7 +2629,7 @@ void
 ConnectionBase::SaveServerDetails(HWND hwnd, const wyChar *conn, const wyChar *directory)
 {
     wyInt32     ret = 1, value = 1;
-    wyWChar     temp[SIZE_1024] = {0};
+    wyWChar     temp[SIZE_2048] = {0};
 	wyString    tempstr, isencrypted;
 
     // Server Host

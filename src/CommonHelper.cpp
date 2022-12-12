@@ -1120,25 +1120,29 @@ CheckForOnUpdate(wyString &strcreate, wyInt32 fieldpos)
 	free(create);
 	return find;
 }
+
 wyBool GetExpressionValue(wyChar * currentrow, wyString * expression)
 {
-wyChar * find="AS";
-wyBool found=wyFalse;
-const char *ptr = strstr(currentrow,find);
-if(ptr) {
-	found=wyTrue;
-  int index = ptr - currentrow+2;
-   while(currentrow[index]!='S'&& currentrow[index]!='P'&& currentrow[index]!='V' )
-   {
-	   expression->AddSprintf("%c",currentrow[index]);
+	wyString rowstr(currentrow);
+	wyChar * find = "AS";
+	wyBool found = wyFalse;
+	int startpos = -1;
+	int endpos = -1;
+	
+	startpos = rowstr.FindI("AS");
+	if (startpos == -1)
+		return found;
 
-     index++;
-   }
+	startpos = startpos + 3; //length of AS and space.
+
+	if (((endpos = rowstr.FindI("VIRTUAL")) != -1) || ((endpos = rowstr.FindI("STORED")) != -1) || ((endpos = rowstr.FindI("PERSISTENT")) != -1)) {
+		expression->SetAs(rowstr.Substr(startpos, endpos - startpos));
+		found = wyTrue;
+	}
+	return found;
+
 }
 
-return found;
-
-}
 wyBool GetCheckConstraintValue(wyChar * currentrow, wyString * expression)
 {
 	if (currentrow == NULL)
@@ -4261,6 +4265,7 @@ InitConnectionDetails(ConnectionInfo *conn)
 	conn->m_rgbfgconn				= RGB(0, 0, 0);
 #endif
 
+	conn->m_no_ca = wyFalse;
     return;
 }
 
@@ -4379,11 +4384,11 @@ IsDatatypeNumeric(wyString  &datatype)
 }
 
 //Checks whether the datatype belongs to the deprecated numeric size datatypes or not
+//We are not considering tinyint as MySQL returns display width for tinyint. It is an exceptional case. 
 wyBool
 IsDatatypeDeprecatedSizeType(wyString  &datatype)
 {
-	if (!(
-		datatype.CompareI("tinyint") == 0 ||
+	if (!(datatype.CompareI("tinyint") == 0 ||		
 		datatype.CompareI("smallint") == 0 ||
 		datatype.CompareI("mediumint") == 0 ||
 		datatype.CompareI("int") == 0 ||
@@ -4710,7 +4715,7 @@ RemovePattern(wyString &text, const wyChar* pattern)
 
 	re = pcre_compile(
 		pattern,              /* the pattern */
-		PCRE_UTF8 | PCRE_CASELESS | PCRE_NEWLINE_CR,/* default options */ //match is a case insensitive
+		PCRE_UTF8 | PCRE_CASELESS | PCRE_NEWLINE_CR,/* default options */ //match is a case insensitive 
 		&error,               /* for error message */
 		&erroffset,           /* for error offset */
 		NULL);                /* use default character tables */
@@ -4747,9 +4752,9 @@ RemovePattern(wyString &text, const wyChar* pattern)
 
 }
 
-void
+void 
 SetSslAuthentication(MYSQL *mysql, ConnectionInfo *conninfo)
-{
+{ 
 	/// SSL Connection if ssl is selected
 	if (conninfo->m_issslchecked == wyTrue)
 	{
@@ -4778,4 +4783,31 @@ SetSslAuthentication(MYSQL *mysql, ConnectionInfo *conninfo)
 				NULL, conninfo->m_cipher.GetLength() ? conninfo->m_cipher.GetString() : NULL);
 		}
 	}
+}
+
+wyUInt32
+GetConnectionId(Tunnel *tunnel, MYSQL *mysql)
+{
+	MYSQL_RES   *myres;
+	MYSQL_ROW   myrow;
+	wyString	query;
+	wyString idstr;
+	wyUInt32	conectionid = 0;
+	query.SetAs("SELECT CONNECTION_ID()");
+	myres = SjaExecuteAndGetResult(tunnel, &mysql, query);
+	if (!myres)
+	{
+		//collation.SetAs("latin1");
+		return wyFalse;
+	}
+
+	myrow = sja_mysql_fetch_row(tunnel, myres); 
+
+	if (myrow[0])
+		idstr.SetAs(myrow[0]);
+
+	if (myres)
+		sja_mysql_free_result(tunnel, myres);
+
+	return idstr.GetAsInt32();
 }
