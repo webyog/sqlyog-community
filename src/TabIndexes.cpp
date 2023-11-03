@@ -1742,14 +1742,12 @@ TabIndexes::FillColumnsGrid(HWND hwnd)
             }
             if(!tmpindcols)
             {
-				//add only thoes columns for index which are not virtual
-				if(!(m_ismariadb52 && cfieldswrapobj->m_newval->m_virtuality.CompareI("VIRTUAL")==0) )
-               { 
-				  newrow = CustomGrid_InsertRow(m_hdlggrid);
+				//add only columns including virtual columns
+				
+				newrow = CustomGrid_InsertRow(m_hdlggrid);
                 CustomGrid_SetText(m_hdlggrid, newrow, 0, (wyChar*)cfieldswrapobj->m_newval->m_name.GetString());
                 CustomGrid_SetText(m_hdlggrid, newrow, 1, (wyChar*)cfieldswrapobj->m_newval->m_datatype.GetString());
                 CustomGrid_SetRowLongData(m_hdlggrid, newrow, (LPARAM) cfieldswrapobj);
-				}
             }
         }
         cfieldswrapobj = (FieldStructWrapper*)cfieldswrapobj->m_next;

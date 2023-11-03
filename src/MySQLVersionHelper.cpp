@@ -517,10 +517,10 @@ void GetVersionInfoforAutoComplete(MYSQL *mysql, wyString &VersionS)
 	char *dbString = mysql_get_server_info(mysql);
 	if(strstr(dbString, "MariaDB")) ///if its mariadb,check if the version is above 10.2
 	{
-		if(me >= 100200) 
+		if(me >= 100200 && me < 100300)
 			me = 50713;///if mariadb version is > 10.2 it supports JSON, hence include functions till mysql version 5.7.13
-		else
-			me = 50066;///if mariadb version is < 10.2, include functions only for previous versons of mysql.		
+		else if(me < 100200)
+			me = 50300;///if mariadb version is < 10.2, include functions only for previous versons of mysql.		
 	}
 	
  	VersionS.Sprintf("%ld", me);

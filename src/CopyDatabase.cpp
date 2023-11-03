@@ -1582,7 +1582,8 @@ CopyDatabase::InitExportData(HWND hwndtree)
 	else
 		m_isremdefiner = wyFalse;
 	InitTargetServer();	
-	SetNamesToUTF8();	
+
+	SetNamesToUTF8();
 
     return wyTrue;
 }
@@ -2612,54 +2613,66 @@ CopyDatabase::RevertTargetServer()
 void
 CopyDatabase::SetNamesToUTF8()
 {
-    wyString    query;
-    MYSQL_RES   *res;
+	wyString query;
+	MYSQL_RES *res;
 
-    if(IsMySQL41(m_newsrctunnel, &m_newsrcmysql)&& IsMySQL41(m_newtargettunnel, &m_newtargetmysql))
+	wyString srcUtf8CharType = "utf8";
+	wyString trgtUtf8CharType = "utf8";
+
+	if (m_tgtinfo->m_initcommand.FindI("utf8mb4") >= 0)
 	{
-		if(m_newsrctunnel->IsTunnel())
-			m_newsrctunnel->SetCharset("utf8");
+		trgtUtf8CharType = "utf8mb4";
+	}
+
+	if(m_srcinfo->m_initcommand.FindI("utf8mb4") >= 0)
+	{
+		srcUtf8CharType = "utf8mb4";
+	}
+
+	if (IsMySQL41(m_newsrctunnel, &m_newsrcmysql) && IsMySQL41(m_newtargettunnel, &m_newtargetmysql))
+	{
+		if (m_newsrctunnel->IsTunnel())
+			m_newsrctunnel->SetCharset(srcUtf8CharType.GetString());
 		else
 		{
-			query.Sprintf("SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT"); 
+			query.Sprintf("SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT");
 			res = SjaExecuteAndGetResult(m_newsrctunnel, &m_newsrcmysql, query);
-			if(res)
+			if (res)
 				m_newsrctunnel->mysql_free_result(res);
 
-			query.Sprintf("SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS"); 
+			query.Sprintf("SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS");
 			res = SjaExecuteAndGetResult(m_newsrctunnel, &m_newsrcmysql, query);
-			if(res)
+			if (res)
 				m_newsrctunnel->mysql_free_result(res);
 
-			query.Sprintf("SET NAMES utf8"); 
+			query.Sprintf("SET NAMES %s", srcUtf8CharType.GetString());
 			res = SjaExecuteAndGetResult(m_newsrctunnel, &m_newsrcmysql, query);
-			if(res)
+			if (res)
 				m_newsrctunnel->mysql_free_result(res);
 		}
 
-		if(m_newtargettunnel->IsTunnel())
-			m_newtargettunnel->SetCharset("utf8");
+		if (m_newtargettunnel->IsTunnel())
+			m_newtargettunnel->SetCharset(trgtUtf8CharType.GetString());
 		else
 		{
-
-			query.Sprintf("SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT"); 
+			query.Sprintf("SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT");
 			res = SjaExecuteAndGetResult(m_newtargettunnel, &m_newtargetmysql, query);
-			if(res)
+			if (res)
 				m_newtargettunnel->mysql_free_result(res);
 
-			query.Sprintf("SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS"); 
+			query.Sprintf("SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS");
 			res = SjaExecuteAndGetResult(m_newtargettunnel, &m_newtargetmysql, query);
-			if(res)
+			if (res)
 				m_newtargettunnel->mysql_free_result(res);
 
-			query.Sprintf("SET NAMES utf8"); 
+			query.Sprintf("SET NAMES %s", trgtUtf8CharType.GetString());
 			res = SjaExecuteAndGetResult(m_newtargettunnel, &m_newtargetmysql, query);
-			if(res)
+			if (res)
 				m_newtargettunnel->mysql_free_result(res);
 		}
-    }
+	}
 
-    return;
+	return;
 }
 
 void 

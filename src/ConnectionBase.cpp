@@ -908,6 +908,11 @@ ConnectionBase::ChangeConnName(HWND hdlg)
     hwndc = (HWND)SendMessage(hwndcombo, CCBM_GETCOMBOHWND, NULL, NULL); 
 
 	VERIFY ((cursel = SendMessage(hwndcombo, CB_GETCURSEL, 0, 0))!= CB_ERR);
+	
+	if (cursel == -1) {
+		cursel = SendMessage(hwndcombo, CB_GETCOUNT, cursel, 0) - 1;
+	}
+	
 	VERIFY ((SendMessage(hwndc, CB_GETLBTEXT, cursel,(LPARAM)pconn.m_connname))); 
 	VERIFY((count = SendMessage(hwndcombo, CB_GETITEMDATA, cursel, 0)));
 
@@ -1583,6 +1588,9 @@ ConnectionBase::GetInitialDetails(HWND hdlg)
 	dirstr.SetAs(directory);
 
     count = SendMessage(hwndcombo, CB_GETCURSEL, 0, 0);
+	if (count == -1) {
+		count = SendMessage(hwndcombo, CB_GETCOUNT, count, 0) - 1;
+	}
 	VERIFY(count != CB_ERR);
 	count = SendMessage(hwndcombo, CB_GETITEMDATA, count, 0);
 	conn.Sprintf("Connection %u", count);
@@ -1799,6 +1807,9 @@ ConnectionBase::GetOtherValues(HWND hdlg, ConnectionInfo *coninfo)
     
     // now get the title.
 	index = SendMessage(hcb,CB_GETCURSEL,0,0);
+	if (index == -1) {
+		index = SendMessage(hcb, CB_GETCOUNT, index, 0) - 1;
+	}
 	
 	SendMessage(hwndCombo,CB_GETLBTEXT, index, (LPARAM)title);
 	SendMessage(GetDlgItem(hdlg, IDC_DLGCONNECT_DATABASE), WM_GETTEXT,(WPARAM)SIZE_512 - 1,(LPARAM)db);
@@ -2907,6 +2918,10 @@ ConnectionBase::GetConnectionName(HWND hdlg, wyString *connnamestr, const wyChar
 	HWND        hwndCombo = (HWND) SendMessage(hcb, CCBM_GETCOMBOHWND, NULL, NULL);
 
 	VERIFY((index = SendMessage(hcb, CB_GETCURSEL, 0, 0))!= CB_ERR);
+
+	if (index == -1) {
+		index = SendMessage(hcb, CB_GETCOUNT, index, 0) - 1;
+	}
 
 	txtlen = (SendMessage(hcb, CB_GETLBTEXTLEN, index, 0));
 

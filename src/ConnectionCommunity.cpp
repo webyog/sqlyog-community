@@ -1231,6 +1231,9 @@ ConnectionCommunity::CreateSourceInstance(CopyDatabase *copydb)
 
 	VERIFY(!(copydb->m_newsrctunnel->mysql_options(tempmysql, MYSQL_INIT_COMMAND, "/*40030 SET net_write_timeout=3600 */")));
 
+	if(copydb->m_srcinfo->m_initcommand.FindI("utf8mb4") >=0)
+		VERIFY(!(copydb->m_newsrctunnel->mysql_options(tempmysql, MYSQL_INIT_COMMAND, copydb->m_srcinfo->m_initcommand.GetString())));
+
 	SetMySQLOptions(copydb->m_srcinfo, copydb->m_newsrctunnel, &tempmysql, wyTrue);
 
 	newsrcmysql = copydb->m_newsrctunnel->mysql_real_connect(tempmysql, 
@@ -1269,7 +1272,10 @@ ConnectionCommunity::CreateTargetInstance(CopyDatabase *copydb)
     copydb->m_newtargettunnel = CreateTunnel((wyBool)copydb->m_targettunnel->IsTunnel());
 		
 	VERIFY(tempmysql = copydb->m_newtargettunnel->mysql_init((MYSQL*)0));
-		
+	
+	if (copydb->m_tgtinfo->m_initcommand.FindI("utf8mb4") >= 0)
+		VERIFY(!(copydb->m_newtargettunnel->mysql_options(tempmysql, MYSQL_INIT_COMMAND, copydb->m_tgtinfo->m_initcommand.GetString())));
+
 	SetMySQLOptions(copydb->m_tgtinfo, copydb->m_newtargettunnel, &tempmysql);
 
 	newtargetmysql = copydb->m_newtargettunnel->mysql_real_connect(tempmysql, 

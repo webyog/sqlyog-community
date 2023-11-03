@@ -1490,6 +1490,7 @@ ExportBatch::SetOtherValues(MySQLDump *dump)
 	wyString	filename;
     wyString    charset, query;
 	wyBool		ischunkinsert,isprifixtimestamp=wyFalse;
+	MDIWindow	*wnd = GetActiveWin();
 
     dump->SetDatabase(m_db.GetString());
 	dump->SetAllTables(m_alltables);
@@ -1516,9 +1517,14 @@ ExportBatch::SetOtherValues(MySQLDump *dump)
 			dump->SetChunkLimit(chunklimit);
 		}
 	}
-   
-	if(IsMySQL41(m_tunnel, m_mysql))
-		dump->SetCharSet("utf8");
+
+	if (wnd->m_conninfo.m_initcommand.FindI("utf8mb4") >= 0)
+		dump->SetCharSet("utf8mb4");
+	else if(IsMySQL41(m_tunnel, m_mysql))
+	{	
+			dump->SetCharSet("utf8");
+	}
+	
     else
     {
         if(GetServerDefaultCharset(m_tunnel, *m_mysql, charset, query) == wyFalse)

@@ -1989,6 +1989,9 @@ TabFields::GetDefaultValue(wyString& query, FieldStructWrapper* cwrapobj)
 		{
 			query.Add("'' ");
 		}
+		else if (datatype.Compare("varchar") == 0 && ((defval.FindI("UUID()") != -1) || (defval.FindI("SYS_GUID()") != -1))) {
+			query.AddSprintf("%s ", defval.GetString());
+		}
 		else
 		{
 			if(defval.GetCharAt(0) == '`' && defval.GetCharAt(defval.GetLength() - 1) == '`' 

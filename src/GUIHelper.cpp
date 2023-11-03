@@ -1859,6 +1859,10 @@ WriteConnDetails(HWND hdlg)
 
 	VERIFY((index = SendMessage(hcb, CB_GETCURSEL, 0, 0))!= CB_ERR);
 
+	if (index == -1) {
+		index = SendMessage(hcb, CB_GETCOUNT, index, 0) - 1;
+	}
+	
 	txtlen = (SendMessage(hcb, CB_GETLBTEXTLEN, index, 0));
 
 	conname = AllocateBuffWChar(txtlen + 1);

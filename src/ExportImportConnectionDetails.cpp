@@ -1369,7 +1369,11 @@ wyBool ExportImportConnection::LoadDataToLV(HWND hwnd)
         
             cono=atoi(tempconsecname+10);
             if(connnamestr.Compare("") == 0)
-                return wyFalse;
+			{
+				++i;
+				tempconsecname = strtok(NULL, seps);
+				continue;
+			}
             AddRowsToListViewControl(m_hwndLV, cono, connnamestr.GetAsWideChar(), connhostnamestr.GetAsWideChar(), connusernamestr.GetAsWideChar(), connportstr.GetAsWideChar(),isSSH, isSSL, isHTTP);
             ++i;
             tempconsecname = strtok(NULL, seps);

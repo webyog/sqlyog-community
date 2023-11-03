@@ -269,6 +269,12 @@ private:
 	*/
     wyBool              DumpDatabaseOnUtf8();
 
+	/// Dumps database with setting the utf8mb4 option 
+	/**
+	@returns wyTrue
+	*/
+	wyBool              DumpDatabaseOnUtf8mb4();
+
 	/// Changes the current database
 	/**
 	@param db			: IN Database name to change to 

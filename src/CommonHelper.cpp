@@ -75,7 +75,7 @@ extern	FILE	*logfilehandle;
 static wyChar table64[]=
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-static CryptoPP::byte AESKey[16] = { };//provide any Key
+static CryptoPP::byte AESKey[16] = {}; //Provide any Key
 static CryptoPP::byte AESiv[16] = {}; //Provide any IV
 
 Tunnel *
@@ -1149,42 +1149,22 @@ wyBool GetCheckConstraintValue(wyChar * currentrow, wyString * expression)
 	{
 		return wyFalse;
 	}
-	wyChar * find = "CHECK", *findcomment = "COMMENT";
+	wyChar * find = "CHECK ";
 	wyBool found = wyFalse;
 	wyChar *ptr = strstr(currentrow, find);
-	wyChar *ptrc = strstr(currentrow, findcomment);
-	wyString s1, s2,s3;
-	s1.SetAs(currentrow);
-	s2.SetAs("");
-	s3.SetAs("COMMENT");
 	wyInt32 index=0;
 	if (ptr) {
-		if (ptrc) {
-			index = ptr - currentrow + 5;
-			s2.SetAs(s1.Substr(index, 7));
-			while (s2.CompareI(s3)!=0)//(currentrow[index + 2] != 'C' && currentrow[index + 3] != 'O' && currentrow[index + 4] != 'M')
-			{
-				expression->AddSprintf("%c", currentrow[index]);
-				index++;
-				s2.SetAs(s1.Substr(index, 7));
-			}
-			found = wyTrue;
-		}
-		else
+		index = ptr - currentrow + 6; //length of "CHECK "
+
+		while (wyTrue)
 		{
-			 index = ptr - currentrow + 5;
+			if ((currentrow[index] == ',' && currentrow[index + 2] == ' ')|| (currentrow[index] == '\0' ))
+				break;
 
-			while (wyTrue)
-			{
-				if ((currentrow[index] == ',' && currentrow[index + 2] == ' ')|| (currentrow[index] == '\0' ))
-					break;
-
-				expression->AddSprintf("%c", currentrow[index]);
-				index++;
-			}
-			found = wyTrue;
+			expression->AddSprintf("%c", currentrow[index]);
+			index++;
 		}
-
+		found = wyTrue;
 	}
 
 	return found;
@@ -1193,13 +1173,13 @@ wyBool GetCheckConstraintValue(wyChar * currentrow, wyString * expression)
 
 wyBool GettablelevelCheckConstraintValue(wyChar * currentrow, wyString * expression)
 {
-	wyChar * find = "CHECK";
+	wyChar * find = "CHECK ";
 	wyBool found = wyFalse;/*, withcomment = wyFalse, withoutcomment = wyFalse;*/
 	wyChar *ptr = strstr(currentrow, find);
 	wyInt32 index=0;
 	if (ptr) {
 		found = wyTrue;
-		index =( ptr - currentrow) + 5;
+		index =( ptr - currentrow) + 6; //length of "CHECK "
 		while (currentrow[index] != '\0')
 		{
 			/*if (currentrow[index] == '\0' && currentrow[index + 2] == ' ')
@@ -4264,8 +4244,8 @@ InitConnectionDetails(ConnectionInfo *conn)
 	conn->m_rgbconn				= RGB(255, 255, 255);
 	conn->m_rgbfgconn				= RGB(0, 0, 0);
 #endif
-
 	conn->m_no_ca = wyFalse;
+	    
     return;
 }
 
@@ -4810,4 +4790,5 @@ GetConnectionId(Tunnel *tunnel, MYSQL *mysql)
 		sja_mysql_free_result(tunnel, myres);
 
 	return idstr.GetAsInt32();
+
 }

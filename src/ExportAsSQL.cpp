@@ -2497,6 +2497,10 @@ MySQLDump::DumpDatabase(wyString * buffer, const wyChar *db, wyInt32 *fileerr)
         if(DumpDatabaseOnUtf8() == wyFalse)
             return wyFalse;	
 
+	if (m_charset.CompareI("utf8mb4") == 0)
+		if (DumpDatabaseOnUtf8mb4() == wyFalse)
+			return wyFalse;
+
 	if(m_singletransaction == wyTrue)
 		OnSingleTransaction();
 
@@ -2579,6 +2583,28 @@ MySQLDump::DumpDatabaseOnUtf8()
 		sja_mysql_free_result(m_tunnel, res);
 
     return wyTrue;
+}
+
+wyBool
+MySQLDump::DumpDatabaseOnUtf8mb4()
+{
+	MYSQL_RES   *res;
+	wyString    query;
+
+	query.SetAs("SET NAMES UTF8MB4");
+
+	res = SjaExecuteAndGetResult(m_tunnel, &m_mysql, query);
+
+#ifdef _WIN32
+
+	m_tunnel->SetCharset("utf8mb4");
+
+#endif
+
+	if (res)
+		sja_mysql_free_result(m_tunnel, res);
+
+	return wyTrue;
 }
 
 wyBool 
