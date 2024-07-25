@@ -576,6 +576,43 @@ wyBool IsMariaDB100502(Tunnel * tunnel, PMYSQL mysql)
 		return wyFalse;
 }
 
+
+// Check the version of MariaDB for 10.10.0 and above
+wyBool IsMariaDB101000(Tunnel * tunnel, PMYSQL mysql)
+{
+	long me = mysql_get_server_version(*mysql);
+	const char *dbString = mysql_get_server_info(*mysql);
+	
+	if (me >= 101000 && strstr(dbString, "MariaDB"))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
+// Check the version of MariaDB for 10.5.0 and above
+wyBool IsMariaDB100500(Tunnel * tunnel, PMYSQL mysql)
+{
+	long me = mysql_get_server_version(*mysql);
+	const char *dbString = mysql_get_server_info(*mysql);
+	
+	if (me >= 100500 && strstr(dbString, "MariaDB"))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
+// Check the version of MariaDB for 10.7.0 and above
+wyBool IsMariaDB100700(Tunnel * tunnel, PMYSQL mysql)
+{
+	long me = mysql_get_server_version(*mysql);
+	const char *dbString = mysql_get_server_info(*mysql);
+
+	if (me >= 100700 && strstr(dbString, "MariaDB"))
+		return wyTrue;
+	else
+		return wyFalse;
+}
+
 // MySQL version check for 5.7.6 and above for Alter/Create query
 wyBool IsMySQL576(Tunnel * tunnel, PMYSQL mysql)
 {

@@ -31,6 +31,7 @@
 #define MA_HASH_SHA384    5
 #define MA_HASH_SHA512    6
 #define MA_HASH_RIPEMD160 7
+#define MA_HASH_MAX       8
 
 /*! Hash digest sizes */
 #define MA_MD5_HASH_SIZE 16
@@ -44,18 +45,11 @@
 #define MA_MAX_HASH_SIZE 64
 /** \typedef MRL hash context */
 
-#if defined(WIN32)
-#include <windows.h>
-#include <bcrypt.h>
-typedef struct {
-  char free_me;
-  BCRYPT_ALG_HANDLE hAlg;
-  BCRYPT_HASH_HANDLE hHash;
-  PBYTE hashObject;
-  DWORD digest_len;
-} MA_HASH_CTX;
-#elif defined(HAVE_OPENSSL)
+#if defined(HAVE_WINCRYPT)
 typedef void MA_HASH_CTX;
+#elif defined(HAVE_OPENSSL)
+#include <openssl/evp.h>
+typedef EVP_MD_CTX MA_HASH_CTX;
 #elif defined(HAVE_GNUTLS)
 typedef struct {
   void *ctx;
@@ -67,11 +61,10 @@ typedef struct {
   @brief acquire and initialize new hash context
 
   @param[in] algorithm   hash algorithm
-  @param[in] ctx         pointer to a crypto context
 
   @return    hash context on success, NULL on error
 */
-MA_HASH_CTX *ma_hash_new(unsigned int algorithm, MA_HASH_CTX *ctx);
+MA_HASH_CTX *ma_hash_new(unsigned int algorithm);
 
 /**
   @brief release and deinitializes a hash context
@@ -113,7 +106,7 @@ void ma_hash_result(MA_HASH_CTX *ctx, unsigned char *digest);
 
   @param[in] hash algorithm
 
-  @retuns digest size or 0 on error
+  @returns digest size or 0 on error
 */
 static inline size_t ma_hash_digest_size(unsigned int hash_alg)
 {
@@ -153,11 +146,7 @@ static inline void ma_hash(unsigned int algorithm,
                            unsigned char *digest)
 {
   MA_HASH_CTX *ctx= NULL;
-#ifdef HAVE_SCHANNEL
-  MA_HASH_CTX dctx;
-  ctx= &dctx;
-#endif
-  ctx= ma_hash_new(algorithm, ctx);
+  ctx= ma_hash_new(algorithm);
   ma_hash_input(ctx, buffer, buffer_length);
   ma_hash_result(ctx, digest);
   ma_hash_free(ctx);

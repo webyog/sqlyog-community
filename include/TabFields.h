@@ -152,6 +152,15 @@ public:
 	//is mariadb version>=10.3.9
 	wyBool                     m_ismariadb10309;
 
+	//is mariadb version>=10.10.0
+	wyBool                     m_ismariadb1010;
+
+	//is mariadb version>=10.5.0
+	wyBool                     m_ismariadb105;
+
+	//is mariadb version>=10.7.0
+	wyBool                     m_ismariadb107;
+
 	//is mysql version>=5.7
 	wyBool                     m_ismysql57;
 
@@ -573,7 +582,16 @@ public:
 	@param index			: Index
 	@returns wyTrue
 	*/
-    wyBool                      HandleSetEnumValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index);
+    wyBool                      HandleSetEnumValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index); 
+
+	/// Handles the Inet4, Inet6 and Uiud datatype validation
+	/**
+	@param hwndgrid			: HANDLE to grid window
+	@param row				: Row number
+	@param index			: Index
+	@returns wyTrue
+	*/
+	wyBool                      HandleInet4andInet6andUuidValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index);  
 
     /// Handles if duplicate field name is present 
 	/**

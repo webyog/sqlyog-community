@@ -160,6 +160,15 @@ wyBool IsMariaDB10309(Tunnel * tunnel, PMYSQL mysql);
 //MariaDB 10.5.2 for new privileges
 wyBool IsMariaDB100502(Tunnel * tunnel, PMYSQL mysql);
 
+//MariaDB 10.5.0 for new privileges
+wyBool IsMariaDB100500(Tunnel * tunnel, PMYSQL mysql);
+
+//MariaDB 10.7.0 for new privileges
+wyBool IsMariaDB100700(Tunnel * tunnel, PMYSQL mysql);
+
+//MariaDB 10.10.0 for new privileges
+wyBool IsMariaDB101000(Tunnel * tunnel, PMYSQL mysql);
+
 //MySQL 5.7.0 for Virtual/Stored columns
 wyBool IsMySQL57(Tunnel * tunnel, PMYSQL mysql);
 

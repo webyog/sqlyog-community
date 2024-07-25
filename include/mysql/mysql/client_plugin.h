@@ -1,5 +1,5 @@
 /* Copyright (C) 2010 - 2012 Sergei Golubchik and Monty Program Ab
-                 2014 MariaDB Corporation AB
+                 2014, 2022 MariaDB Corporation AB
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Library General Public
@@ -51,13 +51,15 @@
 #define MARIADB_CLIENT_PVIO_PLUGIN           101
 #define MARIADB_CLIENT_TRACE_PLUGIN          102
 #define MARIADB_CLIENT_CONNECTION_PLUGIN     103
+#define MARIADB_CLIENT_COMPRESSION_PLUGIN    104
 
 #define MARIADB_CLIENT_REMOTEIO_PLUGIN_INTERFACE_VERSION 0x0100
 #define MARIADB_CLIENT_PVIO_PLUGIN_INTERFACE_VERSION 0x0100
 #define MARIADB_CLIENT_TRACE_PLUGIN_INTERFACE_VERSION 0x0100
 #define MARIADB_CLIENT_CONNECTION_PLUGIN_INTERFACE_VERSION 0x0100
+#define MARIADB_CLIENT_COMPRESSION_PLUGIN_INTERFACE_VERSION 0x0100
 
-#define MARIADB_CLIENT_MAX_PLUGINS             4
+#define MARIADB_CLIENT_MAX_PLUGINS             5
 
 #define mysql_declare_client_plugin(X)          \
      struct st_mysql_client_plugin_ ## X        \
@@ -78,8 +80,9 @@
   const char *license;                                  \
   void *mysql_api;                                      \
   int (*init)(char *, size_t, int, va_list);            \
-  int (*deinit)();                                      \
+  int (*deinit)(void);                                  \
   int (*options)(const char *option, const void *);
+
 struct st_mysql_client_plugin
 {
   MYSQL_CLIENT_PLUGIN_HEADER
@@ -132,6 +135,17 @@ struct st_mysql_client_plugin_TRACE
 {
   MYSQL_CLIENT_PLUGIN_HEADER
 };
+
+#include <ma_compress.h>
+
+typedef struct st_mariadb_client_plugin_COMPRESS
+{
+  MYSQL_CLIENT_PLUGIN_HEADER
+  ma_compress_ctx *(*init_ctx)(int compression_level);
+  void (*free_ctx)(ma_compress_ctx *ctx);
+  my_bool (*compress)(ma_compress_ctx *ctx, void *dst, size_t *dst_len, void *source, size_t source_len);
+  my_bool (*decompress)(ma_compress_ctx *ctx, void *dst, size_t *dst_len, void *source, size_t *source_len);
+} MARIADB_COMPRESSION_PLUGIN;
 
 /**
   type of the mysql_authentication_dialog_ask function

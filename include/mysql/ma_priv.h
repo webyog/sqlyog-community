@@ -39,6 +39,13 @@ static inline uint ma_extended_type_info_rows(const MYSQL *mysql)
   return ma_has_extended_type_info(mysql) ? 1 : 0;
 }
 
+static inline my_bool ma_supports_cache_metadata(const MYSQL *mysql)
+{
+  return (mysql->extension->mariadb_server_capabilities &
+          (MARIADB_CLIENT_CACHE_METADATA >> 32)) != 0 ;
+}
+
+
 static inline uint ma_result_set_rows(const MYSQL *mysql)
 {
   return ma_has_extended_type_info(mysql) ? 9 : 8;
@@ -46,5 +53,18 @@ static inline uint ma_result_set_rows(const MYSQL *mysql)
 
 MA_FIELD_EXTENSION *ma_field_extension_deep_dup(MA_MEM_ROOT *memroot,
                                                 const MA_FIELD_EXTENSION *from);
+
+MYSQL_FIELD *ma_duplicate_resultset_metadata(MYSQL_FIELD *fields, size_t count,
+                                             MA_MEM_ROOT *memroot);
+
+extern void ma_save_session_track_info(void *ptr, enum enum_mariadb_status_info type, ...);
+
+#define ma_status_callback(mysql, last_status)\
+  if ((mysql)->server_status != last_status && \
+      (mysql)->options.extension->status_callback != ma_save_session_track_info)\
+  {\
+    (mysql)->options.extension->status_callback((mysql)->options.extension->status_data,\
+                                                STATUS_TYPE, (mysql)->server_status);\
+  }
 
 #endif

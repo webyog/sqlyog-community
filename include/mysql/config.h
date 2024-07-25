@@ -11,6 +11,7 @@
 #define HAVE_FCNTL_H 1
 #define HAVE_FLOAT_H 1
 #define HAVE_LIMITS_H 1
+/* #undef HAVE_LINUX_LIMITS_H */
 /* #undef HAVE_PWD_H */
 /* #undef HAVE_SELECT_H */
 #define HAVE_STDDEF_H 1
@@ -21,6 +22,8 @@
 /* #undef HAVE_SYS_SELECT_H */
 /* #undef HAVE_SYS_SOCKET_H */
 /* #undef HAVE_SYS_STREAM_H */
+#define HAVE_SYS_STAT_H 1
+/* #undef HAVE_SYS_SYSCTL_H */
 #define HAVE_SYS_TYPES_H 1
 /* #undef HAVE_SYS_UN_H */
 /* #undef HAVE_UNISTD_H */
@@ -85,6 +88,11 @@
 # define HAVE_UINT 1
 #endif
 
+/* #undef SIZEOF_USHORT */
+#if defined(SIZEOF_USHORT)
+# define HAVE_USHORT 1
+#endif
+
 /* #undef SIZEOF_ULONG */
 #if defined(SIZEOF_ULONG)
 # define HAVE_ULONG 1
@@ -138,5 +146,5 @@
 #define LOCAL_INFILE_MODE_AUTO 2
 #define ENABLED_LOCAL_INFILE LOCAL_INFILE_MODE_AUTO
 
-#define MARIADB_DEFAULT_CHARSET "latin1"
+#define MARIADB_DEFAULT_CHARSET "utf8mb4"
 

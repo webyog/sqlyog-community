@@ -5522,11 +5522,29 @@ FrameWindow::InitCollationCombo(HWND hwnd)
     wyString    query, collationstr;
     MYSQL_ROW   myrow;
     MYSQL_RES   *myres;
-    wyInt32     index;
-    
+    wyInt32     index, width;
+
     HWND        hwndcombo = GetDlgItem(hwnd, IDC_COLLATECOMBO);
 
-    query.SetAs("show collation");
+    // Check for MariaDB connection
+    if (IsMariaDB(wnd->m_tunnel, &wnd->m_mysql))
+    {
+        if (IsMariaDB101000(wnd->m_tunnel, &wnd->m_mysql))
+        {
+			// For MariaDB 10.10.0 or higher, use the FULL_COLLATION_NAME
+            query.SetAs("SELECT DISTINCT FULL_COLLATION_NAME, CHARACTER_SET_NAME FROM information_schema.COLLATION_CHARACTER_SET_APPLICABILITY");
+        }
+        else
+        {
+			// For MariaDB versions lower than 10.10.0, use the COLLATION_NAME
+            query.SetAs("SELECT DISTINCT COLLATION_NAME, CHARACTER_SET_NAME FROM information_schema.COLLATION_CHARACTER_SET_APPLICABILITY");
+        }
+    }
+    else
+    {
+		// For other Database server existing flow will work and SHOW COLLATION will work to get the list of collations
+        query.SetAs("SHOW COLLATION");
+    }
     myres = ExecuteAndGetResult(wnd, wnd->m_tunnel, &wnd->m_mysql, query);
     if(!myres)
 	{
@@ -5544,6 +5562,10 @@ FrameWindow::InitCollationCombo(HWND hwnd)
 	{
 		wnd->m_tunnel->mysql_free_result(myres);
 	}
+
+	// Set the width of the collation combo box based on the widest item
+	width = SetComboWidth(hwndcombo);
+	SendMessage(hwndcombo, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
 }
 
 wyBool 
@@ -9056,49 +9078,85 @@ FrameWindow::FetchSelectedCollation(HWND hwnd)
 void
 FrameWindow::ReInitRelatedCollations(HWND hwnd)
 {
-    MDIWindow	*pcquerywnd = GetActiveWin();
+    MDIWindow   *pcquerywnd = GetActiveWin();
     MYSQL_RES   *myres;
     MYSQL_ROW   myrow;
     wyWChar     *relcollation = NULL;
-    wyString    query, collationstr;
-    wyInt32      ret, index = 0;
-    
+    wyString    query, collationstr, selectedcharset;
+    wyInt32      ret, index = 0, width;
+
     HWND    hwndcombo = GetDlgItem(hwnd, IDC_COLLATECOMBO);
-    
-    query.SetAs("show collation");
+
+    bool isMariaDbSelectedCharSet = false;
+
+	// Check for MariaDB connection
+    if (IsMariaDB(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql))
+    {
+        selectedcharset.SetAs(pcquerywnd->m_pcqueryobject->m_dbcharset);
+        isMariaDbSelectedCharSet = selectedcharset.CompareI(STR_DEFAULT) != 0;
+        if (IsMariaDB101000(pcquerywnd->m_tunnel, &pcquerywnd->m_mysql))
+        {
+			// For MariaDB 10.10.0 or higher, use the FULL_COLLATION_NAME
+            query.SetAs("SELECT DISTINCT FULL_COLLATION_NAME, CHARACTER_SET_NAME FROM information_schema.COLLATION_CHARACTER_SET_APPLICABILITY");
+        }
+        else
+        {
+			// For MariaDB versions lower than 10.10.0, use the COLLATION_NAME
+            query.SetAs("SELECT DISTINCT COLLATION_NAME, CHARACTER_SET_NAME FROM information_schema.COLLATION_CHARACTER_SET_APPLICABILITY");
+        }
+
+        if (isMariaDbSelectedCharSet) {
+            query.Add(" WHERE CHARACTER_SET_NAME = '");
+            query.Add(selectedcharset.GetString());
+            query.Add("' ");
+        }
+    }
+    else
+    {
+		// For other Database server existing flow will work and SHOW COLLATION will work to get the list of collations
+		query.SetAs("SHOW COLLATION");
+    }
+
 
     myres = ExecuteAndGetResult(pcquerywnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query);
-    if(!myres)
-	{
+    if (!myres) {
         ShowMySQLError(hwnd, pcquerywnd->m_tunnel, &pcquerywnd->m_mysql, query.GetString());
-		return;
-	}
-    
+        return;
+    }
+
     VERIFY(SendMessage(hwndcombo, CB_RESETCONTENT, 0, 0));
-    
-    while(myrow = pcquerywnd->m_tunnel->mysql_fetch_row(myres))
-    {
+
+    while ((myrow = pcquerywnd->m_tunnel->mysql_fetch_row(myres))) 
+	{
         collationstr.SetAs(myrow[0]);
-        ret = SendMessage(hwndcombo, CB_FINDSTRINGEXACT, -1,(LPARAM)collationstr.GetAsWideChar());
-	    if(ret != CB_ERR)
-        {
-            if(wcsstr(collationstr.GetAsWideChar(), pcquerywnd->m_pcqueryobject->m_dbcharset.GetAsWideChar()) == NULL)
+        ret = SendMessage(hwndcombo, CB_FINDSTRINGEXACT, -1, (LPARAM)collationstr.GetAsWideChar());
+        if (ret != CB_ERR) 
+		{
+            if (wcsstr(collationstr.GetAsWideChar(), pcquerywnd->m_pcqueryobject->m_dbcharset.GetAsWideChar()) == NULL)
                 SendMessage(hwndcombo, CB_DELETESTRING, ret, 0);
         }
-        else if((relcollation = wcsstr(collationstr.GetAsWideChar(), pcquerywnd->m_pcqueryobject->m_dbcharset.GetAsWideChar())) != NULL)
+        else if (isMariaDbSelectedCharSet)
         {
-            if(collationstr.GetCharAt(pcquerywnd->m_pcqueryobject->m_dbcharset.GetLength()) == '_')
+            SendMessage(hwndcombo, CB_ADDSTRING, 0, (LPARAM)collationstr.GetAsWideChar());
+        }
+        else if ((relcollation = wcsstr(collationstr.GetAsWideChar(), pcquerywnd->m_pcqueryobject->m_dbcharset.GetAsWideChar())) != NULL) {
+            if (collationstr.GetCharAt(pcquerywnd->m_pcqueryobject->m_dbcharset.GetLength()) == '_')
                 SendMessage(hwndcombo, CB_ADDSTRING, 0, (LPARAM)collationstr.GetAsWideChar());
         }
-        else if(pcquerywnd->m_pcqueryobject->m_dbcharset.CompareI(STR_DEFAULT) == 0)
+        else if (pcquerywnd->m_pcqueryobject->m_dbcharset.CompareI(STR_DEFAULT) == 0) {
             SendMessage(hwndcombo, CB_ADDSTRING, 0, (LPARAM)collationstr.GetAsWideChar());
+        }
     }
-    
-    //Select 'Default'	
-	 if((index = SendMessage(hwndcombo , CB_ADDSTRING, 0,(LPARAM)TEXT(STR_DEFAULT))) != CB_ERR)
+
+    //Select 'Default'    
+    if ((index = SendMessage(hwndcombo, CB_ADDSTRING, 0, (LPARAM)TEXT(STR_DEFAULT))) != CB_ERR)
         SendMessage(hwndcombo, CB_SELECTSTRING, 0, (LPARAM)TEXT(STR_DEFAULT));
 
     pcquerywnd->m_tunnel->mysql_free_result(myres);
+
+	// Set the width of the collation combo box based on the widest item
+	width = SetComboWidth(hwndcombo);
+	SendMessage(hwndcombo, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
 }
 
 wyBool  

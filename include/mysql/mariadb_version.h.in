@@ -15,6 +15,12 @@
 #define MARIADB_VERSION_ID		@MARIADB_VERSION_ID@
 #define MARIADB_PORT	        	@MARIADB_PORT@
 #define MARIADB_UNIX_ADDR               "@MARIADB_UNIX_ADDR@"
+#ifndef MYSQL_UNIX_ADDR
+#define MYSQL_UNIX_ADDR MARIADB_UNIX_ADDR
+#endif
+#ifndef MYSQL_PORT
+#define MYSQL_PORT MARIADB_PORT
+#endif
 
 #define MYSQL_CONFIG_NAME               "my"
 #define MYSQL_VERSION_ID                @MARIADB_VERSION_ID@

@@ -1480,25 +1480,52 @@ TableTabInterface::HandleTabCharset()
 }
 
 void
-TableTabInterface::ReInitRelatedCollations(HWND hwnd, wyWChar  *charsetname)
+TableTabInterface::ReInitRelatedCollations(HWND hwnd, wyWChar *charsetname)
 {
-    MYSQL_RES   *myres;
-    MYSQL_ROW   myrow;
-    wyWChar     *relcollation  = NULL;
-    wyString    query, collationstr;
-    wyInt32     ret, selcharsetlen  = 0;
+    MYSQL_RES *myres;
+    MYSQL_ROW myrow;
+    wyWChar *relcollation = NULL;
+    wyString query, collationstr, charsetstr;
+    wyInt32 ret, selcharsetlen = 0, width;
 
-    HWND    hwndcombo = m_hcmbcollation;// GetDlgItem(hwnd, IDC_TABCOLLATION);
+    HWND hwndcombo = m_hcmbcollation; // GetDlgItem(hwnd, IDC_TABCOLLATION);
 
-    query.SetAs("show collation");
+    bool isMariaDbSelectedCharSet = false;
+    charsetstr.SetAs(charsetname);
+
+    // Check for MariaDB connection
+    if (IsMariaDB(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql))
+    {
+        isMariaDbSelectedCharSet = charsetname && wcscmp(charsetname, TEXT(STR_DEFAULT)) != 0;
+        if (IsMariaDB101000(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql))
+        {
+			// For MariaDB 10.10.0 or higher, use the FULL_COLLATION_NAME
+            query.SetAs("SELECT DISTINCT FULL_COLLATION_NAME, CHARACTER_SET_NAME FROM information_schema.COLLATION_CHARACTER_SET_APPLICABILITY");
+        }
+        else
+        {
+			// For MariaDB versions lower than 10.10.0, use the COLLATION_NAME
+            query.SetAs("SELECT DISTINCT COLLATION_NAME, CHARACTER_SET_NAME FROM information_schema.COLLATION_CHARACTER_SET_APPLICABILITY");
+        }
+        if (isMariaDbSelectedCharSet) {
+            query.Add(" WHERE CHARACTER_SET_NAME = '");
+            query.Add(charsetstr.GetString());
+            query.Add("' ");
+        }
+    }
+    else
+    {
+		// For other Database server existing flow will work and SHOW COLLATION will work to get the list of collations
+		query.SetAs("SHOW COLLATION");
+    }
     myres = ExecuteAndGetResult(m_mdiwnd, m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql, query);
     if(!myres)
-	{
+    {
         ShowMySQLError(hwnd, m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql, query.GetString());
-		return;
-	}
+        return;
+    }
 
-    VERIFY((hwndcombo, CB_RESETCONTENT, 0, 0));
+    VERIFY(SendMessage(hwndcombo, CB_RESETCONTENT, 0, 0));
 
     if(charsetname)
         selcharsetlen = wcslen(charsetname);
@@ -1507,11 +1534,15 @@ TableTabInterface::ReInitRelatedCollations(HWND hwnd, wyWChar  *charsetname)
     {
         collationstr.SetAs(myrow[0]);
         ret = SendMessage(hwndcombo, CB_FINDSTRINGEXACT, -1,(LPARAM)collationstr.GetAsWideChar());
-	    if(ret != CB_ERR)
+        if(ret != CB_ERR)
         {
             //delete the items which are not relevent
            if(wcsstr(collationstr.GetAsWideChar(), charsetname) == NULL)
                 SendMessage(hwndcombo, CB_DELETESTRING, ret, 0);
+        }
+        else if (isMariaDbSelectedCharSet)
+        {
+            SendMessage(hwndcombo, CB_ADDSTRING, 0, (LPARAM)collationstr.GetAsWideChar());
         }
         else if((relcollation = wcsstr(collationstr.GetAsWideChar(), charsetname)) != NULL)
         {
@@ -1522,9 +1553,6 @@ TableTabInterface::ReInitRelatedCollations(HWND hwnd, wyWChar  *charsetname)
     }
     
     m_mdiwnd->m_tunnel->mysql_free_result(myres);
-    
-    wyString charsetstr;
-    charsetstr.SetAs(charsetname);
 
     ret = SendMessage(hwndcombo, CB_FINDSTRINGEXACT, -1,(LPARAM)TEXT(STR_DEFAULT));
 
@@ -1544,6 +1572,10 @@ TableTabInterface::ReInitRelatedCollations(HWND hwnd, wyWChar  *charsetname)
         else
             SendMessage(hwndcombo, CB_SETCURSEL, (WPARAM)0, 0);
     }
+
+	// Set the width of the collation combo box based on the widest item
+	width = SetComboWidth(m_hcmbcollation);
+	SendMessage(m_hcmbcollation, CB_SETDROPPEDWIDTH, width + COMBOWIDTHMARGIN, 0);
 }
 
 LRESULT CALLBACK
@@ -1876,7 +1908,7 @@ TableTabInterface::CreateOtherWindows()
 
     //...Creating Colation Windows (Static & Combo)
     m_hstatcollation =   CreateWindowEx(0, WC_STATIC, _(TEXT("Collation")), 
-                                        style, 0, 0, 0, 0, m_hwnd, (HMENU) 0, 
+                                        style, 0, 0, 0, 0, m_hwnd, (HMENU) 0,
 										(HINSTANCE)pGlobals->m_hinstance, NULL);
     if(m_hstatcollation)
     {
@@ -1884,15 +1916,18 @@ TableTabInterface::CreateOtherWindows()
         UpdateWindow(m_hstatcollation);
     }
 
-    m_hcmbcollation =   CreateWindowEx(WS_EX_CLIENTEDGE, WC_COMBOBOX, _(TEXT("")), 
-                                        style | CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP | WS_GROUP, 
-										0, 0, 0, 0, m_hwnd, 
-                                        (HMENU) IDC_TABCOLLATION, (HINSTANCE)pGlobals->m_hinstance, NULL);
+	m_hcmbcollation = CreateWindowEx(WS_EX_CLIENTEDGE, WC_COMBOBOX, _(TEXT("")),
+									style | CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP | WS_GROUP,
+									0, 0, 0, 0, m_hwnd,
+									(HMENU)IDC_TABCOLLATION, (HINSTANCE)pGlobals->m_hinstance, NULL);
+
+
     if(m_hcmbcollation)
     {
         ShowWindow(m_hcmbcollation, SW_SHOW);
         UpdateWindow(m_hcmbcollation);
-    }
+
+	}
 
 	m_hbtnsave = CreateWindowEx(0, WC_BUTTON, _(TEXT("&Save")), style | WS_TABSTOP| WS_GROUP  , 0,0, 0,0,
     											m_hwnd, (HMENU)IDC_SAVE, 

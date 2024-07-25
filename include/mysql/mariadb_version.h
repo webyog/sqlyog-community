@@ -10,18 +10,24 @@
 #include <custom_conf.h>
 #else
 #define PROTOCOL_VERSION		10
-#define MARIADB_CLIENT_VERSION_STR	"10.4.3"
-#define MARIADB_BASE_VERSION		"mariadb-10.4"
-#define MARIADB_VERSION_ID		100403
+#define MARIADB_CLIENT_VERSION_STR	"10.8.8"
+#define MARIADB_BASE_VERSION		"mariadb-10.8"
+#define MARIADB_VERSION_ID		100808
 #define MARIADB_PORT	        	3306
 #define MARIADB_UNIX_ADDR               "/tmp/mysql.sock"
+#ifndef MYSQL_UNIX_ADDR
+#define MYSQL_UNIX_ADDR MARIADB_UNIX_ADDR
+#endif
+#ifndef MYSQL_PORT
+#define MYSQL_PORT MARIADB_PORT
+#endif
 
 #define MYSQL_CONFIG_NAME               "my"
-#define MYSQL_VERSION_ID                100403
-#define MYSQL_SERVER_VERSION            "10.4.3-MariaDB"
+#define MYSQL_VERSION_ID                100808
+#define MYSQL_SERVER_VERSION            "10.8.8-MariaDB"
 
-#define MARIADB_PACKAGE_VERSION "3.1.8"
-#define MARIADB_PACKAGE_VERSION_ID 30108
+#define MARIADB_PACKAGE_VERSION "3.3.8"
+#define MARIADB_PACKAGE_VERSION_ID 30308
 #define MARIADB_SYSTEM_TYPE "Windows"
 #define MARIADB_MACHINE_TYPE "AMD64"
 #define MARIADB_PLUGINDIR "C:/Program Files/mariadb-connector-c/lib/mariadb/plugin"

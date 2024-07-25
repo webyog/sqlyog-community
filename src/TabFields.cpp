@@ -125,6 +125,9 @@ TabFields::TabFields(HWND hwnd, TableTabInterfaceTabMgmt* ptabmgmt)
     m_mdiwnd            =   GetActiveWin();
     m_ismysql41         =   IsMySQL41(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql));
 	m_ismariadb52       =   IsMariaDB52(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
+	m_ismariadb1010		=	IsMariaDB101000(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql); 
+	m_ismariadb105		=	IsMariaDB100500(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql); 
+	m_ismariadb107		=	IsMariaDB100700(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
     m_ismysql57			=   IsMySQL57(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
 	m_ismysql578        =   IsMySQL578(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
 	m_ismariadb10309	=	IsMariaDB10309(m_mdiwnd->m_tunnel, &m_mdiwnd->m_mysql);
@@ -1120,23 +1123,50 @@ TabFields::CreateGrid(HWND hwnd)
 wyBool
 TabFields::InitGrid()
 {
-    wyInt32			counter;		// normal counter
+    wyInt32			counter,index;		// normal counter
 	wyInt32			num_cols;		// number of columns
 	GVCOLUMN		gvcol;			// structure used to create columns for grid
-	//wyWChar	 		(*type)[33][20]; 
-	wyWChar			type[33][20] =	{	L"tinyint", L"smallint", L"mediumint", L"int", L"bigint", L"real", L"bit", L"bool", L"boolean",
-										L"float", L"double", L"decimal", L"date", L"datetime", L"timestamp", L"numeric",  L"time", L"year", L"char", 
-										L"varchar", L"tinyblob", L"tinytext", L"text",L"blob" ,L"mediumblob", L"mediumtext", L"longblob", L"longtext", 
-										L"enum", L"set", L"binary", L"varbinary" };
-	if(m_ismysql578)
+	wyWChar type[36][20] = { L"tinyint",L"smallint", L"mediumint", L"int", L"bigint", L"real", L"bit", L"bool", L"boolean",
+		L"float", L"double", L"decimal", L"date", L"datetime", L"timestamp", L"numeric", L"time", L"year", L"char",
+		L"varchar", L"tinyblob", L"tinytext", L"text", L"blob", L"mediumblob", L"mediumtext", L"longblob", L"longtext",
+		L"enum", L"set", L"binary", L"varbinary"};
+
+	//set visiblity off for new data types based on maria db versions.
+	index = 31;
+
+	if (m_ismysql578)
 	{
-		type[32][0]='j';
-		type[32][1]='s';
-		type[32][2]='o';
-		type[32][3]='n';
+		index++;
+		type[index][0] = 'j';
+		type[index][1] = 's';
+		type[index][2] = 'o';
+		type[index][3] = 'n';
+		
+	}
+	if (m_ismariadb105) {
+		index++;
+		type[index][0] = 'i';
+		type[index][1] = 'n';
+		type[index][2] = 'e';
+		type[index][3] = 't';
+		type[index][4] = '6';
+	}
+	if (m_ismariadb1010) {
+		index++;
+		type[index][0] = 'i';
+		type[index][1] = 'n';
+		type[index][2] = 'e';
+		type[index][3] = 't';
+		type[index][4] = '4';
+	}
+	if (m_ismariadb107) {
+		index++;
+		type[index][0] = 'u';
+		type[index][1] = 'u';
+		type[index][2] = 'i';
+		type[index][3] = 'd';
 	}
 
-	
 	wyWChar virtuallity[3][20]= {  L"(none)", L"VIRTUAL",NULL};
 	if (m_ismariadb10309)
 		mbstowcs(virtuallity[2], "STORED", strlen("STORED") + 1);
@@ -1167,10 +1197,8 @@ TabFields::InitGrid()
 	
 	VOID		    *listtype[] = {NULL, (VOID*)type, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, (void*)virtuallity,NULL,NULL};
 	wyInt32			elemsize[] = {  0, sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,sizeof(virtuallity[0]),0,0};
-	wyInt32			elemcount[] = {0, sizeof(type)/sizeof(type[0]), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, sizeof(virtuallity)/sizeof(virtuallity[0]),0,0};
+	wyInt32			elemcount[] = {0, index + 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, sizeof(virtuallity)/sizeof(virtuallity[0]),0,0};
 	
-	if(! m_ismysql578)   // to avoid extra counting of the new datatype json
-		elemcount[1]=elemcount[1]-1;
 	
 	for (counter=0; counter < num_cols ; counter++ )
     {
@@ -2480,13 +2508,32 @@ TabFields::FilterCollationColumn(wyInt32 row, wyInt32 charsetlen)
     
     selcharset  = AllocateBuffWChar(charsetlen + 1);
 
-	CustomGrid_GetItemText(m_hgridfields, row, CHARSETCOL, selcharset);
+    CustomGrid_GetItemText(m_hgridfields, row, CHARSETCOL, selcharset);
     CustomGrid_DeleteListContent(m_hgridfields, COLLATIONCOL);
     selcharsetstr.SetAs(selcharset);
     
     free(selcharset);
 
-    query.SetAs("show collation");
+    // Check for MariaDB connection
+    if (IsMariaDB(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql)))
+    {
+        // Compare version number
+        if (IsMariaDB101000(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql)))
+        {
+			// For MariaDB 10.10.0 or higher, use the FULL_COLLATION_NAME
+            query.SetAs("SELECT DISTINCT FULL_COLLATION_NAME, CHARACTER_SET_NAME FROM information_schema.COLLATION_CHARACTER_SET_APPLICABILITY");
+        }
+        else
+        {
+			// For MariaDB versions lower than 10.10.0, use the COLLATION_NAME
+            query.SetAs("SELECT DISTINCT COLLATION_NAME, CHARACTER_SET_NAME FROM information_schema.COLLATION_CHARACTER_SET_APPLICABILITY");
+        }
+    }
+    else
+    {
+		// For other Database server existing flow will work and SHOW COLLATION will work to get the list of collations
+		query.SetAs("SHOW COLLATION");
+    }
     myres = ExecuteAndGetResult(m_mdiwnd, m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), query);
     if(!myres)
 	{
@@ -2519,7 +2566,25 @@ TabFields::InitCollationCol()
     MYSQL_RES       *myres = NULL;
     MYSQL_ROW       myrow;
     
-    query.SetAs("show collation");
+    // Check for MariaDB connection
+    if (IsMariaDB(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql)))
+    {
+        if (IsMariaDB101000(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql)))
+        {
+			// For MariaDB 10.10.0 or higher, use the FULL_COLLATION_NAME
+            query.SetAs("SELECT DISTINCT FULL_COLLATION_NAME, CHARACTER_SET_NAME FROM information_schema.COLLATION_CHARACTER_SET_APPLICABILITY");
+        }
+        else
+        {
+			// For MariaDB versions lower than 10.10.0, use the COLLATION_NAME
+            query.SetAs("SELECT DISTINCT COLLATION_NAME, CHARACTER_SET_NAME FROM information_schema.COLLATION_CHARACTER_SET_APPLICABILITY");
+        }
+    }
+    else
+    {
+		// For other Database server existing flow will work and SHOW COLLATION will work to get the list of collations
+		query.SetAs("SHOW COLLATION");
+    }
     myres = ExecuteAndGetResult(m_mdiwnd, m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), query);
      if(!myres)
 	{
@@ -4671,6 +4736,51 @@ TabFields::HandleSetEnumValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &inde
 }
 
 wyBool
+TabFields::HandleInet4andInet6andUuidValidation(HWND &hwndgrid, wyUInt32 &row, wyUInt32 &index)
+{
+	FieldStructWrapper *cwrapobj = NULL;
+
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, CHARSET, wyTrue);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, COLLATION, wyTrue);
+
+	CustomGrid_SetText(hwndgrid, row, CHARSET, "");
+	CustomGrid_SetText(hwndgrid, row, COLLATION, "");
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, DEFVALUE, wyFalse);
+
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, PRIMARY, wyFalse);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, UNSIGNED + index, wyFalse);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ZEROFILL + index, wyFalse);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, LENGTH, wyTrue);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, AUTOINCR + index, wyFalse);
+	CustomGrid_SetColumnReadOnly(hwndgrid, row, ONUPDATECT, wyTrue);
+	CustomGrid_SetBoolValue(hwndgrid, row, ONUPDATECT, GV_FALSE);
+
+	// Handle BINARY column if MySQL version is less than 4.1
+	if (m_ismysql41 == wyFalse)
+	{
+		CustomGrid_SetColumnReadOnly(hwndgrid, row, BINARY, wyTrue);
+		CustomGrid_SetBoolValue(hwndgrid, row, BINARY, GV_FALSE);
+	}
+
+	// Get the FieldStructWrapper object
+	cwrapobj = (FieldStructWrapper *)CustomGrid_GetRowLongData(m_hgridfields, row);
+	if (cwrapobj && cwrapobj->m_newval)
+	{
+		// Clear CHARSET and COLLATION values in newval object
+		cwrapobj->m_newval->m_charset.Clear();
+		cwrapobj->m_newval->m_collation.Clear();
+
+		// Set other attributes in newval object
+		cwrapobj->m_newval->m_onupdate = wyFalse;
+		if (m_ismysql41 == wyFalse)
+			cwrapobj->m_newval->m_binary = wyFalse;
+	}
+
+	return wyTrue;
+}
+
+
+wyBool
 TabFields::SetValidation(wyUInt32 row, wyChar* datatype)
 {
 	wyUInt32	index = 0;
@@ -4769,7 +4879,12 @@ TabFields::SetValidation(wyUInt32 row, wyChar* datatype)
 	if ((stricmp (datatype , "set" )  == 0 )  ||
 		 (stricmp (datatype , "enum" )  == 0 ) )
          return HandleSetEnumValidation(hwndgrid, row, index);
-	
+	if ((stricmp(datatype, "inet4") == 0) ||
+		(stricmp(datatype, "inet6") == 0) ||
+		(stricmp(datatype, "uuid") == 0)) 
+	{
+		return HandleInet4andInet6andUuidValidation(hwndgrid, row, index);
+	}	
 	return wyTrue;
 }
 

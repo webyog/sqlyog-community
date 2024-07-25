@@ -16,7 +16,7 @@
    MA 02111-1301, USA */
 
 /*
-  A better inplementation of the UNIX ctype(3) library.
+  A better implementation of the UNIX ctype(3) library.
   Notes:   my_global.h should be included before ctype.h
 */
 

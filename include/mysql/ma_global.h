@@ -26,13 +26,10 @@
 #include <windows.h>
 #include <stdlib.h>
 #define strcasecmp _stricmp
+#define strtok_r strtok_s
+#define strdup _strdup
 #define sleep(x) Sleep(1000*(x))
-#ifdef _MSC_VER
-#define inline __inline
-#if _MSC_VER < 1900
-#define snprintf _snprintf
-#endif
-#endif
+#define strerror_r(errno,buf,len) strerror_s(buf,len,errno)
 #define STDCALL __stdcall 
 #endif
 
@@ -90,21 +87,6 @@
 #endif /* THREAD */
 
 /* Go around some bugs in different OS and compilers */
-#ifdef _AIX			/* By soren@t.dk */
-#define _H_STRINGS
-#define _SYS_STREAM_H
-#define _AIX32_CURSES
-#define ulonglong2double(A) my_ulonglong2double(A)
-#define my_off_t2double(A)  my_ulonglong2double(A)
-#ifdef	__cplusplus
-extern "C" {
-#endif
-double my_ulonglong2double(unsigned long long A);
-#ifdef	__cplusplus
-}
-#endif
-#endif /* _AIX */
-
 #ifdef HAVE_BROKEN_SNPRINTF	/* HPUX 10.20 don't have this defined */
 #undef HAVE_SNPRINTF
 #endif
@@ -240,7 +222,7 @@ double my_ulonglong2double(unsigned long long A);
 #endif
 
 /* #define USE_some_charset 1 was deprecated by changes to configure */
-/* my_ctype my_to_upper, my_to_lower, my_sort_order gain theit right value */
+/* my_ctype my_to_upper, my_to_lower, my_sort_order gain their right value */
 /* automagically during configuration */
 
 /* Does the system remember a signal handler after a signal ? */
@@ -250,7 +232,7 @@ double my_ulonglong2double(unsigned long long A);
 
 
 #if defined(_lint) || defined(FORCE_INIT_OF_VARS)
-#define LINT_INIT(var)	var=0			/* No uninitialize-warning */
+#define LINT_INIT(var)	do{var=0;}while(0)		   /* No uninitialize-warning */
 #define LINT_INIT_STRUCT(var) memset(&var, 0, sizeof(var)) /* No uninitialize-warning */
 #else
 #define LINT_INIT(var)
@@ -268,14 +250,16 @@ double my_ulonglong2double(unsigned long long A);
 
 #if defined(__EMX__) || !defined(HAVE_UINT)
 typedef unsigned int uint;
+#endif
+#if defined(__EMX__) || !defined(HAVE_USHORT)
 typedef unsigned short ushort;
 #endif
 
 #define sgn(a)		(((a) < 0) ? -1 : ((a) > 0) ? 1 : 0)
-#define swap(t,a,b)	{ register t dummy; dummy = a; a = b; b = dummy; }
+#define swap(t,a,b)	do{register t dummy; dummy = a; a = b; b = dummy;}while(0)
 #define test(a)		((a) ? 1 : 0)
-#define set_if_bigger(a,b)  { if ((a) < (b)) (a)=(b); }
-#define set_if_smaller(a,b) { if ((a) > (b)) (a)=(b); }
+#define set_if_bigger(a,b)  do{ if ((a) < (b)) (a)=(b); }while(0)
+#define set_if_smaller(a,b) do{ if ((a) > (b)) (a)=(b); }while(0)
 #define test_all_bits(a,b) (((a) & (b)) == (b))
 #define set_bits(type, bit_count) (sizeof(type)*8 <= (bit_count) ? ~(type) 0 : ((((type) 1) << (bit_count)) - (type) 1))
 #define array_elements(A) ((uint) (sizeof(A)/sizeof(A[0])))
@@ -440,11 +424,11 @@ typedef SOCKET_SIZE_TYPE size_socket;
 */
 #define MALLOC_OVERHEAD 8
 	/* get memory in huncs */
-#define ONCE_ALLOC_INIT		(uint) (4096-MALLOC_OVERHEAD)
+#define ONCE_ALLOC_INIT		((uint) (4096-MALLOC_OVERHEAD))
 	/* Typical record cash */
-#define RECORD_CACHE_SIZE	(uint) (64*1024-MALLOC_OVERHEAD)
+#define RECORD_CACHE_SIZE	((uint) (64*1024-MALLOC_OVERHEAD))
 	/* Typical key cash */
-#define KEY_CACHE_SIZE		(uint) (8*1024*1024-MALLOC_OVERHEAD)
+#define KEY_CACHE_SIZE		((uint) (8*1024*1024-MALLOC_OVERHEAD))
 
 	/* Some things that this system doesn't have */
 
@@ -590,7 +574,7 @@ typedef long my_ptrdiff_t;
 #define STDCALL
 #endif
 
-/* Typdefs for easyier portability */
+/* Typedefs for easier portability */
 
 #if defined(VOIDTYPE)
 typedef void	*gptr;		/* Generic pointer */
@@ -598,8 +582,8 @@ typedef void	*gptr;		/* Generic pointer */
 typedef char	*gptr;		/* Generic pointer */
 #endif
 #ifndef HAVE_INT_8_16_32
-typedef char	int8;		/* Signed integer >= 8	bits */
-typedef short	int16;		/* Signed integer >= 16 bits */
+typedef signed char	int8;	/* Signed integer >= 8	bits */
+typedef signed short	int16;	/* Signed integer >= 16 bits */
 #endif
 #ifndef HAVE_UCHAR
 typedef unsigned char	uchar;	/* Short for unsigned char */
@@ -753,13 +737,14 @@ typedef char		bool;	/* Ordinary boolean values 0 1 */
 #endif /* L64 */
 #endif /* _WIN32 */
 /*
-** Define-funktions for reading and storing in machine independent format
+** Define functions for reading and storing in machine independent format
 **  (low byte first)
 */
 
 /* Optimized store functions for Intel x86 */
 #define int1store(T,A) *((int8*) (T)) = (A)
 #define uint1korr(A)   (*(((uint8*)(A))))
+#define sint1korr(A)   (*(((int8*)(A))))
 #if defined(__i386__) || defined(_WIN32)
 #define sint2korr(A)	(*((int16 *) (A)))
 #define sint3korr(A)	((int32) ((((uchar) (A)[2]) & 128) ? \
@@ -800,9 +785,9 @@ typedef char		bool;	/* Ordinary boolean values 0 1 */
 #define uint8korr(A)	(*((ulonglong *) (A)))
 #define sint8korr(A)	(*((longlong *) (A)))
 #define int2store(T,A)	*((uint16*) (T))= (uint16) (A)
-#define int3store(T,A)  do { *(T)=  (uchar) ((A));\
-                            *(T+1)=(uchar) (((uint) (A) >> 8));\
-                            *(T+2)=(uchar) (((A) >> 16)); } while (0)
+#define int3store(T,A)  do { *(T)=  (uchar) ((A) & 0xff);\
+                            *(T+1)=(uchar) (((uint) (A) >> 8) & 0xff);\
+                            *(T+2)=(uchar) (((A) >> 16)  & 0xff); } while (0)
 #define int4store(T,A)	*((long *) (T))= (long) (A)
 #define int5store(T,A)  do { *(T)= (uchar)((A));\
                              *((T)+1)=(uchar) (((A) >> 8));\
@@ -815,7 +800,7 @@ typedef char		bool;	/* Ordinary boolean values 0 1 */
                              *((T)+3)=(uchar) (((A) >> 24)); \
                              *((T)+4)=(uchar) (((A) >> 32)); \
                              *((T)+5)=(uchar) (((A) >> 40)); } while(0)
-#define int8store(T,A)	*((ulonglong *) (T))= (ulonglong) (A)
+#define int8store(T,A)	do {*((ulonglong *) (T))= (ulonglong) (A);} while(0)
 
 typedef union {
   double v;
@@ -973,7 +958,7 @@ do { doubleget_union _tmp; \
 
 #define float8get(V,M)   doubleget((V),(M))
 #define float8store(V,M) doublestore((V),(M))
-#endif /* WORDS_BIGENDIAN */
+#endif /* HAVE_BIGENDIAN */
 
 #endif /* __i386__ OR _WIN32 */
 
@@ -986,7 +971,7 @@ do { doubleget_union _tmp; \
 				  (((uint32) ((uchar) (A)[1])) << 16) |\
 				  (((uint32) ((uchar) (A)[0])) << 24))
 /*
-  Define-funktions for reading and storing in machine format from/to
+  Define functions for reading and storing in machine format from/to
   short/long to/from some place in memory V should be a (not
   register) variable, M is a pointer to byte
 */
@@ -1043,14 +1028,14 @@ do { doubleget_union _tmp; \
 #define longlongget(V,M) memcpy(&V, (M), sizeof(ulonglong))
 #define longlongstore(T,V) memcpy((T), &V, sizeof(ulonglong))
 
-#endif /* WORDS_BIGENDIAN */
+#endif /* HAVE_BIGENDIAN */
 
 #ifndef THREAD
-#define thread_safe_increment(V,L) (V)++
-#define thread_safe_add(V,C,L)     (V)+=(C)
-#define thread_safe_sub(V,C,L)     (V)-=(C)
-#define statistic_increment(V,L)   (V)++
-#define statistic_add(V,C,L)       (V)+=(C)
+#define thread_safe_increment(V,L) ((V)++)
+#define thread_safe_add(V,C,L)     ((V)+=(C))
+#define thread_safe_sub(V,C,L)     ((V)-=(C))
+#define statistic_increment(V,L)   ((V)++)
+#define statistic_add(V,C,L)       ((V)+=(C))
 #endif
 
 #ifdef _WIN32
@@ -1069,9 +1054,9 @@ do { doubleget_union _tmp; \
 
 #ifdef HAVE_DLOPEN
 #ifdef _WIN32
-#define dlsym(lib, name) GetProcAddress((HMODULE)lib, name)
+#define dlsym(lib, name) GetProcAddress((HMODULE)(lib), name)
 #define dlopen(libname, unused) LoadLibraryEx(libname, NULL, 0)
-#define dlclose(lib) FreeLibrary((HMODULE)lib)
+#define dlclose(lib) FreeLibrary((HMODULE)(lib))
 #elif defined(HAVE_DLFCN_H)
 #include <dlfcn.h>
 #endif

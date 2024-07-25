@@ -1,5 +1,6 @@
 /* Copyright (c) 2011, Monty Program Ab
    Copyright (c) 2011, Oleksandr Byelkin
+   Copyright (c) 2012, 2022 MariaDB Corporation AB
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are
@@ -81,7 +82,7 @@ enum enum_dyncol_func_result
   ER_DYNCOL_YES= 1,                /* For functions returning 0/1 */
   ER_DYNCOL_FORMAT= -1,            /* Wrong format of the encoded string */
   ER_DYNCOL_LIMIT=  -2,            /* Some limit reached */
-  ER_DYNCOL_RESOURCE= -3,          /* Out of resourses */
+  ER_DYNCOL_RESOURCE= -3,          /* Out of resources */
   ER_DYNCOL_DATA= -4,              /* Incorrect input data */
   ER_DYNCOL_UNKNOWN_CHARSET= -5,   /* Unknown character set */
   ER_DYNCOL_TRUNCATED= 2           /* OK, but data was truncated */
@@ -242,7 +243,10 @@ int mariadb_dyncol_column_cmp_named(const MYSQL_LEX_STRING *s1,
 enum enum_dyncol_func_result
 mariadb_dyncol_column_count(DYNAMIC_COLUMN *str, uint *column_count);
 
-#define mariadb_dyncol_value_init(V) (V)->type= DYN_COL_NULL
+#define mariadb_dyncol_value_init(V) \
+do {\
+  (V)->type= DYN_COL_NULL;\
+} while(0)
 
 /*
   Prepare value for using as decimal

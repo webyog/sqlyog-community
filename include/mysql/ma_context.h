@@ -1,5 +1,6 @@
 /*
-  Copyright 2011 Kristian Nielsen and Monty Program Ab
+   Copyright 2011 Kristian Nielsen and Monty Program Ab
+             2015, 2022 MariaDB Corporation AB
 
   This file is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -113,16 +114,16 @@ struct my_context {
 #endif
 
 /*
-  Initialize an asynchroneous context object.
+  Initialize an asynchronous context object.
   Returns 0 on success, non-zero on failure.
 */
 extern int my_context_init(struct my_context *c, size_t stack_size);
 
-/* Free an asynchroneous context object, deallocating any resources used. */
+/* Free an asynchronous context object, deallocating any resources used. */
 extern void my_context_destroy(struct my_context *c);
 
 /*
-  Spawn an asynchroneous context. The context will run the supplied user
+  Spawn an asynchronous context. The context will run the supplied user
   function, passing the supplied user data pointer.
 
   The context must have been initialised with my_context_init() prior to
@@ -130,7 +131,7 @@ extern void my_context_destroy(struct my_context *c);
 
   The user function may call my_context_yield(), which will cause this
   function to return 1. Then later my_context_continue() may be called, which
-  will resume the asynchroneous context by returning from the previous
+  will resume the asynchronous context by returning from the previous
   my_context_yield() call.
 
   When the user function returns, this function returns 0.
@@ -140,7 +141,7 @@ extern void my_context_destroy(struct my_context *c);
 extern int my_context_spawn(struct my_context *c, void (*f)(void *), void *d);
 
 /*
-  Suspend an asynchroneous context started with my_context_spawn.
+  Suspend an asynchronous context started with my_context_spawn.
 
   When my_context_yield() is called, execution immediately returns from the
   last my_context_spawn() or my_context_continue() call. Then when later
@@ -152,10 +153,10 @@ extern int my_context_spawn(struct my_context *c, void (*f)(void *), void *d);
 extern int my_context_yield(struct my_context *c);
 
 /*
-  Resume an asynchroneous context. The context was spawned by
+  Resume an asynchronous context. The context was spawned by
   my_context_spawn(), and later suspended inside my_context_yield().
 
-  The asynchroneous context may be repeatedly suspended with
+  The asynchronous context may be repeatedly suspended with
   my_context_yield() and resumed with my_context_continue().
 
   Each time it is suspended, this function returns 1. When the originally
@@ -178,7 +179,7 @@ struct mysql_async_context {
     resumed, eg. whether we woke up due to connection completed or timeout
     in mysql_real_connect_cont().
   */
-  unsigned int events_occured;
+  unsigned int events_occurred;
   /*
     This is set to the result of the whole asynchronous operation when it
     completes. It uses a union, as different calls have different return
@@ -223,6 +224,14 @@ struct mysql_async_context {
   struct st_ma_pvio *pvio;
   void (*suspend_resume_hook)(my_bool suspend, void *user_data);
   void *suspend_resume_hook_user_data;
+
+  /* If non-NULL,  this is a poitner to the result of getaddrinfo() currently
+   * under traversal in pvio_socket_connect(). It gets reset to NULL when a
+   * connection has been established to a server. The main objective is to
+   * free this memory resource in mysql_close() while an initiated connection
+   * has not been established. */
+  struct addrinfo* pending_gai_res;
+
   /*
     This is used to save the execution contexts so that we can suspend an
     operation and switch back to the application context, to resume the

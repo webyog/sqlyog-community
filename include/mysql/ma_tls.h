@@ -145,6 +145,7 @@ unsigned int ma_tls_get_finger_print(MARIADB_TLS *ctls, char *fp, unsigned int f
 int ma_tls_get_protocol_version(MARIADB_TLS *ctls);
 const char *ma_pvio_tls_get_protocol_version(MARIADB_TLS *ctls);
 int ma_pvio_tls_get_protocol_version_id(MARIADB_TLS *ctls);
+void ma_tls_set_connection(MYSQL *mysql);
 
 /* Function prototypes */
 MARIADB_TLS *ma_pvio_tls_init(MYSQL *mysql);
@@ -156,6 +157,7 @@ int ma_pvio_tls_verify_server_cert(MARIADB_TLS *ctls);
 const char *ma_pvio_tls_cipher(MARIADB_TLS *ctls);
 my_bool ma_pvio_tls_check_fp(MARIADB_TLS *ctls, const char *fp, const char *fp_list);
 my_bool ma_pvio_start_ssl(MARIADB_PVIO *pvio);
+void ma_pvio_tls_set_connection(MYSQL *mysql);
 void ma_pvio_tls_end();
 
 #endif /* _ma_tls_h_ */

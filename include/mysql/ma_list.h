@@ -39,7 +39,7 @@ extern int list_walk(LIST *list,list_walk_action action,char * argument);
 
 #define list_rest(a) ((a)->next)
 #define list_push(a,b) (a)=list_cons((b),(a))
-#define list_pop(A) {LIST *old=(A); (A)=list_delete(old,old) ; ma_free((char *) old,MYF(MY_FAE)); }
+#define list_pop(A) do {LIST *old=(A); (A)=list_delete(old,old) ; ma_free((char *) old,MYF(MY_FAE)); } while(0)
 
 #ifdef	__cplusplus
 }

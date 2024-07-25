@@ -8,6 +8,12 @@
 #define MARIADB_TLS void
 #endif
 
+/* CONC-492: Allow to build plugins outside of MariaDB Connector/C
+   source tree wnen ma_global.h was not included. */
+#if !defined(_global_h) && !defined(MY_GLOBAL_INCLUDED)
+typedef unsigned char uchar;
+#endif
+
 #define PVIO_SET_ERROR if (pvio->set_error) \
                         pvio->set_error
 
@@ -78,6 +84,8 @@ struct st_ma_pvio {
   PVIO_METHODS *methods;
   void (*set_error)(MYSQL *mysql, unsigned int error_nr, const char *sqlstate, const char *format, ...);
   void (*callback)(MARIADB_PVIO *pvio, my_bool is_read, const uchar *buffer, size_t length);
+  size_t bytes_read;
+  size_t bytes_sent;
 };
 
 typedef struct st_ma_pvio_cinfo

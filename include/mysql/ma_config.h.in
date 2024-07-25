@@ -11,6 +11,7 @@
 #cmakedefine HAVE_FCNTL_H 1
 #cmakedefine HAVE_FLOAT_H 1
 #cmakedefine HAVE_LIMITS_H 1
+#cmakedefine HAVE_LINUX_LIMITS_H 1
 #cmakedefine HAVE_PWD_H 1
 #cmakedefine HAVE_SELECT_H 1
 #cmakedefine HAVE_STDDEF_H 1
@@ -21,6 +22,8 @@
 #cmakedefine HAVE_SYS_SELECT_H 1
 #cmakedefine HAVE_SYS_SOCKET_H 1
 #cmakedefine HAVE_SYS_STREAM_H 1
+#cmakedefine HAVE_SYS_STAT_H 1
+#cmakedefine HAVE_SYS_SYSCTL_H 1
 #cmakedefine HAVE_SYS_TYPES_H 1
 #cmakedefine HAVE_SYS_UN_H 1
 #cmakedefine HAVE_UNISTD_H 1
@@ -83,6 +86,11 @@
 #cmakedefine SIZEOF_UINT @SIZEOF_UINT@
 #if defined(SIZEOF_UINT)
 # define HAVE_UINT 1
+#endif
+
+#cmakedefine SIZEOF_USHORT @SIZEOF_USHORT@
+#if defined(SIZEOF_USHORT)
+# define HAVE_USHORT 1
 #endif
 
 #cmakedefine SIZEOF_ULONG @SIZEOF_ULONG@

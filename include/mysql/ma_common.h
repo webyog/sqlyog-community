@@ -21,7 +21,8 @@
 #define _ma_common_h
 
 #include <mysql.h>
-#include <ma_hash.h>
+#include <mysql/client_plugin.h>
+#include <ma_hashtbl.h>
 
 enum enum_multi_status {
   COM_MULTI_OFF= 0,
@@ -54,7 +55,7 @@ struct st_mysql_options_extension {
   char *ssl_crlpath;
   char *server_public_key_path;
   struct mysql_async_context *async_context;
-  HASH connect_attrs;
+  MA_HASHTBL connect_attrs;
   size_t connect_attrs_len;
   void (*report_progress)(const MYSQL *mysql,
                           unsigned int stage,
@@ -74,11 +75,18 @@ struct st_mysql_options_extension {
   my_bool read_only;
   char *connection_handler;
   my_bool (*set_option)(MYSQL *mysql, const char *config_option, const char *config_value);
-  HASH userdata;
+  MA_HASHTBL userdata;
   char *server_public_key;
   char *proxy_header;
   size_t proxy_header_len;
   int (*io_wait)(my_socket handle, my_bool is_read, int timeout);
+  my_bool skip_read_response;
+  char *restricted_auth;
+  char *rpl_host;
+  unsigned short rpl_port;
+  void (*status_callback)(void *ptr, enum enum_mariadb_status_info type, ...);
+  void *status_data;
+  my_bool tls_verify_server_cert;
 };
 
 typedef struct st_connection_handler
@@ -92,6 +100,8 @@ typedef struct st_connection_handler
 struct st_mariadb_net_extension {
   enum enum_multi_status multi_status;
   int extended_errno;
+  ma_compress_ctx *compression_ctx;
+  MARIADB_COMPRESSION_PLUGIN *compression_plugin;
 };
 
 struct st_mariadb_session_state
@@ -109,8 +119,8 @@ struct st_mariadb_extension {
 };
 
 #define OPT_EXT_VAL(a,key) \
-  ((a)->options.extension && (a)->options.extension->key) ?\
-    (a)->options.extension->key : 0
+  (((a)->options.extension && (a)->options.extension->key) ?\
+    (a)->options.extension->key : 0)
 
 #endif
 
