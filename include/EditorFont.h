@@ -105,12 +105,18 @@ public:
     */
 	static void SetColor(HWND hwndedit, wyBool fromini, wyBool isinfotab = wyFalse);
 
+	static void SetThemeColor(HWND hwndedit, wyBool fromini, wyBool isinfotab = wyFalse);
+
+
 	/// Sets the width for the line numbers
     /**
     @param hwndedit:  IN Window Handler.
     @returns void.    
     */
 	static void SetLineNumberWidth(HWND hwndedit);
+
+	/// Centralized theme-aware function for setting margin colors
+	static void SetThemeAwareMarginColors(HWND hwndedit, wyString &dirstr);
 
 	/// Changes the editor as a whole.
 	/**
@@ -132,6 +138,36 @@ public:
 	*/
 	static void SetColorFromIni(HWND hwndedit, wyWChar directory[], wyBool isinfotab);
 	
+	/**
+	@param hwndedit		:	IN Handle to the Scintilla editor window.
+	@returns void.  
+	*/
+	static void ApplyEditorThemeColors(HWND hwndedit, wyBool isinfotab = wyFalse);
+	static void ApplyEditorThemeColors(HWND hwndedit, EDITORCOLORINFO *pDefColors, wyBool isinfotab);
+
+
+	/// Apply default colors to dialog editors in dark theme
+	/**
+	@param hwndedit		:	IN Handle to the Scintilla editor window.
+	@param isinfotab	:	IN whether it is an info tab or not
+	@returns void.  
+	*/
+	static void ApplyDialogEditorDefaultColors(HWND hwndedit, wyBool isinfotab = wyFalse);
+
+	/// Helper function to determine if a Scintilla editor is in the main window
+	/**
+	@param hwndedit		:	IN Handle to the Scintilla editor window.
+	@returns wyTrue if the editor is in the main window, wyFalse if in dialog/popup
+	*/
+	static wyBool IsMainWindowEditor(HWND hwndedit);
+
+	/// Helper function to handle MTI control routing
+	/**
+	@param hwndedit		:	IN Handle to the Scintilla editor window.
+	@returns wyTrue if MTI control was handled and routed, wyFalse if not an MTI control
+	*/
+	static wyBool HandleMTIControlRouting(HWND hwndedit);
+	
 	/// Select default colors .
 	/**
 	@param hwndedit		:	 IN ini file.
@@ -146,5 +182,8 @@ public:
 	@returns void.  
 	*/
 	static void SetCase(HWND hwndedit);
+	static void GetColorFromIni(HWND hwndedit, wyWChar directory[], EDITORCOLORINFO *editorcolors, wyBool isinfotab);
+	static void GetColorDefault(HWND hwndedit, EDITORCOLORINFO *editorcolors, wyBool isinfotab);
+
 };
 #endif

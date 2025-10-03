@@ -23,6 +23,7 @@
 #include "Global.h"
 #include "CommonHelper.h"
 #include "MySQLVersionHelper.h"
+#include "wyTheme.h"
 #include "SQLMaker.h"
 #include "sqlite3.h"
 #include "WyMySQLError.h"
@@ -628,6 +629,15 @@ ChangeEditMenuItem(HMENU hmenu)
     {
         HandleRemoveExplainOptions(hmenu);
     }
+
+	if(wyTheme::IsDarkThemeActive() || pGlobals->m_conncount == 0)
+	{
+		EnableMenuItem(hmenu, IDM_OBCOLOR, MF_GRAYED | MF_BYCOMMAND);
+	}
+	else
+	{
+		EnableMenuItem(hmenu, IDM_OBCOLOR, MF_ENABLED | MF_BYCOMMAND);
+	}
 
 	if(!pcquerywnd)
 		return wyTrue;
@@ -4636,26 +4646,64 @@ CreateIcon(wyUInt32 iconid)
 }
 
 
+// Helper function to handle dark theme dialog MTI tab colors
+void
+SetMTIColorsForDarkThemeDialog(COLORREF& selectionColor, COLORREF& bgColor, COLORREF& fgColor)
+{
+    // For dialog MTI tabs in dark theme, use default colors only
+    // Colors are already initialized to defaults in the calling function
+    // This function exists to provide a clear separation of logic
+    // and can be extended in the future if needed
+}
+
+// Helper function to get theme colors from wyTheme::GetMTIColors
+void
+GetThemeColorsToMTI(COLORREF* selectionColor, COLORREF* bgColor, COLORREF* fgColor)
+{
+    MTICOLORINFO mticolors;
+    if(wyTheme::GetMTIColors(&mticolors))
+    {
+        if(bgColor != nullptr && (mticolors.m_mask & MTICF_BACKGROUND))
+            *bgColor = mticolors.m_background;
+        if(fgColor != nullptr && (mticolors.m_mask & MTICF_FOREGROUND))
+            *fgColor = mticolors.m_foreground;
+        if(selectionColor != nullptr && (mticolors.m_mask & MTICF_SELECTION))
+            *selectionColor = mticolors.m_selection;
+    }
+}
+
 void
 SetMTIColor(HWND hwnd)
 {
     wyWChar     directory[MAX_PATH+1] = {0}, *lpfileport = 0;
 	wyString	dirstr;
-    COLORREF selectionColor,bgColor,fgColor;
-    if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
+    COLORREF selectionColor = DEF_TEXTSELECTION, bgColor = DEF_BKGNDEDITORCOLOR, fgColor = DEF_NORMALCOLOR;
+    
+    // Check if this is a dialog MTI tab in dark theme
+    if(wyTheme::IsDarkThemeActive() && !EditorFont::IsMainWindowEditor(hwnd))
     {
-        dirstr.SetAs(directory);
-        selectionColor   =   wyIni::IniGetInt(GENERALPREFA, "MTISelectionColor",   DEF_TEXTSELECTION, dirstr.GetString());
-        bgColor=wyIni::IniGetInt(GENERALPREFA, "MTIBgColor", DEF_BKGNDEDITORCOLOR, dirstr.GetString()); 
-        fgColor=wyIni::IniGetInt(GENERALPREFA, "MTIFgColor", DEF_NORMALCOLOR, dirstr.GetString()); 
-
-        SendMessage(hwnd,SCI_SETSELBACK,1,selectionColor);
-        SendMessage(hwnd, SCI_STYLESETBACK, STYLE_DEFAULT, (LPARAM)bgColor);
-        SendMessage( hwnd, SCI_SETCARETFORE,bgColor ^ 0xFFFFFF,0); //Change Caret color in editor window
-        SendMessage(hwnd, SCI_STYLESETFORE, SCE_MYSQL_DEFAULT, fgColor);
-        SendMessage(hwnd, SCI_STYLESETBACK, SCE_MYSQL_DEFAULT, bgColor);
-        SendMessage(hwnd, SCI_STYLESETBOLD, SCE_MYSQL_DEFAULT, FALSE);
+        SetMTIColorsForDarkThemeDialog(selectionColor, bgColor, fgColor);
     }
+    else
+    {
+        // For main window MTI tabs or light theme, use custom colors and theme colors
+        if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
+        {
+            dirstr.SetAs(directory);
+            selectionColor   =   wyIni::IniGetInt(GENERALPREFA, "MTISelectionColor",   DEF_TEXTSELECTION, dirstr.GetString());
+            bgColor=wyIni::IniGetInt(GENERALPREFA, "MTIBgColor", DEF_BKGNDEDITORCOLOR, dirstr.GetString()); 
+            fgColor=wyIni::IniGetInt(GENERALPREFA, "MTIFgColor", DEF_NORMALCOLOR, dirstr.GetString()); 
+        }
+
+        GetThemeColorsToMTI(&selectionColor, &bgColor, &fgColor);
+    }
+
+    SendMessage(hwnd,SCI_SETSELBACK,1,selectionColor);
+    SendMessage(hwnd, SCI_STYLESETBACK, STYLE_DEFAULT, (LPARAM)bgColor);
+    SendMessage( hwnd, SCI_SETCARETFORE,bgColor ^ 0xFFFFFF,0); //Change Caret color in editor window
+    SendMessage(hwnd, SCI_STYLESETFORE, SCE_MYSQL_DEFAULT, fgColor);
+    SendMessage(hwnd, SCI_STYLESETBACK, SCE_MYSQL_DEFAULT, bgColor);
+    SendMessage(hwnd, SCI_STYLESETBOLD, SCE_MYSQL_DEFAULT, FALSE);
 }
 
 
@@ -8353,12 +8401,15 @@ EnableFolding(HWND hwnd)
 
     if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
     {
-        //Chnage line number margin color
+		//Chnage line number margin color
         wyString	dirstr(directory);
         
         forecolor   =   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginFgColor",   RGB(0,0,0), dirstr.GetString());
         backcolor   =   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginbackgroundColor",   DEF_MARGINNUMBER, dirstr.GetString());
 		texturecolor=   wyIni::IniGetInt(GENERALPREFA, "FoldingMarginTextureColor",   COLOR_WHITE, dirstr.GetString());
+        
+		// Margin colors for overriding default colors for dark theme. 
+        GetFoldingMarginColors(forecolor, backcolor, texturecolor);
     }
     SendMessage(hwnd, SCI_SETPROPERTY, (WPARAM)"fold", (LPARAM)"1");
     SendMessage(hwnd, SCI_SETPROPERTY, (WPARAM)"fold.comment", (LPARAM)"1");
@@ -8405,6 +8456,25 @@ EnableFolding(HWND hwnd)
 	SendMessage(hwnd, SCI_MARKERSETBACK, (WPARAM)SC_MARKNUM_FOLDERMIDTAIL, (LPARAM)forecolor); 
 
     SendMessage(hwnd, SCI_SETFOLDFLAGS, (WPARAM)SC_FOLDFLAG_LINEAFTER_CONTRACTED, 0);
+}
+
+void
+GetFoldingMarginColors(COLORREF& forecolor, COLORREF& backcolor, COLORREF& texturecolor)
+{
+    EDITORCOLORINFO editorcolors;
+    if (wyTheme::GetEditorColors(&editorcolors))
+    {
+        if (editorcolors.m_mask & EDITORCF_FOLDMARGIN)
+        {
+            backcolor = editorcolors.m_foldmargin;
+            texturecolor = editorcolors.m_foldmargin;
+        }
+        
+        if (editorcolors.m_mask & EDITORCF_FOLDMARGINTEXT)
+        {
+            forecolor = editorcolors.m_foldmargintext;
+        }
+    }
 }
 
 void
@@ -10400,4 +10470,25 @@ WriteFullSectionToTable(wyString *sqlitequery, wyInt32 id, wyInt32 position, Con
 	sqliteobj->Finalize(&stmt);
 
 	return wyTrue;
+}
+
+const char* GetOptimizeCSS()
+{
+    return wyTheme::IsDarkThemeActive() ? CSS_OPTIMIZE_CLASS_DARK : CSS_OPTIMIZE_CLASS_LIGHT;
+}
+
+const char* GetWarningCSS()
+{
+    return wyTheme::IsDarkThemeActive() ? CSS_WARNING_DARK : CSS_WARNING_LIGHT;
+}
+
+const char* GetClass2CSS()
+{
+    return wyTheme::IsDarkThemeActive() ? CSS_CLASS2_DARK : CSS_CLASS2_LIGHT;
+}
+
+
+const char* GetClassesCSS()
+{
+	return wyTheme::IsDarkThemeActive() ? CSS_CLASSES_DARK : CSS_CLASSES_LIGHT;
 }

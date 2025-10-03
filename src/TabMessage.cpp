@@ -139,7 +139,7 @@ TabMessage::CreateQueryMessageEdit(HWND hwndparent, MDIWindow *wnd)
 
 	
     SetFont();
-    SetColor();
+	SetColor();
 
 	//for disabling the default context menu
 	SendMessage(m_hwnd, SCI_USEPOPUP, 0, 0);
@@ -377,13 +377,28 @@ TabMessage::SetColor()
     wyWChar     directory[MAX_PATH+1] = {0}, *lpfileport = 0;
 	wyString	dirstr;
 
-    if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
-    {
-        dirstr.SetAs(directory);
-        m_rgbselectioncolor   =   wyIni::IniGetInt(GENERALPREFA, "MTISelectionColor",   DEF_TEXTSELECTION, dirstr.GetString());
-        m_rgbbgcolor=wyIni::IniGetInt(GENERALPREFA, "MTIBgColor", DEF_BKGNDEDITORCOLOR, dirstr.GetString()); 
-        m_rgbfgcolor=wyIni::IniGetInt(GENERALPREFA, "MTIFgColor", DEF_NORMALCOLOR, dirstr.GetString()); 
+    m_rgbselectioncolor = DEF_TEXTSELECTION;
+    m_rgbbgcolor = DEF_BKGNDEDITORCOLOR; 
+    m_rgbfgcolor = DEF_NORMALCOLOR;
 
+    // Check if this is a dialog MTI tab in dark theme
+    if(wyTheme::IsDarkThemeActive() && !EditorFont::IsMainWindowEditor(m_hwnd))
+    {
+        SetMTIColorsForDarkThemeDialog(m_rgbselectioncolor, m_rgbbgcolor, m_rgbfgcolor);
+    }
+    else
+    {
+        // For main window MTI tabs or light theme, use custom colors and theme colors
+        if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
+        {
+            dirstr.SetAs(directory);
+            m_rgbselectioncolor   =   wyIni::IniGetInt(GENERALPREFA, "MTISelectionColor", DEF_TEXTSELECTION, dirstr.GetString());
+            m_rgbbgcolor=wyIni::IniGetInt(GENERALPREFA, "MTIBgColor", DEF_BKGNDEDITORCOLOR, dirstr.GetString()); 
+            m_rgbfgcolor=wyIni::IniGetInt(GENERALPREFA, "MTIFgColor", DEF_NORMALCOLOR, dirstr.GetString()); 
+        }
+
+        GetThemeColorsToMTI(&m_rgbselectioncolor, &m_rgbbgcolor, &m_rgbfgcolor);
+    }
 
         SendMessage(m_hwnd,SCI_SETSELBACK,1,m_rgbselectioncolor);
         SendMessage( m_hwnd, SCI_SETCARETFORE,m_rgbbgcolor ^ 0xFFFFFF,0); //Change Caret color in editor window
@@ -395,7 +410,6 @@ TabMessage::SetColor()
         SendMessage(m_hwnd, SCI_STYLESETVISIBLE, SCE_SQLYOGMSG_RESULTTAG, 0);
         SendMessage(m_hwnd, SCI_STYLESETVISIBLE, SCE_SQLYOGMSG_NORESULTTAG, 0);
         SendMessage(m_hwnd, SCI_STYLESETVISIBLE, SCE_SQLYOGMSG_WARNINGTAG, 0);
-    }
 }
 
 
@@ -518,3 +532,4 @@ TabMessage::ComboListProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
     //call the original proc
     return CallWindowProc(ptm->m_origlistproc, hwnd, message, wparam, lparam);
 }
+

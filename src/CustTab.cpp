@@ -35,6 +35,8 @@ the perfomance and a few redundant members are removed.
 #include "MDIWindow.h"
 #include "CommonHelper.h"
 #include "DoubleBuffer.h"
+#include "Symbols.h"
+#include "wyTheme.h"
 
 #define IDC_CTAB		                    WM_USER + 116
 #define UM_PAINTTABHEADER                   WM_USER + 200
@@ -937,37 +939,51 @@ CCustTab::SetGradientArrayOnFocus(LPCTCITEM pitem, PRECT prect, LPTRIVERTEX vert
 	vertex[1].x     = prect->right + (m_isfixedlength == wyTrue ? 0 : 1);
 	vertex[1].y     = prect->bottom + TABTOPSPACE + 1; 			
    
-	if((pitem->m_mask & CTBIF_COLOR)  && (pitem->m_color  >= 0) && m_isfixedlength)
+	// Use theme selected tab color for connection tabs in dark theme
+	if(m_id == IDC_CONNECTIONTAB && wyTheme::IsDarkThemeActive()) // Connection tab ID and dark theme
 	{
-		vertex[1].Red   = (COLOR16)(GetRValue(pitem->m_color) << 8);
-		vertex[1].Green = (COLOR16)(GetGValue(pitem->m_color) << 8);
-		vertex[1].Blue  = (COLOR16)(GetBValue(pitem->m_color) << 8);
-		vertex[1].Alpha = 0x0000;
-		
-        /*t1 = vertex[0].Red > vertex[0].Green ? vertex[0].Green : vertex[0].Red;
-        t1 = t1 > vertex[0].Blue? vertex[0].Blue : t1;*/
-
-		vertex[0].Red   = vertex[1].Red + ( 13 * (0xff00 - vertex[1].Red)/16); //m_red;
-		vertex[0].Green = vertex[1].Green + ( 13 * (0xff00 - vertex[1].Green)/16);  //m_green;
-		vertex[0].Blue  = vertex[1].Blue + ( 13 * (0xff00 - vertex[1].Blue)/16); //m_blue;
+		// Use theme selected tab color for connection tabs
+		vertex[0].Red   = (COLOR16)(GetRValue(m_colorinfo.m_seltabfg1) << 8);
+		vertex[0].Green = (COLOR16)(GetGValue(m_colorinfo.m_seltabfg1) << 8);
+		vertex[0].Blue  = (COLOR16)(GetBValue(m_colorinfo.m_seltabfg1) << 8);
 		vertex[0].Alpha = 0x0000;
 
-        //m_colorinfo.m_tabbg1 = RGB(vertex[1].Red, vertex[1].Green, vertex[1].Blue);
+		vertex[1].Red   = vertex[0].Red;
+		vertex[1].Green = vertex[0].Green;
+		vertex[1].Blue  = vertex[0].Blue;
+		vertex[1].Alpha = 0x0000;
+	}
+	else if ((pitem->m_mask & CTBIF_COLOR) && (pitem->m_color >= 0) && m_isfixedlength)
+	{
+		vertex[1].Red = (COLOR16)(GetRValue(pitem->m_color) << 8);
+		vertex[1].Green = (COLOR16)(GetGValue(pitem->m_color) << 8);
+		vertex[1].Blue = (COLOR16)(GetBValue(pitem->m_color) << 8);
+		vertex[1].Alpha = 0x0000;
+
+		/*t1 = vertex[0].Red > vertex[0].Green ? vertex[0].Green : vertex[0].Red;
+		t1 = t1 > vertex[0].Blue? vertex[0].Blue : t1;*/
+
+		vertex[0].Red = vertex[1].Red + (13 * (0xff00 - vertex[1].Red) / 16); //m_red;
+		vertex[0].Green = vertex[1].Green + (13 * (0xff00 - vertex[1].Green) / 16);  //m_green;
+		vertex[0].Blue = vertex[1].Blue + (13 * (0xff00 - vertex[1].Blue) / 16); //m_blue;
+		vertex[0].Alpha = 0x0000;
+
+		//m_colorinfo.m_tabbg1 = RGB(vertex[1].Red, vertex[1].Green, vertex[1].Blue);
 	}
 	else
 	{
-		vertex[0].Red   = (COLOR16)(GetRValue(m_colorinfo.m_seltabfg1) << 8);//0xf300;
+		vertex[0].Red = (COLOR16)(GetRValue(m_colorinfo.m_seltabfg1) << 8);//0xf300;
 		vertex[0].Green = (COLOR16)(GetGValue(m_colorinfo.m_seltabfg1) << 8);//0xf100;
-		vertex[0].Blue  = (COLOR16)(GetBValue(m_colorinfo.m_seltabfg1) << 8);//0xe600;
+		vertex[0].Blue = (COLOR16)(GetBValue(m_colorinfo.m_seltabfg1) << 8);//0xe600;
 		vertex[0].Alpha = 0x0000;
-	
 
-    vertex[1].Red   = (COLOR16)(GetRValue(m_colorinfo.m_seltabfg2) << 8);
-    vertex[1].Green = (COLOR16)(GetGValue(m_colorinfo.m_seltabfg2) << 8);
-    vertex[1].Blue  = (COLOR16)(GetBValue(m_colorinfo.m_seltabfg2) << 8);
-    vertex[1].Alpha = 0xfe00;
-    
-    }
+
+		vertex[1].Red = (COLOR16)(GetRValue(m_colorinfo.m_seltabfg2) << 8);
+		vertex[1].Green = (COLOR16)(GetGValue(m_colorinfo.m_seltabfg2) << 8);
+		vertex[1].Blue = (COLOR16)(GetBValue(m_colorinfo.m_seltabfg2) << 8);
+		vertex[1].Alpha = 0xfe00;
+
+	}
 
 	return;
 }
@@ -1037,50 +1053,50 @@ CCustTab::SetGradientArrayOnMouseOver(LPCTCITEM pitem, PRECT prect, LPTRIVERTEX 
 	return;
 }
 
-void  
+void
 CCustTab::SetGradientArrayOnUnFocus(LPCTCITEM pitem, PRECT prect, LPTRIVERTEX vertex)
 {
 	wyInt32		tabred, tabblue, tabgreen;
 
-    if(pitem)
-    {
-        vertex[1].x     = prect->right + (m_isfixedlength == wyTrue ? -1 : 1);
-	    vertex[1].y     = prect->bottom + TABTOPSPACE + 1; 
-    }
-
-	if(pitem && (pitem->m_mask & CTBIF_COLOR)  && (pitem->m_color >= 0) && m_isfixedlength)
+	if (pitem)
 	{
-		tabred		= (COLOR16)(GetRValue(pitem->m_color) << 8);
-		tabgreen	= (COLOR16)(GetGValue(pitem->m_color) << 8);
-		tabblue		= (COLOR16)(GetBValue(pitem->m_color) << 8);
+		vertex[1].x = prect->right + (m_isfixedlength == wyTrue ? -1 : 1);
+		vertex[1].y = prect->bottom + TABTOPSPACE + 1;
+	}
 
-		vertex[0].Red   = tabred;
+	if (pitem && (pitem->m_mask & CTBIF_COLOR) && (pitem->m_color >= 0) && m_isfixedlength)
+	{
+		tabred = (COLOR16)(GetRValue(pitem->m_color) << 8);
+		tabgreen = (COLOR16)(GetGValue(pitem->m_color) << 8);
+		tabblue = (COLOR16)(GetBValue(pitem->m_color) << 8);
+
+		vertex[0].Red = tabred;
 		vertex[0].Green = tabgreen;
-		vertex[0].Blue  = tabblue;
+		vertex[0].Blue = tabblue;
 		vertex[0].Alpha = 0;
 
-		vertex[1].Red   = tabred;
+		vertex[1].Red = tabred;
 		vertex[1].Green = tabgreen;
-		vertex[1].Blue  = tabblue;
+		vertex[1].Blue = tabblue;
 		vertex[1].Alpha = 0;
 	}
 	else
 	{
-        tabred		= (COLOR16)(GetRValue(m_colorinfo.m_tabbg1) << 8);
-		tabgreen	= (COLOR16)(GetGValue(m_colorinfo.m_tabbg1) << 8);
-		tabblue		= (COLOR16)(GetBValue(m_colorinfo.m_tabbg1) << 8);
+		tabred = (COLOR16)(GetRValue(m_colorinfo.m_tabbg1) << 8);
+		tabgreen = (COLOR16)(GetGValue(m_colorinfo.m_tabbg1) << 8);
+		tabblue = (COLOR16)(GetBValue(m_colorinfo.m_tabbg1) << 8);
 
-		vertex[0].Red   = tabred;//m_red;//0xe500;
-        vertex[0].Green = tabgreen;// m_green;//0xe400;
-        vertex[0].Blue  = tabblue; //m_blue;//0xd800;
+		vertex[0].Red = tabred;//m_red;//0xe500;
+		vertex[0].Green = tabgreen;// m_green;//0xe400;
+		vertex[0].Blue = tabblue; //m_blue;//0xd800;
 		vertex[0].Alpha = 0x0000;
 
-		vertex[1].Red   = tabred;//0xdd00;
+		vertex[1].Red = tabred;//0xdd00;
 		vertex[1].Green = tabgreen;//0xdc00;
-		vertex[1].Blue  = tabgreen;//0xd800;
+		vertex[1].Blue = tabgreen;//0xd800;
 		vertex[1].Alpha = 0x0000;
 
-    }
+	}
 
 	return;
 }
@@ -3027,7 +3043,21 @@ CCustTab::DrawTabs(HDC hdc)
         }
 
         color =  m_isfixedlength == wyTrue ? m_tabdet[i].ctcitem.m_color : COLOR_WHITE;
-        fgcolor = m_isfixedlength == wyTrue ? m_tabdet[i].ctcitem.m_fgcolor : ((i == m_selectedtab) ? m_colorinfo.m_seltabtext : m_colorinfo.m_tabtext);
+        
+        // Use theme text colors with priority over individual tab colors
+        if(i == m_selectedtab && (m_colorinfo.m_mask & CTCF_SELTABTEXT))
+        {
+            fgcolor = m_colorinfo.m_seltabtext;
+        }
+        else if(i != m_selectedtab && (m_colorinfo.m_mask & CTCF_TABTEXT))
+        {
+            fgcolor = m_colorinfo.m_tabtext;
+        }
+        else
+        {
+            // Fallback to original logic
+            fgcolor = m_isfixedlength == wyTrue ? m_tabdet[i].ctcitem.m_fgcolor : ((i == m_selectedtab) ? m_colorinfo.m_seltabtext : m_colorinfo.m_tabtext);
+        }
         prevcolor = SetTextColor(hdc, fgcolor);
         DrawText(hdc, temp.GetAsWideChar(), -1, &temprect, DT_LEFT | DT_VCENTER | DT_END_ELLIPSIS | DT_SINGLELINE);
         SetTextColor(hdc, prevcolor);
@@ -3373,13 +3403,25 @@ CCustTab::DrawFixedLengthTab(HDC hdcmem, RECT * prect, wyInt32 tabindex, wyBool 
 
     if(m_selectedtab == tabindex)
 	{
-        red = (COLOR16)(GetRValue(m_tabdet[tabindex].ctcitem.m_color));
-        green = (COLOR16)(GetGValue(m_tabdet[tabindex].ctcitem.m_color));
-	    blue  = (COLOR16)(GetBValue(m_tabdet[tabindex].ctcitem.m_color));
-        red   = red + ( 17 * (0xfe - red)/20); //m_red;
-	    green = green + ( 17 * (0xfe - green)/20);  //m_green;
-	    blue  = blue + ( 17 * (0xfe - blue)/20); //m_blue;
-        hbrush = CreateSolidBrush(RGB(red,green, blue));
+        // Use theme selected tab color for connection tabs in dark theme
+        if(m_id == IDC_CONNECTIONTAB && wyTheme::IsDarkThemeActive()) // Connection tab ID and dark theme
+        {
+            red   = (COLOR16)(GetRValue(m_colorinfo.m_seltabfg1));
+            green = (COLOR16)(GetGValue(m_colorinfo.m_seltabfg1));
+            blue  = (COLOR16)(GetBValue(m_colorinfo.m_seltabfg1));
+            hbrush = CreateSolidBrush(RGB(red, green, blue));
+        }
+		else
+		{
+			red = (COLOR16)(GetRValue(m_tabdet[tabindex].ctcitem.m_color));
+			green = (COLOR16)(GetGValue(m_tabdet[tabindex].ctcitem.m_color));
+			blue = (COLOR16)(GetBValue(m_tabdet[tabindex].ctcitem.m_color));
+			red = red + (17 * (0xfe - red) / 20); //m_red;
+			green = green + (17 * (0xfe - green) / 20);  //m_green;
+			blue = blue + (17 * (0xfe - blue) / 20); //m_blue;
+			hbrush = CreateSolidBrush(RGB(red, green, blue));
+		}
+
         temppen = m_hpengrey;//CreatePen(PS_SOLID, 0,/*m_tabdet[tabindex].ctcitem.m_color*/) ;//(HPEN)SelectObject(hdcmem, m_hpenbottomline);
         hboldpen = (HPEN)SelectObject(hdcmem, temppen);
 	}

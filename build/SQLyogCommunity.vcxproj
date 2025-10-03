@@ -137,7 +137,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>shfolder.lib;version.lib;Ws2_32.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite3.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;cryptlib.lib;tinyxml2.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>shfolder.lib;version.lib;Ws2_32.lib;odbc32.lib;odbccp32.lib;wsock32.lib;comctl32.lib;htmlhelp.lib;wininet.lib;imm32.lib;gdiplus.lib;ole32.lib;msimg32.lib;sqlite3.lib;mariadbclient.lib;HTMLayout.lib;pcre.lib;Rpcrt4.lib;shlwapi.lib;vld.lib;winmm.lib;cryptlib.lib;tinyxml2.lib;secur32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>LIBCMT; LIBC;LIBCD;msvcrt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -814,6 +814,9 @@
     <None Include="bitmaps\TableOptions.ico" />
     <None Include="bitmaps\TabPreview.ico" />
     <None Include="ClassDiagram1.cd" />
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\include\Dark.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

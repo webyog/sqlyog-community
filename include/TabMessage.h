@@ -80,7 +80,6 @@ public:
     wyBool        OnContextMenu(LPARAM lparam);
 
     void        OnWMCommand(WPARAM wparam);
-	
 	 /// HANDLE to the message edit window 
     HWND        m_hwnd;
 

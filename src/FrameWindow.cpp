@@ -33,6 +33,7 @@
 #include "MDIWindow.h"
 #include "ExportMultiFormat.h"
 #include "PreferenceBase.h"
+#include "wyTheme.h"
 #include "PreferenceCommunity.h"
 #include "HelpHeader.h"
 #include "OtherDialogs.h"
@@ -1429,6 +1430,10 @@ FrameWindow::WndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 					pGlobals->m_pcmainwin->AddTextInCombo(NODBSELECTED);
 				}
 			}
+			
+			// Update connection tab colors after restoration - ensure theme colors are applied correctly
+			wyTheme::UpdateConnectionTabColorsForTheme();
+			
 			ShowWindow(hwnd, pcmainwin->m_showwindowstyle);
 			pcmainwin->m_showwindowstyle = SW_HIDE;
 			SetForegroundWindow(hwnd);
@@ -2672,6 +2677,10 @@ FrameWindow::OnWmCommand(WPARAM wParam)
         break;
 
 	case IDM_OBCOLOR:
+		// Block color change when dark theme is active
+		if(wyTheme::IsDarkThemeActive())
+			break;
+			
 		SendMessage(pcquerywnd->m_pcqueryobject->m_hwnd, WM_COMMAND, wParam, NULL);
 		break;
 		
@@ -7567,6 +7576,13 @@ FrameWindow::ONWmMainWinNotify(HWND hwnd, LPARAM lparam, WPARAM wparam)
                 LocalizeMenu(hmenu);
 	            htrackmenu = GetSubMenu(hmenu, 0);
                 wyTheme::SetMenuItemOwnerDraw(htrackmenu);
+                
+                // Disable ObjectBrowser color change when dark theme is active
+                if(wyTheme::IsDarkThemeActive())
+                {
+                    EnableMenuItem(htrackmenu, IDM_OBCOLOR, MF_GRAYED | MF_BYCOMMAND);
+                }
+                
                 GetCursorPos(&pnt);
 			    TrackPopupMenu(htrackmenu, TPM_LEFTALIGN | TPM_RIGHTBUTTON, pnt.x, pnt.y, 0, hwnd, NULL);
                 FreeMenuOwnerDrawItem(htrackmenu);
@@ -9334,6 +9350,9 @@ FrameWindow::CreateConnDialog(wyBool readsession)
 	
             PostMessage(pGlobals->m_pcmainwin->m_hwndmain, WM_SETACTIVEWINDOW, (WPARAM)pcquerywnd->m_hwnd, 0 );
 			SetCursor(LoadCursor(NULL, IDC_ARROW));
+			
+			// Update connection tab colors after new connection - ensure theme colors are applied correctly
+			wyTheme::UpdateConnectionTabColorsForTheme();
 		}
 
 		break;

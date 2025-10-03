@@ -1662,6 +1662,7 @@
 #define IDI_CHECKCONSTRAINT             44143
 #define IDC_PLUGIN_PROMPT				44144
 #define IDC_AUTHPLUGIN					44145
+#define IDR_THEME_DARK					44146
 
 
 // Next default values for new objects

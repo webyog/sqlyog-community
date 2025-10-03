@@ -613,6 +613,7 @@ wyBool IsMariaDB100700(Tunnel * tunnel, PMYSQL mysql)
 		return wyFalse;
 }
 
+
 // MySQL version check for 5.7.6 and above for Alter/Create query
 wyBool IsMySQL576(Tunnel * tunnel, PMYSQL mysql)
 {

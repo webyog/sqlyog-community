@@ -26,6 +26,7 @@
 #include "MDIWindow.h"  
 #include "TabMgmt.h"
 #include "CustTab.h"
+#include "wyTheme.h"
 
 #include <scilexer.h>
 
@@ -202,6 +203,9 @@ ConnectionTab::InsertConnectionTab(wyString * title, LPARAM lparam, wyBool iscon
 	{
 		CreateCustomTabTooltip(hwndtab);
 	}
+
+	// Update connection tab colors to ensure theme colors are applied correctly
+	wyTheme::UpdateConnectionTabColorsForTheme();
 
 	return wyTrue;
 }

@@ -23,6 +23,8 @@
 #include "GUIHelper.h"
 #include "FrameWindowHelper.h"
 #include "TableTabInterface.h"
+#include "wyTheme.h"
+#include "resource.h"
 
 extern PGLOBALS		pGlobals;
 
@@ -806,9 +808,8 @@ PreferenceBase::FontPrefHandleWmInitDialog(HWND hwnd)
     SendMessage (GetDlgItem(hwnd,IDC_EDITPREFDEMO), EM_SETSEL, (WPARAM)0, (LPARAM)0);
     SendMessage (GetDlgItem(hwnd,IDC_EDITPREFDEMO), EM_REPLACESEL, 0, (LPARAM) ((LPSTR) strg));
     
-    
-    EnableWindow(GetDlgItem(hwnd,IDC_BUTTONBACKGROUNDPREF2),FALSE);
-    EnableWindow(GetDlgItem(hwnd,IDC_BUTTONFOREGROUNDPREF),FALSE);
+    wyBool enableColors = wyTheme::IsDarkThemeActive() ? wyFalse : wyTrue;
+    EnableDisableColorControls(hwnd, enableColors);
     
 }
 	
@@ -825,8 +826,19 @@ PreferenceBase::FontPrefHandleWmCtlColorStatic(HWND hwnd, WPARAM wParam, LPARAM 
 	if(identifier == IDC_STATIC_TEST)
     {
         SetBkMode(hdc,TRANSPARENT);
+        
+        // Show grayed out colors when dark theme is active
+        if(wyTheme::IsDarkThemeActive())
+        {
+            SetTextColor(hdc, GetSysColor(COLOR_GRAYTEXT));
+            SetDCBrushColor(hdc, GetSysColor(COLOR_BTNFACE));
+        }
+        else
+        {
         SetTextColor(hdc,m_rgbfgcolor);
         SetDCBrushColor(hdc, m_rgbbgcolor);
+        }
+        
         return (BOOL)GetStockObject(DC_BRUSH);
     }
 
@@ -835,6 +847,13 @@ PreferenceBase::FontPrefHandleWmCtlColorStatic(HWND hwnd, WPARAM wParam, LPARAM 
 
 void PreferenceBase::SetColorsInStaticControl(HWND hwnd)
 {
+    // Don't update colors when dark theme is active
+    if(wyTheme::IsDarkThemeActive())
+    {
+        ChangeBkFrColor(hwnd, GetSysColor(COLOR_GRAYTEXT), GetSysColor(COLOR_BTNFACE));
+        return;
+    }
+    
     HTREEITEM selected =NULL;
     selected=(HTREEITEM)SendDlgItemMessage(hwnd,IDC_TREE2,TVM_GETNEXTITEM,TVGN_CARET,(LPARAM)selected);
     TVITEM tvi;
@@ -907,6 +926,10 @@ PreferenceBase::FontPrefHandleWmCommand(HWND hwnd, WPARAM wParam)
         break;
     case IDC_BUTTONFOREGROUNDPREF:
         {
+            // Don't allow color changes when dark theme is active
+            if(wyTheme::IsDarkThemeActive())
+                break;
+                
             selected=(HTREEITEM)SendDlgItemMessage(hwnd,IDC_TREE2,TVM_GETNEXTITEM,TVGN_CARET,(LPARAM)selected);
             
             if(selected != NULL)
@@ -932,6 +955,10 @@ PreferenceBase::FontPrefHandleWmCommand(HWND hwnd, WPARAM wParam)
         break;
     case IDC_BUTTONBACKGROUNDPREF2:
         {
+            // Don't allow color changes when dark theme is active
+            if(wyTheme::IsDarkThemeActive())
+                break;
+                
             selected=(HTREEITEM)SendDlgItemMessage(hwnd,IDC_TREE2,TVM_GETNEXTITEM,TVGN_CARET,(LPARAM)selected);
             if(selected != NULL)
             {
@@ -986,12 +1013,19 @@ PreferenceBase::FontPrefHandleWmNotify(HWND hwnd, LPARAM lParam)
         LPNMTREEVIEW pnmtv = (LPNMTREEVIEW) lParam;
         tvd=(TREEVIEWDATA *)pnmtv->itemNew.lParam;
         
+        if(wyTheme::IsDarkThemeActive())
+        {
+            SetFrgndBkgndBtn(hwnd, FALSE, FALSE);
+        }
+        else
+        {
         SetFrgndBkgndBtn(hwnd, 
             tvd->mask & IF_FOREGROUND_MASK ? TRUE: FALSE, 
             tvd->mask & IF_BACKGROUND_MASK ? TRUE : FALSE);
 
         ChangeBkFrColor(hwnd,*(tvd->fgColor),*(tvd->bgColor));
         UpdateWindow(hwnd);
+        }
     }
     else if(lpnm->code == TVN_ITEMEXPANDING)
     {
@@ -1062,6 +1096,13 @@ PreferenceBase::OthersPrefHandleWmInitDialog(HWND hwnd, LPARAM lParam)
 void 
 PreferenceBase::OthersPrefHandleWmCommand(HWND hwnd, WPARAM wParam)
 {
+	wyInt32 index;
+	wyWChar theme[20];
+	wyString	themestr;
+	LPTHEMEINFO pthemeinfo;
+	HWND hwndcombo;
+
+
     switch(LOWORD(wParam))
 	{	
 #ifndef COMMUNITY
@@ -1110,6 +1151,37 @@ PreferenceBase::OthersPrefHandleWmCommand(HWND hwnd, WPARAM wParam)
 		}
 		
 		break;
+		case IDC_THEMECOMBO: 
+			
+			if (HIWORD(wParam) == CBN_SELCHANGE) {
+#ifdef COMMUNITY
+				hwndcombo = GetDlgItem(hwnd, IDC_THEMECOMBO);
+
+				if ((pthemeinfo = (LPTHEMEINFO)GetWindowLongPtr(hwndcombo, GWLP_USERDATA)))
+				{
+					index = SendMessage(hwndcombo, CB_GETCURSEL, 0, 0);
+					index = SendMessage(hwndcombo, CB_GETITEMDATA, index, 0);
+
+					if (((pthemeinfo + index)->m_type == RESOURCE_THEME) && (pthemeinfo + index)->m_name.Compare("Dark") ==0)
+					{
+						pGlobals->m_pcmainwin->m_connection->GetSQLyogUltimateDialog();
+						THEMEINFO* pactivetheme;
+
+						pactivetheme = wyTheme::GetActiveThemeInfo();
+						index = -1;
+						if (pactivetheme) {
+							index = SendMessage(hwndcombo, CB_SELECTSTRING, -1, (LPARAM)pactivetheme->m_name.GetAsWideChar());
+						}
+						if (index == -1)
+							index = 0;
+						
+						SendMessage(hwndcombo, CB_SETCURSEL, index, 0);
+					}
+				}				
+#endif
+				
+			}
+			break;
 	}
 }
 
@@ -1584,11 +1656,24 @@ PreferenceBase::FillThemeCombo(HWND hwnd)
         }
         else
         {
+
+#ifdef COMMUNITY
+			if (pactivetheme->m_type == RESOURCE_THEME && pactivetheme->m_name.Compare("Dark") == 0){
+				SendMessage(hwnd, CB_SETCURSEL, index, 0);
+			}
+			else if (!(pthemeinfo + i)->m_filename.CompareI(pactivetheme->m_filename) &&
+				(pthemeinfo + i)->m_type == pactivetheme->m_type)
+			{
+				SendMessage(hwnd, CB_SETCURSEL, index, 0);
+			}
+
+#else
             if(!(pthemeinfo + i)->m_filename.CompareI(pactivetheme->m_filename) &&
                 (pthemeinfo + i)->m_type == pactivetheme->m_type)
             {
                 SendMessage(hwnd, CB_SETCURSEL, index, 0);
             }
+#endif
         }
     }
 
@@ -1794,10 +1879,17 @@ PreferenceBase::SaveOthersPreferences(HWND hwndbase, wyInt32 page)
         i = SendMessage(hwndcombo, CB_GETITEMDATA, i, 0);
             
         if((!pactivetheme && (pthemeinfo + i)->m_type != NO_THEME) ||
-            (pactivetheme && pactivetheme->m_filename.CompareI((pthemeinfo + i)->m_filename)/* && pactivetheme->m_type != (pthemeinfo + i)->m_type)*/))//fixing issue--user was not able to switch between same theme type.
+            (pactivetheme && pactivetheme->m_filename.CompareI((pthemeinfo + i)->m_filename)/* && pactivetheme->m_type != (pthemeinfo + i)->m_type)*/))//fixing issue--user were not able to switch between same theme type.
         {
             m_isthemechanged = wyTrue;
             wyTheme::GetSetThemeInfo(SET_THEME, pthemeinfo + i);
+            
+            HWND hwndfonttab = PropSheet_IndexToHwnd(GetParent(hwnd), FONT_PAGE);
+            if(hwndfonttab)
+            {
+                wyBool enableColors = wyTheme::IsDarkThemeActive() ? wyFalse : wyTrue;
+                EnableDisableColorControls(hwndfonttab, enableColors);
+            }
         }
     }
         
@@ -2541,7 +2633,7 @@ PreferenceBase::SaveDefaultOthersPreferences()
 		
 	wyIni::IniWriteString(GENERALPREFA, "ToolIconSize", TOOLBARICONSIZE_DEFAULT, dirstr.GetString());
 	SetToolBarIconSize();
-
+	
     if(wyTheme::GetActiveThemeInfo())
     {
         m_isthemechanged = wyTrue;
@@ -2695,4 +2787,44 @@ PreferenceBase::FillSizeCombo(HWND hwndcombo)
 	SendMessage(hwndcombo, CB_INSERTSTRING, 0,(LPARAM)_(L"Small"));
 	SendMessage(hwndcombo, CB_INSERTSTRING, 0,(LPARAM)_(L"Normal"));
 	SendMessage(hwndcombo, CB_INSERTSTRING, 0,(LPARAM)_(L"Large"));
+}
+
+
+
+//Helper function to enable/disable color controls based on theme
+void 
+PreferenceBase::EnableDisableColorControls(HWND hwnd, wyBool enable)
+{
+    wyInt32 colorcontrols[] = {
+        IDC_TREE2,                     
+        IDC_BUTTONFOREGROUNDPREF,       
+        IDC_BUTTONBACKGROUNDPREF2      
+    };
+    
+    wyInt32 count = sizeof(colorcontrols) / sizeof(colorcontrols[0]);
+    
+    for(wyInt32 i = 0; i < count; i++)
+    {
+        EnableWindow(GetDlgItem(hwnd, colorcontrols[i]), enable);
+    }
+    
+    HWND hwndpreview = GetDlgItem(hwnd, IDC_EDITPREFDEMO);
+    if(hwndpreview)
+    {
+        if(enable)
+        {
+            SetWindowText(hwndpreview, _(L"\nPreview"));
+        }
+        else
+        {
+            SetWindowText(hwndpreview, _(L""));
+        }
+    }
+    
+    HWND hwndstatictest = GetDlgItem(hwnd, IDC_STATIC_TEST);
+    if(hwndstatictest)
+    {
+        EnableWindow(hwndstatictest, enable);
+        InvalidateRect(hwndstatictest, NULL, TRUE);
+    }
 }

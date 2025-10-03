@@ -1580,4 +1580,7 @@
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Xml Include="..\include\Dark.xml" />
+  </ItemGroup>
 </Project>

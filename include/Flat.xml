@@ -56,7 +56,7 @@
 	<conntab tabbottomline="true">
 		<background color1="0xFFFFFF" color2="0xFFFFFF" />
 		<foreground color1="0x3b7dbb" color2="0xFFFFFF" />
-		<selectedtab color2="13218213" />
+		<selectedtab color2="0xFFFFFF" />
 		<plusbutton color1="0x3b7dbb" />
 		<closebutton color1="0x3b7dbb" />
 		<seperator highlight="0x3b7dbb" inactive="0x818080" />
@@ -99,4 +99,5 @@
 		<dragarrow color1="4210943" />
 		<hyperlink color1="0xFFFF80" />
 	</tabletab>
+
 </sqlyogtheme>

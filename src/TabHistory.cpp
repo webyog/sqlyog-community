@@ -107,11 +107,11 @@ TabHistory::CreateEditWindow()
     //SendMessage(hwndedit, SCI_SETFONTQUALITY, (WPARAM)SC_EFF_QUALITY_LCD_OPTIMIZED, 0);
 
 	SetFont();
+	SetColor();
 	
 	//for disabling the default context menu
 	SendMessage(m_hwnd, SCI_USEPOPUP, 0, 0);
 
-    SetColor();
 	m_wporigproc =(WNDPROC)SetWindowLongPtr(m_hwnd, GWLP_WNDPROC,(LONG_PTR)TabHistory::WndProc);	
 	SetWindowLongPtr(m_hwnd, GWLP_USERDATA,(LONG_PTR)this);	
 	return m_hwnd;
@@ -127,6 +127,7 @@ void
 TabHistory::SetColor()
 {
 	EditorFont::SetColor(m_hwnd, wyTrue);
+	EditorFont::SetCase(m_hwnd);
 }
 
 LRESULT	CALLBACK 
@@ -364,9 +365,15 @@ TabHistory::Show(wyBool setfocus)
 	wyWChar		directory[MAX_PATH+1] = {0};
 
     if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
+    {
         EditorFont::SetColor(m_hwnd,wyTrue);
+        EditorFont::SetCase(m_hwnd);
+    }
     else
+    {
         EditorFont::SetColor(m_hwnd,wyFalse);
+        EditorFont::SetCase(m_hwnd);
+    }
     
     count = CustomTab_GetItemCount(m_hwndparent);
 
@@ -599,3 +606,4 @@ TabHistory::GetCompleteTextByPost(wyString &query, MDIWindow *wnd)
 
 	return;
 }
+

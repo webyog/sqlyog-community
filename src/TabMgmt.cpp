@@ -753,19 +753,22 @@ TabMgmt::AddExplainQueryAnalyzer(MySQLResultDataEx* pdata, wyBool isselectquery,
 
 	m_pqa->m_htmlformatstr.Add("<style type=\"text/css\">");
 	
-	m_pqa->m_htmlformatstr.Add(CSS_CLASSES);
-	m_pqa->m_htmlformatstr.Add(CSS_CLASS2);
+	m_pqa->m_htmlformatstr.Add(GetClassesCSS());
+	m_pqa->m_htmlformatstr.Add(GetClass2CSS());
 	
 
-	m_pqa->m_htmlformatstr.Add(CSS_WARNING);
+	m_pqa->m_htmlformatstr.Add(GetWarningCSS());
 
 	m_pqa->m_htmlformatstr.Add("</style>");	
 	
 
-    m_pqa->m_htmlformatstr.Add(((QueryAnalyzer *)m_pqa)->m_statushtml.GetString());
+    m_pqa->m_htmlprofilerresultstr.SetAs(((QueryAnalyzer *)m_pqa)->m_statushtml.GetString());
     
     ((QueryAnalyzer *)m_pqa)->ConvertMySQLResultToHtml(pdata->m_datares, &resultexplain, isExtended ? 5 : 1, wyFalse); 
-	m_pqa->m_htmlformatstr.Add(resultexplain.GetString());
+	
+	m_pqa->m_htmlprofilerresultstr.Add(resultexplain.GetString());
+
+	m_pqa->m_htmlformatstr.Add(m_pqa->m_htmlprofilerresultstr.GetString());
 	
     if(m_pqa->CreateHtmlEditor(&m_pqa->m_htmlformatstr) == wyFalse)
     {

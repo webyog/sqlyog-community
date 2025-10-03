@@ -188,7 +188,20 @@ LRESULT CALLBACK HTMLayoutNotifyHandler(UINT uMsg, WPARAM wParam, LPARAM lParam,
       case HLN_LOAD_DATA:         //break; //return OnLoadData((LPNMHL_LOAD_DATA) lParam);
 		  return OnLoadData((LPNMHL_LOAD_DATA) lParam);
       case HLN_DATA_LOADED:       break; //return OnDataLoaded((LPNMHL_DATA_LOADED)lParam);
-      case HLN_DOCUMENT_COMPLETE: break; //return OnDocumentComplete();
+      case HLN_DOCUMENT_COMPLETE: //return OnDocumentComplete();
+      {
+          // Mark this HTMLayout window as having a fully build document
+          // This enables safe theme CSS application after
+          HWND hwndFrom = ((NMHDR*)lParam)->hwndFrom;
+          SetProp(hwndFrom, L"INFO_HTML_DOC_READY", (HANDLE)1);
+          if(GetProp(hwndFrom, L"INFO_HTML_NEED_THEME") != NULL)
+          {
+             
+              PostMessage(hwndFrom, WM_USER + 1002, 0, 0);
+              RemoveProp(hwndFrom, L"INFO_HTML_NEED_THEME");
+          }
+          return 0; 
+      }
       case HLN_ATTACH_BEHAVIOR:  
 		  return OnAttachBehavior((LPNMHL_ATTACH_BEHAVIOR)lParam );
   }

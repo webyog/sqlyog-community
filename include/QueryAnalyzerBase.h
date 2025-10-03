@@ -135,6 +135,7 @@ public:
 
 	//HTML buffer
 	wyString		m_htmlformatstr;
+	wyString		m_htmlprofilerresultstr;
 
     wyBool          m_isbuffereddrawing;
 

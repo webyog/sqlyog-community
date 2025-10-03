@@ -68,7 +68,7 @@ QueryAnalyzerCommunity::InitHtmlBuffer(wyBool istunnel, wyBool isdeftab)
 	m_htmlformatstr.SetAs("<html><body>");
 	m_htmlformatstr.Add("<style type=\"text/css\">");
 		
-	m_htmlformatstr.Add(CSS_WARNING);
+	m_htmlformatstr.Add(GetWarningCSS());
 	
 	m_htmlformatstr.Add("</style>");		
 	

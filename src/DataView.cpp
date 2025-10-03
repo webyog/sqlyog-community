@@ -1524,9 +1524,11 @@ DataView::CreateGrid()
 	m_hwndgrid = CreateCustomGridEx(m_hwndframe, 
 									0, 0, 0, 0, 
 									m_gridwndproc, 
-									GV_EX_ROWCHECKBOX | GV_EX_OWNERDATA | GV_EX_COL_TOOLTIP, (LPARAM)this);
+									GV_EX_ROWCHECKBOX | GV_EX_OWNERDATA | GV_EX_COL_TOOLTIP, (LPARAM)this, wyTrue, wyFalse, wyFalse);
     
 	CustomGrid_SetOwnerData(m_hwndgrid, wyTrue);
+
+	//SetGridTheme();
 	SetGridFont();
     ShowWindow(m_hwndgrid, SW_HIDE);
 }
@@ -1626,28 +1628,43 @@ DataView::SetColor()
 {
     wyWChar		*lpfileport = 0;
 	wyWChar		directory[MAX_PATH+1] = {0};
-    COLORREF	color,backcolor;
+    COLORREF	color, backcolor, selectioncolor;
+	
+    selectioncolor = DEF_TEXTSELECTION;
+    backcolor = DEF_BKGNDEDITORCOLOR;
+    color = DEF_NORMALCOLOR;
 	
 	//Get the complete path.
-	if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
+    // Check if this is a dialog MTI tab in dark theme
+    if(wyTheme::IsDarkThemeActive() && !EditorFont::IsMainWindowEditor(m_hwndtext))
     {
-        wyString	dirstr(directory);
-
-        backcolor   =   wyIni::IniGetInt(GENERALPREFA, "MTISelectionColor",   DEF_TEXTSELECTION, dirstr.GetString());
-        SendMessage(m_hwndtext,SCI_SETSELBACK,1,backcolor);
-        
-        backcolor=wyIni::IniGetInt(GENERALPREFA, "MTIBgColor", DEF_BKGNDEDITORCOLOR, dirstr.GetString()); 
-        SendMessage( m_hwndtext, SCI_STYLESETBACK, STYLE_DEFAULT, (LPARAM)backcolor);
-        
-        SendMessage( m_hwndtext, SCI_SETCARETFORE,backcolor ^ 0xFFFFFF,0); //Change Caret color in editor window
-
-        color = wyIni::IniGetInt(GENERALPREFA, "MTIFgColor", DEF_NORMALCOLOR, dirstr.GetString()); 
-        
-        SendMessage(m_hwndtext, SCI_STYLESETFORE, SCE_MYSQL_DEFAULT, color);
-        SendMessage(m_hwndtext, SCI_STYLESETBACK, SCE_MYSQL_DEFAULT, backcolor);
-        SendMessage( m_hwndtext, SCI_SETCARETFORE,backcolor ^ 0xFFFFFF,0);
-        SendMessage(m_hwndtext, SCI_STYLESETBOLD, SCE_MYSQL_DEFAULT, FALSE);
+        //SetMTIColorsForDarkThemeDialog(selectioncolor, backcolor, color);
     }
+    else
+    {
+        // For main window MTI tabs or light theme, use custom colors and theme colors
+        if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
+        {
+            wyString	dirstr(directory);
+
+            selectioncolor = wyIni::IniGetInt(GENERALPREFA, "MTISelectionColor", DEF_TEXTSELECTION, dirstr.GetString());
+            backcolor = wyIni::IniGetInt(GENERALPREFA, "MTIBgColor", DEF_BKGNDEDITORCOLOR, dirstr.GetString()); 
+            color = wyIni::IniGetInt(GENERALPREFA, "MTIFgColor", DEF_NORMALCOLOR, dirstr.GetString()); 
+        }
+        
+        GetThemeColorsToMTI(&selectioncolor, &backcolor, &color);
+    }
+    
+    SendMessage(m_hwndtext, SCI_SETSELBACK, 1, selectioncolor);
+    SendMessage(m_hwndtext, SCI_SETCARETFORE, backcolor ^ 0xFFFFFF, 0); //Change Caret color in editor window
+    SendMessage(m_hwndtext, SCI_STYLESETBACK, STYLE_DEFAULT, (LPARAM)backcolor);
+    SendMessage(m_hwndtext, SCI_STYLESETFORE, STYLE_DEFAULT, color);
+    SendMessage(m_hwndtext, SCI_STYLESETBOLD, STYLE_DEFAULT, FALSE);
+
+	SendMessage(m_hwndtext, SCI_STYLESETFORE, SCE_MYSQL_DEFAULT, color);
+	SendMessage(m_hwndtext, SCI_STYLESETBACK, SCE_MYSQL_DEFAULT, backcolor);
+	SendMessage(m_hwndtext, SCI_SETCARETFORE, backcolor ^ 0xFFFFFF, 0);
+	SendMessage(m_hwndtext, SCI_STYLESETBOLD, SCE_MYSQL_DEFAULT, FALSE);
 }
 
 
@@ -2397,11 +2414,17 @@ DataView::FrameWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
             {
                 hdc = BeginPaint(hwnd, &ps);
                 DoubleBuffer db(hwnd, hdc);
-                db.EraseBackground(RGB(255, 255, 255));
+                // Apply MTI theme colors to banner canvas
+                COLORREF bannerBgColor = RGB(255, 255, 255); // Default white
+                COLORREF bannerTextColor = GetSysColor(COLOR_GRAYTEXT); // Default gray text
+                
+                GetThemeColorsToMTI(nullptr, &bannerBgColor, &bannerTextColor);
+                
+                db.EraseBackground(bannerBgColor);
                 GetWindowRect(dvptr->m_hwndgrid, &rect);
                 MapWindowRect(NULL, hwnd, &rect);
                 SetBkMode(db.m_buffer.m_hmemdc, TRANSPARENT);
-                SetTextColor(db.m_buffer.m_hmemdc, GetSysColor(COLOR_GRAYTEXT));
+                SetTextColor(db.m_buffer.m_hmemdc, bannerTextColor);
 
                 //get the banner text and draw it
                 dvptr->GetBanner(bannertext);
@@ -2425,13 +2448,18 @@ DataView::FrameWndProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
             {
                 hdc = BeginPaint(hwnd, &ps);
 
+                COLORREF bannerBgColor = RGB(255, 255, 255); // Default white
+                COLORREF bannerTextColor = GetSysColor(COLOR_GRAYTEXT); // Default gray text
+                
+                GetThemeColorsToMTI(nullptr, &bannerBgColor, &bannerTextColor);
+
                 //erase the background
-                DoubleBuffer::EraseBackground(hwnd, hdc, NULL, RGB(255, 255, 255));
+                DoubleBuffer::EraseBackground(hwnd, hdc, NULL, bannerBgColor);
 
                 GetWindowRect(dvptr->m_hwndgrid, &rect);
                 MapWindowRect(NULL, hwnd, &rect);
                 SetBkMode(hdc, TRANSPARENT);
-                SetTextColor(hdc, GetSysColor(COLOR_GRAYTEXT));
+                SetTextColor(hdc, bannerTextColor);
 
                 //get the banner text and draw it
                 dvptr->GetBanner(bannertext);
@@ -8711,6 +8739,16 @@ DataView::SetAllFonts()
     SetTextViewFont();
 }
 
+void DataView::SetGridTheme() {
+	GRIDCOLORINFO    ci = { 0 };
+
+	CustomGrid_SetColorInfo(m_hwndgrid, NULL);
+	wyTheme::GetGridColors(&ci);
+	if (ci.m_mask) {
+		CustomGrid_SetColorInfo(m_hwndgrid, &ci);
+	}
+}
+
 //funtion is called when the selection change from one row to another
 void        
 DataView::OnGvnEndChangeRow(WPARAM wparam)
@@ -8865,3 +8903,4 @@ DataView::SetParentWindow(HWND hwndparent)
     //return the new parent
     return m_hwndparent;
 }
+

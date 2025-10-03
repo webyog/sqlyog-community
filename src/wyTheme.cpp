@@ -25,6 +25,8 @@ Author: Vishal P.R
 #include <iostream>
 #include "wyTheme.h"
 #include "FrameWindowHelper.h"
+#include "EditorFont.h"
+#include "TabMessage.h"
 
 //theme directory
 #define THEMEDIR            "Themes"
@@ -35,6 +37,7 @@ Author: Vishal P.R
 //resource themes
 #define AZURETHEME          IDR_THEME_TWILIGHT
 #define METROTHEME          IDR_THEME_FLAT
+#define DARKTHEME			IDR_THEME_DARK
 
 //some predefines
 #define MENUBARINDEX        0
@@ -57,6 +60,14 @@ Author: Vishal P.R
 #define DRAGARROW           "dragarrow"
 #define LINK                "hyperlink"
 #define LINE                "line"
+#define SELROWCOLOR         "selrowcolor"
+#define ALTROWCOLOR         "altrowcolor"
+#define SELCELLTEXT			"selcelltext"
+#define COLUMNHEADERTEXT	"colheadertext"
+#define COLUMNHEADER		"colheader"
+#define COLUMNHEADERBUTTON  "colheaderbutton"
+#define CELLBUTTONCOLOR		"columnbuttontext"
+#define CELLBORDER			"border"
 
 //xml elements
 #define ELE_ROOT            "sqlyogtheme"
@@ -148,7 +159,7 @@ wyTheme::GetThemes(LPTHEMEINFO* pthemeinfo)
     wyInt32         i = -1, size, j;
     THEMEINFO       ti;
     tinyxml2::XMLDocument*  ptx;
-	wyInt32         themes[] = {0, AZURETHEME,METROTHEME};
+	wyInt32         themes[] = {0, AZURETHEME,METROTHEME,DARKTHEME};
 
     //first initialize the array pointer
     *pthemeinfo = NULL;
@@ -356,6 +367,57 @@ wyTheme::GetTabColors(wyInt32 index, LPTABCOLORINFO pcolorinfo)
 
     return wyFalse;
 }
+
+//get object browser colors
+wyBool
+wyTheme::GetObjectBrowserColors(OBJECTBROWSERCOLORINFO* pcolorinfo)
+{
+    if(wyTheme::m_theme)
+    {
+        return wyTheme::m_theme->GetThemeObjectBrowserColors(pcolorinfo);
+    }
+
+    return wyFalse;
+}
+
+//get canvas colors
+wyBool
+wyTheme::GetCanvasColors(CANVASCOLORINFO* pcolorinfo)
+{
+    if(wyTheme::m_theme)
+    {
+        return wyTheme::m_theme->GetThemeCanvasColors(pcolorinfo);
+    }
+
+    return wyFalse;
+}
+
+//get MTI colors
+wyBool
+wyTheme::GetMTIColors(MTICOLORINFO* pcolorinfo)
+{
+    if(wyTheme::m_theme)
+    {
+        return wyTheme::m_theme->GetThemeMTIColors(pcolorinfo);
+    }
+
+    return wyFalse;
+}
+
+//get tab colors for the index specified
+wyBool
+wyTheme::GetGridColors(LPGRIDCOLORINFO pcolorinfo)
+{
+	//if we have valid theme
+	if (wyTheme::m_theme)
+	{
+		//set the theme tab colors
+		return wyTheme::m_theme->GetThemeGridColors(pcolorinfo);
+	}
+
+	return wyFalse;
+}
+
 
 //function to get the hyperlink color for the index specified
 wyBool
@@ -605,6 +667,74 @@ wyTheme::SubclassControls()
     m_origeditclassproc = (WNDPROC)SetClassLongPtr(hwnd, GCLP_WNDPROC, (LONG_PTR)SuperClassedEditProc);
     DestroyWindow(hwnd);
 }
+
+//get the editor colors
+wyBool
+wyTheme::GetThemeEditorColors(LPEDITORCOLORINFO pcolorinfo)
+{
+	if (!m_editorcolorinfo.m_mask)
+	{
+		return wyFalse;
+	}
+
+	if (pcolorinfo)
+	{
+		*pcolorinfo = m_editorcolorinfo;
+	}
+
+	return wyTrue;
+}
+
+void
+wyTheme::CreateEditorColors(tinyxml2::XMLElement* prootele, const wyChar* element, LPEDITORCOLORINFO pcolorinfo)
+{
+	tinyxml2::XMLElement* pele;
+
+	memset(pcolorinfo, 0, sizeof(EDITORCOLORINFO));
+
+	//get the element
+	if (!(pele = prootele->FirstChildElement(element)))
+	{
+		return;
+	}
+
+	// Set basic editor colors
+	pcolorinfo->m_mask |= GetColorInfo(pele, BACKGROUND, COLOR1, &pcolorinfo->m_background) ? EDITORCF_BACKGROUND : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, FORGROUND, COLOR1, &pcolorinfo->m_foreground) ? EDITORCF_FOREGROUND : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "selection", COLOR1, &pcolorinfo->m_selection) ? EDITORCF_SELECTION : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "linenumber", COLOR1, &pcolorinfo->m_linenumber) ? EDITORCF_LINENUMBER : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "caretline", COLOR1, &pcolorinfo->m_caretline) ? EDITORCF_CARETLINE : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "caret", COLOR1, &pcolorinfo->m_caret) ? EDITORCF_CARET : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "margin", COLOR1, &pcolorinfo->m_margin) ? EDITORCF_MARGIN : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "foldmargin", COLOR1, &pcolorinfo->m_foldmargin) ? EDITORCF_FOLDMARGIN : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "foldmargintext", COLOR1, &pcolorinfo->m_foldmargintext) ? EDITORCF_FOLDMARGINTEXT : 0;
+	
+	// Set syntax highlighting colors
+	pcolorinfo->m_mask |= GetColorInfo(pele, "normal", COLOR1, &pcolorinfo->m_normal) ? EDITORCF_NORMAL : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "comment", COLOR1, &pcolorinfo->m_comment) ? EDITORCF_COMMENT : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "hiddencmd", COLOR1, &pcolorinfo->m_hiddencmd) ? EDITORCF_HIDDENCMD : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "string", COLOR1, &pcolorinfo->m_string) ? EDITORCF_STRING : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "keyword", COLOR1, &pcolorinfo->m_keyword) ? EDITORCF_KEYWORD : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "function", COLOR1, &pcolorinfo->m_function) ? EDITORCF_FUNCTION : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "operator", COLOR1, &pcolorinfo->m_operator) ? EDITORCF_OPERATOR : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "number", COLOR1, &pcolorinfo->m_number) ? EDITORCF_NUMBER : 0;
+}
+
+
+//get editor colors
+wyBool
+wyTheme::GetEditorColors(EDITORCOLORINFO* pcolorinfo)
+{
+	//if we have valid theme
+	if (wyTheme::m_theme)
+	{
+		//set the theme editor colors
+		return wyTheme::m_theme->GetThemeEditorColors(pcolorinfo);
+	}
+
+	return wyFalse;
+}
+
 
 //function to draw status bar part
 void 
@@ -865,6 +995,7 @@ wyTheme::DrawMenuItem(LPDRAWITEMSTRUCT lpds, HMENU hmenubar)
         {
             FillRect(lpds->hDC, &lpds->rcItem, brhighlight);
 		    FrameRect(lpds->hDC, &lpds->rcItem, brhighlight);
+			
         }
 	}
 	else
@@ -876,7 +1007,7 @@ wyTheme::DrawMenuItem(LPDRAWITEMSTRUCT lpds, HMENU hmenubar)
     //get menu item info
 	mif.cbSize = sizeof(mif);
     mif.fMask = MIIM_STRING | MIIM_FTYPE | MIIM_ID;
-    mif.fType = MFT_STRING;
+    mif.fType = MFT_STRING ;
     mif.dwTypeData = menustring;
     mif.cch = MAX_PATH;
     GetMenuItemInfo(hmenu, lpds->itemID, FALSE, &mif);
@@ -949,20 +1080,20 @@ wyTheme::DrawMenuItem(LPDRAWITEMSTRUCT lpds, HMENU hmenubar)
     wyTheme::GetDualColor(hmenu != hmenubar ? DUAL_COLOR_SELMENUTEXT : DUAL_COLOR_SELMENUBARTEXT, &selmenutext);
 
     //if the menu item state is disabled
-    if((lpds->itemState & ODS_DISABLED) || (lpds->itemState & ODS_GRAYED))
-    {
-        //set the text color
-        colortext = ((lpds->itemState & ODS_SELECTED) || (lpds->itemState & ODS_HOTLIGHT)) 
-            ? (selmenutext.m_flag & 2) ? selmenutext.m_color2 : GetSysColor(COLOR_3DSHADOW)
-            : (menutext.m_flag & 2) ? menutext.m_color2 : GetSysColor(COLOR_GRAYTEXT);
-    }
-    else
-    {
-        //set the text color
-        colortext = ((lpds->itemState & ODS_SELECTED) || (lpds->itemState & ODS_HOTLIGHT)) 
-            ? (selmenutext.m_flag & 1) ? selmenutext.m_color1 : GetSysColor(COLOR_HIGHLIGHTTEXT)
-            : (menutext.m_flag & 1) ? menutext.m_color1 : GetSysColor(COLOR_MENUTEXT);
-    }
+	if ((lpds->itemState & ODS_DISABLED) || (lpds->itemState & ODS_GRAYED))
+	{
+		//set the text color
+         colortext = ((lpds->itemState & ODS_SELECTED) || (lpds->itemState & ODS_HOTLIGHT))
+			? (selmenutext.m_flag & 2) ? selmenutext.m_color2 : GetSysColor(COLOR_3DSHADOW)
+			: (menutext.m_flag & 2) ? menutext.m_color2 : GetSysColor(COLOR_GRAYTEXT);
+	}
+	else
+	{
+		//set the text color
+		colortext = ((lpds->itemState & ODS_SELECTED) || (lpds->itemState & ODS_HOTLIGHT)) 
+			? (selmenutext.m_flag & 1) ? selmenutext.m_color1 : GetSysColor(COLOR_HIGHLIGHTTEXT)
+			: (menutext.m_flag & 1) ? menutext.m_color1 : GetSysColor(COLOR_MENUTEXT);
+	}
 
     //set dc text color
 	SetTextColor(lpds->hDC, colortext);
@@ -980,7 +1111,7 @@ wyTheme::DrawMenuItem(LPDRAWITEMSTRUCT lpds, HMENU hmenubar)
     //draw the text
     DrawText(lpds->hDC, menustring, len, &rctext, fformat | ((lpds->itemState & ODS_NOACCEL) ? DT_HIDEPREFIX : 0));
 	
-    //restore dc
+	//restore dc
 	RestoreDC(lpds->hDC, dcstate);
 
     //delete the brush
@@ -990,6 +1121,114 @@ wyTheme::DrawMenuItem(LPDRAWITEMSTRUCT lpds, HMENU hmenubar)
     }
 
 	return wyTrue;
+}
+
+
+// Function to identify editor type and characteristics
+EDITORINFO wyTheme::IdentifyEditorType(HWND hwnd)
+{
+	EDITORINFO info = { 0 };
+	info.controlId = GetDlgCtrlID(hwnd);
+
+	if (info.controlId == IDC_QUERYEDIT)
+	{
+		HWND hwndParent = GetParent(hwnd);
+		wyWChar parentClass[SIZE_256];
+
+		if (hwndParent && GetClassName(hwndParent, parentClass, SIZE_256 - 1))
+		{
+			if (!wcsicmp(parentClass, L"InsertUpdate"))
+			{
+				info.isInfoTabEditor = wyTrue;
+				return info;
+			}
+		}
+
+		// Check for TabPreview editor
+		void* userData = (void*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if (userData)
+		{
+			HWND hwndGrandParent = GetParent(hwndParent);
+			if (hwndGrandParent)
+			{
+				wyWChar grandParentClass[SIZE_256];
+				if (GetClassName(hwndGrandParent, grandParentClass, SIZE_256 - 1))
+				{
+					if (wcsstr(grandParentClass, L"Custom Tab") != NULL)
+					{
+						info.isTabPreviewEditor = wyTrue;
+						return info;
+					}
+				}
+			}
+		}
+
+		// If not ObjectInfo or TabPreview, it's the main query editor
+		info.isMainQueryEditor = wyTrue;
+	}
+
+	return info;
+}
+
+// Function to apply colors to MTI editors (TabMessage, DataView)
+static void ApplyMTIEditorColors(HWND hwnd, wyInt32 controlId)
+{
+	switch (controlId)
+	{
+	case IDC_QUERYMESSAGEEDIT:
+	{
+		TabMessage* pmsg = (TabMessage*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if (pmsg)
+			pmsg->SetColor();
+		break;
+	}
+
+	case IDC_TABLEDATAEDIT:
+	{
+		DataView* pdv = (DataView*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+		if (pdv)
+			pdv->SetColor();
+		break;
+	}
+	}
+}
+
+// Function to apply colors to ObjectInfo editors
+static void ApplyObjectInfoEditorColors(HWND hwnd)
+{
+	ObjectInfo* poi = (ObjectInfo*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+	if (poi)
+		poi->SetColor();
+}
+
+// Function to apply colors to TabPreview editors
+static void ApplyTabPreviewEditorColors(HWND hwnd)
+{
+	if (wyTheme::IsDarkThemeActive())
+	{
+		EditorFont::ApplyDialogEditorDefaultColors(hwnd, wyFalse);
+	}
+	else
+	{
+		EditorFont::SetColor(hwnd, wyTrue);
+		EditorFont::SetCase(hwnd);
+	}
+}
+
+// Function to apply colors to main editors
+static void ApplyMainEditorColors(HWND hwnd)
+{
+	EditorFont::SetThemeColor(hwnd, wyTrue);
+	EditorFont::SetCase(hwnd);
+}
+
+// Function to handle folding for main query editors
+static void HandleEditorFolding(HWND hwnd, const EDITORINFO& info)
+{
+	if (info.controlId == IDC_QUERYEDIT && info.isMainQueryEditor)
+	{
+		EnableFolding(hwnd);
+	}
 }
 
 //---------------------------------
@@ -1027,17 +1266,17 @@ wyTheme::~wyTheme()
     if(m_hmaintoolbarbrush != NULL)
     {
         DeleteBrush(m_hmaintoolbarbrush);
-    }
+	}
 
     if(m_hhsplitterbrush != NULL)
     {
         DeleteBrush(m_hhsplitterbrush);
-    }
+	}
 
     if(m_hhsplitterpen != NULL)
     {
         DeleteBrush(m_hhsplitterpen);
-    }
+	}
 
     if(m_hmdibrush != NULL)
     {
@@ -1170,7 +1409,21 @@ wyTheme::InitTheme()
     CreateTabColors(ele, ELE_QUERYTAB, &m_qtcolorinfo);
     CreateTabColors(ele, ELE_RESTAB, &m_tmcolorinfo);
     CreateTabColors(ele, "tabletab", &m_tabletabcolorinfo);
+	CreateEditorColors(ele, "editors", &m_editorcolorinfo);
+
+
     
+    //create object browser colors
+    CreateObjectBrowserColors(ele, "objectbrowser", &m_objectbrowsercolorinfo);
+    
+    //create canvas colors
+    CreateCanvasColors(ele, "canvas", &m_canvascolorinfo);
+    
+    //create MTI colors
+    CreateMTIColors(ele, "messagetabs", &m_mticolorinfo);
+
+	CreateGridColors(ele, "customgrid", &m_gridcolorinfo);
+        
     //create dual colors
     SetDualColors(ele, ELE_MENUBAR, FORGROUND, COLOR1, COLOR2, &m_colormenuhighlight[MENUBARINDEX]);
     SetDualColors(ele, ELE_MENUBAR, "text", ACTIVE, INACTIVE, &m_colormenutext[MENUBARINDEX]);
@@ -1275,6 +1528,16 @@ wyTheme::GetSetThemeInfo(wyInt32 mode, LPTHEMEINFO pthemeinfo, wyString* pthemed
         {
             return wyFalse;
         }
+
+#ifdef COMMUNITY
+		//IDR_DARKTHEME id = 44146
+		if (themetype == RESOURCE_THEME && themefile.Compare("44146") == 0)
+		{
+			themefile.SetAs("0");
+			themetype = NO_THEME;
+			return wyTrue;
+		}
+#endif
 
         //if valid theme info pointer
         if(pthemeinfo)
@@ -1499,6 +1762,121 @@ wyTheme::CreateTabColors(tinyxml2::XMLElement* prootele, const wyChar* element, 
     pcolorinfo->m_mask |= GetColorInfo(pele, "hyperlink", COLOR1, &pcolorinfo->m_linkcolor) ? CTCF_LINK : 0;    
 }
 
+//function to create object browser colors
+void 
+wyTheme::CreateObjectBrowserColors(tinyxml2::XMLElement* prootele, const wyChar* element, LPOBJECTBROWSERCOLORINFO pcolorinfo)
+{
+    tinyxml2::XMLElement* pele;
+
+    memset(pcolorinfo, 0, sizeof(OBJECTBROWSERCOLORINFO));
+
+    if(!(pele = prootele->FirstChildElement(element)))
+    {
+        return;
+    }
+
+    pcolorinfo->m_mask |= GetColorInfo(pele, BACKGROUND, COLOR1, &pcolorinfo->m_background) ? OBCF_BACKGROUND : 0;
+    pcolorinfo->m_mask |= GetColorInfo(pele, FORGROUND, COLOR1, &pcolorinfo->m_foreground) ? OBCF_FOREGROUND : 0;
+    pcolorinfo->m_mask |= GetColorInfo(pele, "selected", COLOR1, &pcolorinfo->m_selected) ? OBCF_SELECTED : 0;
+}
+
+//function to create canvas colors
+void 
+wyTheme::CreateCanvasColors(tinyxml2::XMLElement* prootele, const wyChar* element, LPCANVASCOLORINFO pcolorinfo)
+{
+    tinyxml2::XMLElement* pele;
+
+    memset(pcolorinfo, 0, sizeof(CANVASCOLORINFO));
+
+    if(!(pele = prootele->FirstChildElement(element)))
+    {
+        return;
+    }
+
+    pcolorinfo->m_mask |= GetColorInfo(pele, BACKGROUND, COLOR1, &pcolorinfo->m_background) ? CANVASCF_BACKGROUND : 0;
+    pcolorinfo->m_mask |= GetColorInfo(pele, FORGROUND, COLOR1, &pcolorinfo->m_foreground) ? CANVASCF_FOREGROUND : 0;
+    pcolorinfo->m_mask |= GetColorInfo(pele, "line", COLOR1, &pcolorinfo->m_line) ? CANVASCF_LINE : 0;
+}
+
+//function to create MTI colors
+void 
+wyTheme::CreateMTIColors(tinyxml2::XMLElement* prootele, const wyChar* element, LPMTICOLORINFO pcolorinfo)
+{
+    tinyxml2::XMLElement* pele;
+
+    memset(pcolorinfo, 0, sizeof(MTICOLORINFO));
+
+    if(!(pele = prootele->FirstChildElement(element)))
+    {
+        return;
+    }
+
+    pcolorinfo->m_mask |= GetColorInfo(pele, BACKGROUND, COLOR1, &pcolorinfo->m_background) ? MTICF_BACKGROUND : 0;
+    pcolorinfo->m_mask |= GetColorInfo(pele, FORGROUND, COLOR1, &pcolorinfo->m_foreground) ? MTICF_FOREGROUND : 0;
+    pcolorinfo->m_mask |= GetColorInfo(pele, "selection", COLOR1, &pcolorinfo->m_selection) ? MTICF_SELECTION : 0;
+}
+
+//function to create tab color
+void
+wyTheme::CreateGridColors(tinyxml2::XMLElement* prootele, const wyChar* element, LPGRIDCOLORINFO pcolorinfo)
+{
+	tinyxml2::XMLElement* pele;
+	const wyChar* strtemp;
+
+	memset(pcolorinfo, 0, sizeof(GRIDCOLORINFO));
+
+	//get the element
+	if (!(pele = prootele->FirstChildElement(element)))
+	{
+		return;
+	}
+
+	////set bottom line
+	//if ((strtemp = pele->Attribute(TABBOTTOMLINE)) && !strcmp(strtemp, "true"))
+	//{
+	//	pcolorinfo->m_mask |= CTCF_BOTTOMLINE;
+	//}
+
+	////set border
+	//if ((strtemp = pele->Attribute("border")) && !strcmp(strtemp, "true"))
+	//{
+	//	pcolorinfo->m_mask |= CTCF_BORDER;
+	//	pcolorinfo->m_border = wyTrue;
+	//}
+
+	//set colors
+	pcolorinfo->m_mask |= GetColorInfo(pele, BACKGROUND, COLOR1, &pcolorinfo->m_gridbg1) ? CTCF_GRIDBG1 : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, BACKGROUND, COLOR2, &pcolorinfo->m_gridbg2) ? CTCF_GRIDBG2 : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, FORGROUND, COLOR1, &pcolorinfo->m_gridfg) ? CTCF_GRIDFG1 : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, COLUMNHEADER, COLOR1, &pcolorinfo->m_gridcolheader) ? CTCF_GRIDCOLHDR : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, COLUMNHEADER, COLOR2, &pcolorinfo->m_gridselcolheader) ? CTCF_GRIDSELCOLHDR : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, COLUMNHEADERTEXT, COLOR1, &pcolorinfo->m_gridcolhdertext) ? CTCF_GRIDCOLHDRTXT : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, COLUMNHEADERTEXT, COLOR2, &pcolorinfo->m_gridselcolhdertext) ? CTCF_GRIDSELCOLHDRTXT : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, SELROWCOLOR, COLOR1, &pcolorinfo->m_selrowcolor) ? CTCF_GRIDSELROW : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, ALTROWCOLOR, COLOR1, &pcolorinfo->m_althighlightcolor) ? CTCF_ALTHIGHLIGHTCOLOR : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, SELCELLTEXT, COLOR1, &pcolorinfo->m_selcelltext) ? CTCF_GRIDSELCELLTEXT : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, COLUMNHEADERBUTTON, COLOR1, &pcolorinfo->m_colheaderbutton) ? CTCF_COLHEADERBUTTON : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, CELLBORDER, ACTIVE, &pcolorinfo->m_cellborder) ? CTCF_GRIDCELLBORDER : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, SEPERATOR, INACTIVE, &pcolorinfo->m_inactivesep) ? CTCF_INACTIVESEP : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, CELLBUTTONCOLOR, COLOR1, &pcolorinfo->m_buttontextcolor) ? CTCF_CELLBUTTONCOLOR : 0;
+
+
+/*	pcolorinfo->m_mask |= GetColorInfo(pele, FORGROUND, COLOR2, &pcolorinfo->m_hottabfg1) ? CTCF_HOTTABFG1 : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, SEPERATOR, ACTIVE, &pcolorinfo->m_activesep) ? CTCF_ACTIVESEP : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, SEPERATOR, INACTIVE, &pcolorinfo->m_inactivesep) ? CTCF_INACTIVESEP : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, SEPERATOR, "highlight", &pcolorinfo->m_highlightsep) ? CTCF_HIGHLIGHTSEP : 0;
+	
+	pcolorinfo->m_mask |= GetColorInfo(pele, FORGROUND, "color3", &pcolorinfo->m_hottabfg2) ? CTCF_HOTTABFG2 : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, SELTAB, COLOR1, &pcolorinfo->m_selrowfg1) ? CTCF_SELTABFG1 : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, SELTAB, COLOR2, &pcolorinfo->m_selrowfg2) ? CTCF_SELTABFG2 : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, SELTABTEXT, COLOR1, &pcolorinfo->m_selrowtext) ? CTCF_SELTABTEXT : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, TABTEXT, COLOR1, &pcolorinfo->m_gridtext) ? CTCF_TABTEXT : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, PLUSBUTTON, COLOR1, &pcolorinfo->m_gridcontrols) ? CTCF_TABCONTROLS : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "closebutton", COLOR1, &pcolorinfo->m_closebutton) ? CTCF_CLOSEBUTTON : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, DRAGARROW, COLOR1, &pcolorinfo->m_dragarrow) ? CTCF_DRAGARROW : 0;
+	pcolorinfo->m_mask |= GetColorInfo(pele, "hyperlink", COLOR1, &pcolorinfo->m_linkcolor) ? CTCF_LINK : 0;*/
+}
+
 //function to read the color from the element
 wyBool
 wyTheme::GetColorInfo(tinyxml2::XMLElement* pele, const wyChar* element, const wyChar* attribute, COLORREF* pcolor)
@@ -1634,7 +2012,7 @@ wyTheme::GetThemeBrush(wyInt32 index, HBRUSH* phbrush)
 
         case BRUSH_MENUBAR:
             hbrush = m_hmenubrush[MENUBARINDEX];
-            break;
+			break;
     }
 
     //if no match
@@ -1723,6 +2101,75 @@ wyTheme::GetThemeTabColors(wyInt32 index, LPTABCOLORINFO pcolorinfo)
     }
 
     return wyTrue;
+}
+
+//get the object browser colors
+wyBool 
+wyTheme::GetThemeObjectBrowserColors(LPOBJECTBROWSERCOLORINFO pcolorinfo)
+{
+    if(!m_objectbrowsercolorinfo.m_mask)
+    {
+        return wyFalse;
+    }
+
+    if(pcolorinfo)
+    {
+        *pcolorinfo = m_objectbrowsercolorinfo;
+    }
+
+    return wyTrue;
+}
+
+wyBool 
+wyTheme::GetThemeCanvasColors(LPCANVASCOLORINFO pcolorinfo)
+{
+    if(!m_canvascolorinfo.m_mask)
+    {
+        return wyFalse;
+    }
+
+    if(pcolorinfo)
+    {
+        *pcolorinfo = m_canvascolorinfo;
+    }
+
+    return wyTrue;
+}
+
+//get the MTI colors
+wyBool 
+wyTheme::GetThemeMTIColors(LPMTICOLORINFO pcolorinfo)
+{
+    if(!m_mticolorinfo.m_mask)
+    {
+        return wyFalse;
+    }
+
+    if(pcolorinfo)
+    {
+        *pcolorinfo = m_mticolorinfo;
+    }
+
+    return wyTrue;
+}
+
+
+//get the tab colors
+wyBool
+wyTheme::GetThemeGridColors(LPGRIDCOLORINFO pcolorinfo)
+{
+	if (!m_gridcolorinfo.m_mask)
+	{
+		return wyFalse;
+	}
+
+	//set the tab color
+	if (pcolorinfo)
+	{
+		*pcolorinfo = m_gridcolorinfo;
+	}
+
+	return wyTrue;
 }
 
 //function to get the hyperlink color
@@ -1879,6 +2326,22 @@ wyTheme::SuperClassedEditProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpa
     return m_origeditclassproc ? m_origeditclassproc(hwnd, message, wparam, lparam) : 0;
 }
 
+
+void
+wyTheme::UpdateWindowClassBrushForTheme(const wyWChar* className, wyInt32 brushType)
+{
+    WNDCLASS wc;
+    HBRUSH hbr;
+    
+    if (GetClassInfo(pGlobals->m_pcmainwin->GetHinstance(), className, &wc))
+    {
+        wc.hbrBackground = wyTheme::GetBrush(brushType, &hbr) ? hbr : (HBRUSH)(COLOR_BTNFACE+1);
+        
+        UnregisterClass(className, pGlobals->m_pcmainwin->GetHinstance());
+        RegisterClass(&wc);
+    }
+}
+
 //function to apply theme in SQLyog
 void
 wyTheme::ApplyTheme()
@@ -1893,8 +2356,8 @@ wyTheme::ApplyTheme()
     //free resources and reinitailize
     wyTheme::FreeResources();
     wyTheme::Init();
-    
-    //set the class brush for MDI window
+
+	//set the class brush for MDI window
     if(pmdi)
     {
         SetClassLongPtr(pmdi->m_hwnd, GCLP_HBRBACKGROUND, (LONG_PTR)(wyTheme::GetBrush(BRUSH_MDICHILD, &hbr) ? hbr : GetSysColorBrush(COLOR_BTNFACE)));
@@ -1904,13 +2367,31 @@ wyTheme::ApplyTheme()
     //set class brush for frame window
     SetClassLongPtr(pGlobals->m_pcmainwin->m_hwndmain, GCLP_HBRBACKGROUND, (LONG_PTR)(wyTheme::GetBrush(BRUSH_FRAMEWINDOW, &hbr) ? hbr : GetSysColorBrush(COLOR_BTNFACE)));
 
+    //Update window class brushes that get registered once at startup
+    UpdateWindowClassBrushForTheme(QUERY_WINDOW_CLASS_NAME_STR, BRUSH_MDICHILD);      // Query window background
+    UpdateWindowClassBrushForTheme(VSPLITTER_WINDOW_CLASS_NAME_STR, BRUSH_VSPLITTER); // Vertical splitter
+    UpdateWindowClassBrushForTheme(HSPLITTER_WINDOW_CLASS_NAME_STR, BRUSH_HSPLITTER); // Horizontal splitter
+
     //enumerate the window for updating colors and resizing
     EnumChildWindows(pGlobals->m_pcmainwin->m_hwndmain, wyTheme::EnumChildProcUpdateTabs, NULL);
-    EnumChildWindows(pGlobals->m_pcmainwin->m_hwndmain, wyTheme::EnumChildProcResize, NULL);
+	EnumChildWindows(pGlobals->m_pcmainwin->m_hwndmain, wyTheme::EnumChildProcResize, NULL);
 
+	// Update editor colors for all MDI windows
+	EnumChildWindows(pGlobals->m_hwndclient, wyTheme::EnumChildProcUpdateEditorColors, NULL);
+	
+	// Update connection tab colors - dark them overrides custom colors
+	UpdateConnectionTabColorsForTheme();
+
+    // Post custom messages to MDI child windows for ObjectInfo refresh
+	EnumChildWindows(pGlobals->m_hwndclient, wyTheme::EnumChildProcPostThemeMessage, NULL);
+
+	// Refresh HTML content for all MDI windows (ObjectInfo, QueryAnalyzer, etc.)
+	EnumChildWindows(pGlobals->m_hwndclient, wyTheme::EnumChildProcRefreshHtml, NULL);
     //set the owner draw from menu and redraw the menu bar
     pGlobals->m_pcmainwin->SetYogMenuOwnerDraw();
     DrawMenuBar(pGlobals->m_pcmainwin->m_hwndmain);
+
+	EnumChildWindows(pGlobals->m_pcmainwin->m_hwndmain, wyTheme::EnumChildProcUpdateGridColors, NULL);
 
     //repaint everything
     InvalidateRect(pGlobals->m_pcmainwin->m_hwndmain, NULL, TRUE);
@@ -1980,7 +2461,7 @@ wyTheme::EnumChildProcUpdateTabs(HWND hwnd, LPARAM lparam)
 
             GetClassName(hwndparent, classname, SIZE_256 - 1);
 
-            if(!wcsicmp(classname, TABLE_TABINTERFACE_WINDOW))
+			if(!wcsicmp(classname, TABLE_TABINTERFACE_WINDOW))
             {
                 ci.m_border = wyTrue;
                 ci.m_mask = CTCF_BORDER;
@@ -1999,11 +2480,142 @@ wyTheme::EnumChildProcUpdateTabs(HWND hwnd, LPARAM lparam)
                 }
             }
         }
-    }
+    }    
+	else if (!wcsicmp(classname, L"SysTreeView32"))
+	{
+		if (GetDlgCtrlID(hwnd) == IDC_OBJECTTREE)
+		{
+			MDIWindow* pmdi = (MDIWindow*)GetWindowLongPtr(GetParent(hwnd), GWLP_USERDATA);
+			if (pmdi && pmdi->m_pcqueryobject)
+			{
+				pmdi->m_pcqueryobject->UpdateColors();
+			}
+		}
+	}
+	
 
     return TRUE;
 }
 
+
+
+//function to update editor colors for MDI child windows
+BOOL CALLBACK
+wyTheme::EnumChildProcUpdateEditorColors(HWND hwnd, LPARAM lparam)
+{
+	wyWChar classname[SIZE_256];
+
+	GetClassName(hwnd, classname, SIZE_256 - 1);
+
+	if (!wcsicmp(classname, L"Scintilla"))
+	{
+        EDITORINFO editorInfo = wyTheme::IdentifyEditorType(hwnd);
+        
+        // Handle different editor types with separation
+        if (editorInfo.controlId == IDC_QUERYMESSAGEEDIT || editorInfo.controlId == IDC_TABLEDATAEDIT)
+        {
+            ApplyMTIEditorColors(hwnd, editorInfo.controlId);
+        }
+        else if (editorInfo.controlId == IDC_QUERYEDIT)
+        {
+            if (editorInfo.isInfoTabEditor)
+            {
+                ApplyObjectInfoEditorColors(hwnd);
+            }
+            else if (editorInfo.isTabPreviewEditor)
+            {
+               // ApplyTabPreviewEditorColors(hwnd);
+            }
+            else if (editorInfo.isMainQueryEditor)
+            {
+                ApplyMainEditorColors(hwnd);
+            }
+        }
+        else
+        {
+            ApplyMainEditorColors(hwnd);
+        }
+
+        // Handle folding for appropriate editors
+        HandleEditorFolding(hwnd, editorInfo);
+        
+		InvalidateRect(hwnd, NULL, TRUE);
+	}
+
+	return TRUE;
+}
+
+//function to refresh HTML content for MDI child windows when theme changes
+BOOL CALLBACK
+wyTheme::EnumChildProcRefreshHtml(HWND hwnd, LPARAM lparam)
+{
+	wyWChar classname[SIZE_256];
+
+	GetClassName(hwnd, classname, SIZE_256 - 1);
+
+	if (!wcsicmp(classname, L"HtmlFormViewWindow"))
+	{
+	SendMessage(hwnd, WM_USER + 1001, 0, 0);	
+	}
+	else if(!wcsicmp(classname, L"PQAHtmlWindow")) {
+		SendMessage(hwnd, WM_USER + 1001, 0, 0);
+	}
+	else if (!wcsicmp(classname, L"Db search Html window")) {
+		SendMessage(hwnd, WM_USER + 1001, 0, 0);
+	}
+    else if (!wcsicmp(classname, L"InfoHtmlWindow"))
+    {
+        SendMessage(hwnd, WM_USER + 1002, 0, 0);
+    }
+
+	return TRUE;
+}
+
+//function to post theme change messages to MDI child windows
+BOOL CALLBACK
+wyTheme::EnumChildProcPostThemeMessage(HWND hwnd, LPARAM lparam)
+{
+    wyWChar classname[SIZE_256];
+    GetClassName(hwnd, classname, SIZE_256 - 1);
+    
+    // Post custom message to all MDI child windows to refresh their ObjectInfo
+    if(!wcsicmp(classname, QUERY_WINDOW_CLASS_NAME_STR))
+    {
+        PostMessage(hwnd, WM_USER + 2001, 0, 0);  // Custom theme change message
+    }
+    
+    return TRUE;
+}
+
+
+//function to update editor colors for MDI child windows
+BOOL CALLBACK
+wyTheme::EnumChildProcUpdateGridColors(HWND hwnd, LPARAM lparam)
+{
+	wyWChar classname[SIZE_256];
+	GRIDCOLORINFO   ci = { 0 };
+	wyBool isdefaultgrid = wyFalse;
+
+	GetClassName(hwnd, classname, SIZE_256 - 1);
+
+	if (!wcsicmp(classname, L"CustomGridControl"))
+	{
+		isdefaultgrid = CustomGrid_GetDefaultGrid(hwnd);
+		if (!isdefaultgrid) {
+			if (IsDarkThemeActive() && wyTheme::GetGridColors(&ci))
+			{
+				CustomGrid_SetColorInfo(hwnd, &ci);
+				CustomGrid_SetDarkTheme(hwnd, wyTrue);
+			}
+			else {
+				CustomGrid_SetColorInfo(hwnd, NULL);
+				CustomGrid_SetDarkTheme(hwnd, wyFalse);
+			}
+		}
+	}
+
+	return TRUE;
+}
 //helper function to convert hex value into COLORREF
 COLORREF
 wyTheme::GetColorFromHex(wyInt32 color)
@@ -2015,4 +2627,80 @@ wyTheme::GetColorFromHex(wyInt32 color)
     blue = color & 0xFF;
 
     return RGB(red, green, blue);
+}
+
+
+//function to update connection tab colors when theme changes
+void
+wyTheme::UpdateConnectionTabColorsForTheme()
+{
+    HWND hwndtab = pGlobals->m_pcmainwin->m_hwndconntab;
+    if(!hwndtab)
+        return;
+        
+    wyInt32 tabcount = CustomTab_GetItemCount(hwndtab);
+    TABCOLORINFO ci = {0};
+	wyBool isdarktheme = wyTheme::IsDarkThemeActive();
+    
+    // Get theme colors for connection tabs
+    wyBool hasthemecolors = isdarktheme?wyTheme::GetTabColors(COLORS_CONNTAB, &ci):wyFalse;
+    
+    for(wyInt32 i = 0; i < tabcount; i++)
+    {
+        CTCITEM item = {0};
+        item.m_mask = CTBIF_LPARAM | CTBIF_COLOR;
+        
+        if(CustomTab_GetItem(hwndtab, i, &item) == -1)
+            continue;
+            
+        MDIWindow* pmdi = (MDIWindow*)item.m_lparam;
+        if(!pmdi)
+            continue;
+            
+
+        if(isdarktheme)
+        {
+            if(hasthemecolors)
+            {
+                if(ci.m_mask & CTCF_TABBG1)
+                    item.m_color = ci.m_tabbg1;
+                if(ci.m_mask & CTCF_TABTEXT)
+                    item.m_fgcolor = ci.m_tabtext;
+                    
+                CustomTab_SetItemColor(hwndtab, i, &item);
+            }
+        }
+        else
+        {
+            if(pmdi->m_conninfo.m_rgbconn >= 0)
+            {
+                item.m_color = pmdi->m_conninfo.m_rgbconn;
+                item.m_fgcolor = pmdi->m_conninfo.m_rgbfgconn;
+                CustomTab_SetItemColor(hwndtab, i, &item);
+            }
+        }
+    }
+    
+    InvalidateRect(hwndtab, NULL, TRUE);
+    UpdateWindow(hwndtab);
+}
+
+wyBool 
+wyTheme::IsDarkThemeActive()
+{
+    const LPTHEMEINFO pactivetheme = wyTheme::GetActiveThemeInfo();
+    
+    if(!pactivetheme)
+        return wyFalse;
+    
+    if(pactivetheme->m_type == RESOURCE_THEME)
+    {
+        wyString darkthemeid;
+        darkthemeid.Sprintf("%d", IDR_THEME_DARK);
+        
+        if(!pactivetheme->m_filename.CompareI(darkthemeid))
+            return wyTrue;
+    }
+    
+    return wyFalse;
 }

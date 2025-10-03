@@ -19,6 +19,7 @@
 #include "ObjectInfo.h"
 #include "EditorFont.h"
 #include "Htmlrender.h"
+#include "wyTheme.h"
 
 
 
@@ -30,30 +31,67 @@
 #define IDM_OBJECT_COPY		13
 #define ONE_KB				1024
 
-#define CSS_INFOTAB_CLASSES ".resultcaptionstyle	{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left;}\
+// Light theme CSS (original)
+#define CSS_INFOTAB_CLASSES_LIGHT ".resultcaptionstyle	{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color: black;}\
 .colcaptionstyleleft {font: bold 12px \"Courier New\", Courier, mono; background:#4caaf9; color: #FFFFFF;text-align:left; padding-left:2px; padding-right:1px;border-spacing:0px;}\
-.cellstyleleft{text-align:left;padding-left:1px; padding-right:1px;}\
-.cellstyleright{text-align:right;padding-right:1px; padding-left:1px;}\
-.captionfontstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right;}\
-.datafontstylerowodd{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#e5e5e5;height:23px;}\
-.datafontstyleroweven{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#FFFFFF;height:18px;}\
-.statustablestyle{border: none; solid #EEE1FF;height:auto;word-wrap:break-word;table-layout:fixed;}\
+.cellstyleleft{text-align:left;padding-left:1px; padding-right:1px; color: black;}\
+.cellstyleright{text-align:right;padding-right:1px; padding-left:1px; color: black;}\
+.captionfontstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right; color: black;}\
+.datafontstylerowodd{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#e5e5e5; color: black; height:23px;}\
+.datafontstyleroweven{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#FFFFFF; color: black; height:18px;}\
+.statustablestyle{border: none; solid #EEE1FF;height:auto;word-wrap:break-word;table-layout:fixed; background:#FFFFFF;}\
 .pkcolcaptionstyle{background:#4caaf9; color: #FFFFFF;}\
 .imgcaptionstyle{vertical-align: middle;}\
-.text1 {font: bold 16px \"Trebuchet MS\", Verdana, Arial, Helvetica;}\
-.optimizecolstyle{font: 12px \"Courier New\", Courier, mono; text-align:left; background:#D6E7FF;height:18px; text-align:left; padding-left:10px; padding-right:10x;}\
-.optimizedtablestyle{border:none solid #EEE1FF; word-wrap:break-word;table-layout:fixed;}\
-.optimizedtable1style{word-wrap:break-all;table-layout:fixed;}\
-.tablestyle{border: none; solid #EEE1FF;}\
+.text1 {font: bold 16px \"Trebuchet MS\", Verdana, Arial, Helvetica; color: black;}\
+.optimizecolstyle{font: 12px \"Courier New\", Courier, mono; text-align:left; background:#D6E7FF; color: black; height:18px; text-align:left; padding-left:10px; padding-right:10x;}\
+.optimizedtablestyle{border:none solid #EEE1FF; word-wrap:break-word;table-layout:fixed; background:#FFFFFF;}\
+.optimizedtable1style{word-wrap:break-all;table-layout:fixed; background:#FFFFFF;}\
+.tablestyle{border: none; solid #EEE1FF; background:#FFFFFF;}\
 .tabcaptionstyle{font: 14px \"Open Sans\", Verdana, Arial, Helvetica; text-align:left; color:black;}\
 .buttonstyle{color:#333333; border-color:#a9b4bc;font: bold 12px \"Trebuchet MS\", Verdana, Arial, Helvetica,sans-serif;  background-color:  #efefee;}\
 .warningstyle{font: 13px \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color:grey;}\
-.redindexrowstyle{font: 12px \"Couthrier New\", Courier, mono; text-align:right; background:#FAC8A5; height:18px;}\
-.redindexcolstyle{font: 12px \"Courier New\", Courier, mono; text-align:left; background:#FAC8A5; height:18px; text-align:left; padding-left:10px; padding-right:10x;}\
-.captionstyle{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left;background-color:#FFFFFF; background-repeat:repeat-x;}\
+.redindexrowstyle{font: 12px \"Couthrier New\", Courier, mono; text-align:right; background:#FAC8A5; color: black; height:18px;}\
+.redindexcolstyle{font: 12px \"Courier New\", Courier, mono; text-align:left; background:#FAC8A5; color: black; height:18px; text-align:left; padding-left:10px; padding-right:10x;}\
+.captionstyle{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left;background-color:#FFFFFF; color: black; background-repeat:repeat-x;}\
 .blueline { background-color: #4caaf9;height: 1px; }\
 a:link { color: #3b7dbb; text-decoration:none;} a:visited { color: #3b7dbb; text-decoration:none;} a:hover {color: #4caaf9; text-decoration:none;} a:active { color: #4caaf9; text-decoration:none;}\
-.whitespace{background-color: #FFFFFF;height: 5px; }"   
+.whitespace{background-color: #FFFFFF;height: 5px; }\
+body{background-color: #FFFFFF; color: black;}"
+
+// Dark theme CSS
+#define CSS_INFOTAB_CLASSES_DARK "body { background-color: #1E1E1E; margin: 8px; padding: 0; color: #DCDCDC; }\
+html { background-color: #1E1E1E; margin: 8; padding: 0; }\
+.resultcaptionstyle	{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color: #DCDCDC;}\
+.colcaptionstyleleft {font: bold 12px \"Courier New\", Courier, mono; background:#3b7dbb; color: #DCDCDC;text-align:left; padding-left:2px; padding-right:1px;border-spacing:0px;}\
+.cellstyleleft{text-align:left;padding-left:1px; padding-right:1px; color: #DCDCDC;}\
+.cellstyleright{text-align:right;padding-right:1px; padding-left:1px; color: #DCDCDC;}\
+.captionfontstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right; color: #DCDCDC;}\
+.datafontstylerowodd{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#1A1A1A; color: #FFFFFF; height:23px;}\
+.datafontstyleroweven{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#0F0F0F; color: #FFFFFF; height:18px;}\
+.statustablestyle{border: none; solid #404040;height:auto;word-wrap:break-word;table-layout:fixed; background:#1E1E1E;}\
+.pkcolcaptionstyle{background:#3b7dbb; color: #DCDCDC;}\
+.imgcaptionstyle{vertical-align: middle;}\
+.text1 {font: bold 16px \"Trebuchet MS\", Verdana, Arial, Helvetica; color: #DCDCDC;}\
+.optimizecolstyle{font: 12px \"Courier New\", Courier, mono; text-align:left; background:#3b7dbb; color: #DCDCDC; height:18px; text-align:left; padding-left:10px; padding-right:10x;}\
+.optimizedtablestyle{border:none solid #404040; word-wrap:break-word;table-layout:fixed; background:#1E1E1E;}\
+.optimizedtable1style{word-wrap:break-all;table-layout:fixed; background:#1E1E1E;}\
+.tablestyle{border: none; solid #404040; background:#1E1E1E;}\
+.tabcaptionstyle{font: 14px \"Open Sans\", Verdana, Arial, Helvetica; text-align:left; color:#DCDCDC;}\
+.buttonstyle{color:#000000; border-color:#606060;font: bold 12px \"Trebuchet MS\", Verdana, Arial, Helvetica,sans-serif;  background-color:background-color:#3b7dbb;}\
+.warningstyle{font: 13px \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color:#888888;}\
+.redindexrowstyle{font: 12px \"Couthrier New\", Courier, mono; text-align:right; background:#8B4513; color: #DCDCDC; height:18px;}\
+.redindexcolstyle{font: 12px \"Courier New\", Courier, mono; text-align:left; background:#8B4513; color: #DCDCDC; height:18px; text-align:left; padding-left:10px; padding-right:10x;}\
+.captionstyle{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left;background-color:#1E1E1E; color: #DCDCDC; background-repeat:repeat-x;}\
+.blueline { background-color: #3b7dbb;height: 1px; }\
+a:link { color: #4caaf9; text-decoration:none;} a:visited { color: #4caaf9; text-decoration:none;} a:hover {color: #6cc0ff; text-decoration:none;} a:active { color: #6cc0ff; text-decoration:none;}\
+.whitespace{background-color: #1E1E1E;height: 5px; }\
+body{background-color: #1E1E1E; color: #DCDCDC;}"   
+
+// Function to get the appropriate CSS based on current theme
+const char* GetInfoTabCSS()
+{
+    return wyTheme::IsDarkThemeActive() ? CSS_INFOTAB_CLASSES_DARK : CSS_INFOTAB_CLASSES_LIGHT;
+}
 
 #define SCHEMA_OPTBUTTON "<input id=\"schemaoptbutton\" type=\"button\" value=\"%s\" class=\"buttonstyle\"></input>"
 #define LINK_SCHEMA_OPTIMIZE _("Calculate Optimal Datatypes")
@@ -186,6 +224,7 @@ ObjectInfo::CreateEditWindow()
 	SendMessage(m_hwnd, SCI_SETWRAPMODE, SC_WRAP_NONE, SC_WRAP_NONE);
 	SetColor();
     SetFont();
+	
 }
 
 void
@@ -199,32 +238,35 @@ ObjectInfo::SetColor()
 {
     wyWChar		*lpfileport = 0;
 	wyWChar		directory[MAX_PATH+1] = {0};
-    COLORREF	color, backcolor;
+    COLORREF	color, backcolor, selectioncolor;
+	
+    selectioncolor = DEF_TEXTSELECTION;
+    backcolor = DEF_BKGNDEDITORCOLOR;
+    color = DEF_NORMALCOLOR;
 	
 	//Get the complete path.
-	if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
+	// ObjectInfo editors should always get theme colors (they are main window editors)
+    if(SearchFilePath(L"sqlyog", L".ini", MAX_PATH, directory, &lpfileport) == wyTrue)
     {
         wyString	dirstr(directory);
 
-        backcolor   =   wyIni::IniGetInt(GENERALPREFA, "MTISelectionColor",   DEF_TEXTSELECTION, dirstr.GetString());
-        SendMessage(m_hwnd,SCI_SETSELBACK,1,backcolor);
-        
-        backcolor=wyIni::IniGetInt(GENERALPREFA, "MTIBgColor", DEF_BKGNDEDITORCOLOR, dirstr.GetString()); 
-        SendMessage( m_hwnd, SCI_STYLESETBACK, STYLE_DEFAULT, (LPARAM)backcolor);
-        
-        SendMessage( m_hwnd, SCI_SETCARETFORE,backcolor ^ 0xFFFFFF,0); //Change Caret color in editor window
-
+        selectioncolor = wyIni::IniGetInt(GENERALPREFA, "MTISelectionColor", DEF_TEXTSELECTION, dirstr.GetString());
+        backcolor = wyIni::IniGetInt(GENERALPREFA, "MTIBgColor", DEF_BKGNDEDITORCOLOR, dirstr.GetString()); 
         color = wyIni::IniGetInt(GENERALPREFA, "MTIFgColor", DEF_NORMALCOLOR, dirstr.GetString()); 
-        
-        SendMessage(m_hwnd, SCI_STYLESETFORE, SCE_MYSQL_DEFAULT, color);
-        SendMessage(m_hwnd, SCI_STYLESETBACK, SCE_MYSQL_DEFAULT, backcolor);
-        SendMessage(m_hwnd, SCI_STYLESETBOLD, SCE_MYSQL_DEFAULT, FALSE);
-    }
-    else
-    {
-        EditorFont::SetColor(m_hwnd, wyTrue, wyTrue);
     }
     
+    GetThemeColorsToMTI(&selectioncolor, &backcolor, &color);
+
+    SendMessage(m_hwnd, SCI_SETSELBACK, 1, selectioncolor);
+    SendMessage(m_hwnd, SCI_SETCARETFORE, backcolor ^ 0xFFFFFF, 0); 
+    SendMessage(m_hwnd, SCI_STYLESETBACK, STYLE_DEFAULT, (LPARAM)backcolor);
+    SendMessage(m_hwnd, SCI_STYLESETFORE, STYLE_DEFAULT, color);
+    SendMessage(m_hwnd, SCI_STYLESETBOLD, STYLE_DEFAULT, FALSE);
+  
+	SendMessage(m_hwnd, SCI_STYLESETFORE, SCE_MYSQL_DEFAULT, color);
+	SendMessage(m_hwnd, SCI_STYLESETBACK, SCE_MYSQL_DEFAULT, backcolor);
+	SendMessage(m_hwnd, SCI_STYLESETBOLD, SCE_MYSQL_DEFAULT, FALSE);
+
     EditorFont::SetCase(m_hwnd);
 }
 
@@ -258,9 +300,27 @@ LRESULT	CALLBACK
 ObjectInfo::HtmlWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	ObjectInfo* ptabobject = (ObjectInfo*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-	LRESULT     lResult;
-	BOOL        bHandled;
+    LRESULT     lResult;
+    BOOL        bHandled;
     POINT		pt;
+
+    if(message == WM_USER + 1002)
+    {
+        // Apply CSS only if the HTMLayout document is ready.
+        // mark a pending flag so it can be applid on HLN_DOCUMENT_COMPLETE.
+        if(GetProp(hwnd, L"INFO_HTML_DOC_READY") != NULL)
+        {
+            wyString css;
+            css.SetAs(GetInfoTabCSS());
+            HTMLayoutSetCSS(hwnd, (LPCBYTE)css.GetString(), css.GetLength(), NULL, NULL);
+            HTMLayoutUpdateWindow(hwnd);
+        }
+        else
+        {
+            SetProp(hwnd, L"INFO_HTML_NEED_THEME", (HANDLE)1);
+        }
+        return 0; 
+    }
 
     lResult = HTMLayoutProcND(hwnd,message,wParam,lParam, &bHandled);
     
@@ -269,7 +329,7 @@ ObjectInfo::HtmlWndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
         return lResult;
     }
 
-	switch(message)
+	 switch(message)
 	{		
 	    case WM_HELP:
 		    ShowHelp("http://sqlyogkb.webyog.com/article/84-query-profiler");
@@ -458,6 +518,10 @@ ObjectInfo::InitView()
 void
 ObjectInfo::Refresh(wyBool isforce)
 {
+    // Null check to prevent crashes during theme switching
+    if(!m_wnd || !m_wnd->m_pcqueryobject)
+        return;
+
     MDIWindow*      wnd = m_wnd;
     CQueryObject*   pqueryobject = wnd->m_pcqueryobject;
 
@@ -1377,7 +1441,7 @@ ObjectInfo::ShowServerInfo(MDIWindow * wnd)
 						charset=UTF-8\"/></head><body>");
 
 	m_htmlformatstr.Add("<style type=\"text/css\">");
-	m_htmlformatstr.Add(CSS_INFOTAB_CLASSES);
+	m_htmlformatstr.Add(GetInfoTabCSS());
 	m_htmlformatstr.Add("</style>");
 
 	imgcaption.Sprintf("&nbsp;MySQL Server: %s", wnd->m_mysql->server_version);
@@ -3406,11 +3470,11 @@ ObjectInfo::HtmlBufferInit(wyString *htmlbuffer)
 	htmlbuffer->SetAs("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html;\
 						  charset=UTF-8\"/></head><body>");
 	htmlbuffer->Add("<style type=\"text/css\">");
-	htmlbuffer->Add(CSS_INFOTAB_CLASSES);
+	htmlbuffer->Add(GetInfoTabCSS());
 
 	if(m_istableanalyse == wyTrue)
     {
-		htmlbuffer->Add(CSS_OPTIMIZE_CLASS);
+		htmlbuffer->Add(GetOptimizeCSS());
     }
 
 	htmlbuffer->Add("</style>");

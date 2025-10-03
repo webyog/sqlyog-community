@@ -30,6 +30,7 @@
 #include "Verify.h"
 #include <CommCtrl.h>
 #include "CCustomComboBox.h"
+#include "wyTheme.h"
 
 #include <iomanip>
 #include "modes.h"
@@ -2535,11 +2536,23 @@ ConnectionBase::GetAdvancedTabDetailsFromFile(ConnectionInfo *conn, wyChar *conn
 void    
 ConnectionBase::FillAdvancedTab(HWND hwnd, ConnectionInfo *conninfo)
 {
+    // Disable Object Browser color options when dark theme is active
+	if(wyTheme::IsDarkThemeActive())
+	{
+		EnableWindow(GetDlgItem(hwnd, IDC_COLORTXT2) , FALSE);
+		EnableWindow(GetDlgItem(hwnd, IDC_COLORTXT1) , FALSE);
+		EnableWindow(GetDlgItem(hwnd, IDC_COLORTXT3) , FALSE);
+		EnableWindow(GetDlgItem(hwnd, IDC_COLORCOMBO), FALSE);
+		EnableWindow(GetDlgItem(hwnd, IDC_COLORCOMBO3), FALSE);
+	}
+	else
+{
     EnableWindow(GetDlgItem(hwnd, IDC_COLORTXT2) , TRUE);
 	EnableWindow(GetDlgItem(hwnd, IDC_COLORTXT1) , TRUE);
 	EnableWindow(GetDlgItem(hwnd, IDC_COLORTXT3) , TRUE);
 	EnableWindow(GetDlgItem(hwnd, IDC_COLORCOMBO), TRUE);
 	EnableWindow(GetDlgItem(hwnd, IDC_COLORCOMBO3), TRUE);
+	}
 	EnableWindow(GetDlgItem(hwnd, IDC_EDITMODE), TRUE);
 	EnableWindow(GetDlgItem(hwnd, IDC_MODEVALUE), TRUE);
 	EnableWindow(GetDlgItem(hwnd, IDC_MODEGLOBAL), TRUE);

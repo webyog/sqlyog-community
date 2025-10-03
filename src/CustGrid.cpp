@@ -160,10 +160,11 @@ CCustGrid* GetCustCtrlData(HWND hwnd)
 ----------------------------------------------------------------------------------------*/
 
 HWND CreateCustomGrid(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width, 
-                      wyInt32 height, GVWNDPROC m_lpgvwndproc, LPARAM lparam, wyBool isvisible, wyBool flip)
+                      wyInt32 height, GVWNDPROC m_lpgvwndproc, LPARAM lparam, wyBool isvisible, wyBool flip, wyBool isdefaultgrid)
 {
 
 	HWND	hwndgrid;
+	GRIDCOLORINFO ci = {};
 	hwndgrid = CreateWindowEx(WS_EX_WINDOWEDGE,  customname, TEXT("Custom Grid Control"),
                                 WS_VISIBLE | WS_CHILD | WS_TABSTOP, 
 								x, y, width, height, hwndparent, NULL, 
@@ -173,16 +174,36 @@ HWND CreateCustomGrid(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width,
 		return NULL;
 
 	SendMessage(hwndgrid, GVM_SETLONGDATA, 0, lparam);
+	CustomGrid_SetDefaultGrid(hwndgrid, isdefaultgrid);
+	CustomGrid_SetColorInfo(hwndgrid, NULL);
+
+	if (!isdefaultgrid)
+	{
+		wyTheme::GetGridColors(&ci);
+		if (ci.m_mask)
+			CustomGrid_SetColorInfo(hwndgrid, &ci);
+		if (wyTheme::IsDarkThemeActive()) {
+			CustomGrid_SetDarkTheme(hwndgrid, wyTrue);
+		}
+		else {
+			CustomGrid_SetDarkTheme(hwndgrid, wyFalse);
+		}
+	}
+	else{
+		CustomGrid_SetDarkTheme(hwndgrid, wyFalse);
+	}
+	
     CustomGrid_ShowGrid(hwndgrid, isvisible);
 	return hwndgrid;
 }
 
 HWND CreateCustomGridEx(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width, wyInt32 height, 
-                        GVWNDPROC m_lpgvwndproc, DWORD styles, LPARAM lparam, wyBool isvisible, wyBool flip)
+                        GVWNDPROC m_lpgvwndproc, DWORD styles, LPARAM lparam, wyBool isvisible, wyBool flip, wyBool isdefaultgrid)
 {
 	HWND	hwndgrid;
 	CCustGrid *pcg;
 	TOOLINFO toolinfo;
+	GRIDCOLORINFO ci = {};
 	hwndgrid = CreateWindowEx(WS_EX_WINDOWEDGE,  customname, TEXT("Custom Grid Control"), 
                                     WS_VISIBLE | WS_CHILD | WS_TABSTOP, 
 								    x, y, width, height, hwndparent, NULL, 
@@ -194,6 +215,24 @@ HWND CreateCustomGridEx(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width, wy
 	SendMessage(hwndgrid, GVM_SETLONGDATA, 0, lparam);
 
 	CustomGrid_SetExtendedStyle(hwndgrid, styles);
+	CustomGrid_SetDefaultGrid(hwndgrid, isdefaultgrid);
+	CustomGrid_SetColorInfo(hwndgrid, NULL);
+
+	if (!isdefaultgrid)
+	{
+		wyTheme::GetGridColors(&ci);
+		if (ci.m_mask)
+			CustomGrid_SetColorInfo(hwndgrid, &ci);
+		if (wyTheme::IsDarkThemeActive()) {
+			CustomGrid_SetDarkTheme(hwndgrid, wyTrue);
+		}
+		else {
+			CustomGrid_SetDarkTheme(hwndgrid, wyFalse);
+		}
+	}
+	else {
+		CustomGrid_SetDarkTheme(hwndgrid, wyFalse);
+	}
 
     CustomGrid_ShowGrid(hwndgrid, isvisible);
 	
@@ -547,6 +586,27 @@ void CustomGrid_SetFlip(HWND hwnd, wyBool flag)
 	pcg->SetFlip(flag);
 }
 
+void CustomGrid_SetDefaultGrid(HWND hwnd, wyBool isdefaultgrid)
+{
+	CCustGrid	*pcg = GetCustCtrlData(hwnd);
+
+	pcg->SetDefaultGrid(isdefaultgrid);
+}
+
+void CustomGrid_SetDarkTheme(HWND hwnd, wyBool isdarktheme)
+{
+	CCustGrid	*pcg = GetCustCtrlData(hwnd);
+
+	pcg->SetDarkTheme(isdarktheme);
+}
+
+wyBool CustomGrid_GetDefaultGrid(HWND hwnd)
+{
+	CCustGrid	*pcg = GetCustCtrlData(hwnd);
+
+	return pcg->GetDefaultGrid();
+}
+
 void CustomGrid_LastRecord(HWND hwnd)
 {
     CCustGrid	*pcg = GetCustCtrlData(hwnd);
@@ -871,6 +931,18 @@ void CustomGrid_SetSelAllState(HWND hwnd, wyInt32 state)
     CCustGrid *pcg = GetCustCtrlData(hwnd);
     return pcg->SetSelAllState(state);
 }
+void CustomGrid_SetColorInfo(HWND hwnd, LPGRIDCOLORINFO pcolorinfo)
+{
+	CCustGrid	*pcg = GetCustCtrlData(hwnd);
+	pcg->SetColorInfo(pcolorinfo);
+}
+
+void
+CustomTab_GetColorInfo(HWND hwnd, LPGRIDCOLORINFO pcolorinfo)
+{
+	CCustGrid* pcg = GetCustCtrlData(hwnd);
+	pcg->GetColorInfo(pcolorinfo);
+}
 
 CCustGrid::CCustGrid(HWND hwnd)
 {
@@ -973,7 +1045,8 @@ CCustGrid::CustomGridWndProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
         if(pcg->m_isvisible == wyTrue)
         {
             VERIFY(pcg->CreateFonts());
-		    pcg->m_crbkgnd = RGB(255, 255, 255);
+
+		    pcg->m_crbkgnd = pcg->m_colorinfo.m_gridbg1;
         }
         pcg->m_lparam = lparam;
 		return TRUE;
@@ -2029,6 +2102,7 @@ CCustGrid::DrawInitialButton(PGVCOLNODE pgvnode, HDC hdcmem, RECT *rect)
     LONG style, side = 0;
     RECT rect2;
     GVINITIALBUTTONINFO info = {0};
+	HBRUSH hbrush;
 
 	//if no query executed or no table is selected in OB then no need to draw the initial buttonin Grid.
 	if(!pgvnode)
@@ -2052,24 +2126,27 @@ CCustGrid::DrawInitialButton(PGVCOLNODE pgvnode, HDC hdcmem, RECT *rect)
             rect->right = GV_DEFWIDTH;
     }
     VERIFY(DrawFrameControl(hdcmem, rect, DFC_BUTTON, DFCS_BUTTONPUSH|DFCS_FLAT));
-    
+
+	//// filling the rectangle with border color and then setting the gradient
+	VERIFY(hbrush = CreateSolidBrush(m_colorinfo.m_cellborder));
+	VERIFY(FillRect(hdcmem, rect, hbrush));
+	VERIFY(DeleteObject(hbrush));
 	
+	vertex[0].x = rect->left + 1;
+	vertex[0].y = rect->top + 1;
+
+	vertex[1].x = rect->right - 1;
+	vertex[1].y = rect->bottom - 1;
 	
-	vertex[0].x     = rect->left + 2;
-	vertex[0].y     = rect->top + 2;
+	vertex[0].Red = GetRValue(m_colorinfo.m_colheaderbutton)<<8;// 0xffffff;
+	vertex[0].Green = GetGValue(m_colorinfo.m_colheaderbutton)<<8; //0xffffff;
+	vertex[0].Blue  = GetBValue(m_colorinfo.m_colheaderbutton)<<8; //0xffffff;
+	vertex[0].Alpha = 0x0; //0xffffff;
 
-	vertex[1].x     = rect->right - 2;
-	vertex[1].y     = rect->bottom - 2; 
-
-	vertex[0].Red   = 0xffffff;
-	vertex[0].Green = 0xffffff;
-	vertex[0].Blue  = 0xffffff;
-	vertex[0].Alpha = 0xffffff;
-
-	vertex[1].Red   = 0xffffff;
-	vertex[1].Green = 0xffffff;
-	vertex[1].Blue  = 0xffffff;
-	vertex[1].Alpha = 0xffffff;
+	vertex[1].Red = GetRValue(m_colorinfo.m_colheaderbutton) << 8;// 0xffffff;
+	vertex[1].Green = GetGValue(m_colorinfo.m_colheaderbutton) << 8; //0xffffff;
+	vertex[1].Blue  = GetGValue(m_colorinfo.m_colheaderbutton) << 8; //0xffffff;
+	vertex[1].Alpha = 0x0; //0xffffff;
 
 	//Gradient for button at lef-top most
 	SetGradient(hdcmem, vertex);
@@ -2146,9 +2223,8 @@ CCustGrid::DrawInitialButton(PGVCOLNODE pgvnode, HDC hdcmem, RECT *rect)
         }
         else
             DrawFrameControl(hdcmem, rect, DFC_BUTTON, style);
-
-
     }
+
     
 }
 
@@ -2246,7 +2322,7 @@ CCustGrid::OnPaint(WPARAM wparam, LPARAM lparam)
     hbmold = (HBITMAP)SelectObject(hdcmem, hbmmem);		// not applicable
 
 	// Create a white brush.
-	VERIFY(hbrush = CreateSolidBrush(m_crbkgnd));
+	VERIFY(hbrush = CreateSolidBrush(m_colorinfo.m_gridbg1));
 
 	// Erase the background.
 	VERIFY(FillRect(hdcmem, &rectwin, hbrush));
@@ -2629,6 +2705,7 @@ CCustGrid::DrawButtonForColumn(HDC hdcmem, PGVCOLUMN pgvcol, RECT *rect, wyUInt3
 {
     wyUInt32	state = DFCS_BUTTONPUSH | DFCS_FLAT ;
 	TRIVERTEX	vertex[2];
+	HBRUSH		hbrush;
 
     rect->bottom = rect->top + m_hight;
 		
@@ -2658,26 +2735,29 @@ CCustGrid::DrawButtonForColumn(HDC hdcmem, PGVCOLUMN pgvcol, RECT *rect, wyUInt3
         }
     }
 	
-	vertex[0].x     = rect->left + 2;
-	vertex[0].y     = rect->top + 2;
+	vertex[0].x = rect->left+1;
+	vertex[0].y = rect->top+1;
 
-	vertex[1].x     = rect->right - 2;
-	vertex[1].y     = rect->bottom - 2; 
-
-	vertex[0].Red   = 0xc900;
-	vertex[0].Green = 0xc600;
-	vertex[0].Blue  = 0xb800;
+	vertex[1].x = rect->right-1;
+	vertex[1].y = rect->bottom-1;
+	
+	vertex[0].Red = GetRValue(m_colorinfo.m_gridcolheader) << 8;// 0xc900;
+	vertex[0].Green = GetGValue(m_colorinfo.m_gridcolheader) << 8; 0xc600;
+	vertex[0].Blue = GetBValue(m_colorinfo.m_gridcolheader) << 8;//0xb800;
 	vertex[0].Alpha = 0x0000;
 
-	vertex[1].Red   = 0xc900;
-	vertex[1].Green = 0xc600;
-	vertex[1].Blue  = 0xb800;
-	vertex[1].Alpha = 0x0000;
+	vertex[1].Red = GetRValue(m_colorinfo.m_gridcolheader) << 8;//0xc900;
+	vertex[1].Green = GetGValue(m_colorinfo.m_gridcolheader) << 8;//0xc600;
+	vertex[1].Blue = GetBValue(m_colorinfo.m_gridcolheader) << 8;//0xb800;
 		
 	DrawFrameControl(hdcmem, rect, DFC_BUTTON, state);
 
+	VERIFY(hbrush = CreateSolidBrush(m_colorinfo.m_cellborder));
+	VERIFY(FillRect(hdcmem, rect, hbrush));
+	VERIFY(DeleteObject(hbrush));
+
 	//Column header gradient
-	//SetGradient(hdcmem, vertex, wyFalse);
+	SetGradient(hdcmem, vertex, wyFalse);
 }
 
 void
@@ -2869,6 +2949,8 @@ CCustGrid::DrawColumnText(HDC hdcmem, PGVCOLUMN	pgvcol, RECT recttemp, wyInt32 *
     wyWChar*    str = NULL;
     HICON       hicon = NULL;
 
+	SetTextColor(hdcmem, m_colorinfo.m_gridfg);
+
     if(pgvcol->mask & GVIF_COLUMNMARK)
     {
         if(pgvcol->marktype == GV_MARKTYPE_TEXT)
@@ -2914,13 +2996,13 @@ CCustGrid::DrawColumnText(HDC hdcmem, PGVCOLUMN	pgvcol, RECT recttemp, wyInt32 *
 	{
 		if(m_curselcol == *ncurcol)
 		{
-			SetTextColor(hdcmem,RGB(255,255,255));
+			SetTextColor(hdcmem, m_colorinfo.m_gridselcolhdertext); // (255, 255, 255));
 		}
 		text.SetAs(pgvcol->text);
-	DrawText(hdcmem, text.GetAsWideChar(), lstrlen(text.GetAsWideChar()), &recttemp, format);
-	if(m_curselcol == *ncurcol)
+		DrawText(hdcmem, text.GetAsWideChar(), lstrlen(text.GetAsWideChar()), &recttemp, format);
+		if(m_curselcol == *ncurcol)
 		{
-			SetTextColor(hdcmem,RGB(0,0,0));
+			SetTextColor(hdcmem, m_colorinfo.m_gridcolhdertext); //RGB(0,0,0));
 		}
 	}
 
@@ -2928,7 +3010,7 @@ CCustGrid::DrawColumnText(HDC hdcmem, PGVCOLUMN	pgvcol, RECT recttemp, wyInt32 *
     {
         if(str)
         {
-            hbrush = CreateSolidBrush(RGB(255, 255, 255));
+            hbrush = CreateSolidBrush(m_colorinfo.m_gridselcolhdertext); //RGB(255, 255, 255));
             FillRect(hdcmem, &rect, hbrush);
             DrawText(hdcmem, str, -1, &rect, format);
             DeleteObject(hbrush);
@@ -2938,6 +3020,7 @@ CCustGrid::DrawColumnText(HDC hdcmem, PGVCOLUMN	pgvcol, RECT recttemp, wyInt32 *
             DrawIconEx(hdcmem, rect.left, rect.top, hicon, rect.right - rect.left, rect.bottom - rect.top, 0, NULL, DI_NORMAL);
         }
     }
+	SetTextColor(hdcmem, m_colorinfo.m_gridfg);
 }
 
 void
@@ -2966,28 +3049,32 @@ CCustGrid::DrawRowButtons(HDC hdcmem, RECT *rect, RECT *recttemp, wyInt32 *rowco
     HFONT	            fontold;
     wyWChar		        star[] = L"*";
 	TRIVERTEX			vertex[2];
+	HBRUSH				hbrush;
 	
 	//Gradient variables
-	vertex[0].x     = rect->left+1;
-	vertex[0].y     = rect->top;
+	vertex[0].x = rect->left +1;
+	vertex[0].y = rect->top;
 
-	vertex[1].x     = rect->right-1;
-	vertex[1].y     = rect->bottom-1; 
-
-	vertex[0].Red   = 0xffffff;
-	vertex[0].Green = 0xffffff;
-	vertex[0].Blue  = 0xffffff;
+	vertex[1].x = rect->right - 1;
+	vertex[1].y = rect->bottom - 1;
+	
+	vertex[0].Red = GetRValue(m_colorinfo.m_colheaderbutton)<<8;  // 0xffffff;
+	vertex[0].Green = GetGValue(m_colorinfo.m_colheaderbutton)<<8; // 0xffffff;
+	vertex[0].Blue  = GetBValue(m_colorinfo.m_colheaderbutton)<<8; //0xffffff;
 	vertex[0].Alpha = 0xffffff;
 
-	vertex[1].Red   = 0xffffff;
-	vertex[1].Green = 0xffffff;
-	vertex[1].Blue  = 0xffffff;
+	vertex[1].Red   = GetRValue(m_colorinfo.m_colheaderbutton)<<8; //0xffffff;
+	vertex[1].Green = GetGValue(m_colorinfo.m_colheaderbutton)<<8; //0xffffff;
+	vertex[1].Blue  = GetBValue(m_colorinfo.m_colheaderbutton)<<8; //0xffffff;
 	vertex[1].Alpha = 0xffffff;
-   
 	// now we see whether we need a checkbox somewhere.
 	if(m_exstyle & GV_EX_ROWCHECKBOX)
     {
 		VERIFY(DrawFrameControl(hdcmem, rect, DFC_BUTTON, DFCS_BUTTONPUSH|DFCS_FLAT));
+
+		VERIFY(hbrush = CreateSolidBrush(m_colorinfo.m_cellborder)); //RGB(255, 255, 255));
+		VERIFY(FillRect(hdcmem, rect, hbrush));
+		VERIFY(DeleteObject(hbrush));
 
 		PaintRowHeader(hdcmem, rect, rowcount);
 
@@ -3014,8 +3101,12 @@ CCustGrid::DrawRowButtons(HDC hdcmem, RECT *rect, RECT *recttemp, wyInt32 *rowco
 	    recttemp->bottom  -= 2;
 
 		//Gradient for unselected items(selected items fills with color)
-		if(m_curselrow != *rowcount)
+		if (m_curselrow != *rowcount) {
+			//HBRUSH hbrush = CreateSolidBrush(m_colorinfo.m_cellborder); //RGB(255, 255, 255));
+			//FillRect(hdcmem, rect, hbrush);
+
 			SetGradient(hdcmem, vertex);
+		}
 		
 		if(!info.checkorstar)
 		{
@@ -3024,16 +3115,26 @@ CCustGrid::DrawRowButtons(HDC hdcmem, RECT *rect, RECT *recttemp, wyInt32 *rowco
 		   						
 			VERIFY(DrawFrameControl(hdcmem, recttemp, DFC_BUTTON, state));
 		}
-		else
+		else {
+			if (m_isdarktheme && m_curselrow == *rowcount)
+				SetTextColor(hdcmem,RGB(0,0,0));
 			VERIFY(DrawText(hdcmem, L"*", 1, recttemp, DT_VCENTER | DT_SINGLELINE | DT_CENTER));
+			if (m_isdarktheme && m_curselrow == *rowcount)
+				SetTextColor(hdcmem,m_colorinfo.m_gridfg);
+			
+		}
 	} 
     else
     {
 		state = DFCS_BUTTONPUSH | DFCS_FLAT;
 			
 		VERIFY(DrawFrameControl(hdcmem, rect, DFC_BUTTON, state));
-
-		//Gradient if not check box
+		
+		VERIFY(hbrush = CreateSolidBrush(m_colorinfo.m_cellborder)); //RGB(255, 255, 255));
+		VERIFY(FillRect(hdcmem, rect, hbrush));
+		VERIFY(DeleteObject(hbrush));
+		
+		//Gradient if noSt check box
 		SetGradient(hdcmem, vertex);
 		
 		PaintRowHeader(hdcmem, rect, rowcount);
@@ -3089,21 +3190,28 @@ CCustGrid::GetRemainingRows(PRECT rectwin)
 wyInt32
 CCustGrid::DrawRowColumns(HDC hdcmem, PRECT rect, PRECT rectwin, wyUInt32 *totcx, wyUInt32 *totcy)
 {
-	wyInt32             rowcount = 0, colcount = 0, nrow;	
-    RECT		        rect2 = {0}, recttemp = {0}, greyrect = {0};
+	wyInt32             rowcount = 0, colcount = 0, nrow;
+	RECT		        rect2 = { 0 }, recttemp = { 0 }, greyrect = { 0 };
 	HPEN		        hpen, hpenold;
 	HBRUSH		        hbrbkgnd;
 	PGVCOLUMN	        pgvcol = NULL;
 	PGVROWNODE	        pgvrownode = m_rowlist;
-    PGVROWNODE	        prownode = m_rowlist, temprowlist;
+	PGVROWNODE	        prownode = m_rowlist, temprowlist;
 	PGVCOLNODE	        pgvnode = NULL, pgvcolnode = NULL;
-    wyInt32             rcount = 0;
-    wyBool              isbreak = wyFalse;
-    GVWATTERMARK        gvwattermark = {0};
-		
-	VERIFY(hpen = CreatePen(PS_SOLID, 0, GetSysColor(COLOR_ACTIVEBORDER)));
+	wyInt32             rcount = 0;
+	wyBool              isbreak = wyFalse;
+	GVWATTERMARK        gvwattermark = { 0 };
+
+	if (m_isdarktheme) {
+		VERIFY(hpen = CreatePen(PS_SOLID, 0, m_colorinfo.m_cellborder));
+		VERIFY(hbrbkgnd = CreateSolidBrush(m_colorinfo.m_gridbg1));
+	}
+	else {
+		VERIFY(hpen = CreatePen(PS_SOLID, 0, GetSysColor(COLOR_ACTIVEBORDER)));
+		VERIFY(hbrbkgnd = CreateSolidBrush(RGB(DIS_BKG, DIS_BKG, DIS_BKG)));
+	}
+	
 	hpenold = (HPEN)SelectObject(hdcmem, hpen);	// no ret
-	VERIFY(hbrbkgnd = CreateSolidBrush(RGB(DIS_BKG, DIS_BKG, DIS_BKG)));
 
 	//Draw all rows if Scroll bar is not present
 	if(m_flip == wyFalse && ((m_row + 2) * m_hight < rectwin->bottom))
@@ -3292,10 +3400,10 @@ CCustGrid::DrawGreyRect(HDC hdcmem, RECT *greyrect, RECT *rect2, RECT *recttemp)
 	
     memcpy(greyrect, rect2, sizeof(RECT));
 
-	greyrect->left++; 
-    greyrect->right--; 
-    greyrect->bottom--; 
-    greyrect->top++;
+	greyrect->left++;
+	greyrect->right--;
+	greyrect->bottom--;
+	greyrect->top++;
 
 	VERIFY(MoveToEx(hdcmem, rect2->right - 1, rect2->top, NULL));
 	VERIFY(LineTo(hdcmem, rect2->right - 1, rect2->bottom));
@@ -3306,8 +3414,9 @@ CCustGrid::DrawGreyRect(HDC hdcmem, RECT *greyrect, RECT *rect2, RECT *recttemp)
 	memcpy(recttemp, rect2, sizeof(RECT));
 
 	recttemp->left += 1;
+	
 	recttemp->right -= 3;
-	}
+}
 
 
 void
@@ -3561,7 +3670,7 @@ CCustGrid::DrawCell(HDC hdcmem, wyInt32 row, wyInt32 col, PGVCOLNODE topcolstruc
             {
                 if(row == m_curselrow)
                 {
-                    hpenthick = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+                    hpenthick = CreatePen(PS_SOLID, 1, m_colorinfo.m_selcelltext);
                     hpenthick = (HPEN)SelectObject(hdcmem, hpenthick);
                     MoveToEx(hdcmem, rect->left - 2, rect->top - 1, NULL);
                     LineTo(hdcmem, rect->right, rect->top - 1);
@@ -3576,7 +3685,7 @@ CCustGrid::DrawCell(HDC hdcmem, wyInt32 row, wyInt32 col, PGVCOLNODE topcolstruc
             {
                 if(row == m_curselrow && col == m_curselcol)
                 {
-                    hpenthick = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));
+                    hpenthick = CreatePen(PS_SOLID, 2, m_colorinfo.m_selcelltext);
                     hpenthick = (HPEN)SelectObject(hdcmem, hpenthick);
                     MoveToEx(hdcmem, rect->left - 1, rect->top - 1, NULL);
                     LineTo(hdcmem, rect->right, rect->top - 1);
@@ -3623,13 +3732,13 @@ CCustGrid::DrawCell(HDC hdcmem, wyInt32 row, wyInt32 col, PGVCOLNODE topcolstruc
 
         if((row == m_curselrow &&  col == m_curselcol) && topcolstruct && topcolstruct->isshow == wyTrue)
         {
-		    VERIFY(hbrgrey = CreateSolidBrush(GV_SELCOLOR));
-		    VERIFY(hpenthick = CreatePen(PS_SOLID, 2, RGB(59,125,187)));
+		    VERIFY(hbrgrey = CreateSolidBrush(m_colorinfo.m_selrowcolor));
+			VERIFY(hpenthick = CreatePen(PS_SOLID, 2, m_colorinfo.m_selcelltext)); //RGB(59,125,187)));
 		    hbrold	= (HBRUSH)SelectObject(hdcmem, hbrgrey); // no ret
 		    hpenold = (HPEN)SelectObject(hdcmem, hpenthick); // no ret
 
-		    VERIFY(Rectangle(hdcmem, rect->left-1, rect->top-1, rect->right+1, rect->bottom+1));
-
+			VERIFY(Rectangle(hdcmem, rect->left -1, rect->top-1, rect->right+1, rect->bottom+1));
+			
             SelectObject(hdcmem, hbrold); // no ret
 		    SelectObject(hdcmem, hpenold); // no ret
 
@@ -3639,10 +3748,11 @@ CCustGrid::DrawCell(HDC hdcmem, wyInt32 row, wyInt32 col, PGVCOLNODE topcolstruc
 
 	    if(row == m_curselrow && col != m_curselcol)
         {
-		    color = ROWHIGHLIGHTCOLOR;
-		    r.left = rect->left-1;
-		    r.top = rect->top-1;
-		    r.right = rect->right;
+		    color = m_colorinfo.m_selrowcolor;
+			
+			r.left = rect->left -1;
+			r.top = rect->top -1;
+			r.right = rect->right;
 		    r.bottom = rect->bottom;
 
             VERIFY(hbrgrey = CreateSolidBrush(color));            
@@ -3651,11 +3761,12 @@ CCustGrid::DrawCell(HDC hdcmem, wyInt32 row, wyInt32 col, PGVCOLNODE topcolstruc
 	    }
 	    else if(row != m_curselrow)
 	    {
-		    r.left = rect->left-1;
-		    r.top = rect->top-1;
-		    r.right = rect->right;
-		    r.bottom = rect->bottom;
-		    color = ALTHIGHLIGHTCOLOR;
+		    r.left = rect->left -1;
+			r.top = rect->top -1;
+			r.right = rect->right ;
+			r.bottom = rect->bottom  ;
+	
+			color = m_colorinfo.m_althighlightcolor;;
 
 		    if(row%2)
 		    {
@@ -3746,23 +3857,27 @@ CCustGrid::DrawButtonWithText(HDC hdc, RECT * rect, const wyChar * text, const w
 
 	/* draw the button and ... */
 	rect->right -= 5;
-	
+
 	if(iscombodrop == wyFalse)
-		VERIFY(DrawFrameControl(hdc, rect, DFC_BUTTON, DFCS_BUTTONPUSH|DFCS_FLAT));
+		VERIFY(DrawFrameControl(hdc, rect, DFC_BUTTON, DFCS_BUTTONPUSH | DFCS_FLAT));
 	else
-		VERIFY(DrawFrameControl(hdc, rect, DFC_SCROLL, DFCS_SCROLLDOWN|DFCS_FLAT));
-	
+		VERIFY(DrawFrameControl(hdc, rect, DFC_SCROLL, DFCS_SCROLLDOWN | DFCS_FLAT));
+
 	rect->left += 2;
 
 	if(buttontext)
 		buttontextstr.SetAs(buttontext);
 	else
 		buttontextstr.SetAs("");
-	
+
 	rect->right -= 10;
-	if(iscombodrop ==wyFalse)
-		DrawText(hdc, buttontextstr.GetAsWideChar(), wcslen(buttontextstr.GetAsWideChar()), rect, 
-		DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS | DT_RIGHT );
+	if (iscombodrop == wyFalse) {
+		SetTextColor(hdc, m_colorinfo.m_buttontextcolor);
+
+		DrawText(hdc, buttontextstr.GetAsWideChar(), wcslen(buttontextstr.GetAsWideChar()), rect,
+			DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX | DT_END_ELLIPSIS | DT_RIGHT);
+		SetTextColor(hdc, m_colorinfo.m_gridfg);
+}
 
 	/* get back the left & right coord to original */
 	rect->right += 15;
@@ -7908,6 +8023,23 @@ CCustGrid::SetFormMode(wyBool enable)
     InvalidateRect(m_hwnd, NULL, FALSE);
 }
 
+void
+CCustGrid::SetDefaultGrid(wyBool isdefaultgrid)
+{
+	m_isdefaultgrid = isdefaultgrid;
+}
+
+void
+CCustGrid::SetDarkTheme(wyBool isdarktheme)
+{
+	m_isdarktheme = isdarktheme;
+}
+
+wyBool
+CCustGrid::GetDefaultGrid()
+{
+	return m_isdefaultgrid;
+}
 
 wyBool
 CCustGrid::GetOriginalText(wyInt32 row, wyInt32 col)
@@ -9069,7 +9201,7 @@ CCustGrid::ShowGrid(wyBool isvisible)
         // create all the GDI objects here 
         m_isvisible = wyTrue;
         VERIFY(CreateFonts());
-		m_crbkgnd = RGB(255, 255, 255);
+		m_crbkgnd = m_colorinfo.m_gridbg1; // (255, 255, 255);
         OnCreate(m_lparam);
         ShowWindow(m_hwnd, TRUE);
     }
@@ -9409,5 +9541,241 @@ CCustGrid::SetSelAllState(wyInt32 state)
         }
         
     }
+}
+
+void
+CCustGrid::GetColorInfo(LPGRIDCOLORINFO pcolorinfo)
+{
+	*pcolorinfo = m_colorinfo;
+}
+
+void
+CCustGrid::SetColorInfo(LPGRIDCOLORINFO pcolorinfo)
+{
+	long style;
+
+	if (!pcolorinfo)
+	{
+		SetDefaultColorInfo();
+	}
+	else
+	{
+		if (pcolorinfo->m_mask & CTCF_GRIDBG1)
+		{
+			m_colorinfo.m_gridbg1 = pcolorinfo->m_gridbg1;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_GRIDBG2)
+		{
+			m_colorinfo.m_gridbg2 = pcolorinfo->m_gridbg2;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_GRIDFG1)
+		{
+			m_colorinfo.m_gridfg = pcolorinfo->m_gridfg;
+		}
+
+
+		if (pcolorinfo->m_mask & CTCF_GRIDCOLHDR)
+		{
+			m_colorinfo.m_gridcolheader = pcolorinfo->m_gridcolheader;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_GRIDSELCOLHDR)
+		{
+			m_colorinfo.m_gridselcolheader = pcolorinfo->m_gridselcolheader;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_GRIDCOLHDRTXT)
+		{
+			m_colorinfo.m_gridcolhdertext = pcolorinfo->m_gridcolhdertext;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_GRIDSELCOLHDRTXT)
+		{
+			m_colorinfo.m_gridselcolhdertext = pcolorinfo->m_gridselcolhdertext;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_GRIDSELROWFG1)
+		{
+			m_colorinfo.m_selrowfg1 = pcolorinfo->m_selrowfg1;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_GRIDSELROW) {
+			m_colorinfo.m_selrowcolor = pcolorinfo->m_selrowcolor;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_GRIDROWHIGHLIGHT)
+		{
+			m_colorinfo.m_rowhighlightcolor = pcolorinfo->m_rowhighlightcolor;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_GRIDSELCELLTEXT)
+		{
+			m_colorinfo.m_selcelltext = pcolorinfo->m_selcelltext;
+		}
+
+
+		if (pcolorinfo->m_mask & CTCF_ALTHIGHLIGHTCOLOR)
+		{
+			m_colorinfo.m_althighlightcolor = pcolorinfo->m_althighlightcolor;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_COLHEADERBUTTON) {
+			m_colorinfo.m_colheaderbutton = pcolorinfo->m_colheaderbutton;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_GRIDCELLBORDER)
+		{
+			m_colorinfo.m_cellborder = pcolorinfo->m_cellborder;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_GRIDINACTIVESEP)
+		{
+			m_colorinfo.m_inactivesep = pcolorinfo->m_inactivesep;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_CELLBUTTONCOLOR)
+		{
+			m_colorinfo.m_buttontextcolor = pcolorinfo->m_buttontextcolor;
+		}
+
+
+	/*	if (pcolorinfo->m_mask & CTCF_SELTABFG1)
+		{
+			m_colorinfo.m_selrowfg1 = pcolorinfo->m_selrowfg1;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_SELTABFG2)
+		{
+			m_colorinfo.m_selrowfg2 = pcolorinfo->m_selrowfg2;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_SELTABTEXT)
+		{
+			m_colorinfo.m_selrowtext = pcolorinfo->m_selrowtext;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_TABTEXT)
+		{
+			m_colorinfo.m_gridtext = pcolorinfo->m_gridtext;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_ACTIVESEP)
+		{
+			m_colorinfo.m_activesep = pcolorinfo->m_activesep;
+			m_colorinfo.m_highlightsep = pcolorinfo->m_activesep;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_INACTIVESEP)
+		{
+			m_colorinfo.m_inactivesep = pcolorinfo->m_inactivesep;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_CLOSEBUTTON)
+		{
+			m_colorinfo.m_closebutton = pcolorinfo->m_closebutton;
+		}
+	
+		if (pcolorinfo->m_mask & CTCF_DRAGARROW)
+		{
+			m_colorinfo.m_dragarrow = pcolorinfo->m_dragarrow;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_TABCONTROLS)
+		{
+			m_colorinfo.m_gridcontrols = pcolorinfo->m_gridcontrols;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_HIGHLIGHTSEP)
+		{
+			m_colorinfo.m_highlightsep = pcolorinfo->m_highlightsep;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_BORDER)
+		{
+			m_colorinfo.m_border = pcolorinfo->m_border;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_BOTTOMLINE)
+		{
+
+			//m_colorinfo.m_bottomline = m_colorinfo.m_seltabfg2;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_HOTTABFG1)
+		{
+		//	m_colorinfo.m_hotgridfg1 = pcolorinfo->m_hotgridfg1;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_HOTTABFG2)
+		{
+		//	m_colorinfo.m_hotgridfg2 = pcolorinfo->m_hotgridfg2;
+		}
+
+		if (pcolorinfo->m_mask & CTCF_LINK)
+		{
+			m_colorinfo.m_linkcolor = pcolorinfo->m_linkcolor;
+		}
+
+		m_colorinfo.m_mask |= pcolorinfo->m_mask;
+		style = GetWindowLongPtr(m_hwnd, GWL_STYLE);
+
+		if (m_colorinfo.m_border == wyTrue)
+		{
+			SetWindowLongPtr(m_hwnd, GWL_STYLE, style | WS_BORDER);
+		}
+		else
+		{
+			SetWindowLongPtr(m_hwnd, GWL_STYLE, style & (~WS_BORDER));
+		}*/
+	}
+
+	//CreateResources();
+}
+
+
+void
+CCustGrid::SetDefaultColorInfo()
+{
+
+	m_colorinfo.m_gridbg1 = GRIDBACKGROUNDCOLOR1;
+	m_colorinfo.m_gridfg = GRIDFGCOLOR;
+	m_colorinfo.m_gridcolheader = GRIDCOLHEADER;
+	m_colorinfo.m_gridcolhdertext = GRIDCOLHEADERTEXTCOLOR;
+	m_colorinfo.m_gridselcolhdertext = GRIDSELCOLHEADERTEXTCOLOR;
+	m_colorinfo.m_gridselcolheader = GRIDSELCOLHEADER;
+	m_colorinfo.m_selcelltext = GRIDSELCELLTEXT;
+	m_colorinfo.m_selrowcolor = GRIDSELROWCOLOR;
+	m_colorinfo.m_selrowfg1 = GRIDSELROWFG;
+	m_colorinfo.m_althighlightcolor = ALTHIGHLIGHTCOLOR;
+	m_colorinfo.m_colheaderbutton = GRIDCOLHEADERBUTTON;
+	m_colorinfo.m_mask = CTCF_ALLEXECPT_CTCF_GRIDBOTTOMLINE;
+//	m_colorinfo.m_activesep = TABCOLOR_ACTIVESEP_PEN;
+	m_colorinfo.m_cellborder = GetSysColor(COLOR_ACTIVEBORDER);
+	m_colorinfo.m_buttontextcolor = GRIDCELLBUTTONTEXTCOLOR;
+
+	//m_colorinfo.
+
+	/*m_colorinfo.m_tabbg1 = TABCOLOR_TAB_BG_1;
+	m_colorinfo.m_tabbg2 = TABCOLOR_TAB_BG_2;
+	m_colorinfo.m_seltabfg1 = TABCOLOR_SELTAB_FG_1;
+	m_colorinfo.m_seltabfg2 = TABCOLOR_SELTAB_FG_2;
+	m_colorinfo.m_seltabtext = TABCOLOR_SELTAB_TEXT;
+	m_colorinfo.m_tabtext = TABCOLOR_TAB_TEXT;
+	m_colorinfo.m_activesep = TABCOLOR_ACTIVESEP_PEN;
+	m_colorinfo.m_inactivesep = TABCOLOR_INACTIVESEP_PEN;
+	m_colorinfo.m_closebutton = TABCOLOR_CLOSEBUTTON;
+	m_colorinfo.m_tabfg = TABCOLOR_TAB_FG;
+	m_colorinfo.m_bottomline = TABCOLOR_SELTAB_FG_2;
+	m_colorinfo.m_dragarrow = TABCOLOR_DRAGARROW;
+	m_colorinfo.m_tabcontrols = TABCOLOR_PLUSBUTTON;
+	m_colorinfo.m_highlightsep = m_colorinfo.m_activesep;
+	m_colorinfo.m_hottabfg1 = TABCOLOR_SELTAB_FG_2;
+	m_colorinfo.m_hottabfg2 = TABCOLOR_TAB_FG;
+	m_colorinfo.m_linkcolor = TABCOLOR_LINK;
+	m_colorinfo.m_border = wyFalse;
+	m_colorinfo.m_mask = CTCF_ALLEXECPT_CTCF_BOTTOMLINE;
+	m_colorinfo.m_mask = m_colorinfo.m_mask & (~TABCOLOR_LINK);*/
 }
 

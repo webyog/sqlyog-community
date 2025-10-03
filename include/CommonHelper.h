@@ -57,7 +57,7 @@
 #define     NCP_UTF16   3
 #define     NCP_ASCII   4
 
-#define		FMT_SPACE_4 "    "
+#define		FMT_SPACE_4 "    " 
 
 #define		REGKEY			"Provide any UUID here"
 
@@ -84,8 +84,8 @@
 #define  CPI_LATIN2 28592
 #define  CPI_SWE7  20107
 #define  CPI_ASCII 20127
-#define  CPI_UJIS  51932
-#define  CPI_SJIS  932
+#define  CPI_UJIS  51932 
+#define  CPI_SJIS  932 
 #define  CPI_HEBREW 28598
 #define  CPI_TIS620  874
 #define  CPI_EUCKR  51949
@@ -154,7 +154,7 @@ public:
 enum fkeyOption
 {
 	NOOPTION	= 0,  //if no option selected for ON DELETE or ON UPDATE
-	CASCADE		= 1,
+	CASCADE		= 1,  
 	SETNULL		= 2,
 	NOACTION	= 3,
 	RESTRICT	= 4
@@ -215,7 +215,7 @@ wyBool      EndTransaction(Tunnel *tunnel, MYSQL *mysql);
 */
 bool	   ReConnectSSH(ConnectionInfo *coninfo);
 
-#ifdef WIN32
+#ifdef WIN32 
 ///Create SSH session
 /**
 @param coninfo  : IN ConnectionInfo pointer
@@ -277,10 +277,10 @@ void    GetTimeString(wyString& buff, wyChar *timesep);
 @param extension    : IN File extension
 @param bufferlength : IN Buffer length
 @param buffer       : OUT Pointer to the buffer that receives the path and file name of the file found.
-@param lpfileport   : OUT Pointer to the variable that receives the address (within buffer) of the last component of the valid path and file name, which is the address of the character immediately following the final backslash (\) in the path.
+@param lpfileport   : OUT Pointer to the variable that receives the address (within buffer) of the last component of the valid path and file name, which is the address of the character immediately following the final backslash (\) in the path. 
 @returns wyTrue if successful else wyFalse
 */
-wyBool  SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength,
+wyBool  SearchFilePath(wyWChar *filename, wyWChar *extension, wyInt32 bufferlength, 
                       wyWChar *buffer, wyWChar **lpfileport);
 
 /// Copies table from new to old
@@ -319,7 +319,7 @@ wyInt32 GetBodyOfTrigger(wyString *body );
 @param definer		: OUT definer
 @returns wyTrue on success else wyFalse
 */
-wyBool  GetCreateTriggerString(HWND hwnd , Tunnel * tunnel, PMYSQL mysql, const wyChar *db,
+wyBool  GetCreateTriggerString(HWND hwnd , Tunnel * tunnel, PMYSQL mysql, const wyChar *db, 
                                const wyChar *trigger, wyString &strtrigger, wyString &strmsg, wyBool isdefiner = wyFalse);
 #endif
 
@@ -328,7 +328,7 @@ wyBool  GetCreateTriggerString(HWND hwnd , Tunnel * tunnel, PMYSQL mysql, const 
 @param tunnel   : IN Tunnel pointer
 @param mysql    : IN Pointer to mysql pointer
 @param strmsg   : OUT The SELECT stmt
-@returns void
+@returns void   
 */
 void    GetError(Tunnel * tunnel, PMYSQL mysql, wyString &strmsg);
 
@@ -343,7 +343,7 @@ void    GetError(Tunnel * tunnel, PMYSQL mysql, wyString &strmsg);
 @param queryex		: OUT query
 @returns wyTrue on success else wyFalse
 */
-wyBool  GetCreateFunctionString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar * function,
+wyBool  GetCreateFunctionString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar * function, 
                                 wyString &strfunction, wyString &strmsg, wyString *queryex = NULL);
 
 /// Gets the CREATE PROCEDURE string
@@ -357,7 +357,7 @@ wyBool  GetCreateFunctionString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db,
 @param queryex		: OUT query
 @returns wyTrue on success else wyFalse
 */
-wyBool  GetCreateProcedureString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *procedure,
+wyBool  GetCreateProcedureString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *procedure, 
 								 wyString &strprocedure, wyString &strmsg, wyString *queryex = NULL);
 /// Gets the CREATE EVENT string
 /**
@@ -370,11 +370,11 @@ wyBool  GetCreateProcedureString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db
 @param queryex		: OUT query
 @returns wyTrue on success else wyFalse
 */
-wyBool  GetCreateEventString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *event,
+wyBool  GetCreateEventString(Tunnel * tunnel, PMYSQL mysql, const wyChar *db, const wyChar *event, 
 							 wyString &strevent, wyString &strmsg, wyString *queryex);
 
 
-/// This function gets only the REAL comment, strips of Foreign Key definitions, etc
+/// This function gets only the REAL comment, strips of Foreign Key definitions, etc 
 /**
 @param comment      : OUT Comment statement
 @returns comment string
@@ -397,7 +397,7 @@ wyBool  GetCharsetString(wyString &charsetstring);
 @param whereclause  : IN WHERE clause to consider while counting rows
 @returns the row count
 */
-wyUInt32 GetRowCount(Tunnel *tunnel, MYSQL *mysql, const wyChar *db ,
+wyUInt32 GetRowCount(Tunnel *tunnel, MYSQL *mysql, const wyChar *db , 
                      const wyChar *table, const wyChar * whereclause);
 
 
@@ -410,10 +410,10 @@ wyUInt32 GetRowCount(Tunnel *tunnel, MYSQL *mysql, const wyChar *db ,
 @param strcreate    : OUT The CREATE statement
 @returns wyTrue on success else wyFalse
 */
-wyBool  GetCreateTableString(Tunnel * tunnel, PMYSQL pmysql, const wyChar *db,
+wyBool  GetCreateTableString(Tunnel * tunnel, PMYSQL pmysql, const wyChar *db, 
 							 const wyChar* tbl, wyString &strcreate, wyString &query);
 
-/// Reverses the given string
+/// Reverses the given string 
 /**
 @param text         : IN/OUT Text to change
 @returns void
@@ -496,7 +496,7 @@ wyChar  *AllocateBuff(wyInt32 size);
 */
 wyChar  *RewAllocateBuff(wyChar *buff, wyInt32 size);
 
-/// Creates a tunnel
+/// Creates a tunnel 
 /**
 @param istunnel     : IN tunneling or not.
 @returns a instance of the Tunnel(Child) class
@@ -518,7 +518,7 @@ wyBool  CheckSQLyogFiles(const wyWChar *filename);
 @param extension    : IN File extension
 @returns wyTrue on success else wyFalse
 */
-wyBool  CheckFileExists(wyWChar *buffer, const wyWChar *path, const wyWChar *filename,
+wyBool  CheckFileExists(wyWChar *buffer, const wyWChar *path, const wyWChar *filename, 
                         const wyWChar *extension);
 
 /// Gets the field inforamtion
@@ -530,10 +530,10 @@ wyBool  CheckFileExists(wyWChar *buffer, const wyWChar *path, const wyWChar *fil
 @param tgtmysql     : IN Pointer to target mysql pointer
 @returns void
 */
-void    GetFieldInfoString(Tunnel *tunnel, MYSQL_RES *myres,
+void    GetFieldInfoString(Tunnel *tunnel, MYSQL_RES *myres, 
                         wyString &strcreate, Tunnel *tgttunnel, PMYSQL tgtmysql);
 
-/// Check for presence of ON UPDATE statement
+/// Check for presence of ON UPDATE statement 
 /**
 @param strcreate    : IN CREATE statement
 @param fieldpos     : IN Field position
@@ -620,7 +620,7 @@ wyInt32 EncodeBase64(const wyChar *inp, size_t insize, wyChar **outptr);
 ///  Decodes a string
 /**
 @param dest     : OUT Destination
-@param src      : IN Source
+@param src      : IN Source 
 @returns void
 */
 void    DecodeQuantum(wyUChar *dest, const wyChar *src);
@@ -634,9 +634,9 @@ void    DecodeQuantum(wyUChar *dest, const wyChar *src);
 void    ExtractEngineName(wyChar *engine, wyString &enginename);
 
 
-///  Checks whether the engine is listed in the list
+///  Checks whether the engine is listed in the list 
 /**
-@param engine : IN engine name
+@param engine : IN engine name 
 @returns wyBool, wyTrue if exists, otherwise wyFalse
 */
 wyBool  IsSupportedEngine(wyString &enginename);
@@ -645,7 +645,7 @@ wyBool  IsSupportedEngine(wyString &enginename);
 /**
 @param tunnel   : IN Tunnel pointer
 @param mysql    : IN Mysql pointer
-@param strengine: OUT engines seperated be semicolon(;)
+@param strengine: OUT engines seperated be semicolon(;) 
 */
 void    GetTableEngineString(Tunnel *tunnel, PMYSQL mysql, wyString &strengine);
 
@@ -709,7 +709,7 @@ wyBool      GetForeignKeyInfo(wyString *showcreate,
 void		ExamineData(wyString &codepage, wyString &buffer);
 #endif
 
-///
+/// 
 wyBool      CheckForUtf8(wyString &pBuffer);
 wyInt32     DetectFileFormat(wyChar *pBuffer, wyInt32 pBytesRead, wyInt32 *pHeaderSize);
 
@@ -754,8 +754,8 @@ wyBool	GetMySqlDataType(MysqlDataType *rettypedata, MYSQL_FIELD *fields, wyInt32
 */
 wyInt32 DeletePrivateProfileString(wyChar *strkey, wyChar *section, wyChar *filename);
 
-wyInt32	HandleMySQLRealQuery(Tunnel *tunnel, MYSQL * mysql, const char * query,
-							 unsigned long length, bool isbadforxml, bool batch = false,
+wyInt32	HandleMySQLRealQuery(Tunnel *tunnel, MYSQL * mysql, const char * query, 
+							 unsigned long length, bool isbadforxml, bool batch = false, 
 							 bool isend = false, bool * stop = 0, bool isread = false, bool fksethttpimport = false);
 
 /// Executes an SQL query specified as a counted string.
@@ -780,7 +780,7 @@ void GetColLength(MYSQL_ROW row, wyInt32 numcols, wyInt32 col, wyUInt32 *len);
 
 ///Gets all parsed infos of a foreign key and insert into a struct
 /**
-@param fkeyinfo : IN sting contains a f-key details
+@param fkeyinfo : IN sting contains a f-key details 
 @param fkeyparam : OUT struct loads with F-key details parsed from 'key'
 @return wyTrue for success, else wyFalse
 */
@@ -803,7 +803,7 @@ wyBool			GetParentTable(wyString *fkeyinfo, wyString *parenttable, wyString* par
 */
 wyBool			GetConstraintName(wyString *fkeyinfo, wyString *constraintname);
 
-///Gets the parent table fields involved in relationship
+///Gets the parent table fields involved in relationship 
 /**
 @param fkeyinfo  : IN Foreign key infos
 @param fkeyparam : OUT struct used to store all parsed infos in F-key details
@@ -811,7 +811,7 @@ wyBool			GetConstraintName(wyString *fkeyinfo, wyString *constraintname);
 */
 wyBool			GetParentTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam);
 
-///Gets the child table fields involved in relationship
+///Gets the child table fields involved in relationship 
 /**
 @param fkeyinfo  : IN Foreign key infos
 @param fkeyparam : OUT struct used to store all parsed infos in F-key details
@@ -823,14 +823,14 @@ wyBool			GetChildTableFlds(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam);
 /**
 @param fkeyinfo  : IN Foreign key infos
 @param fkeyparam : OUT struct used to store all parsed infos in F-key details
-@param isupdate  : IN default parameter, wyTrue for ON UPDATE , wyFalse for ON DELETE
+@param isupdate  : IN default parameter, wyTrue for ON UPDATE , wyFalse for ON DELETE  
 @return NoOption ON DELETE is not selectd, or Cascade/SetNull/NoAction/Restrict , according to the one selected
 */
 fkeyOption		GetOnFkeyOption(wyString *fkeyinfo, LFKEYINFOPARAM fkeyparam, wyBool isupdate = wyTrue);
 //free up the memory .
 /**
 @param list  : IN linked list reference.
-@return
+@return 
 */
 void            ReleaseMemory(List *list);
 
@@ -864,7 +864,7 @@ void    ExecuteInitCommands(MYSQL* mysql, Tunnel* tunnel, wyString& initcommands
 
 /// Gets the field inforamtion of the view
 /**
-@param buffer       : IN / OUT Buffer
+@param buffer       : IN / OUT Buffer 
 @param tunnel       : IN Tunnel pointer
 @param view         : IN View name
 @param res          : IN Mysql result pointer
@@ -876,7 +876,7 @@ wyBool         DumpViewStruct(wyString * buffer, Tunnel * tunnel, const wyChar *
 /**
 @param tunnel				: IN Tunnel pointer
 @param mysql				: IN Mysql pointer
-@param tablename			: IN table name
+@param tablename			: IN table name  
 @param dbname				: IN database name
 &param strengine			: OUT function stores the Engine name to this wyString variable
 @return wyTrue if it success else return wyFalse
@@ -906,7 +906,7 @@ wyBool		  InitWinSock();
 */
 //#if ! defined COMMUNITY && defined _WIN32
 #if defined _WIN32
-wyBool			LockPlinkLockFile(wyFile *plinklock);
+wyBool			LockPlinkLockFile(wyFile *plinklock); 
 #endif
 
 #ifdef _WIN32
@@ -1028,7 +1028,7 @@ class ConvertString
 		ConvertString();
         ~ConvertString();
 
-        /// Converts the input(wide) string to Utf8
+        /// Converts the input(wide) string to Utf8 
         /**
         @param widestr : IN widestring to convert
         @returns utf8 string
@@ -1038,12 +1038,12 @@ class ConvertString
         /// converts input (utf8) string to widechar
         /**
         @param utf8str : IN utf8 string to convert
-        @retuns wide string
+        @retuns wide string 
         */
         wyWChar*  ConvertUtf8ToWideChar(wyChar *utf8str);
 
 		wyWChar * ConvertAnsiToWideChar(wyChar* ansistr);
-		wyChar*	  Utf8toAnsi(const wyChar *utf8, wyInt32 len);
+		wyChar*	  Utf8toAnsi(const wyChar *utf8, wyInt32 len);		
 
     private:
         /// utf8 buffer
@@ -1059,3 +1059,5 @@ class ConvertString
 #endif // _win32
 
 #endif
+
+    

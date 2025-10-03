@@ -764,6 +764,8 @@ class DataView
         */
         void                    SetColor();
 
+		void					SetGridTheme();
+
         ///Atomic function to check the thread stop status
         /**
         @param stop             : IN 0 = set status to start, 1 = set status to stop, -1 = retreive the status

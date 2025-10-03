@@ -3204,6 +3204,8 @@ IDR_THEME_TWILIGHT      THEME                   "twilight_theme.xml"
 
 IDR_THEME_FLAT          THEME                   "Flat.xml"
 
+IDR_THEME_DARK          THEME                   "Dark.xml"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

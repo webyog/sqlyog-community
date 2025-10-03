@@ -40,7 +40,6 @@ Author: Vishal P.R
 #define BRUSH_BTNFACE               9
 #define BRUSH_MDICHILD              10
 #define BRUSH_MAINTOOLBAR           11
-
 ///Pen constants
 #define PEN_HSPLITTER               1
 #define PEN_VSPLITTER               2
@@ -88,6 +87,60 @@ Author: Vishal P.R
 #define RESOURCE_THEME              1
 #define FILE_THEME                  2
 
+///Object Browser Color Info flags
+#define OBCF_BACKGROUND             1
+#define OBCF_FOREGROUND             2
+#define OBCF_SELECTED               4
+
+///Canvas Color Info flags
+#define CANVASCF_BACKGROUND         1
+#define CANVASCF_FOREGROUND         2
+#define CANVASCF_LINE               4
+
+///MTI (Messages/Table Data/Info) Color Info flags
+#define MTICF_BACKGROUND            1
+#define MTICF_FOREGROUND            2
+#define MTICF_SELECTION             4
+
+///Editor Color Info flags
+#define EDITORCF_BACKGROUND         1
+#define EDITORCF_FOREGROUND         2
+#define EDITORCF_SELECTION          4
+#define EDITORCF_LINENUMBER         8
+#define EDITORCF_CARETLINE          16
+#define EDITORCF_CARET              32
+#define EDITORCF_MARGIN             64
+#define EDITORCF_NORMAL             128
+#define EDITORCF_COMMENT            256
+#define EDITORCF_HIDDENCMD          512
+#define EDITORCF_STRING             1024
+#define EDITORCF_KEYWORD            2048
+#define EDITORCF_FUNCTION           4096
+#define EDITORCF_OPERATOR           8192
+#define EDITORCF_NUMBER             16384
+#define EDITORCF_FOLDMARGIN         32768
+#define EDITORCF_FOLDMARGINTEXT     65536
+
+#define CTCF_GRIDBG1                    0x1
+#define CTCF_GRIDBG2                    0x2
+#define CTCF_GRIDFG1					0x4
+#define CTCF_GRIDCOLHDR                 0x8
+#define CTCF_GRIDSELCOLHDR              0x10
+#define CTCF_GRIDCOLHDRTXT				0x20
+#define CTCF_GRIDSELCOLHDRTXT           0x40
+#define CTCF_GRIDSELROWFG1              0x80
+#define CTCF_GRIDSELROW                 0x100
+#define CTCF_GRIDROWHIGHLIGHT           0x200
+#define CTCF_GRIDSELCELLTEXT            0x400
+#define CTCF_ALTHIGHLIGHTCOLOR          0x800
+#define CTCF_COLHEADERBUTTON			0x1000
+#define CTCF_GRIDCELLBORDER				0x2000
+#define CTCF_GRIDINACTIVESEP			0x4000
+#define CTCF_CELLBUTTONCOLOR			0x8000
+#define CTCF_CELLBORDER					0x10000
+#define CTCF_GRIDBOTTOMLINE				0x20000
+#define CTCF_ALLEXECPT_CTCF_GRIDBOTTOMLINE  ((-1) & (~CTCF_GRIDBOTTOMLINE))
+
 //Structure representing dual color
 typedef struct dual_color
 {
@@ -113,6 +166,127 @@ typedef struct theme_info
     ///The filename/resource identifier for the theme
     wyString    m_filename;
 }THEMEINFO, *LPTHEMEINFO;
+
+///Object Browser color info structure
+typedef struct objectbrowser_color_info
+{
+    ///Mask indicating which colors are available
+    wyUInt32    m_mask;
+
+    COLORREF    m_background;
+
+    COLORREF    m_foreground;
+
+    COLORREF    m_selected;
+}OBJECTBROWSERCOLORINFO, *LPOBJECTBROWSERCOLORINFO;
+
+///Canvas color info structure
+typedef struct canvas_color_info
+{
+    ///Mask indicating which colors are available
+    wyUInt32    m_mask;
+
+    COLORREF    m_background;
+
+    COLORREF    m_foreground;
+
+    COLORREF    m_line;
+}CANVASCOLORINFO, *LPCANVASCOLORINFO;
+
+///MTI (Messages/Table Data/Info) color info structure
+typedef struct mti_color_info
+{
+    ///Mask indicating which colors are available
+    wyUInt32    m_mask;
+
+    COLORREF    m_background;
+
+    COLORREF    m_foreground;
+
+    COLORREF    m_selection;
+}MTICOLORINFO, *LPMTICOLORINFO;
+
+///Editor color info structure
+typedef struct editor_color_info
+{
+	///Mask indicating which colors are available
+	wyUInt32    m_mask;
+	
+	COLORREF    m_background;
+	
+	COLORREF    m_foreground;
+	
+	COLORREF    m_selection;
+	
+	COLORREF    m_linenumber;
+	
+	COLORREF    m_caretline;
+	
+	COLORREF    m_caret;
+	
+	COLORREF    m_margin;
+	
+	COLORREF    m_foldmargin;
+	
+	COLORREF    m_foldmargintext;
+	
+	COLORREF    m_normal;
+	
+	COLORREF    m_comment;
+	
+	COLORREF    m_hiddencmd;
+	
+	COLORREF    m_string;
+	
+	COLORREF    m_keyword;
+	
+	COLORREF    m_function;
+	
+	COLORREF    m_operator;
+	
+	COLORREF    m_number;
+}EDITORCOLORINFO, *LPEDITORCOLORINFO;
+
+typedef struct  {
+	wyUInt32    m_mask;
+	COLORREF    m_gridbg1;
+	COLORREF    m_gridbg2;
+	COLORREF    m_gridfg;
+	COLORREF    m_gridcolheader;
+	COLORREF    m_gridselcolheader;
+	COLORREF    m_gridcolhdertext;
+	COLORREF    m_gridselcolhdertext;
+	COLORREF    m_selrowcolor;
+	COLORREF    m_rowhighlightcolor;
+	COLORREF	m_althighlightcolor;
+	COLORREF    m_selcelltext;
+	COLORREF    m_selrowfg1;
+	COLORREF    m_selrowfg2;
+	COLORREF    m_selrowtext;
+	COLORREF    m_gridtext;
+	COLORREF    m_colheaderbutton;
+	COLORREF    m_cellborder;
+	COLORREF    m_inactivesep;
+	COLORREF    m_closebutton;
+	COLORREF    m_dragarrow;
+	COLORREF    m_bottomline;
+	COLORREF    m_gridcontrols;
+	COLORREF    m_highlightsep;
+	COLORREF    m_hottabfg1;
+	COLORREF    m_hottabfg2;
+	COLORREF    m_linkcolor;
+	wyBool      m_border;
+	COLORREF    m_buttontextcolor;
+}GRIDCOLORINFO, *LPGRIDCOLORINFO;
+
+///Editor identification structure
+typedef struct editor_info
+{
+    wyInt32 controlId;
+    wyBool isInfoTabEditor;
+    wyBool isTabPreviewEditor;
+    wyBool isMainQueryEditor;
+}EDITORINFO, *LPEDITORINFO;
 
 ///The class that wraps up the entire library operations.
 class wyTheme
@@ -208,6 +382,27 @@ class wyTheme
         */
         static wyBool               GetTabColors(wyInt32 index, TABCOLORINFO* pcolorinfo);
 
+        ///Function to get the object browser colors
+        /**
+        @param pcolorinfo           : OUT the pointer to the object browser color info
+        @returns wyTrue if theme colors found else wyFalse
+        */
+        static wyBool               GetObjectBrowserColors(OBJECTBROWSERCOLORINFO* pcolorinfo);
+
+        ///Function to get the canvas colors
+        /**
+        @param pcolorinfo           : OUT the pointer to the canvas color info
+        @returns wyTrue if theme colors found else wyFalse
+        */
+        static wyBool               GetCanvasColors(CANVASCOLORINFO* pcolorinfo);
+
+        ///Function to get the MTI (Messages/Table Data/Info) colors
+        /**
+        @param pcolorinfo           : OUT the pointer to the MTI color info
+        @returns wyTrue if theme colors found else wyFalse
+        */
+        static wyBool               GetMTIColors(MTICOLORINFO* pcolorinfo);
+
         ///Function to get the dual color for the index specified
         /**
         @param index                : IN  dual color index
@@ -293,6 +488,44 @@ class wyTheme
         */
         static void                 ApplyTheme();
 
+        ///Helper function to update window class background brush for theme switching
+        /**
+        @param className            : IN window class name to update
+        @param brushType            : IN brush type from theme constants (BRUSH_*)
+        @returns void
+        */
+        static void                 UpdateWindowClassBrushForTheme(const wyWChar* className, wyInt32 brushType);
+
+		///Function to get the editor colors
+		/**
+		@param pcolorinfo           : OUT the pointer to the editor color info
+		@returns wyTrue if theme colors found else wyFalse
+		*/
+		static wyBool               GetEditorColors(EDITORCOLORINFO* pcolorinfo);
+
+		static wyBool				GetGridColors(LPGRIDCOLORINFO pcolorinfo);
+		///Helper function to detect if dark theme is currently active
+		/**
+		@returns wyTrue if dark theme is active, wyFalse otherwise
+		*/
+		static wyBool               IsDarkThemeActive();
+
+		///Function to identify editor type and characteristics
+		/**
+		@param hwnd                 : IN handle to the editor window
+		@returns EDITORINFO structure with editor identification details
+		*/
+		static EDITORINFO           IdentifyEditorType(HWND hwnd);
+
+		///Function to create editor colors from XML
+		/**
+		@param pele                 : IN  xml element
+		@param element              : IN  child element name
+		@param pcolorinfo           : OUT editor color info
+		@returns void
+		*/
+		void                        CreateEditorColors(tinyxml2::XMLElement* pele, const wyChar* element, LPEDITORCOLORINFO pcolorinfo);
+
         ///Function to initialize theme
         /**
         @returns wyTrue on success else wyFalse
@@ -323,6 +556,27 @@ class wyTheme
         */
         wyBool                      GetThemeTabColors(wyInt32 index, LPTABCOLORINFO pcolorinfo);
 
+        ///Function to get the object browser colors
+        /**
+        @param pcolorinfo           : OUT the pointer to the object browser color info
+        @returns wyTrue if theme colors found else wyFalse
+        */
+        wyBool                      GetThemeObjectBrowserColors(LPOBJECTBROWSERCOLORINFO pcolorinfo);
+
+        ///Function to get the canvas colors
+        /**
+        @param pcolorinfo           : OUT the pointer to the canvas color info
+        @returns wyTrue if theme colors found else wyFalse
+        */
+        wyBool                      GetThemeCanvasColors(LPCANVASCOLORINFO pcolorinfo);
+
+        ///Function to get the MTI colors
+        /**
+        @param pcolorinfo           : OUT the pointer to the MTI color info
+        @returns wyTrue if theme colors found else wyFalse
+        */
+        wyBool                      GetThemeMTIColors(LPMTICOLORINFO pcolorinfo);
+
         ///Function to get the dual color for the index specified
         /**
         @param index                : IN  dual color index
@@ -338,6 +592,21 @@ class wyTheme
         @returns wyTrue on success else wyFalse
         */
         wyBool                      GetThemeLinkColor(wyInt32 index, COLORREF* plinkcolor);
+
+		///Function to get the editor colors
+		/**
+		@param pcolorinfo           : OUT the pointer to the editor color info
+		@returns wyTrue if theme colors found else wyFalse
+		*/
+		wyBool                      GetThemeEditorColors(LPEDITORCOLORINFO pcolorinfo);
+
+		wyBool						GetThemeGridColors(LPGRIDCOLORINFO pcolorinfo);
+
+        /// Update connection tab colors when theme changes - dark theme overrides custom colors
+        /**
+        @returns void
+        */
+        static void                 UpdateConnectionTabColorsForTheme();
 
         ///The one and only instance of the class
         static wyTheme*             m_theme;
@@ -399,6 +668,42 @@ class wyTheme
         */
         void                        CreateTabColors(tinyxml2::XMLElement* pele, const wyChar* element, LPTABCOLORINFO pcolorinfo);
 
+        ///Function to create object browser colors from XML
+        /**
+        @param pele                 : IN  xml element
+        @param element              : IN  child element name
+        @param pcolorinfo           : OUT object browser color info
+        @returns void
+        */
+        void                        CreateObjectBrowserColors(tinyxml2::XMLElement* pele, const wyChar* element, LPOBJECTBROWSERCOLORINFO pcolorinfo);
+
+        ///Function to create canvas colors from XML
+        /**
+        @param pele                 : IN  xml element
+        @param element              : IN  child element name
+        @param pcolorinfo           : OUT canvas color info
+        @returns void
+        */
+        void                        CreateCanvasColors(tinyxml2::XMLElement* pele, const wyChar* element, LPCANVASCOLORINFO pcolorinfo);
+
+        ///Function to create MTI colors from XML
+        /**
+        @param pele                 : IN  xml element
+        @param element              : IN  child element name
+        @param pcolorinfo           : OUT MTI color info
+        @returns void
+        */
+        void                        CreateMTIColors(tinyxml2::XMLElement* pele, const wyChar* element, LPMTICOLORINFO pcolorinfo);
+
+		///Function to allocate the tab colors
+		/**
+		@param pele                 : IN  xml element
+		@param element              : IN  child element name
+		@param pcolorinfo           : OUT tab color info
+		@returns void
+		*/
+		void                        CreateGridColors(tinyxml2::XMLElement* pele, const wyChar* element, LPGRIDCOLORINFO pcolorinfo);
+
         ///Function to set the dual color
         /**
         @param pele                 : IN  xml element
@@ -439,6 +744,16 @@ class wyTheme
         static BOOL CALLBACK        EnumChildProcUpdateTabs(HWND hwnd, LPARAM lparam);
         static BOOL CALLBACK        EnumChildProcResize(HWND hwnd, LPARAM lparam);
 
+        ///Theme change enumeration callbacks for editor colors and HTML refresh
+        /**
+        @param hwnd                 : IN window handle
+        @param lparam               : IN LPARAM
+        */
+        static BOOL CALLBACK        EnumChildProcUpdateEditorColors(HWND hwnd, LPARAM lparam);
+        static BOOL CALLBACK        EnumChildProcRefreshHtml(HWND hwnd, LPARAM lparam);
+        static BOOL CALLBACK        EnumChildProcPostThemeMessage(HWND hwnd, LPARAM lparam);
+
+		static BOOL CALLBACK		EnumChildProcUpdateGridColors(HWND hwnd, LPARAM lparam);
         ///Original edit proc
         static WNDPROC  m_origeditclassproc;
 
@@ -462,6 +777,17 @@ class wyTheme
 
         ///Table tab color
         TABCOLORINFO    m_tabletabcolorinfo;
+
+        ///Object browser color
+        OBJECTBROWSERCOLORINFO    m_objectbrowsercolorinfo;
+
+        ///Canvas color
+        CANVASCOLORINFO           m_canvascolorinfo;
+
+        ///MTI color
+        MTICOLORINFO              m_mticolorinfo;
+
+		GRIDCOLORINFO	m_gridcolorinfo;
 
         ///Frame window brush
         HBRUSH          m_hframebrush;
@@ -548,6 +874,10 @@ class wyTheme
 
         ///Frame window link color
         DUALCOLOR       m_framewindowlink;
+
+		///Editor color
+		EDITORCOLORINFO           m_editorcolorinfo;
+
 };
 
 #endif

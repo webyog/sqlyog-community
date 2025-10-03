@@ -159,7 +159,6 @@ public:
     */
 	void		SetColor();
 
-
     static wyBool SaveHistory(HWND hwnd);
 
      /// Shows the context menu

@@ -18,7 +18,8 @@
 
 
 #include "FrameWindowHelper.h"
-        
+#include "wyTheme.h"
+
 #define	GVN_BEGINLABELEDIT	        	0x00001
 #define GVN_ENDLABELEDIT	        	0x00002
 #define	GVN_BEGINADDNEWROW	        	0x00003	
@@ -91,6 +92,21 @@
 //#define ROWHIGHLIGHTCOLOR				RGB(219,236,252)
 #define ROWHIGHLIGHTCOLOR				RGB(184,215,246)
 #define ALTHIGHLIGHTCOLOR				RGB(250, 250, 250)
+
+
+#define GRIDBACKGROUNDCOLOR1			RGB(255,255,255)
+#define GRIDBACKGROUNDCOLOR2			RGB(255,255,255)
+#define GRIDFGCOLOR						RGB(0,0,0)
+#define GRIDCOLHEADER					RGB(245,245,245)//RGB(201,198,184)
+#define GRIDSELCOLHEADER				RGB(76,170,249)
+#define GRIDCOLHEADERTEXTCOLOR			RGB(0,0,0)
+#define GRIDSELCOLHEADERTEXTCOLOR		RGB(255,255,255)
+#define GRIDSELROWFG					RGB(0,0,0)
+#define GRIDSELROWCOLOR					RGB(184,215,246)
+#define GRIDSELCELLTEXT					RGB(59,125,187)
+#define GRIDCOLHEADERBUTTON				RGB(255,255,255)
+#define GRIDCELLBUTTONTEXTCOLOR			RGB(0,0,0)
+	
 
 #ifndef _CUST_GRID_
 #define _CUST_GRID_
@@ -870,6 +886,12 @@ public:
     */
     void        SetFormMode(wyBool flag);
 
+	void		SetDefaultGrid(wyBool isdefaultgrid);
+
+	void		SetDarkTheme(wyBool isdefaultgrid);
+
+	wyBool		GetDefaultGrid();
+
     /// Jumps to the next record
     /**
     @param hwnd         : IN Window HANDLE
@@ -1001,7 +1023,11 @@ public:
     wyInt32  GetSelAllState();
 
     void SetSelAllState(wyInt32 state =  -1);
+	void        SetColorInfo(LPGRIDCOLORINFO pcolorinfo);
 
+	void        GetColorInfo(LPGRIDCOLORINFO pcolorinfo);
+
+	void		SetDefaultColorInfo();
 
 private:
 
@@ -2079,6 +2105,10 @@ private:
     //whether the browse button is pressed
     wyBool  m_ispressed;
 	wyBool	g_bMouseTrack;
+
+	GRIDCOLORINFO    m_colorinfo;
+	wyBool	m_isdefaultgrid;
+	wyBool	m_isdarktheme;
 };
 
 #define GV_MARKTYPE_ICON        1
@@ -2157,7 +2187,7 @@ ATOM		InitCustomGrid();
 @param flip         : IN flip grid or not
 */
 HWND		CreateCustomGrid(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width, wyInt32 height, 
-                             GVWNDPROC lpgvwndproc, LPARAM lparam, wyBool isvisible = wyTrue, wyBool flip = wyFalse);
+                             GVWNDPROC lpgvwndproc, LPARAM lparam, wyBool isvisible = wyTrue, wyBool flip = wyFalse, wyBool isdefaultgrid = wyTrue);
 
 /// Creates custom grid with extended window style
 /**
@@ -2174,7 +2204,7 @@ HWND		CreateCustomGrid(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width, wyI
 */
 HWND		CreateCustomGridEx(HWND hwndparent, wyInt32 x, wyInt32 y, wyInt32 width, wyInt32 height, 
                                GVWNDPROC lpgvwndproc, DWORD styles, LPARAM lparam, wyBool isvisible = wyTrue, 
-                               wyBool flip = wyFalse);
+                               wyBool flip = wyFalse, wyBool isdefaultgrid = wyTrue);
 
 /// Sets the class pointer associated with the window
 /**
@@ -2311,6 +2341,11 @@ void        CustomGrid_SetFlip              (HWND hwnd, wyBool flag);
 @param flag         : IN Flip or not
 */
 void        CustomGrid_SetMaxWidth          (HWND hwnd, wyInt32 width);
+
+void		CustomGrid_SetDefaultGrid(HWND hwnd, wyBool isdefaultgrid);
+void		CustomGrid_SetDarkTheme(HWND hwnd, wyBool isdarktheme);
+
+wyBool		CustomGrid_GetDefaultGrid(HWND hwnd);
 
 /// Sets the flag to set or reset the FORM view mode
 /**
@@ -2837,5 +2872,9 @@ GVWNDPROC CustomGrid_GetGridProc(HWND hwnd);
 
 wyInt32 CustomGrid_GetSelAllState(HWND hwnd);
 void CustomGrid_SetSelAllState(HWND hwnd, wyInt32 state);
+
+void                CustomGrid_SetColorInfo(HWND hwnd, LPGRIDCOLORINFO pcolorinfo);
+
+void                CustomGrid_GetColorInfo(HWND hwnd, LPGRIDCOLORINFO pcolorinfo);
 #endif
 

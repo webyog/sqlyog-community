@@ -79,7 +79,7 @@ class tabdetailelem;
 
 //...........................................................................................................
 //.CSS Classes
-#define CSS_CLASSES ".resultcaptionstyle	{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left;color: #424242}\
+#define CSS_CLASSES_LIGHT ".resultcaptionstyle	{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left;color: #424242}\
 .colcaptionstyleleft {font: bold 12px \"Courier New\", Courier, mono; background:#4caaf9; color: #FFFFFF;text-align:left; padding-left:2px; padding-right:1px;border-spacing:0px;}\
 .colcaptionstyleright{font: bold 12px \"Courier New\", Courier, mono; background:#4caaf9; color: #FFFFFF;text-align:left; padding-left:2px; padding-right:1px;border-spacing:0px;}\
 .cellstyleleft{text-align:left;padding-left:1px; padding-right:1px;}\
@@ -97,14 +97,63 @@ class tabdetailelem;
 .blueline { background-color: #4caaf9;height: 1px; }\
 a:link { color: #3b7dbb; text-decoration:none;} a:visited { color: #3b7dbb; text-decoration:none;} a:hover {color: #4caaf9; text-decoration:none;} a:active { color: #4caaf9; text-decoration:none;}"  
 
-#define CSS_OPTIMIZE_CLASS "\
-.datafontstyle_optimize{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#FF0000;height:18px;}"
+#define CSS_CLASSES_DARK "body { background-color: #1E1E1E; margin: 8px; padding: 0; color: #DCDCDC; }\
+html { background-color: #1E1E1E; margin: 8; padding: 0; }\
+.resultcaptionstyle	{font: 14px  \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color: #DCDCDC;}\
+.colcaptionstyleleft {font: bold 12px \"Courier New\", Courier, mono; background:#3b7dbb; color: #DCDCDC;text-align:left; padding-left:2px; padding-right:1px;border-spacing:0px;}\
+.colcaptionstyleright{font: bold 12px \"Courier New\", Courier, mono; background:#4caaf9; color: #FFFFFF;text-align:left; padding-left:2px; padding-right:1px;border-spacing:0px;}\
+.cellstyleleft{text-align:left;padding-left:1px; padding-right:1px;color:#DCDCDC}\
+.cellstyleright{text-align:left;padding-right:1px; padding-left:1px; color: #DCDCDC}\
+.captionfontstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right;}\
+.datafontstylerowodd{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#1A1A1A; color:#FFFFFF; height:23px;}\
+.datafontstyle{font: 12px \"Courier New\", Courier, mono; text-align:right;}\
+.datafontstyleroweven{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#0F0F0F;color:#FFFFFF; height:18px;}\
+.tablestyle{border:none solid #EEE1FF;}\
+.statustablestyle{border:none solid #EEE1FF;}\
+.extendedlevelcaptionstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right;}\
+.extendedleveldatastyle{font: 12px \"Courier New\", Courier, mono; text-align:right;}\
+.warningstyle{font: 13px  \"Courier New\", Courier, mono; text-align:left; color:grey;}\
+.pkcolcaptionstyle{background:#3b7dbb; color: #DCDCDC;}\
+.blueline { background-color: #4caaf9;height: 1px; }\
+a:link { color: #4caaf9; text-decoration:none;} a:visited { color: #4caaf9; text-decoration:none;} a:hover {color: #6cc0ff; text-decoration:none;} a:active { color: #6cc0ff; text-decoration:none;}" 
+// Light theme versions
+#define CSS_OPTIMIZE_CLASS_LIGHT "\
+.datafontstyle_optimize{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#FF0000; color:#FFFFFF; height:18px;}"
 
-#define CSS_WARNING ".tabcaptionstyle{font: 14px \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color:grey;}\
+#define CSS_WARNING_LIGHT ".tabcaptionstyle{font: 14px \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color:grey;}\
 					.tabresultpagestyle{font: 14px \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color:red;}"
 
-#define CSS_CLASS2 ".extendedcodecaptionstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right; padding-left:10px; padding-right:10px;}\
-.extendedcodedatastyle{font: 12px \"Courier New\", Courier, mono; text-align:right; padding-left:10px; padding-right:10px;}"  
+#define CSS_CLASS2_LIGHT ".extendedcodecaptionstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right; padding-left:10px; padding-right:10px; color:black;}\
+.extendedcodedatastyle{font: 12px \"Courier New\", Courier, mono; text-align:right; padding-left:10px; padding-right:10px; color:black;}"
+
+// Dark theme versions  
+#define CSS_OPTIMIZE_CLASS_DARK "body { background-color: #1E1E1E; margin: 5px; padding: 0; color: #DCDCDC; }\
+html { background-color: #1E1E1E; margin: 0; padding: 0; }\
+.datafontstyle_optimize{font: 12px \"Courier New\", Courier, mono; text-align:right; background:#CC0000; color:#DCDCDC; height:18px;}"
+
+#define CSS_WARNING_DARK "body { background-color: #1E1E1E; margin: 5px; padding: 0; color: #DCDCDC; }\
+html { background-color: #1E1E1E; margin: 0; padding: 0; }\
+.tabcaptionstyle{font: 14px \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color:#888888;}\
+.tabresultpagestyle{font: 14px \"Trebuchet MS\", Verdana, Arial, Helvetica; text-align:left; color:#FF6666;}"
+
+#define CSS_CLASS2_DARK "body { background-color: #1E1E1E; margin: 5px; padding: 0; color: #DCDCDC; }\
+html { background-color: #1E1E1E; margin: 0; padding: 0; }\
+.extendedcodecaptionstyle{font: bold 12px \"Courier New\", Courier, mono; text-align:right; padding-left:10px; padding-right:10px; color:#DCDCDC;}\
+.extendedcodedatastyle{font: 12px \"Courier New\", Courier, mono; text-align:right; padding-left:10px; padding-right:10px; color:#DCDCDC;}"
+
+#define CSS_OPTIMIZE_CLASS CSS_OPTIMIZE_CLASS_LIGHT
+#define CSS_WARNING CSS_WARNING_LIGHT  
+#define CSS_CLASS2 CSS_CLASS2_LIGHT 
+#define CSS_CLASSES CSS_CLASSES_LIGHT
+
+
+const char* GetOptimizeCSS();
+
+const char* GetWarningCSS();
+
+const char* GetClass2CSS();
+
+const char* GetClassesCSS();
 
 #define GET_NDB_VERSION_STRING ("select @@ndb_version_string")
 
@@ -1478,6 +1527,15 @@ void                        SetParanthesisHighlighting(HWND hwnd);
 */
 void                        EnableFolding(HWND hwnd);
 
+///Function retrieves folding margin colors from theme settings
+/**
+@param forecolor            : IN/OUT reference to foreground color
+@param backcolor            : IN/OUT reference to background color  
+@param texturecolor         : IN/OUT reference to texture color
+@returns void
+*/
+void                        GetFoldingMarginColors(COLORREF& forecolor, COLORREF& backcolor, COLORREF& texturecolor);
+
 ///Function positions the given window in the center of the monitor where the window given in first parameter resides
 /**
 @param handletoget          : IN window handle to the window based on which the monitor to be identified
@@ -1535,6 +1593,12 @@ void    CreateCustomTabIconList();
 
 //Sets the Scintilla control color to that of Message/Table Data/Info Tab style
 void SetMTIColor(HWND hwnd);
+
+// Helper function to handle dark theme dialog MTI tab colors
+void SetMTIColorsForDarkThemeDialog(COLORREF& selectionColor, COLORREF& bgColor, COLORREF& fgColor);
+
+// Helper function to get theme colors from wyTheme::GetMTIColors
+void GetThemeColorsToMTI(COLORREF* selectionColor = nullptr, COLORREF* bgColor = nullptr, COLORREF* fgColor = nullptr);
 
 wyBool GetTabOpenPersistence(wyInt32 tabimage, wyBool isset = wyFalse, wyBool valuetoset = wyFalse);
 

@@ -1806,7 +1806,7 @@ CopyDatabase::ExportViewsOnParentNotExpanded(HWND hwndtree)
 	//fetching the list from server
 	m_gui_routine((void*)m_gui_lparam, "views", 0, wyFalse, FETCHCOPYDATA);	
 	
-	query.Sprintf("show full tables from `%s` where Table_type = 'view'", m_srcdb.GetString());
+	query.Sprintf("show full tables from `%s` where Table_type = 'VIEW'", m_srcdb.GetString());
 
 	myres = ExecuteAndGetResult(wnd, m_srctunnel, m_srcmysql,query, wyTrue, wyFalse, wyFalse);
 	if(!myres)

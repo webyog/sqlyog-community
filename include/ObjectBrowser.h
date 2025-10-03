@@ -910,6 +910,9 @@ public:
 
     void PaintFilterWindow(HWND hwnd);
 
+    /// Update colors from current theme
+    void            UpdateColors();
+
 	wyBool m_isTruncate;
    
 	/*void    AddToDeleteList(HWND hwnd, TVITEMEX &tvi);*/
@@ -1032,6 +1035,10 @@ public:
     wyInt32     m_height;
 
     List        m_allocatedList;
+
+    COLORREF    m_filterbackcolor;
+
+    COLORREF    m_filterforecolor;
 
 };
 

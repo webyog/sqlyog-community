@@ -641,6 +641,8 @@ public:
     wyBool      m_ishistoryunderquery;
 
 	wyBool		m_ispreferenceapplied;
+
+    void        EnableDisableColorControls(HWND hwnd, wyBool enable);
 };
 
 #endif

@@ -1928,6 +1928,7 @@ void
 void
 TabFields::GetCheckValue(wyString& query, FIELDATTRIBS*   pfieldattribs)
 {
+	wyString checkexpr;
 	if (pfieldattribs->m_mycheckexpression.GetLength())
 	{
 		//wyChar * checkexpressbuff = GetEscapedValue(m_mdiwnd->m_tunnel, &(m_mdiwnd->m_mysql), pfieldattribs->m_mycheckexpression.GetString());
@@ -1935,7 +1936,14 @@ TabFields::GetCheckValue(wyString& query, FIELDATTRIBS*   pfieldattribs)
 		// to avoid extra pair of parenthesis
 		if(m_isalter)
 		{ 
-			query.AddSprintf("CHECK %s", pfieldattribs->m_mycheckexpression.GetString());
+			checkexpr.SetAs(pfieldattribs->m_mycheckexpression.GetString());
+			checkexpr.LTrim();
+			checkexpr.RTrim();
+			//Checking whether the check condition is inside parenthesis. If it is not inside parenthesis then add parenthesis.
+			if(checkexpr.GetCharAt(0) == '(' && checkexpr.GetCharAt(checkexpr.GetLength()-1) == ')')
+				query.AddSprintf("CHECK %s", pfieldattribs->m_mycheckexpression.GetString());
+			else
+				query.AddSprintf("CHECK (%s)", pfieldattribs->m_mycheckexpression.GetString());
 		}
 		else
 		{

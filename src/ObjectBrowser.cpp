@@ -63,6 +63,7 @@ extern	PGLOBALS		pGlobals;
 #define     CUEBANNERTEXT           _(L"Filter (Ctrl+Shift+B)")
 
 
+
 /*
 void GetItemInfo__(HTREEITEM hitem, HWND hwnd)
 {
@@ -178,21 +179,31 @@ CQueryObject::CreateObjectBrowser(HWND hwndparent)
 
     m_hwnd	= hwndobject;
     
-    //Set color for object browser
-	if(pGlobals->m_pcmainwin->m_connection->m_rgbobbkcolor >= 0)
-		backcolor  = pGlobals->m_pcmainwin->m_connection->m_rgbobbkcolor;
-	else
-		backcolor = COLOR_WHITE;
+	OBJECTBROWSERCOLORINFO colorinfo;
 
-	if(pGlobals->m_pcmainwin->m_connection->m_rgbobfgcolor >= 0)
-		forecolor  = pGlobals->m_pcmainwin->m_connection->m_rgbobfgcolor;
-	else
-		forecolor = backcolor ^ 0xFFFFFF;
+		if (pGlobals->m_pcmainwin->m_connection->m_rgbobbkcolor >= 0)
+			backcolor = pGlobals->m_pcmainwin->m_connection->m_rgbobbkcolor;
+		else
+			backcolor = COLOR_WHITE;
+
+		if (pGlobals->m_pcmainwin->m_connection->m_rgbobfgcolor >= 0)
+			forecolor = pGlobals->m_pcmainwin->m_connection->m_rgbobfgcolor;
+		else
+			forecolor = backcolor ^ 0xFFFFFF;
+
+	if (wyTheme::GetObjectBrowserColors(&colorinfo))
+	{
+		if (colorinfo.m_mask & OBCF_BACKGROUND)
+			backcolor = colorinfo.m_background;
+		if (colorinfo.m_mask & OBCF_FOREGROUND)
+			forecolor = colorinfo.m_foreground;
+	}
 
 	TreeView_SetBkColor(m_hwnd, backcolor);
-	
-    //Set the foreground color
 	TreeView_SetTextColor(m_hwnd, forecolor);
+	
+	m_filterbackcolor = backcolor;
+	m_filterforecolor = forecolor;
 
     VERIFY(hwndSt = CreateWindowEx(0, WC_STATIC, _(L"Filter Databases"), WS_VISIBLE | WS_CHILD | SS_ENDELLIPSIS,
                                         2, 2, 16,16, hwndStaticParent, (HMENU)-1, pGlobals->m_pcmainwin->GetHinstance(), this));
@@ -234,6 +245,9 @@ CQueryObject::CreateObjectBrowser(HWND hwndparent)
 
     SetWindowLongPtr(m_hwndFilter, GWLP_USERDATA, (LONG_PTR)this);
     m_FilterProc = (WNDPROC)SetWindowLongPtr(m_hwndFilter, GWLP_WNDPROC, (LONG_PTR) CQueryObject::FilterProc);	
+
+    // Apply theme colors to filter edit box
+    SendMessage(m_hwndFilter, EM_SETBKGNDCOLOR, 0, m_filterbackcolor);
 
 	//..Setting font
     SetFont();
@@ -1639,6 +1653,11 @@ CQueryObject::ShowContextMenu(MDIWindow *wnd, wyInt32 image, POINT *pnt, wyInt32
 		}
 
 		ChangeMenuItemOnPref(hmenu, MNU_OTHEROPT_INDEX); //setting objectbrowser refresh menu on  switch F5 and F9 functionalitiesmenu based on 
+
+		if(wyTheme::IsDarkThemeActive() || pGlobals->m_conncount == 0)
+		{
+			EnableMenuItem(htrackmenu, IDM_OBCOLOR, MF_GRAYED | MF_BYCOMMAND);
+		}
 
 		// Set menu draw property for drawing icon
 		wyTheme::SetMenuItemOwnerDraw(htrackmenu);
@@ -7833,6 +7852,10 @@ CQueryObject::OnWmCommand(WPARAM wparam)
 
 		case IDM_OBCOLOR:
 			{
+				// Block color change when dark theme is active
+				if(wyTheme::IsDarkThemeActive())
+					break;
+					
 				//object browser color dialog
 				conbase->m_rgbobbkcolor = TreeView_GetBkColor(m_hwnd);
 				conbase->m_rgbobfgcolor = TreeView_GetTextColor(m_hwnd);
@@ -8897,4 +8920,61 @@ CQueryObject::PrepareMessageText(wyInt32 toImage, HTREEITEM hti, wyWChar msg[], 
         break;
     }
     wcscat(msg, tvi.pszText);
+}
+
+void
+CQueryObject::UpdateColors()
+{
+	COLORREF    backcolor, forecolor;
+	OBJECTBROWSERCOLORINFO colorinfo;
+	MDIWindow* pmdi = NULL;
+	
+	if (m_hwndparent)
+		pmdi = (MDIWindow*)GetWindowLongPtr(m_hwndparent, GWLP_USERDATA);
+	
+	if (pmdi && pmdi->m_conninfo.m_rgbconn >= 0)
+		backcolor = pmdi->m_conninfo.m_rgbconn;
+	else
+		backcolor = COLOR_WHITE;
+
+	if (pmdi && pmdi->m_conninfo.m_rgbfgconn >= 0)
+		forecolor = pmdi->m_conninfo.m_rgbfgconn;
+	else
+		forecolor = backcolor ^ 0xFFFFFF;
+
+	wyBool shouldApplyThemeColors = wyFalse;
+	
+	if (wyTheme::IsDarkThemeActive())
+	{
+		shouldApplyThemeColors = wyTrue;
+	}
+	else
+	{
+		wyBool hasCustomColors = (pmdi && 
+			(pmdi->m_conninfo.m_rgbconn != COLOR_WHITE || pmdi->m_conninfo.m_rgbfgconn != RGB(0,0,0))) ? wyTrue : wyFalse;
+		shouldApplyThemeColors = hasCustomColors ? wyFalse : wyTrue;
+	}
+		
+	if (shouldApplyThemeColors && wyTheme::GetObjectBrowserColors(&colorinfo))
+	{
+		if (colorinfo.m_mask & OBCF_BACKGROUND)
+			backcolor = colorinfo.m_background;
+		if (colorinfo.m_mask & OBCF_FOREGROUND)
+			forecolor = colorinfo.m_foreground;
+	}
+
+	TreeView_SetBkColor(m_hwnd, backcolor);
+	TreeView_SetTextColor(m_hwnd, forecolor);
+	
+	// Update filter edit box colors
+	if (m_hwndFilter)
+	{
+		m_filterbackcolor = backcolor;
+		m_filterforecolor = forecolor;
+		SendMessage(m_hwndFilter, EM_SETBKGNDCOLOR, 0, m_filterbackcolor);
+		InvalidateRect(m_hwndFilter, NULL, TRUE);
+	}
+
+	InvalidateRect(m_hwnd, NULL, TRUE);
+	UpdateWindow(m_hwnd);
 }
