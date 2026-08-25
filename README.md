@@ -8,13 +8,13 @@ SQLyog runs on Microsoft Windows. It may also run on Linux and Unix via Wine.
 
 Users of SQLyog’s Community edition can get support through Webyog’s [forums for SQLyog](https://forums.webyog.com/forums/forum/sqlyog-2/). Webyog also maintains an extensive [FAQ for SQLyog](http://faq.webyog.com/) for frequently asked questions.
 
-Download SQLyog’s Trial edition [here](https://webyog.com/product/)
+Download SQLyog’s Trial edition [here](https://webyog.com/product/?utm_source=Github&utm_medium=Referral&utm_content=combinationTrialForm&utm_campaign=Github_Comb_trail)
 
 Learn about why you should consider upgrading from the Community edition to the Ultimate edition [here](https://www.idera.com/resourcecentral/infographics/sqlyog-ultimate-edition-vs-sqlyog-community-edition).
 
 Learn more about SQLyog’s commercial edition [here](https://webyog.com/product/sqlyog/).
 
-Download a free, fully functional, 14-day trial of SQLyog’s commercial edition [here](https://webyog.com/product/).
+Download a free, fully functional, 14-day trial of SQLyog’s commercial edition [here](https://webyog.com/product/?utm_source=Github&utm_medium=Referral&utm_content=combinationTrialForm&utm_campaign=Github_Comb_trail).
 
 Schedule a free product demonstration [here](https://webyog.com/product/sqlyog/demo/)
 
